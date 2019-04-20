@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="preference_category_observers">Observateurs</string>
+    <string name="preference_category_observers_default">Observateur par défaut</string>
+    <string name="preference_category_observers_default_not_set">Non défini</string>
+    <string name="preference_category_pointing">Pointage</string>
+    <string name="preference_category_pointing_display_scale">Afficher l\'échelle</string>
+    <string name="preference_category_about">A propos</string>
+    <string name="preference_category_about_app_version">Version de l\'application</string>
+
+</resources>

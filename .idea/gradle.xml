@@ -10,6 +10,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/gn_mobile_core/commons" />
             <option value="$PROJECT_DIR$/gn_mobile_core/viewpager" />
+            <option value="$PROJECT_DIR$/occtax" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
