@@ -15,14 +15,13 @@
         android:layout_height="wrap_content"
         app:cardCornerRadius="@dimen/cardview_radius"
         app:cardElevation="@dimen/cardview_elevation"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="8dp">
+        app:contentPadding="@dimen/padding_default"
+        app:layout_constraintTop_toTopOf="parent">
 
         <fr.geonature.occtax.ui.home.AppSyncView
             android:id="@+id/appSyncView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/padding_default">
+            android:layout_height="wrap_content">
         </fr.geonature.occtax.ui.home.AppSyncView>
 
     </androidx.cardview.widget.CardView>

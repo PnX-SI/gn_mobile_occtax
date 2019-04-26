@@ -50,6 +50,7 @@ class PreferencesActivity : AppCompatActivity(),
     }
 
     companion object {
+
         fun newIntent(context: Context): Intent {
             return Intent(context, PreferencesActivity::class.java)
         }

@@ -82,7 +82,7 @@ class InputObserverListFragment : Fragment() {
         if (view is RecyclerView) {
             adapter = InputObserverRecyclerViewAdapter(listener)
             with(view) {
-                layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+                layoutManager = LinearLayoutManager(context)
             }
             view.adapter = adapter
 
@@ -161,6 +161,19 @@ class InputObserverListFragment : Fragment() {
         listener = null
     }
 
+    /**
+     * Callback used by [InputObserverListFragment].
+     */
+    interface OnInputObserverListFragmentListener {
+
+        /**
+         * Called when [InputObserver] has been selected.
+         *
+         * @param inputObserver the selected [InputObserver]
+         */
+        fun onSelectedObserver(inputObserver: InputObserver?)
+    }
+
     companion object {
 
         private const val LOADER_OBSERVERS = 1
@@ -173,18 +186,5 @@ class InputObserverListFragment : Fragment() {
          */
         @JvmStatic
         fun newInstance() = InputObserverListFragment()
-    }
-
-    /**
-     * Callback used by [InputObserverListFragment].
-     */
-    interface OnInputObserverListFragmentListener {
-
-        /**
-         * Called when [InputObserver] has been selected.
-         *
-         * @param inputObserver the selected [InputObserver]
-         */
-        fun onSelectedObserver(inputObserver: InputObserver?)
     }
 }

@@ -11,7 +11,6 @@ import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import fr.geonature.commons.data.AppSync
 import fr.geonature.commons.data.Provider.buildUri
-import fr.geonature.occtax.R
 import fr.geonature.occtax.ui.settings.PreferencesFragment
 
 /**
@@ -30,14 +29,14 @@ class HomeFragment : Fragment() {
                 args: Bundle?): Loader<Cursor> {
             when (id) {
                 LOADER_APP_SYNC -> return CursorLoader(requireContext(),
-                        buildUri(AppSync.TABLE_NAME,
-                                args!!.getString(AppSync.COLUMN_ID)!!),
-                        arrayOf(AppSync.COLUMN_ID,
-                                AppSync.COLUMN_LAST_SYNC,
-                                AppSync.COLUMN_INPUTS_TO_SYNCHRONIZE),
-                        null,
-                        null,
-                        null)
+                                                       buildUri(AppSync.TABLE_NAME,
+                                                                args!!.getString(AppSync.COLUMN_ID)!!),
+                                                       arrayOf(AppSync.COLUMN_ID,
+                                                               AppSync.COLUMN_LAST_SYNC,
+                                                               AppSync.COLUMN_INPUTS_TO_SYNCHRONIZE),
+                                                       null,
+                                                       null,
+                                                       null)
                 else -> throw IllegalArgumentException()
             }
         }
@@ -69,21 +68,24 @@ class HomeFragment : Fragment() {
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.home_fragment, container, false)
+        return inflater.inflate(fr.geonature.occtax.R.layout.home_fragment,
+                                container,
+                                false)
     }
 
     override fun onViewCreated(
             view: View,
             savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        super.onViewCreated(view,
+                            savedInstanceState)
 
         setHasOptionsMenu(true)
 
-        appSyncView = view.findViewById(R.id.appSyncView)
+        appSyncView = view.findViewById(fr.geonature.occtax.R.id.appSyncView)
         appSyncView.setListener(onAppSyncViewListener)
 
-        view.findViewById<View>(R.id.fab)
-                .setOnClickListener { listener?.onStartInput() }
+        view.findViewById<View>(fr.geonature.occtax.R.id.fab)
+                .setOnClickListener {listener?.onStartInput() }
     }
 
     override fun onAttach(context: Context) {
@@ -106,9 +108,11 @@ class HomeFragment : Fragment() {
     override fun onCreateOptionsMenu(
             menu: Menu,
             inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
+        super.onCreateOptionsMenu(menu,
+                                  inflater)
 
-        inflater.inflate(R.menu.settings, menu)
+        inflater.inflate(fr.geonature.occtax.R.menu.settings,
+                         menu)
     }
 
     /*
@@ -122,7 +126,7 @@ class HomeFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.menu_settings -> {
+            fr.geonature.occtax.R.id.menu_settings -> {
                 listener?.onShowSettings()
                 true
             }
@@ -135,8 +139,8 @@ class HomeFragment : Fragment() {
 
         LoaderManager.getInstance(this)
                 .initLoader(LOADER_APP_SYNC,
-                        bundleOf(AppSync.COLUMN_ID to requireContext().packageName),
-                        mLoaderCallbacks)
+                            bundleOf(AppSync.COLUMN_ID to requireContext().packageName),
+                            mLoaderCallbacks)
     }
 
     /**
@@ -151,6 +155,11 @@ class HomeFragment : Fragment() {
     companion object {
         private const val LOADER_APP_SYNC = 1
 
+        /**
+         * Use this factory method to create a new instance of [HomeFragment].
+         *
+         * @return A new instance of [HomeFragment]
+         */
         fun newInstance() = HomeFragment()
     }
 }

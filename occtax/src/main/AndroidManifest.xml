@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          package="fr.geonature.occtax"
-          android:sharedUserId="@string/sharedUserId">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="fr.geonature.occtax"
+    android:sharedUserId="@string/sharedUserId">
 
     <application
         android:allowBackup="true"
@@ -29,6 +30,8 @@
             android:name=".ui.observers.InputObserverListActivity"
             android:label="@string/activity_observers_title"
             android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".ui.input.InputPagerFragmentActivity">
         </activity>
 
     </application>

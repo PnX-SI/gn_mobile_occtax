@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="ListItemActionView">
+        <attr name="title" />
+        <attr name="no_data" format="reference" />
+        <attr name="action_empty" format="reference" />
+        <attr name="action" format="reference" />
+        <attr name="visible_items" format="integer" />
+    </declare-styleable>
+
+</resources>

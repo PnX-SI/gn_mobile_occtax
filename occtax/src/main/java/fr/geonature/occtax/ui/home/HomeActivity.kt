@@ -1,8 +1,8 @@
 package fr.geonature.occtax.ui.home
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
 import fr.geonature.occtax.ui.settings.PreferencesActivity
 import fr.geonature.occtax.util.IntentUtils
 
@@ -21,7 +21,8 @@ class HomeActivity : AppCompatActivity(),
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                    .replace(android.R.id.content, HomeFragment.newInstance())
+                    .replace(android.R.id.content,
+                             HomeFragment.newInstance())
                     .commit()
         }
     }
@@ -35,8 +36,6 @@ class HomeActivity : AppCompatActivity(),
     }
 
     override fun onStartInput() {
-        // TODO: call input activity
-        Toast.makeText(this, "Not implemented", Toast.LENGTH_SHORT)
-                .show()
+        startActivity(InputPagerFragmentActivity.newIntent(this))
     }
 }

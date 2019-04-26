@@ -17,7 +17,7 @@ import fr.geonature.commons.data.InputObserver
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
 class InputObserverRecyclerViewAdapter(private val listener: InputObserverListFragment.OnInputObserverListFragmentListener?) : RecyclerView.Adapter<InputObserverRecyclerViewAdapter.ViewHolder>(),
-                                                                                                                                FastScroller.SectionIndexer {
+                                                                                                                               FastScroller.SectionIndexer {
     private var cursor: Cursor? = null
 
     private val onClickListener: View.OnClickListener
@@ -30,8 +30,8 @@ class InputObserverRecyclerViewAdapter(private val listener: InputObserverListFr
     }
 
     override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int): ViewHolder {
+            parent: ViewGroup,
+            viewType: Int): ViewHolder {
         return ViewHolder(parent)
     }
 
@@ -40,8 +40,8 @@ class InputObserverRecyclerViewAdapter(private val listener: InputObserverListFr
     }
 
     override fun onBindViewHolder(
-        holder: ViewHolder,
-        position: Int) {
+            holder: ViewHolder,
+            position: Int) {
 
         holder.bind(position)
     }
@@ -53,7 +53,7 @@ class InputObserverRecyclerViewAdapter(private val listener: InputObserverListFr
         val lastname = inputObserver.lastname ?: return ""
 
         return lastname.elementAt(0)
-            .toString()
+                .toString()
     }
 
     fun bind(cursor: Cursor?) {
@@ -62,9 +62,9 @@ class InputObserverRecyclerViewAdapter(private val listener: InputObserverListFr
     }
 
     inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(
-        fr.geonature.occtax.R.layout.list_item,
-        parent,
-        false)) {
+            fr.geonature.occtax.R.layout.list_title_item_2,
+            parent,
+            false)) {
 
         private val title: TextView = itemView.findViewById(android.R.id.title)
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
@@ -80,8 +80,8 @@ class InputObserverRecyclerViewAdapter(private val listener: InputObserverListFr
             val previousTitle = if (position > 0) {
                 cursor.moveToPosition(position - 1)
                 InputObserver.fromCursor(cursor)
-                    ?.lastname?.elementAt(0)
-                    .toString()
+                        ?.lastname?.elementAt(0)
+                        .toString()
             }
             else {
                 ""
@@ -89,7 +89,7 @@ class InputObserverRecyclerViewAdapter(private val listener: InputObserverListFr
 
             if (inputObserver != null) {
                 val currentTitle = inputObserver.lastname?.elementAt(0)
-                    .toString()
+                        .toString()
                 title.text = if (previousTitle == currentTitle) "" else currentTitle
                 text1.text = inputObserver.lastname
                 text2.text = inputObserver.firstname
