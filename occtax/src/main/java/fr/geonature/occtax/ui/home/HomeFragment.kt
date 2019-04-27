@@ -23,7 +23,7 @@ class HomeFragment : Fragment() {
     private var listener: OnHomeFragmentFragmentListener? = null
     private lateinit var appSyncView: AppSyncView
 
-    private val mLoaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
+    private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(
                 id: Int,
                 args: Bundle?): Loader<Cursor> {
@@ -140,7 +140,7 @@ class HomeFragment : Fragment() {
         LoaderManager.getInstance(this)
                 .initLoader(LOADER_APP_SYNC,
                             bundleOf(AppSync.COLUMN_ID to requireContext().packageName),
-                            mLoaderCallbacks)
+                            loaderCallbacks)
     }
 
     /**
