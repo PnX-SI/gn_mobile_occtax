@@ -2,10 +2,8 @@ package fr.geonature.occtax.ui.input
 
 import android.content.Context
 import android.content.Intent
-import android.widget.Toast
 import androidx.viewpager.widget.ViewPager
 import fr.geonature.occtax.ui.input.observers.ObserversAndDateInputFragment
-import fr.geonature.occtax.ui.shared.fragment.AbstractSelectedItemsRecyclerViewFragment
 import fr.geonature.viewpager.ui.AbstractNavigationHistoryPagerFragmentActivity
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
@@ -15,8 +13,7 @@ import fr.geonature.viewpager.ui.IValidateFragment
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivity(),
-                                   AbstractSelectedItemsRecyclerViewFragment.OnSelectedItemsRecyclerViewFragmentListener {
+class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivity() {
 
     override val pagerFragments: Map<Int, IValidateFragment>
         get() = LinkedHashMap<Int, IValidateFragment>().apply {
@@ -27,20 +24,6 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
     override fun performFinishAction() {
         // TODO: save current input
         finish()
-    }
-
-    override fun onSelectedItemsAction(position: Int) {
-        // TODO: manage action
-        Toast.makeText(this,
-                       "Not implemented",
-                       Toast.LENGTH_SHORT)
-                .show()
-
-        val currentPageFragment = getCurrentPageFragment() ?: return
-
-        if (currentPageFragment is AbstractSelectedItemsRecyclerViewFragment) {
-            currentPageFragment.notifyItemChanged(position)
-        }
     }
 
     companion object {

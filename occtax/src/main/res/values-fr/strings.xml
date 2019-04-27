@@ -22,6 +22,9 @@
     <string name="action_add">Ajouter</string>
     <string name="action_edit">Modifier</string>
 
+    <string name="alert_dialog_ok">OK</string>
+    <string name="alert_dialog_cancel">Annuler</string>
+
     <string name="fragment_observers_and_date_input_title">Observateur &#38; date</string>
     <string name="observers_and_date_selected_observers">Observateurs</string>
     <string name="observers_and_date_selected_observers_no_data">Aucun observateur sélectionné.\nAjouter en un via le bouton "Ajouter".</string>

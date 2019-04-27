@@ -1,6 +1,5 @@
 package fr.geonature.occtax.ui.shared.fragment
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Pair
 import android.view.LayoutInflater
@@ -20,7 +19,6 @@ import fr.geonature.occtax.ui.shared.view.ListItemActionView
  */
 abstract class AbstractSelectedItemsRecyclerViewFragment : Fragment() {
 
-    private var listener: OnSelectedItemsRecyclerViewFragmentListener? = null
     private var adapter: SelectedItemsRecyclerViewAdapter? = null
 
     override fun onCreateView(inflater: LayoutInflater,
@@ -38,22 +36,6 @@ abstract class AbstractSelectedItemsRecyclerViewFragment : Fragment() {
         }
 
         return view
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
-        if (context !is OnSelectedItemsRecyclerViewFragmentListener) {
-            throw RuntimeException("$context must implement OnSelectedItemsRecyclerViewFragmentListener")
-        }
-
-        listener = context
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-
-        listener = null
     }
 
     fun notifyItemChanged(position: Int) {
@@ -79,15 +61,9 @@ abstract class AbstractSelectedItemsRecyclerViewFragment : Fragment() {
     abstract fun getSelectedItems(position: Int): Collection<Pair<String, String?>>
 
     /**
-     * Callback used by [AbstractSelectedItemsRecyclerViewFragment].
+     * Called when the action button has been clicked at given position.
      */
-    interface OnSelectedItemsRecyclerViewFragmentListener {
-
-        /**
-         * Called when the action button has been clicked at given position.
-         */
-        fun onSelectedItemsAction(position: Int)
-    }
+    abstract fun onSelectedItemsAction(position: Int)
 
     private inner class SelectedItemsRecyclerViewAdapter : RecyclerView.Adapter<SelectedItemsRecyclerViewAdapter.ViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup,
@@ -127,7 +103,7 @@ abstract class AbstractSelectedItemsRecyclerViewFragment : Fragment() {
 
                 listItemActionView.setListener(object : ListItemActionView.OnListItemActionViewListener {
                     override fun onAction() {
-                        listener?.onSelectedItemsAction(viewType)
+                        onSelectedItemsAction(viewType)
                     }
                 })
 
