@@ -21,8 +21,10 @@
         <fr.geonature.occtax.ui.home.AppSyncView
             android:id="@+id/appSyncView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </fr.geonature.occtax.ui.home.AppSyncView>
+            android:layout_height="wrap_content"
+            app:action="@string/sync_action_synchronize"
+            app:title="@string/sync_device_status"
+            app:visible_items="2" />
 
     </androidx.cardview.widget.CardView>
 

@@ -3,11 +3,11 @@ package fr.geonature.occtax.ui.home
 import android.content.Context
 import android.text.format.DateFormat
 import android.util.AttributeSet
+import android.util.Pair
 import android.view.View
-import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import fr.geonature.commons.data.AppSync
 import fr.geonature.occtax.R
+import fr.geonature.occtax.ui.shared.view.ListItemActionView
 import java.text.NumberFormat
 
 /**
@@ -15,25 +15,24 @@ import java.text.NumberFormat
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class AppSyncView @JvmOverloads constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int = 0) : ConstraintLayout(context,
-                                                  attrs,
-                                                  defStyleAttr) {
+class AppSyncView : ListItemActionView {
 
-    private val textViewLastSyncValue: TextView
-    private val textViewInputsNotSyncValue: TextView
-    private var listener: OnAppSyncViewListener? = null
+    constructor(context: Context) : super(context) {
+        init()
+    }
 
-    init {
-        View.inflate(context,
-                     R.layout.view_app_sync,
-                     this)
+    constructor(context: Context,
+                attrs: AttributeSet) : super(context,
+                                             attrs) {
+        init()
+    }
 
-        textViewLastSyncValue = findViewById(R.id.textViewLastSyncValue)
-        textViewInputsNotSyncValue = findViewById(R.id.textViewInputsNotSyncValue)
-        findViewById<View>(R.id.buttonSynchronize).setOnClickListener { listener?.onStartSync() }
+    constructor(context: Context,
+                attrs: AttributeSet,
+                defStyleAttr: Int) : super(context,
+                                           attrs,
+                                           defStyleAttr) {
+        init()
     }
 
     fun setAppSync(appSync: AppSync?) {
@@ -41,21 +40,18 @@ class AppSyncView @JvmOverloads constructor(
             return
         }
 
-        textViewLastSyncValue.text = if (appSync.lastSync == null) context.getString(R.string.sync_last_synchronization_never)
-        else DateFormat.format(context.getString(R.string.sync_last_synchronization_date),
-                               appSync.lastSync!!)
-        textViewInputsNotSyncValue.text = NumberFormat.getInstance()
-                .format(appSync.inputsToSynchronize)
+        setItems(listOf(Pair.create(context.getString(R.string.sync_last_synchronization),
+                                    if (appSync.lastSync == null) context.getString(R.string.sync_last_synchronization_never)
+                                    else DateFormat.format(context.getString(R.string.sync_last_synchronization_date),
+                                                           appSync.lastSync!!).toString()),
+                        Pair.create(context.getString(R.string.sync_inputs_not_synchronized),
+                                    NumberFormat.getInstance().format(appSync.inputsToSynchronize))))
     }
 
-    fun setListener(listener: OnAppSyncViewListener) {
-        this.listener = listener
-    }
-
-    /**
-     * Callback used by [AppSyncView].
-     */
-    interface OnAppSyncViewListener {
-        fun onStartSync()
+    private fun init() {
+        setItems(listOf(Pair.create(context.getString(R.string.sync_last_synchronization),
+                                    context.getString(R.string.sync_last_synchronization_never)),
+                        Pair.create(context.getString(R.string.sync_inputs_not_synchronized),
+                                    NumberFormat.getInstance().format(0))))
     }
 }

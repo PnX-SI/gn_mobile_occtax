@@ -17,6 +17,7 @@ import androidx.loader.content.Loader
 import fr.geonature.commons.data.AppSync
 import fr.geonature.commons.data.Provider.buildUri
 import fr.geonature.occtax.ui.settings.PreferencesFragment
+import fr.geonature.occtax.ui.shared.view.ListItemActionView
 
 /**
  * Home screen [Fragment].
@@ -66,12 +67,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private val onAppSyncViewListener = object : AppSyncView.OnAppSyncViewListener {
-        override fun onStartSync() {
-            listener?.onStartSync()
-        }
-    }
-
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -90,7 +85,11 @@ class HomeFragment : Fragment() {
         setHasOptionsMenu(true)
 
         appSyncView = view.findViewById(fr.geonature.occtax.R.id.appSyncView)
-        appSyncView.setListener(onAppSyncViewListener)
+        appSyncView.setListener(object : ListItemActionView.OnListItemActionViewListener {
+            override fun onAction() {
+                listener?.onStartSync()
+            }
+        })
 
         view.findViewById<View>(fr.geonature.occtax.R.id.fab)
                 .setOnClickListener { listener?.onStartInput() }

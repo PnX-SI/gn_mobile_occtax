@@ -11,6 +11,8 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.util.StringUtils
 import fr.geonature.occtax.R
@@ -21,7 +23,7 @@ import java.util.ArrayList
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class ListItemActionView : ConstraintLayout {
+open class ListItemActionView : ConstraintLayout {
 
     private lateinit var titleTextView: TextView
     private lateinit var recyclerView: RecyclerView
@@ -36,8 +38,7 @@ class ListItemActionView : ConstraintLayout {
     @StringRes
     private var actionEmptyText: Int = 0
 
-    constructor(context: Context) : super(context,
-                                          null) {
+    constructor(context: Context) : super(context) {
         init(null,
              0)
     }
@@ -147,6 +148,10 @@ class ListItemActionView : ConstraintLayout {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
             adapter = this@ListItemActionView.adapter
         }
+
+        val dividerItemDecoration = DividerItemDecoration(recyclerView.context,
+                                                          (recyclerView.layoutManager as LinearLayoutManager).orientation)
+        recyclerView.addItemDecoration(dividerItemDecoration)
 
         // load attributes
         val ta = context.obtainStyledAttributes(
