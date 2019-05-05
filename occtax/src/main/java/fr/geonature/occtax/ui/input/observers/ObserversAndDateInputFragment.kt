@@ -1,13 +1,21 @@
 package fr.geonature.occtax.ui.input.observers
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.util.Pair
-import android.widget.Toast
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ListView
+import androidx.fragment.app.Fragment
+import fr.geonature.commons.data.InputObserver
 import fr.geonature.occtax.R
 import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
+import fr.geonature.occtax.ui.observers.InputObserverListActivity
 import fr.geonature.occtax.ui.shared.dialog.DatePickerDialogFragment
-import fr.geonature.occtax.ui.shared.fragment.AbstractSelectedItemsRecyclerViewFragment
+import fr.geonature.occtax.ui.shared.view.ListItemActionView
 import fr.geonature.viewpager.ui.IValidateFragment
 import java.util.Calendar
 import java.util.Date
@@ -17,15 +25,21 @@ import java.util.Date
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class ObserversAndDateInputFragment : AbstractSelectedItemsRecyclerViewFragment(),
+class ObserversAndDateInputFragment : Fragment(),
                                       IValidateFragment {
 
+    private val inputObservers: MutableList<InputObserver> = ArrayList()
     private var inputDate = Date()
+
+    private var selectedObserversActionView: ListItemActionView? = null
+    private var inputDateActionView: ListItemActionView? = null
 
     private val onCalendarSetListener = object : DatePickerDialogFragment.OnCalendarSetListener {
         override fun onCalendarSet(calendar: Calendar) {
             inputDate = calendar.time
-            notifyItemChanged(1)
+            inputDateActionView?.setItems(listOf(Pair.create(DateFormat.format(getString(R.string.observers_and_date_date_format),
+                                                                               inputDate).toString(),
+                                                             "")))
         }
     }
 
@@ -36,6 +50,61 @@ class ObserversAndDateInputFragment : AbstractSelectedItemsRecyclerViewFragment(
 
         val dialogFragment = supportFragmentManager.findFragmentByTag(DATE_PICKER_DIALOG_FRAGMENT) as DatePickerDialogFragment?
         dialogFragment?.setOnCalendarSetListener(onCalendarSetListener)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater,
+                              container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        // Inflate the layout for this fragment
+        val view = inflater.inflate(R.layout.fragment_observers_and_date_input,
+                                    container,
+                                    false)
+
+        selectedObserversActionView = view.findViewById(R.id.selected_observers_action_view)
+        selectedObserversActionView?.setListener(object : ListItemActionView.OnListItemActionViewListener {
+            override fun onAction() {
+                val context = context ?: return
+
+                startActivityForResult(InputObserverListActivity.newIntent(context,
+                                                                           ListView.CHOICE_MODE_MULTIPLE,
+                                                                           inputObservers),
+                                       0)
+            }
+        })
+
+        inputDateActionView = view.findViewById(R.id.input_date_action_view)
+        inputDateActionView?.setListener(object : ListItemActionView.OnListItemActionViewListener {
+            override fun onAction() {
+                val supportFragmentManager = activity?.supportFragmentManager ?: return
+                val datePickerDialogFragment = DatePickerDialogFragment()
+                datePickerDialogFragment.setOnCalendarSetListener(onCalendarSetListener)
+                datePickerDialogFragment.show(supportFragmentManager,
+                                              DATE_PICKER_DIALOG_FRAGMENT)
+            }
+        })
+        inputDateActionView?.setItems(listOf(Pair.create(DateFormat.format(getString(R.string.observers_and_date_date_format),
+                                                                           inputDate).toString(),
+                                                         "")))
+
+        return view
+    }
+
+    override fun onActivityResult(
+            requestCode: Int,
+            resultCode: Int,
+            data: Intent?) {
+        if ((resultCode == Activity.RESULT_OK) && (data != null)) {
+            val selectedInputObservers = data.getParcelableArrayListExtra<InputObserver>(InputObserverListActivity.EXTRA_SELECTED_INPUT_OBSERVERS)
+            inputObservers.clear()
+            inputObservers.addAll(selectedInputObservers)
+            selectedObserversActionView?.setTitle(resources.getQuantityString(R.plurals.observers_and_date_selected_observers,
+                                                                              selectedInputObservers.size,
+                                                                              selectedInputObservers.size))
+            selectedObserversActionView?.setItems(inputObservers.map { inputObserver ->
+                Pair.create(inputObserver.lastname?.toUpperCase() ?: "",
+                            inputObserver.firstname)
+            })
+        }
     }
 
     override fun getResourceTitle(): Int {
@@ -51,78 +120,6 @@ class ObserversAndDateInputFragment : AbstractSelectedItemsRecyclerViewFragment(
     }
 
     override fun refreshView() {}
-
-    override fun getSelectedItemsCount(): Int {
-        return 2
-    }
-
-    override fun getSelectedItemsTitle(position: Int): Int {
-        return when (position) {
-            0 -> R.string.observers_and_date_selected_observers
-            1 -> R.string.observers_and_date_date
-            else -> throw IllegalArgumentException()
-        }
-    }
-
-    override fun getSelectedItemsEmptyText(position: Int): Int {
-        return when (position) {
-            0 -> R.string.observers_and_date_selected_observers_no_data
-            else -> R.string.no_data
-        }
-    }
-
-    override fun getActionText(position: Int): Int {
-        return when (position) {
-            0 -> R.string.action_edit
-            1 -> R.string.action_edit
-            else -> throw IllegalArgumentException()
-        }
-    }
-
-    override fun getActionEmptyText(position: Int): Int {
-        return when (position) {
-            0 -> R.string.action_add
-            1 -> R.string.action_edit
-            else -> throw IllegalArgumentException()
-        }
-    }
-
-    override fun getVisibleItems(position: Int): Int {
-        return when (position) {
-            0 -> 2
-            1 -> 1
-            else -> throw IllegalArgumentException()
-        }
-    }
-
-    override fun getSelectedItems(position: Int): Collection<Pair<String, String?>> {
-        return when (position) {
-            0 -> emptyList()
-            1 -> listOf(Pair.create(DateFormat.format(getString(R.string.observers_and_date_date_format),
-                                                      inputDate).toString(),
-                                    ""))
-            else -> throw IllegalArgumentException()
-        }
-    }
-
-    override fun onSelectedItemsAction(position: Int) {
-        val context = context ?: return
-
-        when (position) {
-            0 -> // TODO: manage action
-                Toast.makeText(context,
-                               "Not implemented",
-                               Toast.LENGTH_SHORT)
-                        .show()
-            1 -> {
-                val supportFragmentManager = activity?.supportFragmentManager ?: return
-                val datePickerDialogFragment = DatePickerDialogFragment()
-                datePickerDialogFragment.setOnCalendarSetListener(onCalendarSetListener)
-                datePickerDialogFragment.show(supportFragmentManager,
-                                              DATE_PICKER_DIALOG_FRAGMENT)
-            }
-        }
-    }
 
     companion object {
 

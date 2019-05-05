@@ -4,9 +4,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import fr.geonature.commons.data.InputObserver
-import fr.geonature.occtax.R
+
 
 /**
  * Let the user to choose an [InputObserver] from the list.
@@ -16,37 +17,52 @@ import fr.geonature.occtax.R
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
 class InputObserverListActivity : AppCompatActivity(),
-        InputObserverListFragment.OnInputObserverListFragmentListener {
+                                  InputObserverListFragment.OnInputObserverListFragmentListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_toolbar)
+        setContentView(fr.geonature.occtax.R.layout.activity_toolbar)
 
-        setSupportActionBar(findViewById(R.id.toolbar))
+        setSupportActionBar(findViewById(fr.geonature.occtax.R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // Display the fragment as the main content.
         supportFragmentManager.beginTransaction()
-                .replace(R.id.container, InputObserverListFragment.newInstance())
+                .replace(fr.geonature.occtax.R.id.container,
+                         InputObserverListFragment.newInstance(intent.getIntExtra(EXTRA_CHOICE_MODE,
+                                                                                  ListView.CHOICE_MODE_SINGLE),
+                                                               intent.getParcelableArrayListExtra(EXTRA_SELECTED_INPUT_OBSERVERS)))
                 .commit()
     }
 
-    override fun onSelectedObserver(inputObserver: InputObserver?) {
+    override fun onSelectedInputObservers(inputObservers: List<InputObserver>) {
         val intent = Intent().apply {
-            putExtra(EXTRA_SELECTED_OBSERVER, inputObserver)
+            putParcelableArrayListExtra(EXTRA_SELECTED_INPUT_OBSERVERS,
+                                        ArrayList(inputObservers))
         }
 
-        setResult(Activity.RESULT_OK, intent)
+        setResult(Activity.RESULT_OK,
+                  intent)
 
         finish()
     }
 
     companion object {
-        const val EXTRA_SELECTED_OBSERVER = "EXTRA_SELECTED_OBSERVER"
 
-        fun newIntent(context: Context): Intent {
-            return Intent(context, InputObserverListActivity::class.java)
+        const val EXTRA_CHOICE_MODE = "extra_choice_mode"
+        const val EXTRA_SELECTED_INPUT_OBSERVERS = "extra_selected_input_observers"
+
+        fun newIntent(context: Context,
+                      choiceMode: Int = ListView.CHOICE_MODE_SINGLE,
+                      selectedObservers: List<InputObserver> = listOf()): Intent {
+            return Intent(context,
+                          InputObserverListActivity::class.java).apply {
+                putExtra(EXTRA_CHOICE_MODE,
+                         choiceMode)
+                putParcelableArrayListExtra(EXTRA_SELECTED_INPUT_OBSERVERS,
+                                            ArrayList(selectedObservers))
+            }
         }
     }
 }

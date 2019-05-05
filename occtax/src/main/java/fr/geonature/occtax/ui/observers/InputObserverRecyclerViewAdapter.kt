@@ -4,6 +4,8 @@ import android.database.Cursor
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
+import android.widget.ListView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.l4digital.fastscroll.FastScroller
@@ -16,16 +18,33 @@ import fr.geonature.commons.data.InputObserver
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class InputObserverRecyclerViewAdapter(private val listener: InputObserverListFragment.OnInputObserverListFragmentListener?) : RecyclerView.Adapter<InputObserverRecyclerViewAdapter.ViewHolder>(),
-                                                                                                                               FastScroller.SectionIndexer {
+class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecyclerViewAdapterListener) : RecyclerView.Adapter<InputObserverRecyclerViewAdapter.ViewHolder>(),
+                                                                                                           FastScroller.SectionIndexer {
     private var cursor: Cursor? = null
-
+    private var choiceMode: Int = ListView.CHOICE_MODE_SINGLE
+    private val selectedInputObservers: MutableList<InputObserver> = ArrayList()
     private val onClickListener: View.OnClickListener
 
     init {
         onClickListener = View.OnClickListener { v ->
+            val checkbox: CheckBox = v.findViewById(android.R.id.checkbox)
+
             val inputObserver = v.tag as InputObserver
-            listener?.onSelectedObserver(inputObserver)
+
+            if (isSingleChoice()) {
+                selectedInputObservers.clear()
+            }
+
+            if (selectedInputObservers.contains(inputObserver)) {
+                selectedInputObservers.remove(inputObserver)
+                checkbox.isChecked = false
+            }
+            else {
+                selectedInputObservers.add(inputObserver)
+                checkbox.isChecked = true
+            }
+
+            listener.onSelectedInputObservers(selectedInputObservers)
         }
     }
 
@@ -56,9 +75,51 @@ class InputObserverRecyclerViewAdapter(private val listener: InputObserverListFr
                 .toString()
     }
 
+    fun setChoiceMode(choiceMode: Int = ListView.CHOICE_MODE_SINGLE) {
+        this.choiceMode = choiceMode
+    }
+
+    fun isSingleChoice(): Boolean {
+        return choiceMode == ListView.CHOICE_MODE_SINGLE
+    }
+
+    fun setSelectedInputObservers(selectedInputObservers: List<InputObserver>) {
+        this.selectedInputObservers.clear()
+        this.selectedInputObservers.addAll(selectedInputObservers)
+        notifyDataSetChanged()
+    }
+
+    fun getSelectedInputObservers(): List<InputObserver> {
+        return this.selectedInputObservers
+    }
+
     fun bind(cursor: Cursor?) {
         this.cursor = cursor
+        scrollToFirstItemSelected()
         notifyDataSetChanged()
+    }
+
+    private fun scrollToFirstItemSelected() {
+        val cursor = cursor ?: return
+
+        // try to find the first selected item position
+        if (selectedInputObservers.size > 0) {
+            cursor.moveToFirst()
+            var foundFirstItemSelected = false
+
+            while (!cursor.isAfterLast && !foundFirstItemSelected) {
+                val currentInputObserver = InputObserver.fromCursor(cursor)
+
+                if (selectedInputObservers.contains(currentInputObserver)) {
+                    foundFirstItemSelected = true
+                    listener.scrollToFirstSelectedfItemPosition(cursor.position)
+                }
+
+                cursor.moveToNext()
+            }
+
+            cursor.moveToFirst()
+        }
     }
 
     inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(
@@ -69,6 +130,7 @@ class InputObserverRecyclerViewAdapter(private val listener: InputObserverListFr
         private val title: TextView = itemView.findViewById(android.R.id.title)
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
         private val text2: TextView = itemView.findViewById(android.R.id.text2)
+        private val checkbox: CheckBox = itemView.findViewById(android.R.id.checkbox)
 
         fun bind(position: Int) {
             val cursor = cursor ?: return
@@ -93,6 +155,7 @@ class InputObserverRecyclerViewAdapter(private val listener: InputObserverListFr
                 title.text = if (previousTitle == currentTitle) "" else currentTitle
                 text1.text = inputObserver.lastname
                 text2.text = inputObserver.firstname
+                checkbox.isChecked = selectedInputObservers.contains(inputObserver)
 
                 with(itemView) {
                     tag = inputObserver
@@ -100,5 +163,25 @@ class InputObserverRecyclerViewAdapter(private val listener: InputObserverListFr
                 }
             }
         }
+    }
+
+    /**
+     * Callback used by [InputObserverRecyclerViewAdapter].
+     */
+    interface OnInputObserverRecyclerViewAdapterListener {
+
+        /**
+         * Called when [InputObserver]s were been selected.
+         *
+         * @param inputObservers the selected [InputObserver]s
+         */
+        fun onSelectedInputObservers(inputObservers: List<InputObserver>)
+
+        /**
+         * Called if we want to scroll to the first selected item
+         *
+         * @param position the current position of the first selected item
+         */
+        fun scrollToFirstSelectedfItemPosition(position: Int)
     }
 }

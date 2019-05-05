@@ -3,7 +3,15 @@ package fr.geonature.occtax.ui.observers
 import android.content.Context
 import android.database.Cursor
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ListView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -15,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.data.InputObserver
 import fr.geonature.commons.data.Provider.buildUri
+import fr.geonature.occtax.R
 import fr.geonature.occtax.R.layout.fragment_list_inputobserver
 
 /**
@@ -34,21 +43,24 @@ class InputObserverListFragment : Fragment() {
 
             when (id) {
                 LOADER_OBSERVERS -> {
-                    val selections = if (args?.getString(KEY_FILTER, null) == null) Pair(null, null)
+                    val selections = if (args?.getString(KEY_FILTER,
+                                                         null) == null) Pair(null,
+                                                                             null)
                     else {
                         val filter = "%${args.getString(KEY_FILTER)}%"
                         Pair("(${InputObserver.COLUMN_LASTNAME} LIKE ? OR ${InputObserver.COLUMN_FIRSTNAME} LIKE ?)",
-                                arrayOf(filter, filter))
+                             arrayOf(filter,
+                                     filter))
                     }
 
                     return CursorLoader(requireContext(),
-                            buildUri(InputObserver.TABLE_NAME),
-                            arrayOf(InputObserver.COLUMN_ID,
-                                    InputObserver.COLUMN_LASTNAME,
-                                    InputObserver.COLUMN_FIRSTNAME),
-                            selections.first,
-                            selections.second,
-                            null)
+                                        buildUri(InputObserver.TABLE_NAME),
+                                        arrayOf(InputObserver.COLUMN_ID,
+                                                InputObserver.COLUMN_LASTNAME,
+                                                InputObserver.COLUMN_FIRSTNAME),
+                                        selections.first,
+                                        selections.second,
+                                        null)
                 }
 
                 else -> throw IllegalArgumentException()
@@ -57,7 +69,10 @@ class InputObserverListFragment : Fragment() {
 
         override fun onLoadFinished(
                 loader: Loader<Cursor>,
-                data: Cursor) {
+                data: Cursor?) {
+
+            if (data == null) return
+
             when (loader.id) {
                 LOADER_OBSERVERS -> adapter?.bind(data)
             }
@@ -70,28 +85,72 @@ class InputObserverListFragment : Fragment() {
         }
     }
 
+    private var actionMode: ActionMode? = null
+    private val actionModeCallback = object : ActionMode.Callback {
+        override fun onCreateActionMode(mode: ActionMode?,
+                                        menu: Menu?): Boolean {
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode?,
+                                         menu: Menu?): Boolean {
+            return false
+        }
+
+        override fun onActionItemClicked(mode: ActionMode?,
+                                         item: MenuItem?): Boolean {
+            return false
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode?) {
+            actionMode = null
+            listener?.onSelectedInputObservers(adapter?.getSelectedInputObservers() ?: listOf())
+        }
+    }
+
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(fragment_list_inputobserver, container,
-
-                false)
+        val view = inflater.inflate(fragment_list_inputobserver,
+                                    container,
+                                    false)
 
         // Set the adapter
         if (view is RecyclerView) {
-            adapter = InputObserverRecyclerViewAdapter(listener)
+            adapter = InputObserverRecyclerViewAdapter(object : InputObserverRecyclerViewAdapter.OnInputObserverRecyclerViewAdapterListener {
+                override fun onSelectedInputObservers(inputObservers: List<InputObserver>) {
+                    if (adapter?.isSingleChoice() == true) {
+                        listener?.onSelectedInputObservers(inputObservers)
+                        return
+                    }
+
+                    updateActionMode(inputObservers)
+                }
+
+                override fun scrollToFirstSelectedfItemPosition(position: Int) {
+                    view.smoothScrollToPosition(position)
+                }
+            })
+            adapter?.setChoiceMode(arguments?.getInt(ARG_CHOICE_MODE)
+                                           ?: ListView.CHOICE_MODE_SINGLE)
+            adapter?.setSelectedInputObservers(arguments?.getParcelableArrayList(ARG_SELECTED_INPUT_OBSERVERS)
+                                                       ?: listOf())
+                    .also { updateActionMode(adapter?.getSelectedInputObservers() ?: listOf()) }
+
             with(view) {
                 layoutManager = LinearLayoutManager(context)
+                adapter = this@InputObserverListFragment.adapter
             }
-            view.adapter = adapter
 
             val dividerItemDecoration = DividerItemDecoration(view.getContext(),
-                    (view.layoutManager as LinearLayoutManager).orientation)
+                                                              (view.layoutManager as LinearLayoutManager).orientation)
             view.addItemDecoration(dividerItemDecoration)
 
             LoaderManager.getInstance(this)
-                    .initLoader(LOADER_OBSERVERS, null, loaderCallbacks)
+                    .initLoader(LOADER_OBSERVERS,
+                                null,
+                                loaderCallbacks)
         }
 
         return view
@@ -100,7 +159,8 @@ class InputObserverListFragment : Fragment() {
     override fun onViewCreated(
             view: View,
             savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        super.onViewCreated(view,
+                            savedInstanceState)
 
         // we have a menu item to show in action bar
         setHasOptionsMenu(true)
@@ -110,24 +170,25 @@ class InputObserverListFragment : Fragment() {
             menu: Menu,
             inflater: MenuInflater) {
 
-        super.onCreateOptionsMenu(menu, inflater)
+        super.onCreateOptionsMenu(menu,
+                                  inflater)
 
-        inflater.inflate(fr.geonature.occtax.R.menu.search, menu)
+        inflater.inflate(R.menu.search,
+                         menu)
 
-        val searchItem = menu.findItem(fr.geonature.occtax.R.id.action_search)
+        val searchItem = menu.findItem(R.id.action_search)
         val searchView = searchItem.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                // KeyboardUtils.hideSoftKeyboard(context)
-
                 return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
                 LoaderManager.getInstance(this@InputObserverListFragment)
                         .restartLoader(LOADER_OBSERVERS,
-                                bundleOf(Pair(KEY_FILTER, newText)),
-                                loaderCallbacks)
+                                       bundleOf(Pair(KEY_FILTER,
+                                                     newText)),
+                                       loaderCallbacks)
 
                 return true
             }
@@ -137,7 +198,7 @@ class InputObserverListFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                listener?.onSelectedObserver(null)
+                listener?.onSelectedInputObservers(emptyList())
                 true
             }
 
@@ -161,21 +222,39 @@ class InputObserverListFragment : Fragment() {
         listener = null
     }
 
+    private fun updateActionMode(inputObservers: List<InputObserver>) {
+        if (inputObservers.isEmpty()) {
+            actionMode?.finish()
+            return
+        }
+
+        if (actionMode == null) {
+            actionMode = (activity as AppCompatActivity?)?.startSupportActionMode(actionModeCallback)
+            actionMode?.setTitle(R.string.activity_observers_title)
+        }
+
+        actionMode?.subtitle = resources.getQuantityString(R.plurals.action_title_item_count_selected,
+                                                           inputObservers.size,
+                                                           inputObservers.size)
+    }
+
     /**
      * Callback used by [InputObserverListFragment].
      */
     interface OnInputObserverListFragmentListener {
 
         /**
-         * Called when [InputObserver] has been selected.
+         * Called when [InputObserver]s were been selected.
          *
-         * @param inputObserver the selected [InputObserver]
+         * @param inputObservers the selected [InputObserver]s
          */
-        fun onSelectedObserver(inputObserver: InputObserver?)
+        fun onSelectedInputObservers(inputObservers: List<InputObserver>)
     }
 
     companion object {
 
+        private const val ARG_CHOICE_MODE = "arg_choice_mode"
+        private const val ARG_SELECTED_INPUT_OBSERVERS = "arg_selected_input_observers"
         private const val LOADER_OBSERVERS = 1
         private const val KEY_FILTER = "filter"
 
@@ -185,6 +264,14 @@ class InputObserverListFragment : Fragment() {
          * @return A new instance of [InputObserverListFragment]
          */
         @JvmStatic
-        fun newInstance() = InputObserverListFragment()
+        fun newInstance(choiceMode: Int = ListView.CHOICE_MODE_SINGLE,
+                        selectedObservers: List<InputObserver> = listOf()) = InputObserverListFragment().apply {
+            arguments = Bundle().apply {
+                putInt(ARG_CHOICE_MODE,
+                       choiceMode)
+                putParcelableArrayList(ARG_SELECTED_INPUT_OBSERVERS,
+                                       ArrayList(selectedObservers))
+            }
+        }
     }
 }

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.os.Bundle
+import android.widget.ListView
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
@@ -13,8 +14,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import fr.geonature.commons.data.InputObserver
 import fr.geonature.commons.data.Provider.buildUri
-import fr.geonature.occtax.R.string
-import fr.geonature.occtax.R.xml
+import fr.geonature.occtax.R
 import fr.geonature.occtax.ui.observers.InputObserverListActivity
 
 /**
@@ -33,14 +33,14 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
             when (id) {
                 LOADER_OBSERVER -> return CursorLoader(requireContext(),
-                        buildUri(InputObserver.TABLE_NAME,
-                                args!!.getLong(KEY_SELECTED_OBSERVER).toString()),
-                        arrayOf(InputObserver.COLUMN_ID,
-                                InputObserver.COLUMN_LASTNAME,
-                                InputObserver.COLUMN_FIRSTNAME),
-                        null,
-                        null,
-                        null)
+                                                       buildUri(InputObserver.TABLE_NAME,
+                                                                args!!.getLong(KEY_SELECTED_OBSERVER).toString()),
+                                                       arrayOf(InputObserver.COLUMN_ID,
+                                                               InputObserver.COLUMN_LASTNAME,
+                                                               InputObserver.COLUMN_FIRSTNAME),
+                                                       null,
+                                                       null,
+                                                       null)
                 else -> throw IllegalArgumentException()
             }
         }
@@ -67,18 +67,19 @@ class PreferencesFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val defaultObserverPreference = preferenceScreen.findPreference(getString(string.preference_category_observers_default_key))
+        val defaultObserverPreference = preferenceScreen.findPreference(getString(R.string.preference_category_observers_default_key))
 
         if (defaultObserverPreference != null) {
             loadDefaultObserver()
 
             defaultObserverPreference.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                startActivityForResult(InputObserverListActivity.newIntent(requireContext()), 0)
+                startActivityForResult(InputObserverListActivity.newIntent(requireContext()),
+                                       0)
                 true
             }
         }
 
-        val aboutAppVersionPreference = preferenceScreen.findPreference(getString(string.preference_category_about_app_version_key))
+        val aboutAppVersionPreference = preferenceScreen.findPreference(getString(R.string.preference_category_about_app_version_key))
 
         if (aboutAppVersionPreference != null) {
             aboutAppVersionPreference.summary = listener!!.getAppVersion()
@@ -88,7 +89,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(
             savedInstanceState: Bundle?,
             rootKey: String?) {
-        addPreferencesFromResource(xml.preferences)
+        addPreferencesFromResource(R.xml.preferences)
     }
 
     override fun onAttach(context: Context) {
@@ -113,44 +114,56 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             resultCode: Int,
             data: Intent?) {
         if ((resultCode == Activity.RESULT_OK) && (data != null)) {
-            val selectedInputObserver = data.getParcelableExtra<InputObserver>(
-                    InputObserverListActivity.EXTRA_SELECTED_OBSERVER)
-            updateDefaultObserverPreference(selectedInputObserver)
+            val selectedInputObservers = data.getParcelableArrayListExtra<InputObserver>(InputObserverListActivity.EXTRA_SELECTED_INPUT_OBSERVERS)
+            updateDefaultObserverPreference(if (selectedInputObservers.size > 0) selectedInputObservers[0] else null)
         }
     }
 
     private fun loadDefaultObserver() {
         val defaultObserverId = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                .getLong(getString(string.preference_category_observers_default_key), 0)
+                .getLong(getString(R.string.preference_category_observers_default_key),
+                         0)
 
         val args = Bundle()
-        args.putLong(KEY_SELECTED_OBSERVER, defaultObserverId)
+        args.putLong(KEY_SELECTED_OBSERVER,
+                     defaultObserverId)
 
         LoaderManager.getInstance(this)
-                .initLoader(LOADER_OBSERVER, args, loaderCallbacks)
+                .initLoader(LOADER_OBSERVER,
+                            args,
+                            loaderCallbacks)
     }
 
     private fun updateDefaultObserverPreference(defaultObserver: InputObserver?) {
-        val defaultObserverPreference = preferenceScreen.findPreference(getString(string.preference_category_observers_default_key))
+        val defaultObserverPreference = preferenceScreen.findPreference(getString(R.string.preference_category_observers_default_key))
+                ?: return
 
-        if (defaultObserverPreference != null) {
-            val editor = PreferenceManager.getDefaultSharedPreferences(context)
-                    .edit()
+        defaultObserverPreference.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            val context = context ?: return@OnPreferenceClickListener false
 
-            if (defaultObserver == null) {
-                editor.remove(getString(string.preference_category_observers_default_key))
-
-                defaultObserverPreference.setSummary(string.preference_category_observers_default_not_set)
-            }
-            else {
-                editor.putLong(getString(string.preference_category_observers_default_key),
-                        defaultObserver.id)
-
-                defaultObserverPreference.summary = defaultObserver.lastname?.toUpperCase() + if (defaultObserver.lastname == null) "" else " " + defaultObserver.firstname
-            }
-
-            editor.apply()
+            startActivityForResult(InputObserverListActivity.newIntent(context,
+                                                                       ListView.CHOICE_MODE_SINGLE,
+                                                                       if (defaultObserver == null) listOf() else listOf(defaultObserver)),
+                                   0)
+            true
         }
+
+        val editor = PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+
+        if (defaultObserver == null) {
+            editor.remove(getString(R.string.preference_category_observers_default_key))
+
+            defaultObserverPreference.setSummary(R.string.preference_category_observers_default_not_set)
+        }
+        else {
+            editor.putLong(getString(R.string.preference_category_observers_default_key),
+                           defaultObserver.id)
+
+            defaultObserverPreference.summary = defaultObserver.lastname?.toUpperCase() + if (defaultObserver.lastname == null) "" else " " + defaultObserver.firstname
+        }
+
+        editor.apply()
     }
 
     /**

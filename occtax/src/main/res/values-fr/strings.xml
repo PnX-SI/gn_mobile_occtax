@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="activity_preferences_title">Paramètres</string>
     <string name="activity_observers_title">Observateurs</string>
@@ -21,12 +21,20 @@
     <string name="action_search">Recherche</string>
     <string name="action_add">Ajouter</string>
     <string name="action_edit">Modifier</string>
+    <plurals name="action_title_item_count_selected">
+        <item quantity="one">%d sélectionné</item>
+        <item quantity="other">%d sélectionnés</item>
+    </plurals>
 
     <string name="alert_dialog_ok">OK</string>
     <string name="alert_dialog_cancel">Annuler</string>
 
     <string name="fragment_observers_and_date_input_title">Observateur &#38; date</string>
     <string name="observers_and_date_selected_observers">Observateurs</string>
+    <plurals name="observers_and_date_selected_observers">
+        <item quantity="one">%d observateur</item>
+        <item quantity="other">%d observateurs</item>
+    </plurals>
     <string name="observers_and_date_selected_observers_no_data">Aucun observateur sélectionné.\nAjouter en un via le bouton "Ajouter".</string>
     <string name="observers_and_date_date">Date</string>
     <string name="observers_and_date_date_format">dd MMMM yyyy</string>

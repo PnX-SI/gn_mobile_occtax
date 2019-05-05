@@ -3,7 +3,12 @@ package fr.geonature.occtax.ui.home
 import android.content.Context
 import android.database.Cursor
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.loader.app.LoaderManager
@@ -43,7 +48,10 @@ class HomeFragment : Fragment() {
 
         override fun onLoadFinished(
                 loader: Loader<Cursor>,
-                data: Cursor) {
+                data: Cursor?) {
+
+            if (data == null) return
+
             when (loader.id) {
                 LOADER_APP_SYNC -> {
                     if (data.moveToFirst()) {
@@ -85,7 +93,7 @@ class HomeFragment : Fragment() {
         appSyncView.setListener(onAppSyncViewListener)
 
         view.findViewById<View>(fr.geonature.occtax.R.id.fab)
-                .setOnClickListener {listener?.onStartInput() }
+                .setOnClickListener { listener?.onStartInput() }
     }
 
     override fun onAttach(context: Context) {

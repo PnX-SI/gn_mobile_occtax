@@ -70,6 +70,10 @@ class ListItemActionView : ConstraintLayout {
         titleTextView.setText(titleResourceId)
     }
 
+    fun setTitle(title: String) {
+        titleTextView.setText(title)
+    }
+
     fun setEmptyText(@StringRes emptyTextResourceId: Int) {
         emptyTextView.setText(if (emptyTextResourceId == 0) R.string.no_data else emptyTextResourceId)
     }
@@ -94,7 +98,7 @@ class ListItemActionView : ConstraintLayout {
     fun setVisibleItems(visibleItems: Int = 1) {
         val typedArray = context.theme.obtainStyledAttributes(intArrayOf(R.attr.listPreferredItemHeight))
         val listPreferredItemHeight = typedArray.getDimension(0,
-                                                          0f)
+                                                              0f)
 
         if (listPreferredItemHeight > 0) {
             recyclerView.layoutParams.height = visibleItems * listPreferredItemHeight.toInt()
@@ -139,7 +143,10 @@ class ListItemActionView : ConstraintLayout {
             }
         })
 
-        recyclerView.adapter = adapter
+        with(recyclerView) {
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+            adapter = this@ListItemActionView.adapter
+        }
 
         // load attributes
         val ta = context.obtainStyledAttributes(
@@ -148,35 +155,18 @@ class ListItemActionView : ConstraintLayout {
                 defStyle,
                 0)
 
-        if (ta.hasValue(R.styleable.ListItemActionView_title)) {
-            val resourceId = ta.getResourceId(R.styleable.ListItemActionView_title,
-                                              0)
-            setTitle(resourceId)
-        }
-
-        if (ta.hasValue(R.styleable.ListItemActionView_no_data)) {
-            val resourceId = ta.getResourceId(R.styleable.ListItemActionView_no_data,
-                                              0)
-            setActionEmptyText(resourceId)
-        }
-
-        if (ta.hasValue(R.styleable.ListItemActionView_action)) {
-            val resourceId = ta.getResourceId(R.styleable.ListItemActionView_action,
-                                              0)
-            setActionText(resourceId)
-        }
-
-        if (ta.hasValue(R.styleable.ListItemActionView_action_empty)) {
-            val resourceId = ta.getResourceId(R.styleable.ListItemActionView_action_empty,
-                                              0)
-            setActionEmptyText(resourceId)
-        }
-
-        if (ta.hasValue(R.styleable.ListItemActionView_visible_items)) {
-            val visibleItems = ta.getInteger(R.styleable.ListItemActionView_visible_items,
-                                         1)
-            setVisibleItems(visibleItems)
-        }
+        setTitle(ta.getResourceId(R.styleable.ListItemActionView_title,
+                                  0))
+        setEmptyText(ta.getResourceId(R.styleable.ListItemActionView_no_data,
+                                      R.string.no_data))
+        setActionText(ta.getResourceId(R.styleable.ListItemActionView_action,
+                                       0))
+        setActionText(ta.getResourceId(R.styleable.ListItemActionView_action,
+                                       0))
+        setActionEmptyText(ta.getResourceId(R.styleable.ListItemActionView_action_empty,
+                                            0))
+        setVisibleItems(ta.getInteger(R.styleable.ListItemActionView_visible_items,
+                                      1))
 
         ta.recycle()
     }
@@ -230,11 +220,9 @@ class ListItemActionView : ConstraintLayout {
 
         fun setItems(collection: Collection<Pair<String, String?>>) {
             items.clear()
+            items.addAll(collection)
 
-            if (items.addAll(collection)) {
-                notifyItemRangeInserted(0,
-                                        collection.size)
-            }
+            notifyDataSetChanged()
         }
 
         internal inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context)

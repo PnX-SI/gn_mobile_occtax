@@ -6,8 +6,9 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import fr.geonature.occtax.BuildConfig
+import fr.geonature.occtax.R
 import java.text.DateFormat
-import java.util.*
+import java.util.Date
 
 /**
  * Global settings.
@@ -42,10 +43,10 @@ class PreferencesActivity : AppCompatActivity(),
     }
 
     override fun getAppVersion(): String {
-        return getString(fr.geonature.occtax.R.string.app_version,
-                BuildConfig.VERSION_NAME,
-                BuildConfig.VERSION_CODE,
-                DateFormat.getDateTimeInstance()
+        return getString(R.string.app_version,
+                         BuildConfig.VERSION_NAME,
+                         BuildConfig.VERSION_CODE,
+                         DateFormat.getDateTimeInstance()
                         .format(Date(BuildConfig.BUILD_DATE.toLong())))
     }
 
