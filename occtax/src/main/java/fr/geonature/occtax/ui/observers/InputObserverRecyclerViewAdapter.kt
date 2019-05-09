@@ -112,7 +112,7 @@ class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecy
 
                 if (selectedInputObservers.contains(currentInputObserver)) {
                     foundFirstItemSelected = true
-                    listener.scrollToFirstSelectedfItemPosition(cursor.position)
+                    listener.scrollToFirstSelectedItemPosition(cursor.position)
                 }
 
                 cursor.moveToNext()
@@ -182,6 +182,6 @@ class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecy
          *
          * @param position the current position of the first selected item
          */
-        fun scrollToFirstSelectedfItemPosition(position: Int)
+        fun scrollToFirstSelectedItemPosition(position: Int)
     }
 }

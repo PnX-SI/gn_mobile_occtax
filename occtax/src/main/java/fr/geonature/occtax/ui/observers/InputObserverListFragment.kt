@@ -128,7 +128,7 @@ class InputObserverListFragment : Fragment() {
                     updateActionMode(inputObservers)
                 }
 
-                override fun scrollToFirstSelectedfItemPosition(position: Int) {
+                override fun scrollToFirstSelectedItemPosition(position: Int) {
                     view.smoothScrollToPosition(position)
                 }
             })
