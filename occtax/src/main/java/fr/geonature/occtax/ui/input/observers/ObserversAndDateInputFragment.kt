@@ -108,7 +108,7 @@ class ObserversAndDateInputFragment : Fragment(),
     }
 
     override fun getResourceTitle(): Int {
-        return R.string.fragment_observers_and_date_input_title
+        return R.string.pager_fragment_observers_and_date_input_title
     }
 
     override fun pagingEnabled(): Boolean {

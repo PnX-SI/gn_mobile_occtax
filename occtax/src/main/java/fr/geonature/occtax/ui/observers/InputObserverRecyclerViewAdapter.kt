@@ -153,7 +153,7 @@ class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecy
                 val currentTitle = inputObserver.lastname?.elementAt(0)
                         .toString()
                 title.text = if (previousTitle == currentTitle) "" else currentTitle
-                text1.text = inputObserver.lastname
+                text1.text = inputObserver.lastname?.toUpperCase()
                 text2.text = inputObserver.firstname
                 checkbox.isChecked = selectedInputObservers.contains(inputObserver)
 

@@ -3,7 +3,9 @@ package fr.geonature.occtax.ui.input
 import android.content.Context
 import android.content.Intent
 import androidx.viewpager.widget.ViewPager
+import fr.geonature.occtax.R
 import fr.geonature.occtax.ui.input.observers.ObserversAndDateInputFragment
+import fr.geonature.occtax.ui.input.taxa.TaxaFragment
 import fr.geonature.viewpager.ui.AbstractNavigationHistoryPagerFragmentActivity
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
@@ -17,8 +19,10 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
 
     override val pagerFragments: Map<Int, IValidateFragment>
         get() = LinkedHashMap<Int, IValidateFragment>().apply {
-            put(fr.geonature.occtax.R.string.fragment_observers_and_date_input_title,
+            put(R.string.pager_fragment_observers_and_date_input_title,
                 ObserversAndDateInputFragment.newInstance())
+            put(R.string.pager_fragment_taxa_title,
+                TaxaFragment.newInstance())
         }
 
     override fun performFinishAction() {

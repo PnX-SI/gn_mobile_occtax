@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.data.InputObserver
 import fr.geonature.commons.data.Provider.buildUri
 import fr.geonature.occtax.R
-import fr.geonature.occtax.R.layout.fragment_list_inputobserver
+import fr.geonature.occtax.R.layout.fast_scroll_recycler_view
 
 /**
  * [Fragment] to let the user to choose an [InputObserver] from the list.
@@ -112,7 +112,7 @@ class InputObserverListFragment : Fragment() {
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(fragment_list_inputobserver,
+        val view = inflater.inflate(fast_scroll_recycler_view,
                                     container,
                                     false)
 
