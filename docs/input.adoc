@@ -1,6 +1,6 @@
 = Input workflow
 
-[plantuml, images/sync, svg]
+[plantuml, images/input, svg]
 ....
 participant "mobile/occtax" as occtax << mobile >>
 participant "mobile/sync" as sync << mobile >>
