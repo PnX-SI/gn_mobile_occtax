@@ -11,4 +11,8 @@
 .DS_Store
 /build
 /captures
+/docs/.asciidoctor
+/docs/images
+/docs/vendor
+/docs/*.html
 .externalNativeBuild
