@@ -11,8 +11,8 @@ occtax -> occtax : initialize input
 note left
   **input:**
   {
-    "id": <generated_id>
-    "module": "occtax"
+    "id": <generated_id>,
+    "module": "occtax",
     ...
   }
 end note
