@@ -1,0 +1,144 @@
+= Input workflow
+
+[plantuml, images/sync, svg]
+....
+participant "mobile/occtax" as occtax << mobile >>
+participant "mobile/sync" as sync << mobile >>
+
+activate occtax
+
+occtax -> occtax : initialize input
+note left
+  **input:**
+  {
+    "id": <generated_id>
+    "module": "occtax"
+    ...
+  }
+end note
+
+group Step 1: Observers & date
+  occtax -> sync ++ : **query** : ""/observers""
+  sync -> occtax -- : ""[InputObserver]""
+  occtax -> occtax : set logged in observer
+  occtax -> occtax : set selected observers
+  occtax -> occtax : set input date
+
+  alt Save input
+    occtax -> occtax : save input
+    occtax -> occtax : redirect to home page
+  end
+
+end
+
+group Step 2: Location
+  occtax -> occtax : set taxon location
+
+  alt Save input
+    occtax -> occtax : save input
+    occtax -> occtax : redirect to home page
+  end
+
+end
+
+group Step 3: Taxon
+  occtax -> sync ++ : **query** : ""/taxa""
+  sync -> occtax -- : ""[Taxon]""
+  occtax -> occtax : set selected taxon
+
+  alt Save input
+    occtax -> occtax : save input
+    occtax -> occtax : redirect to home page
+  end
+
+end
+
+group Step 4: Informations
+
+  group Step 4.1: Observation
+    occtax -> sync ++ : **query** : ""/observations""
+    sync -> occtax -- : ""[Observation]""
+    occtax -> occtax : set observation method
+  end
+
+  group Step 4.2: Biological state
+    occtax -> sync ++ : **query** : ""/biological_states""
+    sync -> occtax -- : ""[BiologicalState]""
+    occtax -> occtax : set biological state
+  end
+
+  group Step 4.3: Determination
+    occtax -> sync ++ : **query** : ""/determinations""
+    sync -> occtax -- : ""[Determination]""
+    occtax -> occtax : set determination method
+  end
+
+  group Step 4.4: Naturalness
+    occtax -> sync ++ : **query** : ""/naturalness""
+    sync -> occtax -- : ""[Naturalness]""
+    occtax -> occtax : set naturalness
+  end
+
+  ...
+
+  alt Save input
+    occtax -> occtax : save input
+    occtax -> occtax : redirect to home page
+  end
+
+end
+
+group Step 5: Counting
+
+  loop
+
+    occtax -> occtax : add counting step
+
+    group 5.1: Life status
+      occtax -> sync ++ : **query** : ""/life_statuses""
+      sync -> occtax -- : ""[LifeStatus]""
+      occtax -> occtax : set life status
+    end
+
+    group 5.2: Sex
+      occtax -> sync ++ : **query** : ""/life_statuses""
+      sync -> occtax -- : ""[LifeStatus]""
+      occtax -> occtax : set life status
+    end
+
+    ...
+
+  end
+
+  alt Save input
+    occtax -> occtax : save input
+    occtax -> occtax : redirect to home page
+  end
+
+end
+
+group Step 6: Report
+
+  alt Add taxon
+    occtax -> occtax : redirect to **Step 3**
+  end
+
+  alt Edit taxon
+    occtax -> occtax : edit selected taxon
+  end
+
+  alt Save input
+    occtax -> occtax : save input
+    occtax -> occtax : redirect to home page
+  end
+
+  alt Export input
+    occtax -> occtax : save input to //input_<module>_<id>.json//
+    occtax -> occtax : delete saved input
+    occtax -> occtax : redirect to home page
+  end
+
+end
+
+deactivate occtax
+....
