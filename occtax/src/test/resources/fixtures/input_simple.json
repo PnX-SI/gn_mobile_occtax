@@ -1,0 +1,21 @@
+{
+  "id": 1234,
+  "module": "occtax",
+  "geometry": {},
+  "properties": {
+    "meta_device_entry": "mobile",
+    "date_min": "2016-10-28T00:00:00Z",
+    "date_max": "2016-10-28T00:00:00Z",
+    "id_digitiser": 1,
+    "observers": [
+      5,
+      2,
+      3
+    ],
+    "t_occurrences_occtax": [
+      {
+        "cd_nom": 10
+      }
+    ]
+  }
+}
