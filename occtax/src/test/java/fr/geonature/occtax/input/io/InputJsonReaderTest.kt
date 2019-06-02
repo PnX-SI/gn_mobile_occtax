@@ -1,5 +1,6 @@
 package fr.geonature.occtax.input.io
 
+import fr.geonature.commons.input.AbstractInputTaxon
 import fr.geonature.commons.input.io.InputJsonReader
 import fr.geonature.commons.util.IsoDateUtils.toDate
 import fr.geonature.occtax.FixtureHelper.getFixture
@@ -82,6 +83,32 @@ class InputJsonReaderTest {
                           input.getInputObserverIds()
                               .toLongArray())
         assertEquals(listOf(InputTaxon().apply { id = 10 }),
+                     input.getInputTaxa())
+    }
+
+    @Test
+    fun testReadInputWithNoObserverAndNoTaxon() {
+        // given an input file to read
+        val json = getFixture("input_no_observer_no_taxon.json")
+
+        // when parsing this file as Input
+        val input = inputJsonReader.read(json)
+
+        // then
+        assertNotNull(input)
+        assertEquals(1234L,
+                     input!!.id)
+        assertEquals(Input().module,
+                     input.module)
+        assertEquals(toDate("2016-10-28"),
+                     input.date)
+        assertNull(input.getPrimaryObserverId())
+        assertArrayEquals(longArrayOf(),
+                          input.getAllInputObserverIds().toLongArray())
+        assertArrayEquals(longArrayOf(),
+                          input.getInputObserverIds()
+                              .toLongArray())
+        assertEquals(listOf<AbstractInputTaxon>(),
                      input.getInputTaxa())
     }
 }
