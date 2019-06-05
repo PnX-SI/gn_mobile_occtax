@@ -29,12 +29,18 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
             val previousSelectedItemPosition = getItemPosition(selectedTaxon)
 
             val checkbox: CheckBox = v.findViewById(android.R.id.checkbox)
-            checkbox.isChecked = true
+            checkbox.isChecked = !checkbox.isChecked
 
             val taxon = v.tag as Taxon
-            selectedTaxon = taxon
 
-            listener.onSelectedTaxon(taxon)
+            if (checkbox.isChecked) {
+                selectedTaxon = taxon
+                listener.onSelectedTaxon(taxon)
+            }
+            else {
+                selectedTaxon = null
+                listener.onNoTaxonSelected()
+            }
 
             if (previousSelectedItemPosition >= 0) {
                 notifyItemChanged(previousSelectedItemPosition)
@@ -166,6 +172,11 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
          * @param taxon the selected [Taxon]
          */
         fun onSelectedTaxon(taxon: Taxon)
+
+        /**
+         * Called when no [Taxon] has been selected.
+         */
+        fun onNoTaxonSelected()
 
         /**
          * Called if we want to scroll to the first selected item

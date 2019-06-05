@@ -8,7 +8,6 @@ import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import fr.geonature.commons.data.InputObserver
 
-
 /**
  * Let the user to choose an [InputObserver] from the list.
  *

@@ -72,7 +72,7 @@ open class ListItemActionView : ConstraintLayout {
     }
 
     fun setTitle(title: String) {
-        titleTextView.setText(title)
+        titleTextView.text = title
     }
 
     fun setEmptyText(@StringRes emptyTextResourceId: Int) {
@@ -145,7 +145,7 @@ open class ListItemActionView : ConstraintLayout {
         })
 
         with(recyclerView) {
-            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+            layoutManager = LinearLayoutManager(context)
             adapter = this@ListItemActionView.adapter
         }
 

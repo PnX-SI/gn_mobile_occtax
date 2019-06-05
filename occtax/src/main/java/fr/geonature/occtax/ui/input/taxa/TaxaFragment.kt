@@ -18,7 +18,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.data.Provider.buildUri
 import fr.geonature.commons.data.Taxon
+import fr.geonature.commons.input.AbstractInput
 import fr.geonature.occtax.R
+import fr.geonature.occtax.input.Input
+import fr.geonature.occtax.input.InputTaxon
+import fr.geonature.occtax.ui.input.IInputFragment
+import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
 
 /**
@@ -27,7 +32,11 @@ import fr.geonature.viewpager.ui.IValidateFragment
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
 class TaxaFragment : Fragment(),
-                     IValidateFragment {
+                     IValidateFragment,
+                     IInputFragment {
+
+    private var input: Input? = null
+    private var selectedTaxonId: Long? = null
 
     private var adapter: TaxaRecyclerViewAdapter? = null
 
@@ -57,6 +66,19 @@ class TaxaFragment : Fragment(),
                                         null)
                 }
 
+                LOADER_TAXON -> {
+                    return CursorLoader(requireContext(),
+                                        buildUri(Taxon.TABLE_NAME,
+                                                 args?.getLong(KEY_SELECTED_TAXON_ID).toString()),
+                                        arrayOf(Taxon.COLUMN_ID,
+                                                Taxon.COLUMN_NAME,
+                                                Taxon.COLUMN_HERITAGE,
+                                                Taxon.COLUMN_DESCRIPTION),
+                                        null,
+                                        null,
+                                        null)
+                }
+
                 else -> throw IllegalArgumentException()
             }
         }
@@ -68,6 +90,15 @@ class TaxaFragment : Fragment(),
 
             when (loader.id) {
                 LOADER_TAXA -> adapter?.bind(data)
+                LOADER_TAXON -> {
+                    if (data.moveToFirst()) {
+                        val selectedTaxon = Taxon.fromCursor(data)
+
+                        if (selectedTaxon != null) {
+                            adapter?.setSelectedTaxon(selectedTaxon)
+                        }
+                    }
+                }
             }
         }
 
@@ -75,6 +106,14 @@ class TaxaFragment : Fragment(),
             when (loader.id) {
                 LOADER_TAXA -> adapter?.bind(null)
             }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (savedInstanceState?.containsKey(KEY_SELECTED_TAXON_ID) == true) {
+            selectedTaxonId = savedInstanceState.getLong(KEY_SELECTED_TAXON_ID)
         }
     }
 
@@ -87,21 +126,34 @@ class TaxaFragment : Fragment(),
         val recyclerView = view.findViewById<RecyclerView>(android.R.id.list)
 
         // Set the adapter
-        adapter =
-                TaxaRecyclerViewAdapter(object : TaxaRecyclerViewAdapter.OnTaxaRecyclerViewAdapterListener {
-                    override fun onSelectedTaxon(taxon: Taxon) {
-                        // TODO: save current selected taxon
-                    }
+        adapter = TaxaRecyclerViewAdapter(object : TaxaRecyclerViewAdapter.OnTaxaRecyclerViewAdapterListener {
+            override fun onSelectedTaxon(taxon: Taxon) {
+                val selectedTaxonId = selectedTaxonId
 
-                    override fun scrollToFirstSelectedItemPosition(position: Int) {
-                        recyclerView.smoothScrollToPosition(position)
-                    }
-                })
-        val selectedTaxon: Taxon? = arguments?.getParcelable(ARG_SELECTED_TAXON)
+                if (selectedTaxonId != null) {
+                    input?.removeInputTaxon(selectedTaxonId)
+                }
 
-        if (selectedTaxon != null) {
-            adapter?.setSelectedTaxon(selectedTaxon)
-        }
+                input?.addInputTaxon(InputTaxon().apply { id = taxon.id })
+                this@TaxaFragment.selectedTaxonId = taxon.id
+
+                (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+            }
+
+            override fun onNoTaxonSelected() {
+                val selectedTaxonId = selectedTaxonId
+
+                if (selectedTaxonId != null) {
+                    input?.removeInputTaxon(selectedTaxonId)
+                }
+
+                (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+            }
+
+            override fun scrollToFirstSelectedItemPosition(position: Int) {
+                recyclerView.smoothScrollToPosition(position)
+            }
+        })
 
         with(recyclerView) {
             layoutManager = LinearLayoutManager(context)
@@ -111,11 +163,6 @@ class TaxaFragment : Fragment(),
         val dividerItemDecoration = DividerItemDecoration(recyclerView.context,
                                                           (recyclerView.layoutManager as LinearLayoutManager).orientation)
         recyclerView.addItemDecoration(dividerItemDecoration)
-
-        LoaderManager.getInstance(this)
-                .initLoader(LOADER_TAXA,
-                            null,
-                            loaderCallbacks)
 
         return view
     }
@@ -127,6 +174,17 @@ class TaxaFragment : Fragment(),
 
         // we have a menu item to show in action bar
         setHasOptionsMenu(true)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        val selectedTaxonId = selectedTaxonId
+
+        if (selectedTaxonId != null) {
+            outState.putLong(KEY_SELECTED_TAXON_ID,
+                             selectedTaxonId)
+        }
+
+        super.onSaveInstanceState(outState)
     }
 
     override fun onCreateOptionsMenu(menu: Menu,
@@ -147,10 +205,10 @@ class TaxaFragment : Fragment(),
 
             override fun onQueryTextChange(newText: String): Boolean {
                 LoaderManager.getInstance(this@TaxaFragment)
-                        .restartLoader(LOADER_TAXA,
-                                       bundleOf(Pair(KEY_FILTER,
-                                                     newText)),
-                                       loaderCallbacks)
+                    .restartLoader(LOADER_TAXA,
+                                   bundleOf(Pair(KEY_FILTER,
+                                                 newText)),
+                                   loaderCallbacks)
 
                 return true
             }
@@ -166,16 +224,36 @@ class TaxaFragment : Fragment(),
     }
 
     override fun validate(): Boolean {
-        return true
+        return this.input?.getCurrentSelectedInputTaxon() != null
     }
 
-    override fun refreshView() {}
+    override fun refreshView() {
+        LoaderManager.getInstance(this)
+            .initLoader(LOADER_TAXA,
+                        null,
+                        loaderCallbacks)
+
+        val selectedInputTaxon = this.input?.getCurrentSelectedInputTaxon()
+
+        if (selectedInputTaxon != null) {
+            LoaderManager.getInstance(this)
+                .initLoader(LOADER_TAXON,
+                            bundleOf(Pair(KEY_SELECTED_TAXON_ID,
+                                          selectedInputTaxon.id)),
+                            loaderCallbacks)
+        }
+    }
+
+    override fun setInput(input: AbstractInput) {
+        this.input = input as Input
+    }
 
     companion object {
 
-        private const val ARG_SELECTED_TAXON = "arg_selected_taxon"
         private const val LOADER_TAXA = 1
+        private const val LOADER_TAXON = 2
         private const val KEY_FILTER = "filter"
+        private const val KEY_SELECTED_TAXON_ID = "selected_taxon_id"
 
         /**
          * Use this factory method to create a new instance of [TaxaFragment].
@@ -183,11 +261,6 @@ class TaxaFragment : Fragment(),
          * @return A new instance of [TaxaFragment]
          */
         @JvmStatic
-        fun newInstance(selectedTaxon: Taxon? = null) = TaxaFragment().apply {
-            arguments = Bundle().apply {
-                putParcelable(ARG_SELECTED_TAXON,
-                              selectedTaxon)
-            }
-        }
+        fun newInstance() = TaxaFragment()
     }
 }

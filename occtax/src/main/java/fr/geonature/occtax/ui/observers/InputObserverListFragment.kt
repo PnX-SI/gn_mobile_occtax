@@ -136,7 +136,7 @@ class InputObserverListFragment : Fragment() {
                                            ?: ListView.CHOICE_MODE_SINGLE)
             adapter?.setSelectedInputObservers(arguments?.getParcelableArrayList(ARG_SELECTED_INPUT_OBSERVERS)
                                                        ?: listOf())
-                    .also { updateActionMode(adapter?.getSelectedInputObservers() ?: listOf()) }
+                .also { updateActionMode(adapter?.getSelectedInputObservers() ?: listOf()) }
 
             with(view) {
                 layoutManager = LinearLayoutManager(context)
@@ -148,9 +148,9 @@ class InputObserverListFragment : Fragment() {
             view.addItemDecoration(dividerItemDecoration)
 
             LoaderManager.getInstance(this)
-                    .initLoader(LOADER_OBSERVERS,
-                                null,
-                                loaderCallbacks)
+                .initLoader(LOADER_OBSERVERS,
+                            null,
+                            loaderCallbacks)
         }
 
         return view
@@ -185,10 +185,10 @@ class InputObserverListFragment : Fragment() {
 
             override fun onQueryTextChange(newText: String): Boolean {
                 LoaderManager.getInstance(this@InputObserverListFragment)
-                        .restartLoader(LOADER_OBSERVERS,
-                                       bundleOf(Pair(KEY_FILTER,
-                                                     newText)),
-                                       loaderCallbacks)
+                    .restartLoader(LOADER_OBSERVERS,
+                                   bundleOf(Pair(KEY_FILTER,
+                                                 newText)),
+                                   loaderCallbacks)
 
                 return true
             }
