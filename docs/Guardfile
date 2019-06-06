@@ -1,0 +1,7 @@
+Bundler.require :default
+
+guard 'shell' do
+  watch(/^*.adoc$/) {|f|
+    Asciidoctor.convert_file f[0]
+  }
+end

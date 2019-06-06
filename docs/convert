@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+
+Bundler.require(:default)
+
+Dir["**.adoc"].select {|f|
+  Asciidoctor.convert_file File.join(__dir__, f)
+}

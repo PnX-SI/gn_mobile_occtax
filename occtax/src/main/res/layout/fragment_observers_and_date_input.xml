@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_default"
+            android:layout_marginStart="@dimen/padding_default"
+            android:layout_marginTop="@dimen/padding_default"
+            app:cardCornerRadius="@dimen/cardview_radius"
+            app:cardElevation="@dimen/cardview_elevation"
+            app:contentPadding="@dimen/padding_default">
+
+            <fr.geonature.occtax.ui.shared.view.ListItemActionView
+                android:id="@+id/selected_observers_action_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:action="@string/action_edit"
+                app:action_empty="@string/action_add"
+                app:no_data="@string/observers_and_date_selected_observers_no_data"
+                app:title="@string/observers_and_date_selected_observers"
+                app:visible_items="2" />
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_default"
+            android:layout_marginStart="@dimen/padding_default"
+            android:layout_marginTop="@dimen/padding_default"
+            app:cardCornerRadius="@dimen/cardview_radius"
+            app:cardElevation="@dimen/cardview_elevation"
+            app:contentPadding="@dimen/padding_default">
+
+            <fr.geonature.occtax.ui.shared.view.ListItemActionView
+                android:id="@+id/input_date_action_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:action="@string/action_edit"
+                app:title="@string/observers_and_date_date" />
+
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+</ScrollView>

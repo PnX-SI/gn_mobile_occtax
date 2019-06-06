@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name" translatable="false">OccTax</string>
+    <string name="app_version" translatable="false">%1$s (%2$d)\n%3$s</string>
+
+    <string name="activity_main_title" translatable="false">@string/app_name</string>
+    <string name="activity_preferences_title">Settings</string>
+    <string name="activity_observers_title">Observers</string>
+
+    <string name="sync_device_status">Device status</string>
+    <string name="sync_last_synchronization">Last synchronization</string>
+    <string name="sync_last_synchronization_date">EEE dd MMM yyyy, kk:mm:ss</string>
+    <string name="sync_last_synchronization_never">Never</string>
+    <string name="sync_inputs_not_synchronized">Inputs not synchronized</string>
+    <string name="sync_action_synchronize">Synchronize</string>
+
+    <string name="home_last_inputs">Last inputs</string>
+    <string name="home_no_input">No existing input.\nCreate a new one by tapping the + button.</string>
+
+    <string name="no_data">No data</string>
+    <string name="selected_items_no_data">No selected item.\nAdd one by tapping the "Add" button.</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
+    <string name="action_add">Add</string>
+    <string name="action_edit">Edit</string>
+    <plurals name="action_title_item_count_selected">
+        <item quantity="one">%d selected</item>
+        <item quantity="other">%d selected</item>
+    </plurals>
+
+    <string name="alert_dialog_ok">OK</string>
+    <string name="alert_dialog_cancel">Cancel</string>
+
+    <string name="pager_fragment_observers_and_date_input_title">Observers &#38; date</string>
+    <string name="pager_fragment_taxa_title">Taxa</string>
+
+    <string name="observers_and_date_selected_observers">Selected observers</string>
+    <plurals name="observers_and_date_selected_observers">
+        <item quantity="one">%d selected observer</item>
+        <item quantity="other">%d selected observers</item>
+    </plurals>
+    <string name="observers_and_date_selected_observers_no_data">No selected observer.\nAdd one by tapping the "Add" button.</string>
+    <string name="observers_and_date_date">Date</string>
+    <string name="observers_and_date_date_format">MMMM dd, yyyy</string>
+
+
+</resources>

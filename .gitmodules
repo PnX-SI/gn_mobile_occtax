@@ -1,0 +1,4 @@
+[submodule "gn_mobile_core"]
+	path = gn_mobile_core
+	url = https://github.com/PnX-SI/gn_mobile_core.git
+	branch = develop
