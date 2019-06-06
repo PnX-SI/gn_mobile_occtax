@@ -16,7 +16,8 @@
 
         <activity
             android:name=".ui.home.HomeActivity"
-            android:label="@string/activity_main_title">
+            android:label="@string/activity_main_title"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -31,7 +32,9 @@
             android:label="@string/activity_observers_title"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".ui.input.InputPagerFragmentActivity">
+        <activity
+            android:name=".ui.input.InputPagerFragmentActivity"
+            android:screenOrientation="portrait">
         </activity>
 
     </application>

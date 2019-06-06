@@ -15,10 +15,17 @@ android {
         versionName version
         buildConfigField "String", "BUILD_DATE", "\"" + new Date().getTime() + "\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        archivesBaseName = module.name + "-" + versionName
     }
 
     buildTypes {
+        debug {
+            versionNameSuffix "." + getVersionCode(module.name) + "-DEV"
+        }
+
         release {
+            versionNameSuffix "." + getVersionCode(module.name)
+            debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
