@@ -17,6 +17,10 @@
 
     <string name="home_last_inputs">Last inputs</string>
     <string name="home_no_input">No existing input.\nCreate a new one by tapping the + button.</string>
+    <string name="home_input_date">EEE dd MMM yyyy</string>
+    <string name="home_input_created_at">Input created at %s</string>
+    <string name="home_snackbar_input_deleted">Input deleted</string>
+    <string name="home_snackbar_input_undo">Undo</string>
 
     <string name="no_data">No data</string>
     <string name="selected_items_no_data">No selected item.\nAdd one by tapping the "Add" button.</string>

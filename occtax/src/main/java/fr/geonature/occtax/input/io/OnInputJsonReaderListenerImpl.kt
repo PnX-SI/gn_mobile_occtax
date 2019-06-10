@@ -14,15 +14,15 @@ import java.util.Date
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener {
+class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<Input> {
 
-    override fun createInput(): AbstractInput {
+    override fun createInput(): Input {
         return Input()
     }
 
     override fun readAdditionalInputData(reader: JsonReader,
                                          keyName: String,
-                                         input: AbstractInput) {
+                                         input: Input) {
         when (keyName) {
             "geometry" -> readGeometry(reader,
                                        input)
@@ -33,7 +33,7 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener 
     }
 
     private fun readGeometry(reader: JsonReader,
-                             input: AbstractInput) {
+                             input: Input) {
         reader.beginObject()
 
         // TODO: read geometry object

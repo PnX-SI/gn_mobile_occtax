@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
  */
 class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivity() {
 
-    private lateinit var inputManager: InputManager
+    private lateinit var inputManager: InputManager<Input>
     private lateinit var input: Input
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +36,14 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
                                     OnInputJsonReaderListenerImpl(),
                                     OnInputJsonWriterListenerImpl())
 
-        readCurrentInput()
+        input = intent.getParcelableExtra(EXTRA_INPUT) ?: Input()
+
+        Log.i(TAG,
+              "loading input: ${input.id}")
+
+        GlobalScope.launch(Dispatchers.Main) {
+            pagerManager.load(input.id)
+        }
     }
 
     override fun onPause() {
@@ -69,19 +76,6 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
         setInputToCurrentPage()
     }
 
-    private fun readCurrentInput() {
-        GlobalScope.launch(Dispatchers.Main) {
-            val input = inputManager.readCurrentInput() ?: Input()
-
-            Log.i(TAG, "loading input: ${input.id}")
-
-            pagerHelper.load(input.id)
-
-            this@InputPagerFragmentActivity.input = input as Input
-            this@InputPagerFragmentActivity.setInputToCurrentPage()
-        }
-    }
-
     private fun setInputToCurrentPage() {
         val pageFragment = getCurrentPageFragment()
 
@@ -95,10 +89,15 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
     companion object {
 
         private val TAG = InputPagerFragmentActivity::class.java.name
+        const val EXTRA_INPUT = "extra_input"
 
-        fun newIntent(context: Context): Intent {
+        fun newIntent(context: Context,
+                      input: Input? = null): Intent {
             return Intent(context,
-                          InputPagerFragmentActivity::class.java)
+                          InputPagerFragmentActivity::class.java).apply {
+                putExtra(EXTRA_INPUT,
+                         input)
+            }
         }
     }
 }
