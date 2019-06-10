@@ -132,15 +132,15 @@ class HomeFragment : Fragment() {
                 listener?.onStartInput(input)
             }
 
-            override fun onInputLongClicked(index: Int,
+            override fun onInputLongClicked(position: Int,
                                             input: Input) {
-                selectedInputToDelete = Pair.create(index,
+                selectedInputToDelete = Pair.create(position,
                                                     input)
 
                 GlobalScope.launch(Dispatchers.Main) {
                     listener?.getInputManager()
                         ?.deleteInput(input.id)
-                    (inputRecyclerView.adapter as InputRecyclerViewAdapter).removeAt(index)
+                    (inputRecyclerView.adapter as InputRecyclerViewAdapter).remove(input)
                 }
 
                 Snackbar.make(homeContent,

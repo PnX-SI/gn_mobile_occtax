@@ -25,8 +25,7 @@ class InputRecyclerViewAdapter(private val listener: OnInputRecyclerViewAdapterL
 
     override fun onBindViewHolder(holder: ViewHolder,
                                   position: Int) {
-        holder.bind(position,
-                    inputs[position])
+        holder.bind(inputs[position])
     }
 
     fun setInputs(inputs: List<Input>) {
@@ -50,9 +49,14 @@ class InputRecyclerViewAdapter(private val listener: OnInputRecyclerViewAdapterL
         }
     }
 
-    fun removeAt(index: Int) {
-        this.inputs.removeAt(index)
-        notifyItemRemoved(index)
+    fun remove(input: Input) {
+        val inputPosition = this.inputs.indexOf(input)
+        this.inputs.remove(input)
+        notifyItemRemoved(inputPosition)
+
+        if (this.inputs.isEmpty()) {
+            notifyDataSetChanged()
+        }
     }
 
     inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_2,
@@ -61,14 +65,13 @@ class InputRecyclerViewAdapter(private val listener: OnInputRecyclerViewAdapterL
 
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
 
-        fun bind(position: Int,
-                 input: Input) {
+        fun bind(input: Input) {
             text1.text = itemView.context.getString(R.string.home_input_created_at,
                                                     DateFormat.format(itemView.context.getString(R.string.home_input_date),
                                                                       input.date))
             itemView.setOnClickListener { listener.onInputClicked(input) }
             itemView.setOnLongClickListener {
-                listener.onInputLongClicked(position,
+                listener.onInputLongClicked(inputs.indexOf(input),
                                             input)
                 true
             }
@@ -92,7 +95,7 @@ class InputRecyclerViewAdapter(private val listener: OnInputRecyclerViewAdapterL
          *
          * @param input the selected [Input]
          */
-        fun onInputLongClicked(index: Int,
+        fun onInputLongClicked(position: Int,
                                input: Input)
     }
 }
