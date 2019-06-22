@@ -3,9 +3,12 @@ package fr.geonature.occtax.ui.home
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import fr.geonature.commons.input.InputManager
+import fr.geonature.commons.settings.AppSettingsManager
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.io.OnInputJsonReaderListenerImpl
 import fr.geonature.occtax.input.io.OnInputJsonWriterListenerImpl
+import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.settings.io.OnAppSettingsJsonReaderListenerImpl
 import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
 import fr.geonature.occtax.ui.settings.PreferencesActivity
 import fr.geonature.occtax.util.IntentUtils
@@ -21,6 +24,7 @@ class HomeActivity : AppCompatActivity(),
                      HomeFragment.OnHomeFragmentFragmentListener {
 
     private lateinit var inputManager: InputManager<Input>
+    private lateinit var appSettingsManager: AppSettingsManager<AppSettings>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +32,8 @@ class HomeActivity : AppCompatActivity(),
         inputManager = InputManager(application,
                                     OnInputJsonReaderListenerImpl(),
                                     OnInputJsonWriterListenerImpl())
+        appSettingsManager = AppSettingsManager(application,
+                                                OnAppSettingsJsonReaderListenerImpl())
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
@@ -39,6 +45,10 @@ class HomeActivity : AppCompatActivity(),
 
     override fun getInputManager(): InputManager<Input> {
         return inputManager
+    }
+
+    override fun getAppSettingsManager(): AppSettingsManager<AppSettings> {
+        return appSettingsManager
     }
 
     override fun onShowSettings() {

@@ -71,6 +71,7 @@
         android:clickable="true"
         android:focusable="true"
         android:tint="@android:color/white"
+        android:visibility="invisible"
         app:elevation="@dimen/fab_elevation"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

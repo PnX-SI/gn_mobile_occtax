@@ -33,6 +33,8 @@
     <string name="alert_dialog_ok">OK</string>
     <string name="alert_dialog_cancel">Annuler</string>
 
+    <string name="message_settings_not_found">Erreur lors du chargement des paramètres \'%1$s\'</string>
+
     <string name="pager_fragment_observers_and_date_input_title">Observateur &#38; date</string>
     <string name="pager_fragment_taxa_title">Taxons</string>
 

@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
@@ -24,8 +25,10 @@ import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.data.AppSync
 import fr.geonature.commons.data.Provider.buildUri
 import fr.geonature.commons.input.InputManager
+import fr.geonature.commons.settings.AppSettingsManager
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
+import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.ui.settings.PreferencesFragment
 import fr.geonature.occtax.ui.shared.view.ListItemActionView
 import kotlinx.android.synthetic.main.fragment_home.appSyncView
@@ -46,6 +49,7 @@ class HomeFragment : Fragment() {
 
     private var listener: OnHomeFragmentFragmentListener? = null
     private lateinit var adapter: InputRecyclerViewAdapter
+    private var appSettings: AppSettings? = null
     private var selectedInputToDelete: Pair<Int, Input>? = null
 
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
@@ -199,9 +203,21 @@ class HomeFragment : Fragment() {
                         loaderCallbacks)
 
         GlobalScope.launch(Dispatchers.Main) {
-            val inputs: List<Input> = listener?.getInputManager()?.readInputs()
-                    ?: emptyList()
-            (inputRecyclerView.adapter as InputRecyclerViewAdapter).setInputs(inputs)
+            appSettings = listener?.getAppSettingsManager()
+                ?.loadAppSettings()
+
+            if (appSettings == null) {
+                showToastMessage(getString(R.string.message_settings_not_found,
+                                           listener?.getAppSettingsManager()?.getAppSettingsFilename()))
+            }
+            else {
+                fab.show()
+                activity?.invalidateOptionsMenu()
+
+                val inputs: List<Input> = listener?.getInputManager()?.readInputs()
+                        ?: emptyList()
+                (inputRecyclerView.adapter as InputRecyclerViewAdapter).setInputs(inputs)
+            }
         }
     }
 
@@ -246,6 +262,13 @@ class HomeFragment : Fragment() {
                          menu)
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+
+        val menuItemSettings = menu.findItem(R.id.menu_settings)
+        menuItemSettings.isEnabled = appSettings != null
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_settings -> {
@@ -274,11 +297,21 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun showToastMessage(message: CharSequence) {
+        val context = context ?: return
+
+        Toast.makeText(context,
+                       message,
+                       Toast.LENGTH_LONG)
+            .show()
+    }
+
     /**
      * Callback used by [PreferencesFragment].
      */
     interface OnHomeFragmentFragmentListener {
         fun getInputManager(): InputManager<Input>
+        fun getAppSettingsManager(): AppSettingsManager<AppSettings>
         fun onShowSettings()
         fun onStartSync()
         fun onStartInput(input: Input? = null)
