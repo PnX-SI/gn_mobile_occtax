@@ -3,5 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/gn_mobile_core" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/gn_mobile_maps" vcs="Git" />
   </component>
 </project>

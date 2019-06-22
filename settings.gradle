@@ -1,1 +1,1 @@
-include ':commons', ':viewpager', ':occtax'
+include ':commons', ':viewpager', ':maps', ':occtax'

@@ -8,3 +8,9 @@ Do **NOT** modify directly `commons` and `viewpager`. Any changes should be made
 ```bash
 ./upgrade_submodules.sh
 ```
+
+## Troubleshooting
+
+* Kotlin error, Redeclaration from class within imported module:
+
+  clean project from menu *Build -> Clean Project*, then rebuild project.
