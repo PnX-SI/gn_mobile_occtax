@@ -1,71 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/homeContent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="@dimen/padding_default"
-    tools:context=".ui.home.HomeActivity">
+    android:layout_height="match_parent">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardViewAppSyncView"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="@dimen/cardview_radius"
-        app:cardElevation="@dimen/cardview_elevation"
-        app:contentPadding="@dimen/padding_default"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/padding_default"
+        tools:context=".ui.home.HomeActivity">
 
-        <fr.geonature.occtax.ui.home.AppSyncView
-            android:id="@+id/appSyncView"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewAppSyncView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:action="@string/sync_action_synchronize"
-            app:title="@string/sync_device_status"
-            app:visible_items="2" />
+            app:cardCornerRadius="@dimen/cardview_radius"
+            app:cardElevation="@dimen/cardview_elevation"
+            app:contentPadding="@dimen/padding_default"
+            app:layout_constraintTop_toTopOf="parent">
 
-    </androidx.cardview.widget.CardView>
+            <fr.geonature.occtax.ui.home.AppSyncView
+                android:id="@+id/appSyncView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:action="@string/sync_action_synchronize"
+                app:title="@string/sync_device_status"
+                app:visible_items="2" />
 
-    <TextView
-        android:id="@+id/textViewLastInputs"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/padding_default"
-        android:layout_marginTop="@dimen/padding_default"
-        android:text="@string/home_last_inputs"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@+id/cardViewAppSyncView" />
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewLastInputs">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/inputRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </androidx.recyclerview.widget.RecyclerView>
+        </androidx.cardview.widget.CardView>
 
         <TextView
-            android:id="@+id/inputEmptyTextView"
+            android:id="@+id/textViewLastInputs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/home_no_input"
-            android:textAlignment="center" />
+            android:layout_marginBottom="@dimen/padding_default"
+            android:layout_marginTop="@dimen/padding_default"
+            android:text="@string/home_last_inputs"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/cardViewAppSyncView" />
 
-    </FrameLayout>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewLastInputs">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/inputRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <TextView
+                android:id="@+id/inputEmptyTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/home_no_input"
+                android:textAlignment="center" />
+
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
         android:layout_marginBottom="@dimen/padding_default"
         android:layout_marginEnd="@dimen/padding_default"
         android:clickable="true"
@@ -73,8 +80,6 @@
         android:tint="@android:color/white"
         android:visibility="invisible"
         app:elevation="@dimen/fab_elevation"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_add" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

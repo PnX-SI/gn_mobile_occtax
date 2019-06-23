@@ -37,7 +37,11 @@
     <string name="alert_dialog_ok">OK</string>
     <string name="alert_dialog_cancel">Cancel</string>
 
-    <string name="message_settings_not_found">Unable to load settings \'%1$s\'</string>
+    <string name="snackbar_settings_not_found">Unable to load settings \'%1$s\'</string>
+    <string name="snackbar_permissions_not_granted">Permissions were not granted</string>
+    <string name="snackbar_permissions_granted">Permissions were been granted</string>
+    <string name="snackbar_permission_external_storage_rationale">External storage permission is needed</string>
+    <string name="snackbar_permission_external_storage_available">External storage Permissions have been granted</string>
 
     <string name="pager_fragment_observers_and_date_input_title">Observers &#38; date</string>
     <string name="pager_fragment_taxa_title">Taxa</string>

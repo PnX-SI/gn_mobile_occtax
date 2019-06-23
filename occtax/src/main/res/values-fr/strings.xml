@@ -33,7 +33,11 @@
     <string name="alert_dialog_ok">OK</string>
     <string name="alert_dialog_cancel">Annuler</string>
 
-    <string name="message_settings_not_found">Erreur lors du chargement des paramètres \'%1$s\'</string>
+    <string name="snackbar_settings_not_found">Erreur lors du chargement des paramètres \'%1$s\'</string>
+    <string name="snackbar_permissions_not_granted">Les permissions n\'ont pas été accordées</string>
+    <string name="snackbar_permissions_granted">Les permissions ont été accordées</string>
+    <string name="snackbar_permission_external_storage_rationale">L\'application requiert la permission d\'accéder au contenu de la mémoire de stockage</string>
+    <string name="snackbar_permission_external_storage_available">L\'accès à la mémoire de stockage a été accordée</string>
 
     <string name="pager_fragment_observers_and_date_input_title">Observateur &#38; date</string>
     <string name="pager_fragment_taxa_title">Taxons</string>

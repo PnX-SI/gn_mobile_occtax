@@ -39,7 +39,8 @@ class InputRecyclerViewAdapter(private val listener: OnInputRecyclerViewAdapterL
                  index: Int? = null) {
         if (index == null) {
             this.inputs.add(input)
-            notifyItemInserted(this.inputs.size - 1)
+            notifyItemRangeInserted(this.inputs.size - 1,
+                                    1)
         }
         else {
             this.inputs.add(index,
@@ -47,6 +48,11 @@ class InputRecyclerViewAdapter(private val listener: OnInputRecyclerViewAdapterL
             notifyItemRangeChanged(index,
                                    this.inputs.size - index)
         }
+    }
+
+    fun clear() {
+        this.inputs.clear()
+        notifyDataSetChanged()
     }
 
     fun remove(input: Input) {
