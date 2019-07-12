@@ -33,7 +33,6 @@ import fr.geonature.commons.util.PermissionUtils.requestPermissions
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.settings.AppSettings
-import fr.geonature.occtax.ui.settings.PreferencesFragment
 import fr.geonature.occtax.ui.shared.view.ListItemActionView
 import kotlinx.android.synthetic.main.fragment_home.appSyncView
 import kotlinx.android.synthetic.main.fragment_home.fab
@@ -51,7 +50,7 @@ import kotlinx.coroutines.launch
  */
 class HomeFragment : Fragment() {
 
-    private var listener: OnHomeFragmentFragmentListener? = null
+    private var listener: OnHomeFragmentListener? = null
     private lateinit var adapter: InputRecyclerViewAdapter
     private var appSettings: AppSettings? = null
     private var selectedInputToDelete: Pair<Int, Input>? = null
@@ -80,7 +79,11 @@ class HomeFragment : Fragment() {
                 loader: Loader<Cursor>,
                 data: Cursor?) {
 
-            if (data == null) return
+            if (data == null) {
+                Log.w(TAG, "Failed to load data from '${(loader as CursorLoader).uri}'")
+
+                return
+            }
 
             when (loader.id) {
                 LOADER_APP_SYNC -> {
@@ -238,11 +241,11 @@ class HomeFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        if (context is OnHomeFragmentFragmentListener) {
+        if (context is OnHomeFragmentListener) {
             listener = context
         }
         else {
-            throw RuntimeException("$context must implement OnHomeFragmentFragmentListener")
+            throw RuntimeException("$context must implement OnHomeFragmentListener")
         }
     }
 
@@ -365,9 +368,9 @@ class HomeFragment : Fragment() {
     }
 
     /**
-     * Callback used by [PreferencesFragment].
+     * Callback used by [HomeFragment].
      */
-    interface OnHomeFragmentFragmentListener {
+    interface OnHomeFragmentListener {
         fun getInputManager(): InputManager<Input>
         fun getAppSettingsManager(): AppSettingsManager<AppSettings>
         fun onShowSettings()
@@ -387,6 +390,7 @@ class HomeFragment : Fragment() {
          *
          * @return A new instance of [HomeFragment]
          */
+        @JvmStatic
         fun newInstance() = HomeFragment()
     }
 }

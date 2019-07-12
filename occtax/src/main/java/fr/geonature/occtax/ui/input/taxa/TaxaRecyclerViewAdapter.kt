@@ -70,7 +70,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         val name = taxon.name ?: return ""
 
         return name.elementAt(0)
-                .toString()
+            .toString()
     }
 
     fun setSelectedTaxon(selectedTaxon: Taxon) {
@@ -119,7 +119,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         }
     }
 
-    inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_title_taxon,
+    inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_title_item_2,
                                                                                                                     parent,
                                                                                                                     false)) {
 
@@ -138,8 +138,8 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
             val previousTitle = if (position > 0) {
                 cursor.moveToPosition(position - 1)
                 Taxon.fromCursor(cursor)
-                        ?.name?.elementAt(0)
-                        .toString()
+                    ?.name?.elementAt(0)
+                    .toString()
             }
             else {
                 ""
@@ -147,7 +147,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
 
             if (taxon != null) {
                 val currentTitle = taxon.name?.elementAt(0)
-                        .toString()
+                    .toString()
                 title.text = if (previousTitle == currentTitle) "" else currentTitle
                 text1.text = taxon.name
                 text2.text = taxon.description

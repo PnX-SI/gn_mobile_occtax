@@ -21,7 +21,7 @@ import fr.geonature.occtax.util.IntentUtils
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
 class HomeActivity : AppCompatActivity(),
-                     HomeFragment.OnHomeFragmentFragmentListener {
+                     HomeFragment.OnHomeFragmentListener {
 
     private lateinit var inputManager: InputManager<Input>
     private lateinit var appSettingsManager: AppSettingsManager<AppSettings>

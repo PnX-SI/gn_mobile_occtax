@@ -2,6 +2,7 @@ package fr.geonature.occtax.ui.input.taxa
 
 import android.database.Cursor
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -86,7 +87,11 @@ class TaxaFragment : Fragment(),
         override fun onLoadFinished(loader: Loader<Cursor>,
                                     data: Cursor?) {
 
-            if (data == null) return
+            if (data == null) {
+                Log.w(TAG, "Failed to load data from '${(loader as CursorLoader).uri}'")
+
+                return
+            }
 
             when (loader.id) {
                 LOADER_TAXA -> adapter?.bind(data)
@@ -250,6 +255,7 @@ class TaxaFragment : Fragment(),
 
     companion object {
 
+        private val TAG = TaxaFragment::class.java.name
         private const val LOADER_TAXA = 1
         private const val LOADER_TAXON = 2
         private const val KEY_FILTER = "filter"

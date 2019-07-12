@@ -30,12 +30,15 @@ class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecy
             val checkbox: CheckBox = v.findViewById(android.R.id.checkbox)
 
             val inputObserver = v.tag as InputObserver
+            val isSelected = selectedInputObservers.contains(inputObserver)
 
             if (isSingleChoice()) {
+                val selectedItemsPositions = selectedInputObservers.map { getItemPosition(it) }
                 selectedInputObservers.clear()
+                selectedItemsPositions.forEach { notifyItemChanged(it) }
             }
 
-            if (selectedInputObservers.contains(inputObserver)) {
+            if (isSelected) {
                 selectedInputObservers.remove(inputObserver)
                 checkbox.isChecked = false
             }
@@ -72,7 +75,7 @@ class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecy
         val lastname = inputObserver.lastname ?: return ""
 
         return lastname.elementAt(0)
-                .toString()
+            .toString()
     }
 
     fun setChoiceMode(choiceMode: Int = ListView.CHOICE_MODE_SINGLE) {
@@ -97,6 +100,28 @@ class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecy
         this.cursor = cursor
         scrollToFirstItemSelected()
         notifyDataSetChanged()
+    }
+
+    private fun getItemPosition(inputObserver: InputObserver?): Int {
+        var itemPosition = -1
+        val cursor = cursor ?: return itemPosition
+        if (inputObserver == null) return itemPosition
+
+        cursor.moveToFirst()
+
+        while (!cursor.isAfterLast && itemPosition < 0) {
+            val currentInputObserver = InputObserver.fromCursor(cursor)
+
+            if (inputObserver.id == currentInputObserver?.id) {
+                itemPosition = cursor.position
+            }
+
+            cursor.moveToNext()
+        }
+
+        cursor.moveToFirst()
+
+        return itemPosition
     }
 
     private fun scrollToFirstItemSelected() {
@@ -142,8 +167,8 @@ class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecy
             val previousTitle = if (position > 0) {
                 cursor.moveToPosition(position - 1)
                 InputObserver.fromCursor(cursor)
-                        ?.lastname?.elementAt(0)
-                        .toString()
+                    ?.lastname?.elementAt(0)
+                    .toString()
             }
             else {
                 ""
@@ -151,7 +176,7 @@ class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecy
 
             if (inputObserver != null) {
                 val currentTitle = inputObserver.lastname?.elementAt(0)
-                        .toString()
+                    .toString()
                 title.text = if (previousTitle == currentTitle) "" else currentTitle
                 text1.text = inputObserver.lastname?.toUpperCase()
                 text2.text = inputObserver.firstname
