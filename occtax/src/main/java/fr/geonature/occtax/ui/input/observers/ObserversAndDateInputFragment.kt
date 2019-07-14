@@ -5,6 +5,7 @@ import android.content.Intent
 import android.database.Cursor
 import android.os.Bundle
 import android.text.format.DateFormat
+import android.util.Log
 import android.util.Pair
 import android.view.LayoutInflater
 import android.view.View
@@ -71,7 +72,11 @@ class ObserversAndDateInputFragment : Fragment(),
                 loader: Loader<Cursor>,
                 data: Cursor?) {
 
-            if (data == null) return
+            if (data == null) {
+                Log.w(TAG, "Failed to load data from '${(loader as CursorLoader).uri}'")
+
+                return
+            }
 
             when (loader.id) {
                 LOADER_OBSERVERS_IDS -> {
@@ -221,6 +226,7 @@ class ObserversAndDateInputFragment : Fragment(),
 
     companion object {
 
+        private val TAG = ObserversAndDateInputFragment::class.java.name
         private const val DATE_PICKER_DIALOG_FRAGMENT = "date_picker_dialog_fragment"
         private const val LOADER_OBSERVERS_IDS = 1
         private const val KEY_SELECTED_INPUT_OBSERVER_IDS = "selected_input_observer_ids"

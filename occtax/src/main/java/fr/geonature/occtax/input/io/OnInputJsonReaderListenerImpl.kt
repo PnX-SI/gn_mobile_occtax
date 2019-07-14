@@ -5,6 +5,7 @@ import android.util.JsonToken
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.commons.input.io.InputJsonReader
 import fr.geonature.commons.util.IsoDateUtils
+import fr.geonature.maps.jts.geojson.io.GeoJsonReader
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
 import java.util.Date
@@ -14,15 +15,17 @@ import java.util.Date
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener {
+class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<Input> {
 
-    override fun createInput(): AbstractInput {
+    private val geoJsonReader = GeoJsonReader()
+
+    override fun createInput(): Input {
         return Input()
     }
 
     override fun readAdditionalInputData(reader: JsonReader,
                                          keyName: String,
-                                         input: AbstractInput) {
+                                         input: Input) {
         when (keyName) {
             "geometry" -> readGeometry(reader,
                                        input)
@@ -33,12 +36,14 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener 
     }
 
     private fun readGeometry(reader: JsonReader,
-                             input: AbstractInput) {
-        reader.beginObject()
-
-        // TODO: read geometry object
-
-        reader.endObject()
+                             input: Input) {
+        when (reader.peek()) {
+            JsonToken.NULL -> reader.nextNull()
+            JsonToken.BEGIN_OBJECT -> {
+                input.geometry = geoJsonReader.readGeometry(reader)
+            }
+            else -> reader.skipValue()
+        }
     }
 
     private fun readProperties(reader: JsonReader,

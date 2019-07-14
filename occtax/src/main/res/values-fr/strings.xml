@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <string name="activity_preferences_title">Paramètres</string>
     <string name="activity_observers_title">Observateurs</string>
@@ -13,6 +13,10 @@
 
     <string name="home_last_inputs">Relevés en cours</string>
     <string name="home_no_input">Aucun relevé en cours.\nCréer un nouveau relevé via le bouton +.</string>
+    <string name="home_input_date">EEE dd MMM yyyy</string>
+    <string name="home_input_created_at">Relevé créé le %s</string>
+    <string name="home_snackbar_input_deleted">Relevé supprimé</string>
+    <string name="home_snackbar_input_undo">Annuler</string>
 
     <string name="no_data">Aucune donnée</string>
     <string name="selected_items_no_data">Aucune sélection.\nAjouter en un via le bouton "Ajouter".</string>
@@ -29,7 +33,14 @@
     <string name="alert_dialog_ok">OK</string>
     <string name="alert_dialog_cancel">Annuler</string>
 
+    <string name="snackbar_settings_not_found">Erreur lors du chargement des paramètres \'%1$s\'</string>
+    <string name="snackbar_permissions_not_granted">Les permissions n\'ont pas été accordées</string>
+    <string name="snackbar_permissions_granted">Les permissions ont été accordées</string>
+    <string name="snackbar_permission_external_storage_rationale">L\'application requiert la permission d\'accéder au contenu de la mémoire de stockage</string>
+    <string name="snackbar_permission_external_storage_available">L\'accès à la mémoire de stockage a été accordée</string>
+
     <string name="pager_fragment_observers_and_date_input_title">Observateur &#38; date</string>
+    <string name="pager_fragment_map_title">Pointage</string>
     <string name="pager_fragment_taxa_title">Taxons</string>
 
     <string name="observers_and_date_selected_observers">Observateurs</string>

@@ -1,20 +1,23 @@
 package fr.geonature.occtax.input.io
 
 import android.util.JsonWriter
-import fr.geonature.commons.input.AbstractInput
 import fr.geonature.commons.input.AbstractInputTaxon
 import fr.geonature.commons.input.io.InputJsonWriter
 import fr.geonature.commons.util.IsoDateUtils
+import fr.geonature.maps.jts.geojson.io.GeoJsonWriter
+import fr.geonature.occtax.input.Input
 
 /**
  * Default implementation of [InputJsonWriter.OnInputJsonWriterListener].
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener {
+class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<Input> {
+
+    private val geoJsonWriter = GeoJsonWriter()
 
     override fun writeAdditionalInputData(writer: JsonWriter,
-                                          input: AbstractInput) {
+                                          input: Input) {
         writeGeometry(writer,
                       input)
         writeProperties(writer,
@@ -22,17 +25,22 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener 
     }
 
     private fun writeGeometry(writer: JsonWriter,
-                              input: AbstractInput) {
+                              input: Input) {
         writer.name("geometry")
-            .beginObject()
 
-        // TODO: write geometry object
+        val geometry = input.geometry
 
-        writer.endObject()
+        if (geometry == null) {
+            writer.nullValue()
+        }
+        else {
+            geoJsonWriter.writeGeometry(writer,
+                                        geometry)
+        }
     }
 
     private fun writeProperties(writer: JsonWriter,
-                                input: AbstractInput) {
+                                input: Input) {
         writer.name("properties")
             .beginObject()
 
@@ -54,7 +62,7 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener 
     }
 
     private fun writeDate(writer: JsonWriter,
-                          input: AbstractInput) {
+                          input: Input) {
         val dateToIsoString = IsoDateUtils.toIsoDateString(input.date)
         writer.name("date_min")
             .value(dateToIsoString)
@@ -63,7 +71,7 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener 
     }
 
     private fun writeInputObserverIds(writer: JsonWriter,
-                                      input: AbstractInput) {
+                                      input: Input) {
         writer.name("observers")
             .beginArray()
 
@@ -74,7 +82,7 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener 
     }
 
     private fun writeInputTaxa(writer: JsonWriter,
-                               input: AbstractInput) {
+                               input: Input) {
         writer.name("t_occurrences_occtax")
             .beginArray()
 

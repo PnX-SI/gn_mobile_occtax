@@ -1,0 +1,30 @@
+{
+  "map": {
+    "show_scale": true,
+    "show_compass": true,
+    "max_bounds": [
+      [
+        47.253369,
+        -1.605721
+      ],
+      [
+        47.173845,
+        -1.482811
+      ]
+    ],
+    "center": [
+      47.225827,
+      -1.554470
+    ],
+    "start_zoom": 10.0,
+    "min_zoom": 8.0,
+    "max_zoom": 19.0,
+    "min_zoom_editing": 12.0,
+    "layers": [
+      {
+        "label": "Nantes",
+        "source": "nantes.mbtiles"
+      }
+    ]
+  }
+}

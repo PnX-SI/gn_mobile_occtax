@@ -21,7 +21,7 @@ import java.util.Date
 @RunWith(RobolectricTestRunner::class)
 class InputJsonWriterTest {
 
-    private lateinit var inputJsonWriter: InputJsonWriter
+    private lateinit var inputJsonWriter: InputJsonWriter<Input>
 
     @Before
     fun setUp() {

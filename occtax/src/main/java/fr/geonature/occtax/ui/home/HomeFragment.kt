@@ -1,23 +1,47 @@
 package fr.geonature.occtax.ui.home
 
+import android.Manifest
 import android.content.Context
 import android.database.Cursor
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.core.os.bundleOf
+import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.data.AppSync
 import fr.geonature.commons.data.Provider.buildUri
-import fr.geonature.occtax.ui.settings.PreferencesFragment
+import fr.geonature.commons.input.InputManager
+import fr.geonature.commons.settings.AppSettingsManager
+import fr.geonature.commons.util.PermissionUtils.OnCheckSelfPermissionListener
+import fr.geonature.commons.util.PermissionUtils.checkPermissions
+import fr.geonature.commons.util.PermissionUtils.checkSelfPermissions
+import fr.geonature.commons.util.PermissionUtils.requestPermissions
+import fr.geonature.occtax.R
+import fr.geonature.occtax.input.Input
+import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.ui.shared.view.ListItemActionView
+import kotlinx.android.synthetic.main.fragment_home.appSyncView
+import kotlinx.android.synthetic.main.fragment_home.fab
+import kotlinx.android.synthetic.main.fragment_home.homeContent
+import kotlinx.android.synthetic.main.fragment_home.inputEmptyTextView
+import kotlinx.android.synthetic.main.fragment_home.inputRecyclerView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * Home screen [Fragment].
@@ -26,8 +50,11 @@ import fr.geonature.occtax.ui.shared.view.ListItemActionView
  */
 class HomeFragment : Fragment() {
 
-    private var listener: OnHomeFragmentFragmentListener? = null
-    private lateinit var appSyncView: AppSyncView
+    private var listener: OnHomeFragmentListener? = null
+    private lateinit var adapter: InputRecyclerViewAdapter
+    private var appSettings: AppSettings? = null
+    private var selectedInputToDelete: Pair<Int, Input>? = null
+    private var requestPermissionsResult = true
 
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(
@@ -36,7 +63,8 @@ class HomeFragment : Fragment() {
             when (id) {
                 LOADER_APP_SYNC -> return CursorLoader(requireContext(),
                                                        buildUri(AppSync.TABLE_NAME,
-                                                                args!!.getString(AppSync.COLUMN_ID)!!),
+                                                                args?.getString(AppSync.COLUMN_ID)
+                                                                        ?: ""),
                                                        arrayOf(AppSync.COLUMN_ID,
                                                                AppSync.COLUMN_LAST_SYNC,
                                                                AppSync.COLUMN_INPUTS_TO_SYNCHRONIZE),
@@ -51,7 +79,12 @@ class HomeFragment : Fragment() {
                 loader: Loader<Cursor>,
                 data: Cursor?) {
 
-            if (data == null) return
+            if (data == null) {
+                Log.w(TAG,
+                      "Failed to load data from '${(loader as CursorLoader).uri}'")
+
+                return
+            }
 
             when (loader.id) {
                 LOADER_APP_SYNC -> {
@@ -67,11 +100,23 @@ class HomeFragment : Fragment() {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val selectedInputPositionToDelete = savedInstanceState?.getInt(STATE_SELECTED_INPUT_POSITION_TO_DELETE)
+        val selectedInputToDelete = savedInstanceState?.getParcelable<Input>(STATE_SELECTED_INPUT_TO_DELETE)
+
+        if (selectedInputPositionToDelete != null && selectedInputToDelete != null) {
+            this.selectedInputToDelete = Pair.create(selectedInputPositionToDelete,
+                                                     selectedInputToDelete)
+        }
+    }
+
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?): View {
-        return inflater.inflate(fr.geonature.occtax.R.layout.home_fragment,
+        return inflater.inflate(R.layout.fragment_home,
                                 container,
                                 false)
     }
@@ -84,25 +129,130 @@ class HomeFragment : Fragment() {
 
         setHasOptionsMenu(true)
 
-        appSyncView = view.findViewById(fr.geonature.occtax.R.id.appSyncView)
         appSyncView.setListener(object : ListItemActionView.OnListItemActionViewListener {
             override fun onAction() {
                 listener?.onStartSync()
             }
         })
 
-        view.findViewById<View>(fr.geonature.occtax.R.id.fab)
-                .setOnClickListener { listener?.onStartInput() }
+        fab.setOnClickListener {
+            val appSettings = appSettings ?: return@setOnClickListener
+            listener?.onStartInput(appSettings)
+        }
+
+        adapter = InputRecyclerViewAdapter(object : InputRecyclerViewAdapter.OnInputRecyclerViewAdapterListener {
+            override fun onInputClicked(input: Input) {
+                val appSettings = appSettings ?: return
+
+                Log.i(TAG,
+                      "input selected: ${input.id}")
+
+                listener?.onStartInput(appSettings,
+                                       input)
+            }
+
+            override fun onInputLongClicked(position: Int,
+                                            input: Input) {
+                selectedInputToDelete = Pair.create(position,
+                                                    input)
+
+                GlobalScope.launch(Dispatchers.Main) {
+                    listener?.getInputManager()
+                        ?.deleteInput(input.id)
+                    (inputRecyclerView.adapter as InputRecyclerViewAdapter).remove(input)
+                }
+
+                Snackbar.make(homeContent,
+                              R.string.home_snackbar_input_deleted,
+                              Snackbar.LENGTH_SHORT)
+                    .setAction(R.string.home_snackbar_input_undo
+                    ) {
+                        GlobalScope.launch(Dispatchers.Main) {
+                            val inputToRestore = selectedInputToDelete?.second
+
+                            if (inputToRestore != null) {
+                                listener?.getInputManager()
+                                    ?.saveInput(inputToRestore)
+                                (inputRecyclerView.adapter as InputRecyclerViewAdapter).addInput(inputToRestore,
+                                                                                                 selectedInputToDelete?.first)
+                            }
+
+                            selectedInputToDelete = null
+                        }
+                    }
+                    .show()
+            }
+        })
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                super.onChanged()
+
+                showEmptyTextView(adapter.itemCount == 0)
+            }
+
+            override fun onItemRangeChanged(positionStart: Int,
+                                            itemCount: Int) {
+                super.onItemRangeChanged(positionStart,
+                                         itemCount)
+
+                showEmptyTextView(adapter.itemCount == 0)
+            }
+
+            override fun onItemRangeInserted(positionStart: Int,
+                                             itemCount: Int) {
+                super.onItemRangeInserted(positionStart,
+                                          itemCount)
+
+                showEmptyTextView(false)
+            }
+        })
+
+        with(inputRecyclerView) {
+            layoutManager = LinearLayoutManager(context)
+            adapter = this@HomeFragment.adapter
+        }
+
+        val dividerItemDecoration = DividerItemDecoration(inputRecyclerView.context,
+                                                          (inputRecyclerView.layoutManager as LinearLayoutManager).orientation)
+        inputRecyclerView.addItemDecoration(dividerItemDecoration)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        LoaderManager.getInstance(this)
+            .initLoader(LOADER_APP_SYNC,
+                        bundleOf(AppSync.COLUMN_ID to requireContext().packageName),
+                        loaderCallbacks)
+
+        if (requestPermissionsResult) {
+            val context = context ?: return
+            checkSelfPermissions(context,
+                                 object : OnCheckSelfPermissionListener {
+                                     override fun onPermissionsGranted() {
+                                         loadAppSettings()
+                                     }
+
+                                     override fun onRequestPermissions(vararg permissions: String) {
+                                         requestPermissions(this@HomeFragment,
+                                                            homeContent,
+                                                            R.string.snackbar_permission_external_storage_rationale,
+                                                            REQUEST_EXTERNAL_STORAGE,
+                                                            *permissions)
+                                     }
+                                 },
+                                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        if (context is OnHomeFragmentFragmentListener) {
+        if (context is OnHomeFragmentListener) {
             listener = context
         }
         else {
-            throw RuntimeException("$context must implement OnHomeFragmentFragmentListener")
+            throw RuntimeException("$context must implement OnHomeFragmentListener")
         }
     }
 
@@ -112,28 +262,40 @@ class HomeFragment : Fragment() {
         listener = null
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        val selectedInputPositionToDelete = this.selectedInputToDelete?.first
+        val selectedInputToDelete = this.selectedInputToDelete?.second
+
+        if (selectedInputPositionToDelete != null && selectedInputToDelete != null) {
+            outState.putInt(STATE_SELECTED_INPUT_POSITION_TO_DELETE,
+                            selectedInputPositionToDelete)
+            outState.putParcelable(STATE_SELECTED_INPUT_TO_DELETE,
+                                   selectedInputToDelete)
+        }
+
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onCreateOptionsMenu(
             menu: Menu,
             inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu,
                                   inflater)
 
-        inflater.inflate(fr.geonature.occtax.R.menu.settings,
+        inflater.inflate(R.menu.settings,
                          menu)
     }
 
-    /*
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
 
         val menuItemSettings = menu.findItem(R.id.menu_settings)
-        menuItemSettings.isEnabled = true
+        menuItemSettings.isEnabled = appSettings != null
     }
-    */
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            fr.geonature.occtax.R.id.menu_settings -> {
+            R.id.menu_settings -> {
                 listener?.onShowSettings()
                 true
             }
@@ -141,32 +303,102 @@ class HomeFragment : Fragment() {
         }
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<out String>,
+                                            grantResults: IntArray) {
+        when (requestCode) {
+            REQUEST_EXTERNAL_STORAGE -> {
+                requestPermissionsResult = checkPermissions(grantResults)
 
-        LoaderManager.getInstance(this)
-                .initLoader(LOADER_APP_SYNC,
-                            bundleOf(AppSync.COLUMN_ID to requireContext().packageName),
-                            loaderCallbacks)
+                if (requestPermissionsResult) {
+                    Snackbar.make(homeContent,
+                                  R.string.snackbar_permission_external_storage_available,
+                                  Snackbar.LENGTH_LONG)
+                        .show()
+                }
+                else {
+                    Snackbar.make(homeContent,
+                                  R.string.snackbar_permissions_not_granted,
+                                  Snackbar.LENGTH_LONG)
+                        .show()
+                }
+            }
+            else -> super.onRequestPermissionsResult(requestCode,
+                                                     permissions,
+                                                     grantResults)
+        }
+    }
+
+    private fun loadAppSettings() {
+        GlobalScope.launch(Dispatchers.Main) {
+            appSettings = listener?.getAppSettingsManager()
+                ?.loadAppSettings()
+
+            if (appSettings == null) {
+                fab.hide()
+                adapter.clear()
+                activity?.invalidateOptionsMenu()
+
+                Snackbar.make(homeContent,
+                              getString(R.string.snackbar_settings_not_found,
+                                        listener?.getAppSettingsManager()?.getAppSettingsFilename()),
+                              Snackbar.LENGTH_LONG)
+                    .show()
+            }
+            else {
+                fab.show()
+                activity?.invalidateOptionsMenu()
+
+                val inputs: List<Input> = listener?.getInputManager()?.readInputs()
+                        ?: emptyList()
+                (inputRecyclerView.adapter as InputRecyclerViewAdapter).setInputs(inputs)
+            }
+        }
+    }
+
+    private fun showEmptyTextView(show: Boolean) {
+        if (inputEmptyTextView.visibility == View.VISIBLE == show) {
+            return
+        }
+
+        if (show) {
+            inputEmptyTextView.startAnimation(AnimationUtils.loadAnimation(context,
+                                                                           android.R.anim.fade_in))
+            inputEmptyTextView.visibility = View.VISIBLE
+
+        }
+        else {
+            inputEmptyTextView.startAnimation(AnimationUtils.loadAnimation(context,
+                                                                           android.R.anim.fade_out))
+            inputEmptyTextView.visibility = View.GONE
+        }
     }
 
     /**
-     * Callback used by [PreferencesFragment].
+     * Callback used by [HomeFragment].
      */
-    interface OnHomeFragmentFragmentListener {
+    interface OnHomeFragmentListener {
+        fun getInputManager(): InputManager<Input>
+        fun getAppSettingsManager(): AppSettingsManager<AppSettings>
         fun onShowSettings()
         fun onStartSync()
-        fun onStartInput()
+        fun onStartInput(appSettings: AppSettings,
+                         input: Input? = null)
     }
 
     companion object {
+        private val TAG = HomeFragment::class.java.name
         private const val LOADER_APP_SYNC = 1
+        private const val STATE_SELECTED_INPUT_POSITION_TO_DELETE = "state_selected_input_position_to_delete"
+        private const val STATE_SELECTED_INPUT_TO_DELETE = "state_selected_input_to_delete"
+        private const val REQUEST_EXTERNAL_STORAGE = 0
 
         /**
          * Use this factory method to create a new instance of [HomeFragment].
          *
          * @return A new instance of [HomeFragment]
          */
+        @JvmStatic
         fun newInstance() = HomeFragment()
     }
 }

@@ -23,7 +23,7 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class InputJsonReaderTest {
 
-    private lateinit var inputJsonReader: InputJsonReader
+    private lateinit var inputJsonReader: InputJsonReader<Input>
 
     @Before
     fun setUp() {
@@ -108,6 +108,7 @@ class InputJsonReaderTest {
         assertArrayEquals(longArrayOf(),
                           input.getInputObserverIds()
                               .toLongArray())
+        assertNull(input.geometry)
         assertEquals(listOf<AbstractInputTaxon>(),
                      input.getInputTaxa())
     }

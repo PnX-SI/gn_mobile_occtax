@@ -10,6 +10,8 @@ import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.io.OnInputJsonReaderListenerImpl
 import fr.geonature.occtax.input.io.OnInputJsonWriterListenerImpl
+import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.ui.input.map.InputMapFragment
 import fr.geonature.occtax.ui.input.observers.ObserversAndDateInputFragment
 import fr.geonature.occtax.ui.input.taxa.TaxaFragment
 import fr.geonature.viewpager.ui.AbstractNavigationHistoryPagerFragmentActivity
@@ -26,7 +28,8 @@ import kotlinx.coroutines.launch
  */
 class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivity() {
 
-    private lateinit var inputManager: InputManager
+    private lateinit var inputManager: InputManager<Input>
+    private lateinit var appSettings: AppSettings
     private lateinit var input: Input
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +39,20 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
                                     OnInputJsonReaderListenerImpl(),
                                     OnInputJsonWriterListenerImpl())
 
-        readCurrentInput()
+        appSettings = intent.getParcelableExtra(EXTRA_APP_SETTINGS)
+        input = intent.getParcelableExtra(EXTRA_INPUT) ?: Input()
+        val lastAddedInputTaxon = input.getLastAddedInputTaxon()
+
+        if (lastAddedInputTaxon != null) {
+            input.setCurrentSelectedInputTaxonId(lastAddedInputTaxon.id)
+        }
+
+        Log.i(TAG,
+              "loading input: ${input.id}")
+
+        GlobalScope.launch(Dispatchers.Main) {
+            pagerManager.load(input.id)
+        }
     }
 
     override fun onPause() {
@@ -51,6 +67,8 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
         get() = LinkedHashMap<Int, IValidateFragment>().apply {
             put(R.string.pager_fragment_observers_and_date_input_title,
                 ObserversAndDateInputFragment.newInstance())
+            put(R.string.pager_fragment_map_title,
+                InputMapFragment.newInstance(appSettings.mapSettings!!))
             put(R.string.pager_fragment_taxa_title,
                 TaxaFragment.newInstance())
         }
@@ -69,19 +87,6 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
         setInputToCurrentPage()
     }
 
-    private fun readCurrentInput() {
-        GlobalScope.launch(Dispatchers.Main) {
-            val input = inputManager.readCurrentInput() ?: Input()
-
-            Log.i(TAG, "loading input: ${input.id}")
-
-            pagerHelper.load(input.id)
-
-            this@InputPagerFragmentActivity.input = input as Input
-            this@InputPagerFragmentActivity.setInputToCurrentPage()
-        }
-    }
-
     private fun setInputToCurrentPage() {
         val pageFragment = getCurrentPageFragment()
 
@@ -96,9 +101,19 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
 
         private val TAG = InputPagerFragmentActivity::class.java.name
 
-        fun newIntent(context: Context): Intent {
+        private const val EXTRA_APP_SETTINGS = "extra_app_settings"
+        private const val EXTRA_INPUT = "extra_input"
+
+        fun newIntent(context: Context,
+                      appSettings: AppSettings,
+                      input: Input? = null): Intent {
             return Intent(context,
-                          InputPagerFragmentActivity::class.java)
+                          InputPagerFragmentActivity::class.java).apply {
+                putExtra(EXTRA_APP_SETTINGS,
+                         appSettings)
+                putExtra(EXTRA_INPUT,
+                         input)
+            }
         }
     }
 }
