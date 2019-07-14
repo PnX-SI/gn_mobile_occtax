@@ -80,7 +80,8 @@ class HomeFragment : Fragment() {
                 data: Cursor?) {
 
             if (data == null) {
-                Log.w(TAG, "Failed to load data from '${(loader as CursorLoader).uri}'")
+                Log.w(TAG,
+                      "Failed to load data from '${(loader as CursorLoader).uri}'")
 
                 return
             }
@@ -134,14 +135,20 @@ class HomeFragment : Fragment() {
             }
         })
 
-        fab.setOnClickListener { listener?.onStartInput() }
+        fab.setOnClickListener {
+            val appSettings = appSettings ?: return@setOnClickListener
+            listener?.onStartInput(appSettings)
+        }
 
         adapter = InputRecyclerViewAdapter(object : InputRecyclerViewAdapter.OnInputRecyclerViewAdapterListener {
             override fun onInputClicked(input: Input) {
+                val appSettings = appSettings ?: return
+
                 Log.i(TAG,
                       "input selected: ${input.id}")
 
-                listener?.onStartInput(input)
+                listener?.onStartInput(appSettings,
+                                       input)
             }
 
             override fun onInputLongClicked(position: Int,
@@ -375,7 +382,8 @@ class HomeFragment : Fragment() {
         fun getAppSettingsManager(): AppSettingsManager<AppSettings>
         fun onShowSettings()
         fun onStartSync()
-        fun onStartInput(input: Input? = null)
+        fun onStartInput(appSettings: AppSettings,
+                         input: Input? = null)
     }
 
     companion object {

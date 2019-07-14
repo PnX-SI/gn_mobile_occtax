@@ -59,8 +59,10 @@ class HomeActivity : AppCompatActivity(),
         startActivity(IntentUtils.syncActivity(this))
     }
 
-    override fun onStartInput(input: Input?) {
+    override fun onStartInput(appSettings: AppSettings,
+                              input: Input?) {
         startActivity(InputPagerFragmentActivity.newIntent(this,
+                                                           appSettings,
                                                            input))
     }
 }

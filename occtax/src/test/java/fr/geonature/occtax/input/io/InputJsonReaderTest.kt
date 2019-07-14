@@ -108,6 +108,7 @@ class InputJsonReaderTest {
         assertArrayEquals(longArrayOf(),
                           input.getInputObserverIds()
                               .toLongArray())
+        assertNull(input.geometry)
         assertEquals(listOf<AbstractInputTaxon>(),
                      input.getInputTaxa())
     }

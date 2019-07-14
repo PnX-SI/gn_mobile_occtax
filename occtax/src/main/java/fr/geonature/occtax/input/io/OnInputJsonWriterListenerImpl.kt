@@ -4,6 +4,7 @@ import android.util.JsonWriter
 import fr.geonature.commons.input.AbstractInputTaxon
 import fr.geonature.commons.input.io.InputJsonWriter
 import fr.geonature.commons.util.IsoDateUtils
+import fr.geonature.maps.jts.geojson.io.GeoJsonWriter
 import fr.geonature.occtax.input.Input
 
 /**
@@ -12,6 +13,8 @@ import fr.geonature.occtax.input.Input
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
 class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<Input> {
+
+    private val geoJsonWriter = GeoJsonWriter()
 
     override fun writeAdditionalInputData(writer: JsonWriter,
                                           input: Input) {
@@ -24,11 +27,16 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
     private fun writeGeometry(writer: JsonWriter,
                               input: Input) {
         writer.name("geometry")
-            .beginObject()
 
-        // TODO: write geometry object
+        val geometry = input.geometry
 
-        writer.endObject()
+        if (geometry == null) {
+            writer.nullValue()
+        }
+        else {
+            geoJsonWriter.writeGeometry(writer,
+                                        geometry)
+        }
     }
 
     private fun writeProperties(writer: JsonWriter,

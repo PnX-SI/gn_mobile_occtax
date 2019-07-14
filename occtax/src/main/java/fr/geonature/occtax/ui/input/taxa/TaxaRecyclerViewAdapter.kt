@@ -75,6 +75,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
 
     fun setSelectedTaxon(selectedTaxon: Taxon) {
         this.selectedTaxon = selectedTaxon
+        scrollToFirstItemSelected()
         notifyDataSetChanged()
     }
 

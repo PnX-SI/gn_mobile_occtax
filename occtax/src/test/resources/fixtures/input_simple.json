@@ -1,7 +1,7 @@
 {
   "id": 1234,
   "module": "occtax",
-  "geometry": {},
+  "geometry": null,
   "properties": {
     "meta_device_entry": "mobile",
     "date_min": "2016-10-28T00:00:00Z",

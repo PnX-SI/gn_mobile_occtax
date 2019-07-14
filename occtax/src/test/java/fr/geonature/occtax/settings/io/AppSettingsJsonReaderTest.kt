@@ -49,12 +49,12 @@ class AppSettingsJsonReaderTest {
                                         )
                                 ),
                                 null,
-                                showScale = false,
-                                showCompass = false,
-                                zoom = 8.0,
-                                minZoomLevel = 7.0,
-                                maxZoomLevel = 12.0,
-                                minZoomEditing = 10.0,
+                                showScale = true,
+                                showCompass = true,
+                                zoom = 10.0,
+                                minZoomLevel = 8.0,
+                                maxZoomLevel = 19.0,
+                                minZoomEditing = 12.0,
                                 maxBounds = BoundingBox.fromGeoPoints(
                                         arrayListOf(
                                                 GeoPoint(
