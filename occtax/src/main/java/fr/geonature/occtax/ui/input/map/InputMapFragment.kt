@@ -5,14 +5,20 @@ import androidx.fragment.app.Fragment
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.maps.jts.geojson.GeometryUtils.fromPoint
 import fr.geonature.maps.jts.geojson.GeometryUtils.toPoint
+import fr.geonature.maps.settings.LayerStyleSettings
 import fr.geonature.maps.settings.MapSettings
 import fr.geonature.maps.ui.MapFragment
+import fr.geonature.maps.ui.overlay.feature.FeatureCollectionOverlay
+import fr.geonature.maps.ui.overlay.feature.filter.ContainsFeaturesFilter
 import fr.geonature.maps.ui.widget.EditFeatureButton
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.locationtech.jts.geom.Point
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -34,10 +40,8 @@ class InputMapFragment : MapFragment(),
         onSelectedPOIsListener = object : OnSelectedPOIsListener {
             override fun onSelectedPOIs(pois: List<GeoPoint>) {
                 if (pois.isNotEmpty()) {
-                    input?.geometry = toPoint(pois[0])
+                    selectPOI(pois[0])
                 }
-
-                (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
             }
         }
     }
@@ -64,6 +68,30 @@ class InputMapFragment : MapFragment(),
 
     override fun setInput(input: AbstractInput) {
         this.input = input as Input
+    }
+
+    private fun selectPOI(poi: GeoPoint) {
+        GlobalScope.launch(Dispatchers.Main) {
+            input?.geometry = toPoint(poi)
+
+            // select matching Feature from Overlays
+            input?.selectedFeatureId = getOverlays { overlay -> overlay is FeatureCollectionOverlay }
+                .asSequence()
+                .map { it as FeatureCollectionOverlay }
+                .map { it.also { it.setStyle(it.layerStyle) } }
+                .map {
+                    val filter = ContainsFeaturesFilter(poi,
+                                                        it.layerStyle,
+                                                        LayerStyleSettings.Builder.newInstance().from(it.layerStyle).color("red").build())
+                    it.apply(filter)
+                    filter.getSelectedFeatures()
+                }
+                .flatMap { it.asSequence() }
+                .map { it.id }
+                .firstOrNull()
+
+            (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+        }
     }
 
     companion object {

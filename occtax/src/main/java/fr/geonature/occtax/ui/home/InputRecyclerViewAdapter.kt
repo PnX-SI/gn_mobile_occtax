@@ -4,6 +4,7 @@ import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
@@ -13,6 +14,40 @@ import fr.geonature.occtax.input.Input
  */
 class InputRecyclerViewAdapter(private val listener: OnInputRecyclerViewAdapterListener) : RecyclerView.Adapter<InputRecyclerViewAdapter.ViewHolder>() {
     private val inputs: MutableList<Input> = mutableListOf()
+
+    init {
+        registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                super.onChanged()
+
+                listener.showEmptyTextView(itemCount == 0)
+            }
+
+            override fun onItemRangeChanged(positionStart: Int,
+                                            itemCount: Int) {
+                super.onItemRangeChanged(positionStart,
+                                         itemCount)
+
+                listener.showEmptyTextView(itemCount == 0)
+            }
+
+            override fun onItemRangeInserted(positionStart: Int,
+                                             itemCount: Int) {
+                super.onItemRangeInserted(positionStart,
+                                          itemCount)
+
+                listener.showEmptyTextView(false)
+            }
+
+            override fun onItemRangeRemoved(positionStart: Int,
+                                            itemCount: Int) {
+                super.onItemRangeRemoved(positionStart,
+                                         itemCount)
+
+                listener.showEmptyTextView(itemCount == 0)
+            }
+        })
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup,
                                     viewType: Int): ViewHolder {
@@ -29,10 +64,46 @@ class InputRecyclerViewAdapter(private val listener: OnInputRecyclerViewAdapterL
     }
 
     fun setInputs(inputs: List<Input>) {
+        if (this.inputs.isEmpty()) {
+            this.inputs.addAll(inputs)
+
+            if (inputs.isNotEmpty()) {
+                notifyItemRangeInserted(0,
+                                        inputs.size)
+            }
+
+            return
+        }
+
+        if (inputs.isEmpty()) {
+            clear()
+
+            return
+        }
+
+        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+
+            override fun getOldListSize(): Int {
+                return this@InputRecyclerViewAdapter.inputs.size
+            }
+
+            override fun getNewListSize(): Int {
+                return inputs.size
+            }
+
+            override fun areItemsTheSame(oldItemPosition: Int,
+                                         newItemPosition: Int): Boolean {
+                return this@InputRecyclerViewAdapter.inputs[oldItemPosition].id == inputs[newItemPosition].id
+            }
+
+            override fun areContentsTheSame(oldItemPosition: Int,
+                                            newItemPosition: Int): Boolean {
+                return this@InputRecyclerViewAdapter.inputs[oldItemPosition] == inputs[newItemPosition]
+            }
+        })
         this.inputs.clear()
         this.inputs.addAll(inputs)
-
-        notifyDataSetChanged()
+        diffResult.dispatchUpdatesTo(this)
     }
 
     fun addInput(input: Input,
@@ -103,5 +174,10 @@ class InputRecyclerViewAdapter(private val listener: OnInputRecyclerViewAdapterL
          */
         fun onInputLongClicked(position: Int,
                                input: Input)
+
+        /**
+         * Whether to show an empty text view when data changed.
+         */
+        fun showEmptyTextView(show: Boolean)
     }
 }

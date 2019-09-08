@@ -17,6 +17,7 @@ import androidx.loader.content.Loader
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import fr.geonature.commons.data.AbstractTaxon
 import fr.geonature.commons.data.Provider.buildUri
 import fr.geonature.commons.data.Taxon
 import fr.geonature.commons.input.AbstractInput
@@ -47,34 +48,33 @@ class TaxaFragment : Fragment(),
 
             when (id) {
                 LOADER_TAXA -> {
+                    val selectedFeatureId = input?.selectedFeatureId
                     val selections = if (args?.getString(KEY_FILTER,
                                                          null) == null) Pair(null,
                                                                              null)
                     else {
                         val filter = "%${args.getString(KEY_FILTER)}%"
-                        Pair("(${Taxon.COLUMN_NAME} LIKE ?)",
+                        Pair("(${AbstractTaxon.COLUMN_NAME} LIKE ?)",
                              arrayOf(filter))
                     }
 
                     return CursorLoader(requireContext(),
-                                        buildUri(Taxon.TABLE_NAME),
-                                        arrayOf(Taxon.COLUMN_ID,
-                                                Taxon.COLUMN_NAME,
-                                                Taxon.COLUMN_HERITAGE,
-                                                Taxon.COLUMN_DESCRIPTION),
+                                        buildUri(Taxon.TABLE_NAME,
+                                                 if (selectedFeatureId == null) "" else "area/${selectedFeatureId}"),
+                                        null,
                                         selections.first,
                                         selections.second,
                                         null)
                 }
 
                 LOADER_TAXON -> {
+                    val selectedFeatureId = input?.selectedFeatureId
+
                     return CursorLoader(requireContext(),
                                         buildUri(Taxon.TABLE_NAME,
-                                                 args?.getLong(KEY_SELECTED_TAXON_ID).toString()),
-                                        arrayOf(Taxon.COLUMN_ID,
-                                                Taxon.COLUMN_NAME,
-                                                Taxon.COLUMN_HERITAGE,
-                                                Taxon.COLUMN_DESCRIPTION),
+                                                 args?.getLong(KEY_SELECTED_TAXON_ID).toString(),
+                                                 if (selectedFeatureId == null) "" else "area/${selectedFeatureId}"),
+                                        null,
                                         null,
                                         null,
                                         null)
@@ -88,7 +88,8 @@ class TaxaFragment : Fragment(),
                                     data: Cursor?) {
 
             if (data == null) {
-                Log.w(TAG, "Failed to load data from '${(loader as CursorLoader).uri}'")
+                Log.w(TAG,
+                      "Failed to load data from '${(loader as CursorLoader).uri}'")
 
                 return
             }

@@ -26,9 +26,11 @@ import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
 import fr.geonature.occtax.ui.observers.InputObserverListActivity
 import fr.geonature.occtax.ui.shared.dialog.DatePickerDialogFragment
 import fr.geonature.occtax.ui.shared.view.ListItemActionView
+import fr.geonature.occtax.util.SettingsUtils.getDefaultObserverId
 import fr.geonature.viewpager.ui.IValidateFragment
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 
 /**
  * Selected observer and current date as first {@code Fragment} used by [InputPagerFragmentActivity].
@@ -73,7 +75,8 @@ class ObserversAndDateInputFragment : Fragment(),
                 data: Cursor?) {
 
             if (data == null) {
-                Log.w(TAG, "Failed to load data from '${(loader as CursorLoader).uri}'")
+                Log.w(TAG,
+                      "Failed to load data from '${(loader as CursorLoader).uri}'")
 
                 return
             }
@@ -167,11 +170,11 @@ class ObserversAndDateInputFragment : Fragment(),
             selectedInputObservers.addAll(data.getParcelableArrayListExtra(InputObserverListActivity.EXTRA_SELECTED_INPUT_OBSERVERS))
 
             input?.also {
-                val primaryInputObserverId = it.getPrimaryObserverId()
                 it.clearAllInputObservers()
 
-                if (primaryInputObserverId != null) {
-                    it.setPrimaryInputObserverId(primaryInputObserverId)
+                if (selectedInputObservers.isEmpty()) {
+                    val context = context ?: return
+                    getDefaultObserverId(context).also { defaultObserverId -> if (defaultObserverId != null) it.setPrimaryInputObserverId(defaultObserverId) }
                 }
 
                 it.setAllInputObservers(selectedInputObservers)
@@ -194,14 +197,15 @@ class ObserversAndDateInputFragment : Fragment(),
     }
 
     override fun refreshView() {
+        setDefaultObserverFromSettings()
         val selectedInputObserverIds = input?.getAllInputObserverIds() ?: emptySet()
 
         if (selectedInputObserverIds.isNotEmpty()) {
             LoaderManager.getInstance(this)
-                .initLoader(LOADER_OBSERVERS_IDS,
-                            bundleOf(kotlin.Pair(KEY_SELECTED_INPUT_OBSERVER_IDS,
-                                                 selectedInputObserverIds.toLongArray())),
-                            loaderCallbacks)
+                .restartLoader(LOADER_OBSERVERS_IDS,
+                               bundleOf(kotlin.Pair(KEY_SELECTED_INPUT_OBSERVER_IDS,
+                                                    selectedInputObserverIds.toTypedArray().toLongArray())),
+                               loaderCallbacks)
         }
 
         inputDateActionView?.setItems(listOf(Pair.create(DateFormat.format(getString(R.string.observers_and_date_date_format),
@@ -219,9 +223,18 @@ class ObserversAndDateInputFragment : Fragment(),
                                                                                selectedInputObservers.size,
                                                                                selectedInputObservers.size))
         selectedInputObserversActionView?.setItems(selectedInputObservers.map { inputObserver ->
-            Pair.create(inputObserver.lastname?.toUpperCase() ?: "",
+            Pair.create(inputObserver.lastname?.toUpperCase(Locale.getDefault()) ?: "",
                         inputObserver.firstname)
         })
+    }
+
+    private fun setDefaultObserverFromSettings() {
+        input?.run {
+            if (this.getAllInputObserverIds().isEmpty()) {
+                val context = context ?: return
+                getDefaultObserverId(context).also { defaultObserverId -> if (defaultObserverId != null) this.setPrimaryInputObserverId(defaultObserverId) }
+            }
+        }
     }
 
     companion object {
