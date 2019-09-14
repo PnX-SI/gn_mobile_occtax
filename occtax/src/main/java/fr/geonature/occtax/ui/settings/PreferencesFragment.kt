@@ -16,6 +16,8 @@ import fr.geonature.commons.data.InputObserver
 import fr.geonature.commons.data.Provider.buildUri
 import fr.geonature.occtax.R
 import fr.geonature.occtax.ui.observers.InputObserverListActivity
+import fr.geonature.occtax.util.SettingsUtils.getDefaultObserverId
+import java.util.Locale
 
 /**
  * Global settings.
@@ -52,11 +54,11 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 updateDefaultObserverPreference(InputObserver.fromCursor(data))
             }
             else {
-                updateDefaultObserverPreference(null)
+                updateDefaultObserverPreference()
             }
 
             LoaderManager.getInstance(this@PreferencesFragment)
-                    .destroyLoader(LOADER_OBSERVER)
+                .destroyLoader(LOADER_OBSERVER)
         }
 
         override fun onLoaderReset(loader: Loader<Cursor>) {
@@ -67,7 +69,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val defaultObserverPreference = preferenceScreen.findPreference(getString(R.string.preference_category_observers_default_key))
+        val defaultObserverPreference: Preference? = preferenceScreen.findPreference(getString(R.string.preference_category_observers_default_key))
 
         if (defaultObserverPreference != null) {
             loadDefaultObserver()
@@ -79,7 +81,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             }
         }
 
-        val aboutAppVersionPreference = preferenceScreen.findPreference(getString(R.string.preference_category_about_app_version_key))
+        val aboutAppVersionPreference: Preference? = preferenceScreen.findPreference(getString(R.string.preference_category_about_app_version_key))
 
         if (aboutAppVersionPreference != null) {
             aboutAppVersionPreference.summary = listener!!.getAppVersion()
@@ -120,22 +122,31 @@ class PreferencesFragment : PreferenceFragmentCompat() {
     }
 
     private fun loadDefaultObserver() {
-        val defaultObserverId = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                .getLong(getString(R.string.preference_category_observers_default_key),
-                         0)
+        val context = context
 
-        val args = Bundle()
-        args.putLong(KEY_SELECTED_OBSERVER,
-                     defaultObserverId)
+        if (context == null) {
+            updateDefaultObserverPreference()
+            return
+        }
+
+        val defaultObserverId = getDefaultObserverId(context)
+
+        if (defaultObserverId == null) {
+            updateDefaultObserverPreference()
+            return
+        }
 
         LoaderManager.getInstance(this)
-                .initLoader(LOADER_OBSERVER,
-                            args,
-                            loaderCallbacks)
+            .initLoader(LOADER_OBSERVER,
+                        Bundle().apply {
+                            putLong(KEY_SELECTED_OBSERVER,
+                                    defaultObserverId)
+                        },
+                        loaderCallbacks)
     }
 
-    private fun updateDefaultObserverPreference(defaultObserver: InputObserver?) {
-        val defaultObserverPreference = preferenceScreen.findPreference(getString(R.string.preference_category_observers_default_key))
+    private fun updateDefaultObserverPreference(defaultObserver: InputObserver? = null) {
+        val defaultObserverPreference: Preference = preferenceScreen.findPreference(getString(R.string.preference_category_observers_default_key))
                 ?: return
 
         defaultObserverPreference.onPreferenceClickListener = Preference.OnPreferenceClickListener {
@@ -149,7 +160,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         }
 
         val editor = PreferenceManager.getDefaultSharedPreferences(context)
-                .edit()
+            .edit()
 
         if (defaultObserver == null) {
             editor.remove(getString(R.string.preference_category_observers_default_key))
@@ -160,7 +171,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             editor.putLong(getString(R.string.preference_category_observers_default_key),
                            defaultObserver.id)
 
-            defaultObserverPreference.summary = defaultObserver.lastname?.toUpperCase() + if (defaultObserver.lastname == null) "" else " " + defaultObserver.firstname
+            defaultObserverPreference.summary = defaultObserver.lastname?.toUpperCase(Locale.getDefault()) + if (defaultObserver.lastname == null) "" else " " + defaultObserver.firstname
         }
 
         editor.apply()

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:minHeight="?attr/listPreferredItemHeight">
+
+    <CheckBox
+        android:id="@android:id/checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
+        android:clickable="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@android:id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:paddingStart="?attr/listPreferredItemPaddingStart"
+        android:textAllCaps="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="RtlSymmetry"
+        tools:text="S" />
+
+    <TextView
+        android:id="@android:id/text1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
+        android:layout_marginStart="?attr/listPreferredItemHeight"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="?attr/textAppearanceListItem"
+        app:layout_constraintBottom_toBottomOf="@android:id/text2"
+        app:layout_constraintEnd_toStartOf="@+id/taxon_observers_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@tools:sample/last_names" />
+
+    <TextView
+        android:id="@android:id/text2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
+        android:layout_marginStart="?attr/listPreferredItemHeight"
+        android:textAppearance="?attr/textAppearanceListItemSecondary"
+        app:layout_constraintEnd_toStartOf="@+id/taxon_last_updated_at_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@android:id/text1"
+        tools:text="@tools:sample/first_names" />
+
+    <TextView
+        android:id="@+id/taxon_observers_view"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
+        app:layout_constraintBottom_toBottomOf="@android:id/text1"
+        app:layout_constraintEnd_toStartOf="@android:id/checkbox"
+        app:layout_constraintTop_toTopOf="@android:id/text1"
+        tools:text="3" />
+
+    <TextView
+        android:id="@+id/taxon_last_updated_at_view"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
+        android:textAlignment="textEnd"
+        app:layout_constraintBottom_toBottomOf="@android:id/text2"
+        app:layout_constraintEnd_toStartOf="@android:id/checkbox"
+        app:layout_constraintTop_toTopOf="@android:id/text2"
+        tools:text="@tools:sample/date/ddmmyy" />
+
+    <View
+        android:id="@+id/taxon_color_view"
+        android:layout_width="8dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="@color/colorAccent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

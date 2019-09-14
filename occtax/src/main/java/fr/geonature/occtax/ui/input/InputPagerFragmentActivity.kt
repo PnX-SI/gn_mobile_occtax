@@ -4,16 +4,18 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
-import fr.geonature.commons.input.InputManager
+import fr.geonature.maps.settings.MapSettings
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.input.io.OnInputJsonReaderListenerImpl
-import fr.geonature.occtax.input.io.OnInputJsonWriterListenerImpl
+import fr.geonature.occtax.input.InputViewModel
 import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.ui.input.map.InputMapFragment
 import fr.geonature.occtax.ui.input.observers.ObserversAndDateInputFragment
 import fr.geonature.occtax.ui.input.taxa.TaxaFragment
+import fr.geonature.occtax.util.SettingsUtils.getMapShowCompass
+import fr.geonature.occtax.util.SettingsUtils.getMapShowScale
 import fr.geonature.viewpager.ui.AbstractNavigationHistoryPagerFragmentActivity
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
@@ -28,16 +30,15 @@ import kotlinx.coroutines.launch
  */
 class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivity() {
 
-    private lateinit var inputManager: InputManager<Input>
+    private lateinit var inputViewModel: InputViewModel
     private lateinit var appSettings: AppSettings
     private lateinit var input: Input
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        inputManager = InputManager(application,
-                                    OnInputJsonReaderListenerImpl(),
-                                    OnInputJsonWriterListenerImpl())
+        inputViewModel = ViewModelProvider(this,
+                                           fr.geonature.commons.input.InputViewModel.Factory { InputViewModel(this.application) }).get(InputViewModel::class.java)
 
         appSettings = intent.getParcelableExtra(EXTRA_APP_SETTINGS)
         input = intent.getParcelableExtra(EXTRA_INPUT) ?: Input()
@@ -58,9 +59,7 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
     override fun onPause() {
         super.onPause()
 
-        GlobalScope.launch(Dispatchers.Main) {
-            inputManager.saveInput(input)
-        }
+        inputViewModel.saveInput(input)
     }
 
     override val pagerFragments: Map<Int, IValidateFragment>
@@ -68,15 +67,13 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
             put(R.string.pager_fragment_observers_and_date_input_title,
                 ObserversAndDateInputFragment.newInstance())
             put(R.string.pager_fragment_map_title,
-                InputMapFragment.newInstance(appSettings.mapSettings!!))
+                InputMapFragment.newInstance(getMapSettings()))
             put(R.string.pager_fragment_taxa_title,
                 TaxaFragment.newInstance())
         }
 
     override fun performFinishAction() {
-        GlobalScope.launch(Dispatchers.Main) {
-            inputManager.exportInput(input.id)
-        }
+        inputViewModel.exportInput(input.id)
 
         finish()
     }
@@ -95,6 +92,14 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
             pageFragment.refreshView()
             validateCurrentPage()
         }
+    }
+
+    private fun getMapSettings(): MapSettings {
+        return MapSettings.Builder.newInstance()
+            .from(appSettings.mapSettings!!)
+            .showScale(getMapShowScale(this))
+            .showCompass(getMapShowCompass(this))
+            .build()
     }
 
     companion object {
