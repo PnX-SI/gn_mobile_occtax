@@ -69,7 +69,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val defaultObserverPreference = preferenceScreen.findPreference(getString(R.string.preference_category_observers_default_key))
+        val defaultObserverPreference: Preference? = preferenceScreen.findPreference(getString(R.string.preference_category_observers_default_key))
 
         if (defaultObserverPreference != null) {
             loadDefaultObserver()
@@ -81,7 +81,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             }
         }
 
-        val aboutAppVersionPreference = preferenceScreen.findPreference(getString(R.string.preference_category_about_app_version_key))
+        val aboutAppVersionPreference: Preference? = preferenceScreen.findPreference(getString(R.string.preference_category_about_app_version_key))
 
         if (aboutAppVersionPreference != null) {
             aboutAppVersionPreference.summary = listener!!.getAppVersion()
@@ -146,7 +146,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
     }
 
     private fun updateDefaultObserverPreference(defaultObserver: InputObserver? = null) {
-        val defaultObserverPreference = preferenceScreen.findPreference(getString(R.string.preference_category_observers_default_key))
+        val defaultObserverPreference: Preference = preferenceScreen.findPreference(getString(R.string.preference_category_observers_default_key))
                 ?: return
 
         defaultObserverPreference.onPreferenceClickListener = Preference.OnPreferenceClickListener {

@@ -3,6 +3,7 @@ package fr.geonature.occtax.ui.input.map
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import fr.geonature.commons.input.AbstractInput
+import fr.geonature.commons.util.ThemeUtils
 import fr.geonature.maps.jts.geojson.GeometryUtils.fromPoint
 import fr.geonature.maps.jts.geojson.GeometryUtils.toPoint
 import fr.geonature.maps.settings.LayerStyleSettings
@@ -16,7 +17,7 @@ import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.locationtech.jts.geom.Point
@@ -39,7 +40,10 @@ class InputMapFragment : MapFragment(),
 
         onSelectedPOIsListener = object : OnSelectedPOIsListener {
             override fun onSelectedPOIs(pois: List<GeoPoint>) {
-                if (pois.isNotEmpty()) {
+                if (pois.isEmpty()) {
+                    clearSelection()
+                }
+                else {
                     selectPOI(pois[0])
                 }
             }
@@ -70,9 +74,25 @@ class InputMapFragment : MapFragment(),
         this.input = input as Input
     }
 
+    private fun clearSelection() {
+        input?.geometry = null
+
+        (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+
+        GlobalScope.launch(Main) {
+            getOverlays { overlay -> overlay is FeatureCollectionOverlay }
+                .asSequence()
+                .map { it as FeatureCollectionOverlay }
+                .forEach { it.setStyle(it.layerStyle) }
+        }
+    }
+
     private fun selectPOI(poi: GeoPoint) {
-        GlobalScope.launch(Dispatchers.Main) {
+        GlobalScope.launch(Main) {
+            val context = context ?: return@launch
+
             input?.geometry = toPoint(poi)
+            val accentColor = ThemeUtils.getAccentColor(context)
 
             // select matching Feature from Overlays
             input?.selectedFeatureId = getOverlays { overlay -> overlay is FeatureCollectionOverlay }
@@ -82,7 +102,7 @@ class InputMapFragment : MapFragment(),
                 .map {
                     val filter = ContainsFeaturesFilter(poi,
                                                         it.layerStyle,
-                                                        LayerStyleSettings.Builder.newInstance().from(it.layerStyle).color("red").build())
+                                                        LayerStyleSettings.Builder.newInstance().from(it.layerStyle).color(accentColor).build())
                     it.apply(filter)
                     filter.getSelectedFeatures()
                 }

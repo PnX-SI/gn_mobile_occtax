@@ -48,7 +48,8 @@ class TaxaFragment : Fragment(),
 
             when (id) {
                 LOADER_TAXA -> {
-                    val selectedFeatureId = input?.selectedFeatureId
+                    val selectedFeatureId = args?.getString(KEY_SELECTED_FEATURE_ID,
+                                                            null)
                     val selections = if (args?.getString(KEY_FILTER,
                                                          null) == null) Pair(null,
                                                                              null)
@@ -68,7 +69,8 @@ class TaxaFragment : Fragment(),
                 }
 
                 LOADER_TAXON -> {
-                    val selectedFeatureId = input?.selectedFeatureId
+                    val selectedFeatureId = args?.getString(KEY_SELECTED_FEATURE_ID,
+                                                            null)
 
                     return CursorLoader(requireContext(),
                                         buildUri(Taxon.TABLE_NAME,
@@ -133,7 +135,7 @@ class TaxaFragment : Fragment(),
 
         // Set the adapter
         adapter = TaxaRecyclerViewAdapter(object : TaxaRecyclerViewAdapter.OnTaxaRecyclerViewAdapterListener {
-            override fun onSelectedTaxon(taxon: Taxon) {
+            override fun onSelectedTaxon(taxon: AbstractTaxon) {
                 val selectedTaxonId = selectedTaxonId
 
                 if (selectedTaxonId != null) {
@@ -212,7 +214,9 @@ class TaxaFragment : Fragment(),
             override fun onQueryTextChange(newText: String): Boolean {
                 LoaderManager.getInstance(this@TaxaFragment)
                     .restartLoader(LOADER_TAXA,
-                                   bundleOf(Pair(KEY_FILTER,
+                                   bundleOf(Pair(KEY_SELECTED_FEATURE_ID,
+                                                 input?.selectedFeatureId),
+                                            Pair(KEY_FILTER,
                                                  newText)),
                                    loaderCallbacks)
 
@@ -235,16 +239,19 @@ class TaxaFragment : Fragment(),
 
     override fun refreshView() {
         LoaderManager.getInstance(this)
-            .initLoader(LOADER_TAXA,
-                        null,
-                        loaderCallbacks)
+            .restartLoader(LOADER_TAXA,
+                           bundleOf(Pair(KEY_SELECTED_FEATURE_ID,
+                                         input?.selectedFeatureId)),
+                           loaderCallbacks)
 
         val selectedInputTaxon = this.input?.getCurrentSelectedInputTaxon()
 
         if (selectedInputTaxon != null) {
             LoaderManager.getInstance(this)
                 .initLoader(LOADER_TAXON,
-                            bundleOf(Pair(KEY_SELECTED_TAXON_ID,
+                            bundleOf(Pair(KEY_SELECTED_FEATURE_ID,
+                                          input?.selectedFeatureId),
+                                     Pair(KEY_SELECTED_TAXON_ID,
                                           selectedInputTaxon.id)),
                             loaderCallbacks)
         }
@@ -260,6 +267,7 @@ class TaxaFragment : Fragment(),
         private const val LOADER_TAXA = 1
         private const val LOADER_TAXON = 2
         private const val KEY_FILTER = "filter"
+        private const val KEY_SELECTED_FEATURE_ID = "key_selected_feature_id"
         private const val KEY_SELECTED_TAXON_ID = "selected_taxon_id"
 
         /**

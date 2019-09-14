@@ -1,6 +1,8 @@
 package fr.geonature.occtax.ui.input.taxa
 
 import android.database.Cursor
+import android.graphics.Color
+import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,8 +10,12 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.l4digital.fastscroll.FastScroller
+import fr.geonature.commons.data.AbstractTaxon
 import fr.geonature.commons.data.Taxon
+import fr.geonature.commons.data.TaxonWithArea
+import fr.geonature.commons.util.StringUtils
 import fr.geonature.occtax.R
+import java.text.NumberFormat
 
 /**
  * Default RecyclerView Adapter used by [TaxaFragment].
@@ -21,7 +27,7 @@ import fr.geonature.occtax.R
 class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterListener) : RecyclerView.Adapter<TaxaRecyclerViewAdapter.ViewHolder>(),
                                                                                          FastScroller.SectionIndexer {
     private var cursor: Cursor? = null
-    private var selectedTaxon: Taxon? = null
+    private var selectedTaxon: AbstractTaxon? = null
     private val onClickListener: View.OnClickListener
 
     init {
@@ -31,7 +37,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
             val checkbox: CheckBox = v.findViewById(android.R.id.checkbox)
             checkbox.isChecked = !checkbox.isChecked
 
-            val taxon = v.tag as Taxon
+            val taxon = v.tag as AbstractTaxon
 
             if (checkbox.isChecked) {
                 selectedTaxon = taxon
@@ -79,7 +85,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         notifyDataSetChanged()
     }
 
-    fun getSelectedTaxon(): Taxon? {
+    fun getSelectedTaxon(): AbstractTaxon? {
         return this.selectedTaxon
     }
 
@@ -89,7 +95,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         notifyDataSetChanged()
     }
 
-    private fun getItemPosition(taxon: Taxon?): Int {
+    private fun getItemPosition(taxon: AbstractTaxon?): Int {
         var itemPosition = -1
         val cursor = cursor ?: return itemPosition
         if (taxon == null) return itemPosition
@@ -120,7 +126,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         }
     }
 
-    inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_title_item_2,
+    inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_taxon,
                                                                                                                     parent,
                                                                                                                     false)) {
 
@@ -128,17 +134,20 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
         private val text2: TextView = itemView.findViewById(android.R.id.text2)
         private val checkbox: CheckBox = itemView.findViewById(android.R.id.checkbox)
+        private val taxonColorView: View = itemView.findViewById(R.id.taxon_color_view)
+        private val taxonObserversView: TextView = itemView.findViewById(R.id.taxon_observers_view)
+        private val taxonLastUpdatedAtView: TextView = itemView.findViewById(R.id.taxon_last_updated_at_view)
 
         fun bind(position: Int) {
             val cursor = cursor ?: return
 
             cursor.moveToPosition(position)
 
-            val taxon = Taxon.fromCursor(cursor)
+            val taxon = TaxonWithArea.fromCursor(cursor)
 
             val previousTitle = if (position > 0) {
                 cursor.moveToPosition(position - 1)
-                Taxon.fromCursor(cursor)
+                TaxonWithArea.fromCursor(cursor)
                     ?.name?.elementAt(0)
                     .toString()
             }
@@ -147,12 +156,24 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
             }
 
             if (taxon != null) {
-                val currentTitle = taxon.name?.elementAt(0)
+                val currentTitle = taxon.name.elementAt(0)
                     .toString()
                 title.text = if (previousTitle == currentTitle) "" else currentTitle
                 text1.text = taxon.name
                 text2.text = taxon.description
                 checkbox.isChecked = selectedTaxon?.id == taxon.id
+
+                taxon.taxonArea?.run {
+                    taxonColorView.setBackgroundColor(if (StringUtils.isEmpty(color)) Color.TRANSPARENT else Color.parseColor(color))
+
+                    taxonObserversView.text = NumberFormat.getNumberInstance()
+                        .format(numberOfObservers)
+
+                    if (lastUpdatedAt != null) {
+                        taxonLastUpdatedAtView.text = DateFormat.getDateFormat(itemView.context)
+                            .format(lastUpdatedAt)
+                    }
+                }
 
                 with(itemView) {
                     tag = taxon
@@ -168,11 +189,11 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
     interface OnTaxaRecyclerViewAdapterListener {
 
         /**
-         * Called when a [Taxon] has been selected.
+         * Called when a [AbstractTaxon] has been selected.
          *
-         * @param taxon the selected [Taxon]
+         * @param taxon the selected [AbstractTaxon]
          */
-        fun onSelectedTaxon(taxon: Taxon)
+        fun onSelectedTaxon(taxon: AbstractTaxon)
 
         /**
          * Called when no [Taxon] has been selected.
