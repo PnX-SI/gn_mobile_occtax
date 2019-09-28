@@ -67,7 +67,6 @@ class TaxaFragment : Fragment(),
                                         selections.second,
                                         null)
                 }
-
                 LOADER_TAXON -> {
                     val selectedFeatureId = args?.getString(KEY_SELECTED_FEATURE_ID,
                                                             null)
@@ -81,7 +80,6 @@ class TaxaFragment : Fragment(),
                                         null,
                                         null)
                 }
-
                 else -> throw IllegalArgumentException()
             }
         }
@@ -264,6 +262,7 @@ class TaxaFragment : Fragment(),
     companion object {
 
         private val TAG = TaxaFragment::class.java.name
+
         private const val LOADER_TAXA = 1
         private const val LOADER_TAXON = 2
         private const val KEY_FILTER = "filter"
