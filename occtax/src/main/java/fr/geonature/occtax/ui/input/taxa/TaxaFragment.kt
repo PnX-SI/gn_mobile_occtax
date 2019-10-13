@@ -140,7 +140,7 @@ class TaxaFragment : Fragment(),
                     input?.removeInputTaxon(selectedTaxonId)
                 }
 
-                input?.addInputTaxon(InputTaxon().apply { id = taxon.id })
+                input?.addInputTaxon(InputTaxon(taxon))
                 this@TaxaFragment.selectedTaxonId = taxon.id
 
                 (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
@@ -250,7 +250,7 @@ class TaxaFragment : Fragment(),
                             bundleOf(Pair(KEY_SELECTED_FEATURE_ID,
                                           input?.selectedFeatureId),
                                      Pair(KEY_SELECTED_TAXON_ID,
-                                          selectedInputTaxon.id)),
+                                          selectedInputTaxon.taxon.id)),
                             loaderCallbacks)
         }
     }

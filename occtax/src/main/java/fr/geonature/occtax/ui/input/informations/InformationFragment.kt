@@ -12,11 +12,15 @@ import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import fr.geonature.commons.data.Nomenclature
 import fr.geonature.commons.data.NomenclatureType
 import fr.geonature.commons.data.Provider
+import fr.geonature.commons.data.Taxonomy
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
+import fr.geonature.occtax.input.InputTaxon
+import fr.geonature.occtax.input.SelectedProperty
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.viewpager.ui.IValidateFragment
 
@@ -27,7 +31,8 @@ import fr.geonature.viewpager.ui.IValidateFragment
  */
 class InformationFragment : Fragment(),
                             IValidateFragment,
-                            IInputFragment {
+                            IInputFragment,
+                            ChooseNomenclatureDialogFragment.OnChooseNomenclatureDialogFragmentListener {
 
     private var input: Input? = null
     private var adapter: NomenclatureTypesRecyclerViewAdapter? = null
@@ -58,7 +63,10 @@ class InformationFragment : Fragment(),
             }
 
             when (loader.id) {
-                LOADER_NOMENCLATURE_TYPES -> adapter?.bind(data)
+                LOADER_NOMENCLATURE_TYPES -> {
+                    adapter?.bind(data)
+                    setPropertyValues()
+                }
             }
         }
 
@@ -77,15 +85,27 @@ class InformationFragment : Fragment(),
                                             false)
         // Set the adapter
         adapter = NomenclatureTypesRecyclerViewAdapter(object : NomenclatureTypesRecyclerViewAdapter.OnNomenclatureTypesRecyclerViewAdapterListener {
+            override fun showMore() {
+                setPropertyValues()
+            }
+
             override fun onAction(nomenclatureTypeMnemonic: String) {
-                Log.d(TAG,
-                      "onAction $nomenclatureTypeMnemonic")
+
+                val taxonomy = input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
+                        ?: Taxonomy(Taxonomy.ANY,
+                                    Taxonomy.ANY)
+
+                val chooseNomenclatureDialogFragment = ChooseNomenclatureDialogFragment.newInstance(nomenclatureTypeMnemonic,
+                                                                                                    taxonomy)
+                chooseNomenclatureDialogFragment.show(childFragmentManager,
+                                                      CHOOSE_NOMENCLATURE_DIALOG_FRAGMENT)
             }
 
             override fun onEdit(nomenclatureTypeMnemonic: String,
                                 value: String?) {
-                Log.d(TAG,
-                      "onEdit $nomenclatureTypeMnemonic: $value")
+                (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.set(nomenclatureTypeMnemonic,
+                                                                                        SelectedProperty.fromValue(nomenclatureTypeMnemonic,
+                                                                                                                   value))
             }
         })
 
@@ -120,10 +140,25 @@ class InformationFragment : Fragment(),
         this.input = input as Input
     }
 
+    override fun onSelectedNomenclature(nomenclatureType: String,
+                                        nomenclature: Nomenclature) {
+
+        (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.set(nomenclatureType,
+                                                                                SelectedProperty.fromNomenclature(nomenclatureType,
+                                                                                                                  nomenclature))
+        setPropertyValues()
+    }
+
+    private fun setPropertyValues() {
+        adapter?.setPropertyValues((input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.values?.toList()
+                                           ?: emptyList())
+    }
+
     companion object {
         private val TAG = InformationFragment::class.java.name
 
         private const val LOADER_NOMENCLATURE_TYPES = 1
+        private const val CHOOSE_NOMENCLATURE_DIALOG_FRAGMENT = "choose_nomenclature_dialog_fragment"
 
         /**
          * Use this factory method to create a new instance of [InformationFragment].

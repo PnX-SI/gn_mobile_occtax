@@ -46,7 +46,7 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
         val lastAddedInputTaxon = input.getLastAddedInputTaxon()
 
         if (lastAddedInputTaxon != null) {
-            input.setCurrentSelectedInputTaxonId(lastAddedInputTaxon.id)
+            input.setCurrentSelectedInputTaxonId(lastAddedInputTaxon.taxon.id)
         }
 
         Log.i(TAG,
