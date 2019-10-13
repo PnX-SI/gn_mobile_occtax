@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="nomenclature_meth_obs">Méthodes d\'observation</string>
+    <string name="nomenclature_eta_bio">État biologique de l\'observation</string>
+    <string name="nomenclature_more">Informations avancées</string>
+    <string name="nomenclature_meth_determin">Méthode de détermination</string>
+    <string name="nomenclature_determiner">Déterminateur</string>
+    <string name="nomenclature_statut_bio">Statut biologique</string>
+    <string name="nomenclature_naturalite">Niveau de naturalité</string>
+    <string name="nomenclature_preuve_exist">Preuve d\'existence</string>
+    <string name="nomenclature_comment">Commentaire</string>
+
+</resources>

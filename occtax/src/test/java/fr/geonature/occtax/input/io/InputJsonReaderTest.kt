@@ -1,11 +1,14 @@
 package fr.geonature.occtax.input.io
 
+import fr.geonature.commons.data.Taxon
+import fr.geonature.commons.data.Taxonomy
 import fr.geonature.commons.input.AbstractInputTaxon
 import fr.geonature.commons.input.io.InputJsonReader
 import fr.geonature.commons.util.IsoDateUtils.toDate
 import fr.geonature.occtax.FixtureHelper.getFixture
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
+import fr.geonature.occtax.input.SelectedProperty
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -82,7 +85,43 @@ class InputJsonReaderTest {
                                       3),
                           input.getInputObserverIds()
                               .toLongArray())
-        assertEquals(listOf(InputTaxon().apply { id = 10 }),
+        assertEquals(listOf(InputTaxon(Taxon(10L,
+                                             "taxon_01",
+                                             Taxonomy("Animalia",
+                                                      "Ascidies"))).apply {
+            this.properties["METH_OBS"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
+                                                           "METH_OBS",
+                                                           41,
+                                                           null)
+            this.properties["ETA_BIO"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
+                                                          "ETA_BIO",
+                                                          29,
+                                                          null)
+            this.properties["METH_DETERMIN"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
+                                                                "METH_DETERMIN",
+                                                                445,
+                                                                null)
+            this.properties["DETERMINER"] = SelectedProperty(SelectedProperty.PropertyType.TEXT,
+                                                             "DETERMINER",
+                                                             null,
+                                                             "Determiner value")
+            this.properties["STATUT_BIO"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
+                                                             "STATUT_BIO",
+                                                             29,
+                                                             null)
+            this.properties["NATURALITE"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
+                                                             "NATURALITE",
+                                                             160,
+                                                             null)
+            this.properties["PREUVE_EXIST"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
+                                                               "PREUVE_EXIST",
+                                                               81,
+                                                               null)
+            this.properties["COMMENT"] = SelectedProperty(SelectedProperty.PropertyType.TEXT,
+                                                          "COMMENT",
+                                                          null,
+                                                          "Some comment")
+        }),
                      input.getInputTaxa())
     }
 

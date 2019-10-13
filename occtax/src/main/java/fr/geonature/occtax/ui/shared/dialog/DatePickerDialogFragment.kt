@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.DatePicker
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import fr.geonature.occtax.R
 import java.util.Calendar
 import java.util.Date
 
@@ -24,7 +25,7 @@ class DatePickerDialogFragment : DialogFragment() {
         val context = requireContext()
 
         val view = View.inflate(context,
-                                fr.geonature.occtax.R.layout.dialog_date_picker,
+                                R.layout.dialog_date_picker,
                                 null)
 
         // restore the current selected date
@@ -33,16 +34,16 @@ class DatePickerDialogFragment : DialogFragment() {
         }
 
         val dialog = AlertDialog.Builder(context,
-                                         fr.geonature.occtax.R.style.DialogStyle)
-                .setView(view)
-                .setPositiveButton(fr.geonature.occtax.R.string.alert_dialog_ok) { _, _ -> onCalendarSetListener?.onCalendarSet(selectedDateCalendar) }
-                .setNegativeButton(fr.geonature.occtax.R.string.alert_dialog_cancel,
-                                   null)
-                .create()
+                                         R.style.DialogStyle)
+            .setView(view)
+            .setPositiveButton(R.string.alert_dialog_ok) { _, _ -> onCalendarSetListener?.onCalendarSet(selectedDateCalendar) }
+            .setNegativeButton(R.string.alert_dialog_cancel,
+                               null)
+            .create()
 
         configureDatePicker(view.findViewById(android.R.id.content) as DatePicker,
                             null,
-                            // set the current date as max date selection
+                // set the current date as max date selection
                             Calendar.getInstance().time)
 
         return dialog

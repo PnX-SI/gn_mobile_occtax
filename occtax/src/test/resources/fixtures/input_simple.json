@@ -14,7 +14,52 @@
     ],
     "t_occurrences_occtax": [
       {
-        "cd_nom": 10
+        "cd_nom": 10,
+        "nom_cite": "taxon_01",
+        "regne": "Animalia",
+        "group2_inpn": "Ascidies",
+        "properties": {
+          "meth_obs": {
+            "type": "nomenclature",
+            "id": 41
+          },
+          "eta_bio": {
+            "type": "nomenclature",
+            "id": 29
+          },
+          "meth_determin": {
+            "type": "nomenclature",
+            "id": 445
+          },
+          "determiner": {
+            "type": "text",
+            "label": "Determiner value"
+          },
+          "statut_bio": {
+            "type": "nomenclature",
+            "id": 29
+          },
+          "naturalite": {
+            "type": "nomenclature",
+            "id": 160
+          },
+          "preuve_exist": {
+            "type": "nomenclature",
+            "id": 81
+          },
+          "comment": {
+            "type": "text",
+            "label": "Some comment"
+          }
+        },
+        "id_nomenclature_obs_meth": 41,
+        "id_nomenclature_bio_condition": 29,
+        "id_nomenclature_determination_method": 445,
+        "determiner": "Determiner value",
+        "id_nomenclature_bio_status": 29,
+        "id_nomenclature_naturalness": 160,
+        "id_nomenclature_exist_proof": 81,
+        "comment": "Some comment"
       }
     ]
   }
