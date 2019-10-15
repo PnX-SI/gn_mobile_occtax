@@ -41,7 +41,7 @@ class InputMapFragment : MapFragment(),
         onSelectedPOIsListener = object : OnSelectedPOIsListener {
             override fun onSelectedPOIs(pois: List<GeoPoint>) {
                 if (pois.isEmpty()) {
-                    clearSelection()
+                    clearInputSelection()
                 }
                 else {
                     selectPOI(pois[0])
@@ -59,6 +59,7 @@ class InputMapFragment : MapFragment(),
     }
 
     override fun validate(): Boolean {
+        clearActiveSelection()
         return this.input?.geometry != null
     }
 
@@ -74,7 +75,7 @@ class InputMapFragment : MapFragment(),
         this.input = input as Input
     }
 
-    private fun clearSelection() {
+    private fun clearInputSelection() {
         input?.geometry = null
 
         (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
