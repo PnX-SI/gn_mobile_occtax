@@ -50,6 +50,12 @@ class InputMapFragment : MapFragment(),
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        clearActiveSelection()
+    }
+
     override fun getResourceTitle(): Int {
         return R.string.pager_fragment_map_title
     }
@@ -59,7 +65,6 @@ class InputMapFragment : MapFragment(),
     }
 
     override fun validate(): Boolean {
-        clearActiveSelection()
         return this.input?.geometry != null
     }
 
