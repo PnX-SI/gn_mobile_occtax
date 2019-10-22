@@ -1,4 +1,8 @@
-# gn_mobile_occtax
+# Occtax-mobile
+
+![Occtax-mobile launcher](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/main/res/mipmap-xxxhdpi/ic_launcher.png)
+
+GeoNature Android mobile application for Occtax module.
 
 ## Upgrade git sub modules
 
