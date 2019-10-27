@@ -10,5 +10,9 @@
     <string name="nomenclature_naturalite">Level of naturalness</string>
     <string name="nomenclature_preuve_exist">Proof of existence</string>
     <string name="nomenclature_comment">Comment</string>
+    <string name="nomenclature_stade_vie">Life stage</string>
+    <string name="nomenclature_sexe">Sex</string>
+    <string name="nomenclature_obj_denbr">Purpose of the enumeration</string>
+    <string name="nomenclature_typ_denbr">Type of enumeration</string>
 
 </resources>

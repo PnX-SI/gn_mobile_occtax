@@ -1,4 +1,4 @@
-package fr.geonature.occtax.ui.input.informations
+package fr.geonature.occtax.ui.input.dialog
 
 import android.app.Dialog
 import android.database.Cursor
@@ -98,7 +98,8 @@ class ChooseNomenclatureDialogFragment : DialogFragment() {
         // Set the adapter
         adapter = NomenclatureRecyclerViewAdapter(object : NomenclatureRecyclerViewAdapter.OnNomenclatureRecyclerViewAdapterListener {
             override fun onSelectedNomenclature(nomenclature: Nomenclature) {
-                val nomenclatureType = arguments?.getString(ARG_NOMENCLATURE_TYPE) ?: return
+                val nomenclatureType = arguments?.getString(ARG_NOMENCLATURE_TYPE)
+                        ?: return
                 listener?.onSelectedNomenclature(nomenclatureType,
                                                  nomenclature)
                 dismiss()

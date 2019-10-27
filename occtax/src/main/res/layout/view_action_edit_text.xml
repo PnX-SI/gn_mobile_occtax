@@ -22,6 +22,7 @@
         android:imeOptions="actionDone"
         android:importantForAutofill="no"
         android:inputType="textNoSuggestions"
+        android:labelFor="@android:id/title"
         app:layout_constraintTop_toBottomOf="@android:id/title" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

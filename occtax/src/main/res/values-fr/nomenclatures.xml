@@ -10,5 +10,9 @@
     <string name="nomenclature_naturalite">Niveau de naturalité</string>
     <string name="nomenclature_preuve_exist">Preuve d\'existence</string>
     <string name="nomenclature_comment">Commentaire</string>
+    <string name="nomenclature_stade_vie">Stade de vie</string>
+    <string name="nomenclature_sexe">Sexe</string>
+    <string name="nomenclature_obj_denbr">Objet du dénombrement</string>
+    <string name="nomenclature_typ_denbr">Type de dénombrement</string>
 
 </resources>

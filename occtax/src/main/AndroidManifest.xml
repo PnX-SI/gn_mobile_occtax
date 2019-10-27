@@ -16,8 +16,7 @@
 
         <activity
             android:name=".ui.home.HomeActivity"
-            android:label="@string/activity_main_title"
-            android:screenOrientation="portrait">
+            android:label="@string/activity_main_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -33,6 +32,7 @@
         <activity
             android:name=".ui.input.InputPagerFragmentActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".ui.input.counting.EditCountingMetadataActivity" />
 
     </application>
 

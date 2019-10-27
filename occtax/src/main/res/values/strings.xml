@@ -47,6 +47,7 @@
     <string name="pager_fragment_map_title">Pointing</string>
     <string name="pager_fragment_taxa_title">Taxa</string>
     <string name="pager_fragment_information_title">Information</string>
+    <string name="pager_fragment_counting_title">Counting</string>
 
     <string name="observers_and_date_selected_observers">Selected observers</string>
     <plurals name="observers_and_date_selected_observers">
@@ -59,5 +60,15 @@
 
     <string name="information_determiner_hint">Add determiner</string>
     <string name="information_comment_hint">Add comment</string>
+
+    <string name="counting_no_data">No counting.\nCreate a new one by tapping the + button.</string>
+    <string name="counting_main_label">Counting #%d</string>
+    <string name="counting_description_separator">%1$s: %2$s</string>
+    <string name="counting_snackbar_counting_deleted">Counting deleted</string>
+    <string name="counting_snackbar_counting_undo">Undo</string>
+    <string name="counting_toast_empty">Empty counting: Nothing to save</string>
+    <string name="counting_min_max_title">Min &amp; Max</string>
+    <string name="counting_min_label">Min</string>
+    <string name="counting_max_label">Max</string>
 
 </resources>

@@ -1,5 +1,6 @@
-package fr.geonature.occtax.ui.input.informations
+package fr.geonature.occtax.ui.input.counting
 
+import android.content.Context
 import android.database.Cursor
 import android.os.Bundle
 import android.util.Log
@@ -16,27 +17,25 @@ import fr.geonature.commons.data.Nomenclature
 import fr.geonature.commons.data.NomenclatureType
 import fr.geonature.commons.data.Provider
 import fr.geonature.commons.data.Taxonomy
-import fr.geonature.commons.input.AbstractInput
+import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
+import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.input.InputTaxon
-import fr.geonature.occtax.input.SelectedProperty
-import fr.geonature.occtax.ui.input.IInputFragment
+import fr.geonature.occtax.input.PropertyValue
 import fr.geonature.occtax.ui.input.dialog.ChooseNomenclatureDialogFragment
-import fr.geonature.viewpager.ui.IValidateFragment
 
 /**
- * [Fragment] to let the user to add additional information for the given [Input].
+ * [Fragment] to let the user to edit additional counting information for the given [Input].
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class InformationFragment : Fragment(),
-                            IValidateFragment,
-                            IInputFragment,
-                            ChooseNomenclatureDialogFragment.OnChooseNomenclatureDialogFragmentListener {
+class EditCountingMetadataFragment : Fragment(),
+                                     ChooseNomenclatureDialogFragment.OnChooseNomenclatureDialogFragmentListener {
 
-    private var input: Input? = null
+    private var listener: OnEditCountingMetadataFragmentListener? = null
     private var adapter: NomenclatureTypesRecyclerViewAdapter? = null
+    private lateinit var taxonomy: Taxonomy
+    private lateinit var countingMetadata: CountingMetadata
 
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(id: Int,
@@ -65,8 +64,10 @@ class InformationFragment : Fragment(),
 
             when (loader.id) {
                 LOADER_NOMENCLATURE_TYPES -> {
-                    adapter?.bind(data)
-                    setPropertyValues()
+                    adapter?.also {
+                        it.bind(data)
+                        it.setCountingMetata(countingMetadata)
+                    }
                 }
             }
         }
@@ -78,6 +79,16 @@ class InformationFragment : Fragment(),
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        arguments?.also {
+            taxonomy = it.getParcelable(ARG_TAXONOMY) ?: Taxonomy(Taxonomy.ANY,
+                                                                  Taxonomy.ANY)
+            countingMetadata = it.getParcelable(ARG_COUNTING_METADATA) ?: CountingMetadata()
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -86,15 +97,12 @@ class InformationFragment : Fragment(),
                                             false)
         // Set the adapter
         adapter = NomenclatureTypesRecyclerViewAdapter(object : NomenclatureTypesRecyclerViewAdapter.OnNomenclatureTypesRecyclerViewAdapterListener {
-            override fun showMore() {
-                setPropertyValues()
-            }
 
             override fun onAction(nomenclatureTypeMnemonic: String) {
-
-                val taxonomy = input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
-                        ?: Taxonomy(Taxonomy.ANY,
-                                    Taxonomy.ANY)
+                // workaround to force hide the soft keyboard
+                view?.rootView?.also {
+                    hideSoftKeyboard(it)
+                }
 
                 val chooseNomenclatureDialogFragment = ChooseNomenclatureDialogFragment.newInstance(nomenclatureTypeMnemonic,
                                                                                                     taxonomy)
@@ -102,71 +110,83 @@ class InformationFragment : Fragment(),
                                                       CHOOSE_NOMENCLATURE_DIALOG_FRAGMENT)
             }
 
-            override fun onEdit(nomenclatureTypeMnemonic: String,
-                                value: String?) {
-                (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.set(nomenclatureTypeMnemonic,
-                                                                                        SelectedProperty.fromValue(nomenclatureTypeMnemonic,
-                                                                                                                   value))
+            override fun onMinMaxValues(min: Int,
+                                        max: Int) {
+                countingMetadata.apply {
+                    this.min = min
+                    this.max = max
+                }
+
+                listener?.onCountingMetadata(countingMetadata)
             }
         })
 
         with(recyclerView as RecyclerView) {
             layoutManager = LinearLayoutManager(context)
-            adapter = this@InformationFragment.adapter
+            adapter = this@EditCountingMetadataFragment.adapter
         }
 
         return recyclerView
     }
 
-    override fun getResourceTitle(): Int {
-        return R.string.pager_fragment_information_title
-    }
-
-    override fun pagingEnabled(): Boolean {
-        return true
-    }
-
-    override fun validate(): Boolean {
-        return this.input?.getCurrentSelectedInputTaxon() != null
-    }
-
-    override fun refreshView() {
+    override fun onViewCreated(view: View,
+                               savedInstanceState: Bundle?) {
         LoaderManager.getInstance(this)
-            .restartLoader(LOADER_NOMENCLATURE_TYPES,
-                           null,
-                           loaderCallbacks)
+            .initLoader(LOADER_NOMENCLATURE_TYPES,
+                        null,
+                        loaderCallbacks)
     }
 
-    override fun setInput(input: AbstractInput) {
-        this.input = input as Input
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        if (context is OnEditCountingMetadataFragmentListener) {
+            listener = context
+        }
+        else {
+            throw RuntimeException("$context must implement OnEditCountingMetadataFragmentListener")
+        }
     }
 
     override fun onSelectedNomenclature(nomenclatureType: String,
                                         nomenclature: Nomenclature) {
-
-        (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.set(nomenclatureType,
-                                                                                SelectedProperty.fromNomenclature(nomenclatureType,
-                                                                                                                  nomenclature))
-        setPropertyValues()
+        countingMetadata.properties[nomenclatureType] = PropertyValue.fromNomenclature(nomenclatureType,
+                                                                                       nomenclature)
+        adapter?.setCountingMetata(countingMetadata)
     }
 
-    private fun setPropertyValues() {
-        adapter?.setPropertyValues((input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.values?.toList()
-                                           ?: emptyList())
+    /**
+     * Callback used by [EditCountingMetadataFragment].
+     */
+    interface OnEditCountingMetadataFragmentListener {
+        fun onCountingMetadata(countingMetadata: CountingMetadata)
     }
 
     companion object {
-        private val TAG = InformationFragment::class.java.name
+        private val TAG = EditCountingMetadataFragment::class.java.name
+
+        const val ARG_TAXONOMY = "arg_taxonomy"
+        const val ARG_COUNTING_METADATA = "arg_counting_metadata"
 
         private const val LOADER_NOMENCLATURE_TYPES = 1
         private const val CHOOSE_NOMENCLATURE_DIALOG_FRAGMENT = "choose_nomenclature_dialog_fragment"
 
         /**
-         * Use this factory method to create a new instance of [InformationFragment].
+         * Use this factory method to create a new instance of [EditCountingMetadataFragment].
          *
-         * @return A new instance of [InformationFragment]
+         * @return A new instance of [EditCountingMetadataFragment]
          */
         @JvmStatic
-        fun newInstance() = InformationFragment()
+        fun newInstance(taxonomy: Taxonomy,
+                        countingMetadata: CountingMetadata? = null) = EditCountingMetadataFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(ARG_TAXONOMY,
+                              taxonomy)
+                countingMetadata?.let {
+                    putParcelable(ARG_COUNTING_METADATA,
+                                  countingMetadata)
+                }
+            }
+        }
     }
 }

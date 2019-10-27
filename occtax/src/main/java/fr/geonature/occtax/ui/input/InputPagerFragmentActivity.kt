@@ -11,6 +11,7 @@ import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputViewModel
 import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.ui.input.counting.CountingFragment
 import fr.geonature.occtax.ui.input.informations.InformationFragment
 import fr.geonature.occtax.ui.input.map.InputMapFragment
 import fr.geonature.occtax.ui.input.observers.ObserversAndDateInputFragment
@@ -73,6 +74,8 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
                 TaxaFragment.newInstance())
             put(R.string.pager_fragment_information_title,
                 InformationFragment.newInstance())
+            put(R.string.pager_fragment_counting_title,
+                CountingFragment.newInstance())
         }
 
     override fun performFinishAction() {

@@ -6,8 +6,10 @@ import fr.geonature.commons.input.AbstractInputTaxon
 import fr.geonature.commons.input.io.InputJsonWriter
 import fr.geonature.commons.util.IsoDateUtils
 import fr.geonature.maps.jts.geojson.io.GeoJsonWriter
+import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
+import fr.geonature.occtax.input.PropertyValue
 import fr.geonature.occtax.input.SelectedProperty
 import java.util.Locale
 
@@ -112,35 +114,19 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writer.name("group2_inpn")
             .value(inputTaxon.taxon.taxonomy.group)
 
-        val defaultMnemonicOrder = arrayOf("METH_OBS",
-                                           "ETA_BIO",
-                                           "METH_DETERMIN",
-                                           "DETERMINER",
-                                           "STATUT_BIO",
-                                           "NATURALITE",
-                                           "PREUVE_EXIST",
-                                           "COMMENT")
-
         writeInputTaxonProperties(writer,
-                                  (inputTaxon as InputTaxon).properties.toSortedMap(Comparator { o1, o2 ->
-                                      val i1 = defaultMnemonicOrder.indexOfFirst { it == o1 }
-                                      val i2 = defaultMnemonicOrder.indexOfFirst { it == o2 }
-
-                                      when {
-                                          i1 == -1 -> 1
-                                          i2 == -1 -> -1
-                                          else -> i1 - i2
-                                      }
-                                  }))
+                                  (inputTaxon as InputTaxon).properties,
+                                  inputTaxon.getCounting())
 
         writer.endObject()
     }
 
     private fun writeInputTaxonProperties(writer: JsonWriter,
-                                          properties: Map<String, SelectedProperty>) {
+                                          properties: Map<String, SelectedProperty>,
+                                          counting: List<CountingMetadata>) {
         writer.name("properties")
 
-        if (properties.isEmpty()) {
+        if (properties.isEmpty() && counting.isEmpty()) {
             writer.nullValue()
             return
         }
@@ -152,6 +138,9 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
                                     it.key,
                                     it.value)
         }
+
+        writeInputTaxonCounting(writer,
+                                counting)
 
         writer.endObject()
 
@@ -170,8 +159,70 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
                 "COMMENT" -> writer.name("comment").value(it.value.label)
             }
         }
+
+        // GeoNature mapping: counting
+        writer.name("cor_counting_occtax")
+            .beginArray()
+        counting.forEach { c ->
+            if (c.isEmpty()) return@forEach
+
+            writer.beginObject()
+
+            c.properties.forEach { p ->
+                when (p.key) {
+                    "STADE_VIE" -> writer.name("id_nomenclature_life_stage").value(p.value.value as Long)
+                    "SEXE" -> writer.name("id_nomenclature_sex").value(p.value.value as Long)
+                    "OBJ_DENBR" -> writer.name("id_nomenclature_obj_count").value(p.value.value as Long)
+                    "TYP_DENBR" -> writer.name("id_nomenclature_type_count").value(p.value.value as Long)
+                }
+            }
+
+            writer.name("count_min")
+                .value(c.min)
+            writer.name("count_max")
+                .value(c.max)
+
+            writer.endObject()
+        }
+        writer.endArray()
     }
 
+    private fun writeInputTaxonCounting(writer: JsonWriter,
+                                        counting: List<CountingMetadata>) {
+        writer.name("counting")
+            .beginArray()
+
+        counting.forEach {
+            writeInputTaxonCountingMetadata(writer,
+                                            it)
+        }
+
+        writer.endArray()
+    }
+
+    private fun writeInputTaxonCountingMetadata(writer: JsonWriter,
+                                                countingMetadata: CountingMetadata) {
+        if (countingMetadata.isEmpty()) return
+
+        writer.beginObject()
+
+        writer.name("index")
+            .value(countingMetadata.index)
+        countingMetadata.properties.forEach {
+            writeInputTaxonPropertyValue(writer,
+                                         it.key,
+                                         it.value)
+        }
+
+        writer.name("min")
+            .value(countingMetadata.min)
+        writer.name("max")
+            .value(countingMetadata.max)
+
+        writer.endObject()
+    }
+
+    @Deprecated("use writeInputTaxonPropertyValue")
     private fun writeInputTaxonProperty(writer: JsonWriter,
                                         name: String,
                                         selectedProperty: SelectedProperty) {
@@ -191,6 +242,43 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         if (!TextUtils.isEmpty(selectedProperty.label)) {
             writer.name("label")
                 .value(selectedProperty.label)
+        }
+
+        writer.endObject()
+    }
+
+    /**
+     * Writes property value as object:
+     *
+     * ```
+     * "property_code": {
+     *      "label": "String",
+     *      "value": "String"|Long|Int
+     * }
+     * ```
+     */
+    private fun writeInputTaxonPropertyValue(writer: JsonWriter,
+                                             name: String,
+                                             propertyValue: PropertyValue) {
+        if (propertyValue.isEmpty()) return
+
+        writer.name(name.toLowerCase(Locale.ROOT))
+            .beginObject()
+
+        if (!TextUtils.isEmpty(propertyValue.label)) {
+            writer.name("label")
+                .value(propertyValue.label)
+        }
+
+        if (propertyValue.value != null) {
+            when (propertyValue.value) {
+                is String -> writer.name("value")
+                    .value(propertyValue.value)
+                is Long -> writer.name("value")
+                    .value(propertyValue.value)
+                is Int -> writer.name("value")
+                    .value(propertyValue.value)
+            }
         }
 
         writer.endObject()
