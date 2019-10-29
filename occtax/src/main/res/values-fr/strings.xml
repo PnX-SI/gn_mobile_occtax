@@ -19,7 +19,6 @@
     <string name="home_snackbar_input_undo">Annuler</string>
 
     <string name="no_data">Aucune donnée</string>
-    <string name="selected_items_no_data">Aucune sélection.\nAjouter en un via le bouton "Ajouter".</string>
 
     <string name="action_settings">Paramètres</string>
     <string name="action_search">Recherche</string>
@@ -44,6 +43,7 @@
     <string name="pager_fragment_taxa_title">Taxons</string>
     <string name="pager_fragment_information_title">Informations</string>
     <string name="pager_fragment_counting_title">Dénombrements</string>
+    <string name="pager_fragment_summary_title">Bilan de la saisie</string>
 
     <string name="observers_and_date_selected_observers">Observateurs</string>
     <plurals name="observers_and_date_selected_observers">
@@ -66,5 +66,10 @@
     <string name="counting_min_max_title">Min &amp; Max</string>
     <string name="counting_min_label">Min</string>
     <string name="counting_max_label">Max</string>
+
+    <string name="summary_no_data">Aucune saisie.\nAjouter un nouveau taxon via le bouton +.</string>
+    <string name="summary_snackbar_input_taxon_deleted">Saisie supprimée</string>
+    <string name="summary_snackbar_input_taxon_undo">Annuler</string>
+    <string name="summary_toast_no_input_taxon">Aucune saisie. Redirection vers la dernière étape valide.</string>
 
 </resources>

@@ -20,11 +20,12 @@ import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.ui.input.IInputFragment
+import fr.geonature.occtax.ui.shared.adapter.ListItemRecyclerViewAdapter
 import fr.geonature.viewpager.ui.IValidateFragment
-import kotlinx.android.synthetic.main.fragment_counting.countingContent
-import kotlinx.android.synthetic.main.fragment_counting.countingEmptyTextView
-import kotlinx.android.synthetic.main.fragment_counting.countingRecyclerView
-import kotlinx.android.synthetic.main.fragment_counting.fab
+import kotlinx.android.synthetic.main.fragment_recycler_view_fab.content
+import kotlinx.android.synthetic.main.fragment_recycler_view_fab.empty
+import kotlinx.android.synthetic.main.fragment_recycler_view_fab.fab
+import kotlinx.android.synthetic.main.fragment_recycler_view_fab.list
 
 /**
  * [Fragment] to let the user to add additional counting information for the given [Input].
@@ -41,7 +42,7 @@ class CountingFragment : Fragment(),
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_counting,
+        return inflater.inflate(R.layout.fragment_recycler_view_fab,
                                 container,
                                 false)
     }
@@ -51,6 +52,8 @@ class CountingFragment : Fragment(),
             savedInstanceState: Bundle?) {
         super.onViewCreated(view,
                             savedInstanceState)
+
+        empty.text = getString(R.string.counting_no_data)
 
         fab.setOnClickListener {
             val context = context ?: return@setOnClickListener
@@ -62,54 +65,54 @@ class CountingFragment : Fragment(),
                                    0)
         }
 
-        adapter = CountingRecyclerViewAdapter(object : CountingRecyclerViewAdapter.OnCountingRecyclerViewAdapterListener {
-            override fun onClick(countingMetadata: CountingMetadata) {
+        adapter = CountingRecyclerViewAdapter(object : ListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<CountingMetadata> {
+            override fun onClick(item: CountingMetadata) {
                 val context = context ?: return
                 startActivityForResult(EditCountingMetadataActivity.newIntent(context,
                                                                               input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
                                                                                       ?: Taxonomy(Taxonomy.ANY,
                                                                                                   Taxonomy.ANY),
-                                                                              countingMetadata),
+                                                                              item),
                                        0)
             }
 
             override fun onLongClicked(position: Int,
-                                       countingMetadata: CountingMetadata) {
-                if ((input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.deleteCountingMetadata(countingMetadata.index) != null) {
-                    refreshView()
+                                       item: CountingMetadata) {
+                adapter?.remove(item)
+                (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.deleteCountingMetadata(item.index)
 
-                    Snackbar.make(countingContent,
-                                  R.string.counting_snackbar_counting_deleted,
-                                  Snackbar.LENGTH_LONG)
-                        .setAction(R.string.counting_snackbar_counting_undo
-                        ) {
-                            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.addCountingMetadata(countingMetadata)
-                            refreshView()
-                        }
-                        .show()
-                }
+                Snackbar.make(content,
+                              R.string.counting_snackbar_counting_deleted,
+                              Snackbar.LENGTH_LONG)
+                    .setAction(R.string.counting_snackbar_counting_undo
+                    ) {
+                        adapter?.add(item,
+                                     position)
+                        (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.addCountingMetadata(item)
+                    }
+                    .show()
             }
 
             override fun showEmptyTextView(show: Boolean) {
-                if (countingEmptyTextView.visibility == View.VISIBLE == show) {
+                if (empty.visibility == View.VISIBLE == show) {
                     return
                 }
 
                 if (show) {
-                    countingEmptyTextView.startAnimation(AnimationUtils.loadAnimation(context,
-                                                                                   android.R.anim.fade_in))
-                    countingEmptyTextView.visibility = View.VISIBLE
+                    empty.startAnimation(AnimationUtils.loadAnimation(context,
+                                                                      android.R.anim.fade_in))
+                    empty.visibility = View.VISIBLE
 
                 }
                 else {
-                    countingEmptyTextView.startAnimation(AnimationUtils.loadAnimation(context,
-                                                                                   android.R.anim.fade_out))
-                    countingEmptyTextView.visibility = View.GONE
+                    empty.startAnimation(AnimationUtils.loadAnimation(context,
+                                                                      android.R.anim.fade_out))
+                    empty.visibility = View.GONE
                 }
             }
         })
 
-        with(countingRecyclerView as RecyclerView) {
+        with(list as RecyclerView) {
             layoutManager = LinearLayoutManager(context)
             adapter = this@CountingFragment.adapter
 
@@ -149,14 +152,12 @@ class CountingFragment : Fragment(),
     }
 
     override fun validate(): Boolean {
-        return true
+        return input?.getCurrentSelectedInputTaxon() != null
     }
 
     override fun refreshView() {
-        (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()
-            ?.also {
-                adapter?.setCounting(it)
-            }
+        adapter?.setItems((input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()
+                                  ?: emptyList())
     }
 
     override fun setInput(input: AbstractInput) {

@@ -2,7 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/countingContent"
+    android:id="@android:id/content"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -10,19 +10,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/countingRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+        <include
+            android:id="@android:id/list"
+            layout="@layout/recycler_view" />
 
         <TextView
-            android:id="@+id/countingEmptyTextView"
+            android:id="@android:id/empty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:visibility="gone"
-            android:text="@string/counting_no_data"
-            android:textAlignment="center" />
+            android:text="@string/no_data"
+            android:textAlignment="center"
+            android:visibility="gone" />
 
     </FrameLayout>
 
