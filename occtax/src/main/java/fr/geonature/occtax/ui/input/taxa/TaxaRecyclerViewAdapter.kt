@@ -73,7 +73,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         val cursor = cursor ?: return ""
         cursor.moveToPosition(position)
         val taxon = Taxon.fromCursor(cursor) ?: return ""
-        val name = taxon.name ?: return ""
+        val name = taxon.name
 
         return name.elementAt(0)
             .toString()
@@ -83,10 +83,6 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         this.selectedTaxon = selectedTaxon
         scrollToFirstItemSelected()
         notifyDataSetChanged()
-    }
-
-    fun getSelectedTaxon(): AbstractTaxon? {
-        return this.selectedTaxon
     }
 
     fun bind(cursor: Cursor?) {

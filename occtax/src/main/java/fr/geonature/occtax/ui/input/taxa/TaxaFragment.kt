@@ -38,8 +38,6 @@ class TaxaFragment : Fragment(),
                      IInputFragment {
 
     private var input: Input? = null
-    private var selectedTaxonId: Long? = null
-
     private var adapter: TaxaRecyclerViewAdapter? = null
 
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
@@ -104,6 +102,9 @@ class TaxaFragment : Fragment(),
                             adapter?.setSelectedTaxon(selectedTaxon)
                         }
                     }
+
+                    LoaderManager.getInstance(this@TaxaFragment)
+                        .destroyLoader(LOADER_TAXON)
                 }
             }
         }
@@ -112,14 +113,6 @@ class TaxaFragment : Fragment(),
             when (loader.id) {
                 LOADER_TAXA -> adapter?.bind(null)
             }
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        if (savedInstanceState?.containsKey(KEY_SELECTED_TAXON_ID) == true) {
-            selectedTaxonId = savedInstanceState.getLong(KEY_SELECTED_TAXON_ID)
         }
     }
 
@@ -134,24 +127,17 @@ class TaxaFragment : Fragment(),
         // Set the adapter
         adapter = TaxaRecyclerViewAdapter(object : TaxaRecyclerViewAdapter.OnTaxaRecyclerViewAdapterListener {
             override fun onSelectedTaxon(taxon: AbstractTaxon) {
-                val selectedTaxonId = selectedTaxonId
-
-                if (selectedTaxonId != null) {
-                    input?.removeInputTaxon(selectedTaxonId)
-                }
+                input?.getCurrentSelectedInputTaxon()
+                    ?.also { input?.removeInputTaxon(it.taxon.id) }
 
                 input?.addInputTaxon(InputTaxon(taxon))
-                this@TaxaFragment.selectedTaxonId = taxon.id
 
                 (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
             }
 
             override fun onNoTaxonSelected() {
-                val selectedTaxonId = selectedTaxonId
-
-                if (selectedTaxonId != null) {
-                    input?.removeInputTaxon(selectedTaxonId)
-                }
+                input?.getCurrentSelectedInputTaxon()
+                    ?.also { input?.removeInputTaxon(it.taxon.id) }
 
                 (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
             }
@@ -180,17 +166,6 @@ class TaxaFragment : Fragment(),
 
         // we have a menu item to show in action bar
         setHasOptionsMenu(true)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        val selectedTaxonId = selectedTaxonId
-
-        if (selectedTaxonId != null) {
-            outState.putLong(KEY_SELECTED_TAXON_ID,
-                             selectedTaxonId)
-        }
-
-        super.onSaveInstanceState(outState)
     }
 
     override fun onCreateOptionsMenu(menu: Menu,
