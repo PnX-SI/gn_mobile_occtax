@@ -1,4 +1,4 @@
-package fr.geonature.occtax.ui.input.informations
+package fr.geonature.occtax.ui.input.dialog
 
 import android.database.Cursor
 import android.view.LayoutInflater

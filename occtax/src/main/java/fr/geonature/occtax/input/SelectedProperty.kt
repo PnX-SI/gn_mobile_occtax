@@ -12,6 +12,8 @@ import java.util.Locale
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
+@Deprecated("see PropertyValue",
+            ReplaceWith("PropertyValue"))
 data class SelectedProperty(val type: PropertyType,
                             val code: String,
                             val id: Long?,
@@ -63,6 +65,8 @@ data class SelectedProperty(val type: PropertyType,
         /**
          * Creates a SelectedProperty instance from given [Nomenclature]
          */
+        @Deprecated("use fromNomenclature from PropertyValue",
+                    ReplaceWith("PropertyValue"))
         fun fromNomenclature(code: String,
                              nomenclature: Nomenclature?): SelectedProperty {
             return SelectedProperty(PropertyType.NOMENCLATURE,
@@ -74,6 +78,8 @@ data class SelectedProperty(val type: PropertyType,
         /**
          * Creates a SelectedProperty instance from given String value
          */
+        @Deprecated("use fromValue from PropertyValue",
+                    ReplaceWith("PropertyValue"))
         fun fromValue(code: String,
                       value: String?): SelectedProperty {
             return SelectedProperty(PropertyType.TEXT,

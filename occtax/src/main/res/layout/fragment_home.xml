@@ -37,8 +37,8 @@
             android:id="@+id/textViewLastInputs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/padding_default"
             android:layout_marginTop="@dimen/padding_default"
+            android:layout_marginBottom="@dimen/padding_default"
             android:text="@string/home_last_inputs"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textStyle="bold"
@@ -53,8 +53,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/inputRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-            </androidx.recyclerview.widget.RecyclerView>
+                android:layout_height="match_parent" />
 
             <TextView
                 android:id="@+id/inputEmptyTextView"
@@ -62,7 +61,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="@string/home_no_input"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:visibility="gone" />
 
         </FrameLayout>
 
@@ -73,8 +73,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginBottom="@dimen/padding_default"
         android:layout_marginEnd="@dimen/padding_default"
+        android:layout_marginBottom="@dimen/padding_default"
         android:clickable="true"
         android:focusable="true"
         android:tint="@android:color/white"

@@ -37,7 +37,8 @@
             android:layout_gravity="center"
             android:layout_margin="@dimen/text_margin"
             android:text="@string/no_data"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:visibility="gone" />
 
     </FrameLayout>
 

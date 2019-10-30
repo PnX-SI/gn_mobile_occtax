@@ -7,13 +7,15 @@
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     android:minHeight="?attr/listPreferredItemHeight"
-    android:paddingEnd="?attr/listPreferredItemPaddingEnd"
-    android:paddingStart="?attr/listPreferredItemPaddingStart">
+    android:paddingStart="?attr/listPreferredItemPaddingStart"
+    android:paddingEnd="?attr/listPreferredItemPaddingEnd">
 
     <TextView
         android:id="@android:id/text1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:singleLine="true"
         android:textAppearance="?attr/textAppearanceListItem"
         app:layout_constraintBottom_toBottomOf="@android:id/text2"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,6 +27,8 @@
         android:id="@android:id/text2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:singleLine="true"
         android:textAppearance="?attr/textAppearanceListItemSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@android:id/text1"

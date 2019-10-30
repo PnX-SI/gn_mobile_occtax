@@ -5,8 +5,10 @@ import fr.geonature.commons.data.Taxonomy
 import fr.geonature.commons.input.io.InputJsonWriter
 import fr.geonature.commons.util.IsoDateUtils.toDate
 import fr.geonature.occtax.FixtureHelper.getFixture
+import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
+import fr.geonature.occtax.input.PropertyValue
 import fr.geonature.occtax.input.SelectedProperty
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -45,38 +47,58 @@ class InputJsonWriterTest {
                                            "taxon_01",
                                            Taxonomy("Animalia",
                                                     "Ascidies"))).apply {
-                this.properties["METH_OBS"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                               "METH_OBS",
-                                                               41,
+                properties["METH_OBS"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
+                                                          "METH_OBS",
+                                                          41,
+                                                          null)
+                properties["ETA_BIO"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
+                                                         "ETA_BIO",
+                                                         29,
+                                                         null)
+                properties["METH_DETERMIN"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
+                                                               "METH_DETERMIN",
+                                                               445,
                                                                null)
-                this.properties["ETA_BIO"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                              "ETA_BIO",
-                                                              29,
+                properties["DETERMINER"] = SelectedProperty(SelectedProperty.PropertyType.TEXT,
+                                                            "DETERMINER",
+                                                            null,
+                                                            "Determiner value")
+                properties["STATUT_BIO"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
+                                                            "STATUT_BIO",
+                                                            29,
+                                                            null)
+                properties["NATURALITE"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
+                                                            "NATURALITE",
+                                                            160,
+                                                            null)
+                properties["PREUVE_EXIST"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
+                                                              "PREUVE_EXIST",
+                                                              81,
                                                               null)
-                this.properties["METH_DETERMIN"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                                    "METH_DETERMIN",
-                                                                    445,
-                                                                    null)
-                this.properties["DETERMINER"] = SelectedProperty(SelectedProperty.PropertyType.TEXT,
-                                                                 "DETERMINER",
-                                                                 null,
-                                                                 "Determiner value")
-                this.properties["STATUT_BIO"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                                 "STATUT_BIO",
-                                                                 29,
-                                                                 null)
-                this.properties["NATURALITE"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                                 "NATURALITE",
-                                                                 160,
-                                                                 null)
-                this.properties["PREUVE_EXIST"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                                   "PREUVE_EXIST",
-                                                                   81,
-                                                                   null)
-                this.properties["COMMENT"] = SelectedProperty(SelectedProperty.PropertyType.TEXT,
-                                                              "COMMENT",
-                                                              null,
-                                                              "Some comment")
+                properties["COMMENT"] = SelectedProperty(SelectedProperty.PropertyType.TEXT,
+                                                         "COMMENT",
+                                                         null,
+                                                         "Some comment")
+                addCountingMetadata(CountingMetadata().apply {
+                    properties.putAll(mutableMapOf(Pair("STADE_VIE",
+                                                        PropertyValue("STADE_VIE",
+                                                                      null,
+                                                                      2L)),
+                                                   Pair("SEXE",
+                                                        PropertyValue("SEXE",
+                                                                      null,
+                                                                      168L)),
+                                                   Pair("OBJ_DENBR",
+                                                        PropertyValue("OBJ_DENBR",
+                                                                      null,
+                                                                      146L)),
+                                                   Pair("TYP_DENBR",
+                                                        PropertyValue("TYP_DENBR",
+                                                                      null,
+                                                                      93L))))
+                    min = 1
+                    max = 2
+                })
             })
         }
 
