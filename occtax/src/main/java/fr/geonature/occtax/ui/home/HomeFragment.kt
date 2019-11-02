@@ -199,9 +199,9 @@ class HomeFragment : Fragment() {
         super.onResume()
 
         LoaderManager.getInstance(this)
-            .initLoader(LOADER_APP_SYNC,
-                        bundleOf(AppSync.COLUMN_ID to requireContext().packageName),
-                        loaderCallbacks)
+            .restartLoader(LOADER_APP_SYNC,
+                           bundleOf(AppSync.COLUMN_ID to requireContext().packageName),
+                           loaderCallbacks)
     }
 
     override fun onAttach(context: Context) {
