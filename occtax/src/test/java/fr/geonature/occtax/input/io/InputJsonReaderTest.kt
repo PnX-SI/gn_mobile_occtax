@@ -87,6 +87,7 @@ class InputJsonReaderTest {
                                       3),
                           input.getInputObserverIds()
                               .toLongArray())
+        assertEquals("Global comment", input.comment)
         assertEquals(listOf(InputTaxon(Taxon(10L,
                                              "taxon_01",
                                              Taxonomy("Animalia",

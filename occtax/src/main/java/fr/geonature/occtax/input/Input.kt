@@ -15,10 +15,12 @@ class Input : AbstractInput {
 
     var geometry: Geometry? = null
     var selectedFeatureId: String? = null
+    var comment: String? = null
 
     constructor() : super("occtax")
     constructor(source: Parcel) : super(source) {
         this.geometry = source.readSerializable() as Geometry?
+        this.comment = source.readString()
     }
 
     override fun writeToParcel(dest: Parcel,
@@ -27,6 +29,7 @@ class Input : AbstractInput {
                             flags)
 
         dest.writeSerializable(geometry)
+        dest.writeString(comment)
     }
 
     override fun getTaxaFromParcel(source: Parcel): List<AbstractInputTaxon> {

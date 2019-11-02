@@ -32,7 +32,12 @@
         <item quantity="one">%d selected</item>
         <item quantity="other">%d selected</item>
     </plurals>
+    <string name="action_comment_add">Add comment</string>
+    <string name="action_comment_edit">Edit comment</string>
 
+    <string name="alert_dialog_add_comment_title">Add a comment</string>
+    <string name="alert_dialog_edit_comment_title">Edit a comment</string>
+    <string name="alert_dialog_add_comment_hint">Add a comment</string>
     <string name="alert_dialog_ok">OK</string>
     <string name="alert_dialog_cancel">Cancel</string>
 

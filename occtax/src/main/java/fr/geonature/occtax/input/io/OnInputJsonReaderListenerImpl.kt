@@ -5,7 +5,6 @@ import android.util.JsonReader
 import android.util.JsonToken
 import fr.geonature.commons.data.Taxon
 import fr.geonature.commons.data.Taxonomy
-import fr.geonature.commons.input.AbstractInput
 import fr.geonature.commons.input.io.InputJsonReader
 import fr.geonature.commons.util.IsoDateUtils
 import fr.geonature.maps.jts.geojson.io.GeoJsonReader
@@ -55,7 +54,7 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
     }
 
     private fun readProperties(reader: JsonReader,
-                               input: AbstractInput) {
+                               input: Input) {
         reader.beginObject()
 
         while (reader.hasNext()) {
@@ -78,6 +77,14 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
                         reader.nextNull()
                     }
                 }
+                "comment" -> {
+                    if (reader.peek() != JsonToken.NULL) {
+                        input.comment = reader.nextString()
+                    }
+                    else {
+                        reader.nextNull()
+                    }
+                }
                 "t_occurrences_occtax" -> {
                     if (reader.peek() != JsonToken.NULL) {
                         readInputTaxa(reader,
@@ -95,7 +102,7 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
     }
 
     private fun readInputObservers(reader: JsonReader,
-                                   input: AbstractInput) {
+                                   input: Input) {
         reader.beginArray()
 
         while (reader.hasNext()) {
@@ -109,7 +116,7 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
     }
 
     private fun readInputTaxa(reader: JsonReader,
-                              input: AbstractInput) {
+                              input: Input) {
         reader.beginArray()
 
         while (reader.hasNext()) {
@@ -157,7 +164,7 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
      * ```
      */
     private fun readInputTaxon(reader: JsonReader,
-                               input: AbstractInput) {
+                               input: Input) {
         reader.beginObject()
 
         var id: Long? = null

@@ -43,6 +43,7 @@ class InputJsonWriterTest {
             addInputObserverId(5L)
             addInputObserverId(2L)
             addInputObserverId(3L)
+            comment = "Global comment"
             addInputTaxon(InputTaxon(Taxon(10L,
                                            "taxon_01",
                                            Taxonomy("Animalia",

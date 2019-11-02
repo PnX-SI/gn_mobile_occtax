@@ -58,8 +58,12 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
 
         writer.name("id_digitiser")
             .value(input.getPrimaryObserverId())
+
         writeInputObserverIds(writer,
                               input)
+
+        writer.name("comment")
+            .value(input.comment)
 
         writeInputTaxa(writer,
                        input)

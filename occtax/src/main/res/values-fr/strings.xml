@@ -28,7 +28,12 @@
         <item quantity="one">%d sélectionné</item>
         <item quantity="other">%d sélectionnés</item>
     </plurals>
+    <string name="action_comment_add">Ajouter un commentaire</string>
+    <string name="action_comment_edit">Supprimer un commentaire</string>
 
+    <string name="alert_dialog_add_comment_title">Ajouter un commentaire</string>
+    <string name="alert_dialog_edit_comment_title">Editer un commentaire</string>
+    <string name="alert_dialog_add_comment_hint">Ajouter un commentaire</string>
     <string name="alert_dialog_ok">OK</string>
     <string name="alert_dialog_cancel">Annuler</string>
 
