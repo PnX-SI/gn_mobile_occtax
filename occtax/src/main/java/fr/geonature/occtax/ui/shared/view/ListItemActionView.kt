@@ -14,7 +14,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import fr.geonature.commons.util.StringUtils
 import fr.geonature.occtax.R
 import java.util.ArrayList
 
@@ -231,9 +230,9 @@ open class ListItemActionView : ConstraintLayout {
         }
 
         internal inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context)
-                                                                                             .inflate(R.layout.list_item_2,
-                                                                                                      parent,
-                                                                                                      false)) {
+                                                                                         .inflate(R.layout.list_item_2,
+                                                                                                  parent,
+                                                                                                  false)) {
 
             private val textView1: TextView = itemView.findViewById(android.R.id.text1)
             private val textView2: TextView = itemView.findViewById(android.R.id.text2)
@@ -246,7 +245,7 @@ open class ListItemActionView : ConstraintLayout {
             fun bind(label: String,
                      description: String?) {
                 textView1.text = label
-                textView2.text = if (StringUtils.isEmpty(description)) "" else description
+                textView2.text = description.orEmpty()
             }
         }
     }

@@ -13,7 +13,6 @@ import com.l4digital.fastscroll.FastScroller
 import fr.geonature.commons.data.AbstractTaxon
 import fr.geonature.commons.data.Taxon
 import fr.geonature.commons.data.TaxonWithArea
-import fr.geonature.commons.util.StringUtils
 import fr.geonature.occtax.R
 import java.text.NumberFormat
 
@@ -160,7 +159,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
                 checkbox.isChecked = selectedTaxon?.id == taxon.id
 
                 taxon.taxonArea?.run {
-                    taxonColorView.setBackgroundColor(if (StringUtils.isEmpty(color)) Color.TRANSPARENT else Color.parseColor(color))
+                    taxonColorView.setBackgroundColor(if (color.isNullOrBlank()) Color.TRANSPARENT else Color.parseColor(color))
 
                     taxonObserversView.text = NumberFormat.getNumberInstance()
                         .format(numberOfObservers)
