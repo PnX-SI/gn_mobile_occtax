@@ -6,6 +6,7 @@
 
     <string name="activity_main_title" translatable="false">@string/app_name</string>
     <string name="activity_preferences_title">Settings</string>
+    <string name="activity_dataset_title">Dataset</string>
     <string name="activity_observers_title">Observers</string>
 
     <string name="sync_device_status">Device status</string>
@@ -46,6 +47,9 @@
     <string name="snackbar_permissions_granted">Permissions were been granted</string>
     <string name="snackbar_permission_external_storage_rationale">External storage permission is needed</string>
     <string name="snackbar_permission_external_storage_available">External storage Permissions have been granted</string>
+
+    <string name="dataset_created_at">Created at %s</string>
+    <string name="dataset_date">EEE dd MMM yyyy</string>
 
     <string name="pager_fragment_observers_and_date_input_title">Observers &#38; date</string>
     <string name="pager_fragment_map_title">Pointing</string>

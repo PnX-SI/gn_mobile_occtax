@@ -13,6 +13,20 @@ import fr.geonature.occtax.R
 object SettingsUtils {
 
     /**
+     * Gets the default dataset ID to use.
+     *
+     * @param context the current context
+     *
+     * @return the default dataset ID or `null` if not set
+     */
+    fun getDefaultDatasetId(context: Context): Long? {
+        return getDefaultSharedPreferences(context)
+            .getLong(context.getString(R.string.preference_category_dataset_default_key),
+                     0)
+            .takeIf { it > 0 }
+    }
+
+    /**
      * Gets the default input observer ID to use.
      *
      * @param context the current context

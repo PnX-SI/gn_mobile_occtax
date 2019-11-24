@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="preference_category_dataset">Dataset</string>
+    <string name="preference_category_dataset_default_key" translatable="false">dataset_default</string>
+    <string name="preference_category_dataset_default">Default dataset</string>
+    <string name="preference_category_dataset_default_not_set">Not defined</string>
     <string name="preference_category_observers">Observers</string>
     <string name="preference_category_observers_default_key" translatable="false">observer_default</string>
     <string name="preference_category_observers_default">Default observer</string>

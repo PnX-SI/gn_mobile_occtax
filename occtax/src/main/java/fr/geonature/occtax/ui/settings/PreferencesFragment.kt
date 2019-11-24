@@ -12,10 +12,13 @@ import androidx.loader.content.Loader
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
+import fr.geonature.commons.data.Dataset
 import fr.geonature.commons.data.InputObserver
 import fr.geonature.commons.data.Provider.buildUri
 import fr.geonature.occtax.R
+import fr.geonature.occtax.ui.dataset.DatasetListActivity
 import fr.geonature.occtax.ui.observers.InputObserverListActivity
+import fr.geonature.occtax.util.SettingsUtils.getDefaultDatasetId
 import fr.geonature.occtax.util.SettingsUtils.getDefaultObserverId
 import java.util.Locale
 
@@ -33,16 +36,21 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 id: Int,
                 args: Bundle?): Loader<Cursor> {
 
-            when (id) {
-                LOADER_OBSERVER -> return CursorLoader(requireContext(),
-                                                       buildUri(InputObserver.TABLE_NAME,
-                                                                args!!.getLong(KEY_SELECTED_OBSERVER).toString()),
-                                                       arrayOf(InputObserver.COLUMN_ID,
-                                                               InputObserver.COLUMN_LASTNAME,
-                                                               InputObserver.COLUMN_FIRSTNAME),
-                                                       null,
-                                                       null,
-                                                       null)
+            return when (id) {
+                LOADER_DATASET -> CursorLoader(requireContext(),
+                                               buildUri(Dataset.TABLE_NAME,
+                                                        args!!.getLong(KEY_SELECTED_DATASET).toString()),
+                                               null,
+                                               null,
+                                               null,
+                                               null)
+                LOADER_OBSERVER -> CursorLoader(requireContext(),
+                                                buildUri(InputObserver.TABLE_NAME,
+                                                         args!!.getLong(KEY_SELECTED_OBSERVER).toString()),
+                                                null,
+                                                null,
+                                                null,
+                                                null)
                 else -> throw IllegalArgumentException()
             }
         }
@@ -50,15 +58,14 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         override fun onLoadFinished(
                 loader: Loader<Cursor>,
                 data: Cursor?) {
-            if ((data != null) && data.moveToFirst()) {
-                updateDefaultObserverPreference(InputObserver.fromCursor(data))
-            }
-            else {
-                updateDefaultObserverPreference()
+
+            when (loader.id) {
+                LOADER_DATASET -> updateDefaultDatasetPreference(if ((data != null) && data.moveToFirst()) Dataset.fromCursor(data) else null)
+                LOADER_OBSERVER -> updateDefaultObserverPreference(if ((data != null) && data.moveToFirst()) InputObserver.fromCursor(data) else null)
             }
 
             LoaderManager.getInstance(this@PreferencesFragment)
-                .destroyLoader(LOADER_OBSERVER)
+                .destroyLoader(loader.id)
         }
 
         override fun onLoaderReset(loader: Loader<Cursor>) {
@@ -69,22 +76,27 @@ class PreferencesFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val defaultObserverPreference: Preference? = preferenceScreen.findPreference(getString(R.string.preference_category_observers_default_key))
-
-        if (defaultObserverPreference != null) {
-            loadDefaultObserver()
-
-            defaultObserverPreference.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                startActivityForResult(InputObserverListActivity.newIntent(requireContext()),
-                                       0)
+        (preferenceScreen.findPreference(getString(R.string.preference_category_dataset_default_key)) as Preference?)?.also {
+            loadDefaultDataset()
+            it.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                startActivityForResult(DatasetListActivity.newIntent(requireContext()),
+                                       LOADER_DATASET)
                 true
             }
         }
 
-        val aboutAppVersionPreference: Preference? = preferenceScreen.findPreference(getString(R.string.preference_category_about_app_version_key))
+        (preferenceScreen.findPreference(getString(R.string.preference_category_observers_default_key)) as Preference?)?.also {
+            loadDefaultObserver()
 
-        if (aboutAppVersionPreference != null) {
-            aboutAppVersionPreference.summary = listener!!.getAppVersion()
+            it.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                startActivityForResult(InputObserverListActivity.newIntent(requireContext()),
+                                       LOADER_OBSERVER)
+                true
+            }
+        }
+
+        (preferenceScreen.findPreference(getString(R.string.preference_category_about_app_version_key)) as Preference?)?.also {
+            it.summary = listener?.getAppVersion()
         }
     }
 
@@ -115,10 +127,41 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             requestCode: Int,
             resultCode: Int,
             data: Intent?) {
-        if ((resultCode == Activity.RESULT_OK) && (data != null)) {
-            val selectedInputObservers = data.getParcelableArrayListExtra<InputObserver>(InputObserverListActivity.EXTRA_SELECTED_INPUT_OBSERVERS)
-            updateDefaultObserverPreference(if (selectedInputObservers.size > 0) selectedInputObservers[0] else null)
+        if ((resultCode != Activity.RESULT_OK) || (data == null)) {
+            return
         }
+
+        when (requestCode) {
+            LOADER_DATASET -> updateDefaultDatasetPreference(data.getParcelableExtra(DatasetListActivity.EXTRA_SELECTED_DATASET))
+            LOADER_OBSERVER -> {
+                val selectedInputObservers = data.getParcelableArrayListExtra<InputObserver>(InputObserverListActivity.EXTRA_SELECTED_INPUT_OBSERVERS)
+                updateDefaultObserverPreference(if (selectedInputObservers.size > 0) selectedInputObservers[0] else null)
+            }
+        }
+    }
+
+    private fun loadDefaultDataset() {
+        val context = context
+
+        if (context == null) {
+            updateDefaultDatasetPreference()
+            return
+        }
+
+        val defaultDatasetId = getDefaultDatasetId(context)
+
+        if (defaultDatasetId == null) {
+            updateDefaultDatasetPreference()
+            return
+        }
+
+        LoaderManager.getInstance(this)
+            .initLoader(LOADER_DATASET,
+                        Bundle().apply {
+                            putLong(KEY_SELECTED_DATASET,
+                                    defaultDatasetId)
+                        },
+                        loaderCallbacks)
     }
 
     private fun loadDefaultObserver() {
@@ -145,6 +188,37 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                         loaderCallbacks)
     }
 
+    private fun updateDefaultDatasetPreference(defaultDataset: Dataset? = null) {
+        val defaultDatasetPreference: Preference = preferenceScreen.findPreference(getString(R.string.preference_category_dataset_default_key))
+                ?: return
+
+        defaultDatasetPreference.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            val context = context ?: return@OnPreferenceClickListener false
+
+            startActivityForResult(DatasetListActivity.newIntent(context,
+                                                                 defaultDataset),
+                                   LOADER_DATASET)
+            true
+        }
+
+        val editor = PreferenceManager.getDefaultSharedPreferences(context)
+            .edit()
+
+        if (defaultDataset == null) {
+            editor.remove(getString(R.string.preference_category_dataset_default_key))
+
+            defaultDatasetPreference.setSummary(R.string.preference_category_dataset_default_not_set)
+        }
+        else {
+            editor.putLong(getString(R.string.preference_category_dataset_default_key),
+                           defaultDataset.id)
+
+            defaultDatasetPreference.summary = defaultDataset.name
+        }
+
+        editor.apply()
+    }
+
     private fun updateDefaultObserverPreference(defaultObserver: InputObserver? = null) {
         val defaultObserverPreference: Preference = preferenceScreen.findPreference(getString(R.string.preference_category_observers_default_key))
                 ?: return
@@ -155,7 +229,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             startActivityForResult(InputObserverListActivity.newIntent(context,
                                                                        ListView.CHOICE_MODE_SINGLE,
                                                                        if (defaultObserver == null) listOf() else listOf(defaultObserver)),
-                                   0)
+                                   LOADER_OBSERVER)
             true
         }
 
@@ -186,7 +260,9 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
     companion object {
 
-        private const val LOADER_OBSERVER = 1
+        private const val LOADER_DATASET = 1
+        private const val LOADER_OBSERVER = 2
+        private const val KEY_SELECTED_DATASET = "selected_dataset"
         private const val KEY_SELECTED_OBSERVER = "selected_observer"
 
         /**
