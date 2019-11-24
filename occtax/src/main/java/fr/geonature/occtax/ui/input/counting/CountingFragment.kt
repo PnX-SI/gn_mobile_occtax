@@ -15,12 +15,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.data.Taxonomy
 import fr.geonature.commons.input.AbstractInput
+import fr.geonature.commons.ui.adapter.ListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.ui.input.IInputFragment
-import fr.geonature.occtax.ui.shared.adapter.ListItemRecyclerViewAdapter
 import fr.geonature.viewpager.ui.IValidateFragment
 import kotlinx.android.synthetic.main.fragment_recycler_view_fab.content
 import kotlinx.android.synthetic.main.fragment_recycler_view_fab.empty

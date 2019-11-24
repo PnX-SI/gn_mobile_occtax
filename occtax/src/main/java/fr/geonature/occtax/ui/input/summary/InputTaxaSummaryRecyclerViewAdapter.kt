@@ -3,8 +3,8 @@ package fr.geonature.occtax.ui.input.summary
 import android.view.View
 import android.widget.TextView
 import fr.geonature.commons.input.AbstractInputTaxon
+import fr.geonature.commons.ui.adapter.ListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
-import fr.geonature.occtax.ui.shared.adapter.ListItemRecyclerViewAdapter
 
 /**
  * Default RecyclerView Adapter used by [InputTaxaSummaryFragment].

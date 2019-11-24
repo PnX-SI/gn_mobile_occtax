@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.data.AppSync
 import fr.geonature.commons.data.Provider.buildUri
+import fr.geonature.commons.ui.adapter.ListItemRecyclerViewAdapter
 import fr.geonature.commons.util.PermissionUtils
 import fr.geonature.commons.util.PermissionUtils.checkPermissions
 import fr.geonature.commons.util.PermissionUtils.checkSelfPermissions
@@ -139,20 +140,20 @@ class HomeFragment : Fragment() {
             listener?.onStartInput(appSettings)
         }
 
-        adapter = InputRecyclerViewAdapter(object : InputRecyclerViewAdapter.OnInputRecyclerViewAdapterListener {
-            override fun onInputClicked(input: Input) {
+        adapter = InputRecyclerViewAdapter(object : ListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<Input> {
+            override fun onClick(item: Input) {
                 val appSettings = appSettings ?: return
 
                 Log.i(TAG,
-                      "input selected: ${input.id}")
+                      "input selected: ${item.id}")
 
                 listener?.onStartInput(appSettings,
-                                       input)
+                                       item)
             }
 
-            override fun onInputLongClicked(position: Int,
-                                            input: Input) {
-                inputViewModel?.deleteInput(input)
+            override fun onLongClicked(position: Int,
+                                       item: Input) {
+                inputViewModel?.deleteInput(item)
 
                 Snackbar.make(homeContent,
                               R.string.home_snackbar_input_deleted,
@@ -325,7 +326,7 @@ class HomeFragment : Fragment() {
         inputViewModel?.readInputs()
             ?.observe(this,
                       Observer {
-                          (inputRecyclerView.adapter as InputRecyclerViewAdapter).setInputs(it)
+                          adapter.setItems(it)
                       })
     }
 

@@ -18,10 +18,10 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.commons.input.AbstractInputTaxon
+import fr.geonature.commons.ui.adapter.ListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.ui.input.IInputFragment
-import fr.geonature.occtax.ui.shared.adapter.ListItemRecyclerViewAdapter
 import fr.geonature.occtax.ui.shared.dialog.CommentDialogFragment
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment

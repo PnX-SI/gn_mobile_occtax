@@ -2,9 +2,9 @@ package fr.geonature.occtax.ui.input.counting
 
 import android.view.View
 import android.widget.TextView
+import fr.geonature.commons.ui.adapter.ListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
-import fr.geonature.occtax.ui.shared.adapter.ListItemRecyclerViewAdapter
 import java.util.Locale
 
 /**
