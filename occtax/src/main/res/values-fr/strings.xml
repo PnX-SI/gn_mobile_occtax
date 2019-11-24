@@ -60,6 +60,7 @@
         <item quantity="other">%d observateurs</item>
     </plurals>
     <string name="observers_and_date_selected_observers_no_data">Aucun observateur sélectionné.\nAjouter en un via le bouton "Ajouter".</string>
+    <string name="observers_and_date_dataset">Jeu de données</string>
     <string name="observers_and_date_date">Date</string>
     <string name="observers_and_date_date_format">dd MMMM yyyy</string>
 

@@ -76,24 +76,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        (preferenceScreen.findPreference(getString(R.string.preference_category_dataset_default_key)) as Preference?)?.also {
-            loadDefaultDataset()
-            it.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                startActivityForResult(DatasetListActivity.newIntent(requireContext()),
-                                       LOADER_DATASET)
-                true
-            }
-        }
-
-        (preferenceScreen.findPreference(getString(R.string.preference_category_observers_default_key)) as Preference?)?.also {
-            loadDefaultObserver()
-
-            it.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                startActivityForResult(InputObserverListActivity.newIntent(requireContext()),
-                                       LOADER_OBSERVER)
-                true
-            }
-        }
+        loadDefaultDataset()
+        loadDefaultObserver()
 
         (preferenceScreen.findPreference(getString(R.string.preference_category_about_app_version_key)) as Preference?)?.also {
             it.summary = listener?.getAppVersion()

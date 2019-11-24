@@ -64,6 +64,7 @@
         <item quantity="other">%d selected observers</item>
     </plurals>
     <string name="observers_and_date_selected_observers_no_data">No selected observer.\nAdd one by tapping the "Add" button.</string>
+    <string name="observers_and_date_dataset">Dataset</string>
     <string name="observers_and_date_date">Date</string>
     <string name="observers_and_date_date_format">MMMM dd, yyyy</string>
 

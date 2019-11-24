@@ -60,6 +60,14 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
         while (reader.hasNext()) {
             when (reader.nextName()) {
                 "date_min" -> input.date = IsoDateUtils.toDate(reader.nextString()) ?: Date()
+                "id_dataset" -> {
+                    if (reader.peek() != JsonToken.NULL) {
+                        input.datasetId = reader.nextLong()
+                    }
+                    else {
+                        reader.nextNull()
+                    }
+                }
                 "id_digitiser" -> {
                     if (reader.peek() != JsonToken.NULL) {
                         input.setPrimaryInputObserverId(reader.nextLong())

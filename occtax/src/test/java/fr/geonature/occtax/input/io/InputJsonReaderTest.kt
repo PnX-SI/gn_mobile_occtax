@@ -57,6 +57,7 @@ class InputJsonReaderTest {
                      input?.id)
         assertEquals(Input().module,
                      input?.module)
+        assertNull(input?.datasetId)
     }
 
     @Test
@@ -73,6 +74,8 @@ class InputJsonReaderTest {
                      input!!.id)
         assertEquals(Input().module,
                      input.module)
+        assertEquals(17L,
+                     input.datasetId)
         assertEquals(toDate("2016-10-28"),
                      input.date)
         assertEquals(1L,
@@ -87,7 +90,8 @@ class InputJsonReaderTest {
                                       3),
                           input.getInputObserverIds()
                               .toLongArray())
-        assertEquals("Global comment", input.comment)
+        assertEquals("Global comment",
+                     input.comment)
         assertEquals(listOf(InputTaxon(Taxon(10L,
                                              "taxon_01",
                                              Taxonomy("Animalia",
@@ -162,6 +166,7 @@ class InputJsonReaderTest {
                      input!!.id)
         assertEquals(Input().module,
                      input.module)
+        assertNull(input.datasetId)
         assertEquals(toDate("2016-10-28"),
                      input.date)
         assertNull(input.getPrimaryObserverId())
