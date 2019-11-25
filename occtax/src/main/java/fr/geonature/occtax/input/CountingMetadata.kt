@@ -25,8 +25,8 @@ class CountingMetadata() : Parcelable {
             else -> i1 - i2
         }
     })
-    var min: Int = 0
-    var max: Int = 0
+    var min: Int = 1
+    var max: Int = 1
 
     constructor(source: Parcel) : this() {
         index = source.readInt()
