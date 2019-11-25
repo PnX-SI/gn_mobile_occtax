@@ -2,7 +2,7 @@ package fr.geonature.occtax.ui.input.counting
 
 import android.view.View
 import android.widget.TextView
-import fr.geonature.commons.ui.adapter.ListItemRecyclerViewAdapter
+import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
 import java.util.Locale
@@ -12,7 +12,7 @@ import java.util.Locale
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<CountingMetadata>) : ListItemRecyclerViewAdapter<CountingMetadata>(listener) {
+class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<CountingMetadata>) : AbstractListItemRecyclerViewAdapter<CountingMetadata>(listener) {
 
     override fun getViewHolder(view: View,
                                viewType: Int): AbstractViewHolder {
@@ -38,7 +38,7 @@ class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListene
         return oldItems[oldItemPosition] == newItems[newItemPosition]
     }
 
-    inner class ViewHolder(itemView: View) : ListItemRecyclerViewAdapter<CountingMetadata>.AbstractViewHolder(itemView) {
+    inner class ViewHolder(itemView: View) : AbstractListItemRecyclerViewAdapter<CountingMetadata>.AbstractViewHolder(itemView) {
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
         private val text2: TextView = itemView.findViewById(android.R.id.text2)
 

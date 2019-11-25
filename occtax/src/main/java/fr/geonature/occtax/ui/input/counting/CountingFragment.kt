@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.data.Taxonomy
 import fr.geonature.commons.input.AbstractInput
-import fr.geonature.commons.ui.adapter.ListItemRecyclerViewAdapter
+import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
@@ -65,7 +65,7 @@ class CountingFragment : Fragment(),
                                    0)
         }
 
-        adapter = CountingRecyclerViewAdapter(object : ListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<CountingMetadata> {
+        adapter = CountingRecyclerViewAdapter(object : AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<CountingMetadata> {
             override fun onClick(item: CountingMetadata) {
                 val context = context ?: return
                 startActivityForResult(EditCountingMetadataActivity.newIntent(context,
@@ -152,7 +152,8 @@ class CountingFragment : Fragment(),
     }
 
     override fun validate(): Boolean {
-        return input?.getCurrentSelectedInputTaxon() != null
+        return (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()?.isNotEmpty()
+                ?: false
     }
 
     override fun refreshView() {

@@ -3,7 +3,7 @@ package fr.geonature.occtax.ui.input.summary
 import android.view.View
 import android.widget.TextView
 import fr.geonature.commons.input.AbstractInputTaxon
-import fr.geonature.commons.ui.adapter.ListItemRecyclerViewAdapter
+import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
 
 /**
@@ -11,7 +11,7 @@ import fr.geonature.occtax.R
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<AbstractInputTaxon>) : ListItemRecyclerViewAdapter<AbstractInputTaxon>(listener) {
+class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<AbstractInputTaxon>) : AbstractListItemRecyclerViewAdapter<AbstractInputTaxon>(listener) {
 
     override fun getViewHolder(view: View,
                                viewType: Int): AbstractViewHolder {
@@ -37,7 +37,7 @@ class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapte
         return oldItems[oldItemPosition] == newItems[newItemPosition]
     }
 
-    inner class ViewHolder(itemView: View) : ListItemRecyclerViewAdapter<AbstractInputTaxon>.AbstractViewHolder(itemView) {
+    inner class ViewHolder(itemView: View) : AbstractListItemRecyclerViewAdapter<AbstractInputTaxon>.AbstractViewHolder(itemView) {
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
 
         override fun onBind(item: AbstractInputTaxon) {

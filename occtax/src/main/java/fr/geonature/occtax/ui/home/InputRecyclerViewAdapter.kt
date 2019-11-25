@@ -3,7 +3,7 @@ package fr.geonature.occtax.ui.home
 import android.text.format.DateFormat
 import android.view.View
 import android.widget.TextView
-import fr.geonature.commons.ui.adapter.ListItemRecyclerViewAdapter
+import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 
@@ -12,7 +12,7 @@ import fr.geonature.occtax.input.Input
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<Input>) : ListItemRecyclerViewAdapter<Input>(listener) {
+class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<Input>) : AbstractListItemRecyclerViewAdapter<Input>(listener) {
     override fun getViewHolder(view: View,
                                viewType: Int): AbstractViewHolder {
         return ViewHolder(view)
@@ -37,7 +37,7 @@ class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<I
         return oldItems[oldItemPosition] == newItems[newItemPosition]
     }
 
-    inner class ViewHolder(itemView: View) : ListItemRecyclerViewAdapter<Input>.AbstractViewHolder(itemView) {
+    inner class ViewHolder(itemView: View) : AbstractListItemRecyclerViewAdapter<Input>.AbstractViewHolder(itemView) {
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
 
         override fun onBind(item: Input) {

@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.data.AppSync
 import fr.geonature.commons.data.Provider.buildUri
-import fr.geonature.commons.ui.adapter.ListItemRecyclerViewAdapter
+import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.commons.util.PermissionUtils
 import fr.geonature.commons.util.PermissionUtils.checkPermissions
 import fr.geonature.commons.util.PermissionUtils.checkSelfPermissions
@@ -140,7 +140,7 @@ class HomeFragment : Fragment() {
             listener?.onStartInput(appSettings)
         }
 
-        adapter = InputRecyclerViewAdapter(object : ListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<Input> {
+        adapter = InputRecyclerViewAdapter(object : AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<Input> {
             override fun onClick(item: Input) {
                 val appSettings = appSettings ?: return
 
