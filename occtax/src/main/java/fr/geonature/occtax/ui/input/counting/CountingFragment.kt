@@ -21,6 +21,7 @@ import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.ui.input.IInputFragment
+import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
 import kotlinx.android.synthetic.main.fragment_recycler_view_fab.content
 import kotlinx.android.synthetic.main.fragment_recycler_view_fab.empty
@@ -80,6 +81,7 @@ class CountingFragment : Fragment(),
                                        item: CountingMetadata) {
                 adapter?.remove(item)
                 (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.deleteCountingMetadata(item.index)
+                (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
 
                 Snackbar.make(content,
                               R.string.counting_snackbar_counting_deleted,
