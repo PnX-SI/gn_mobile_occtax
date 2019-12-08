@@ -14,7 +14,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import fr.geonature.commons.data.Dataset
 import fr.geonature.commons.data.InputObserver
-import fr.geonature.commons.data.Provider.buildUri
+import fr.geonature.commons.data.helper.Provider.buildUri
 import fr.geonature.occtax.R
 import fr.geonature.occtax.ui.dataset.DatasetListActivity
 import fr.geonature.occtax.ui.observers.InputObserverListActivity

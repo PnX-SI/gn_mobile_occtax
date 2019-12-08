@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.data.Nomenclature
 import fr.geonature.commons.data.NomenclatureType
-import fr.geonature.commons.data.Provider
 import fr.geonature.commons.data.Taxonomy
+import fr.geonature.commons.data.helper.Provider.buildUri
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
@@ -40,15 +40,13 @@ class EditCountingMetadataFragment : Fragment(),
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(id: Int,
                                     args: Bundle?): Loader<Cursor> {
-            when (id) {
-                LOADER_NOMENCLATURE_TYPES -> {
-                    return CursorLoader(requireContext(),
-                                        Provider.buildUri(NomenclatureType.TABLE_NAME),
-                                        null,
-                                        null,
-                                        null,
-                                        null)
-                }
+            return when (id) {
+                LOADER_NOMENCLATURE_TYPES -> CursorLoader(requireContext(),
+                                                          buildUri(NomenclatureType.TABLE_NAME),
+                                                          null,
+                                                          null,
+                                                          null,
+                                                          null)
                 else -> throw IllegalArgumentException()
             }
         }

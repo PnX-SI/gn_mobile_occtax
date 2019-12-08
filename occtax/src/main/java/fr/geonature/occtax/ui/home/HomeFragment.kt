@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.data.AppSync
-import fr.geonature.commons.data.Provider.buildUri
+import fr.geonature.commons.data.helper.Provider.buildUri
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.commons.util.PermissionUtils
 import fr.geonature.commons.util.PermissionUtils.checkPermissions
@@ -58,17 +58,15 @@ class HomeFragment : Fragment() {
         override fun onCreateLoader(
                 id: Int,
                 args: Bundle?): Loader<Cursor> {
-            when (id) {
-                LOADER_APP_SYNC -> return CursorLoader(requireContext(),
-                                                       buildUri(AppSync.TABLE_NAME,
-                                                                args?.getString(AppSync.COLUMN_ID)
-                                                                        ?: ""),
-                                                       arrayOf(AppSync.COLUMN_ID,
-                                                               AppSync.COLUMN_LAST_SYNC,
-                                                               AppSync.COLUMN_INPUTS_TO_SYNCHRONIZE),
-                                                       null,
-                                                       null,
-                                                       null)
+            return when (id) {
+                LOADER_APP_SYNC -> CursorLoader(requireContext(),
+                                                buildUri(AppSync.TABLE_NAME,
+                                                         args?.getString(AppSync.COLUMN_ID)
+                                                                 ?: ""),
+                                                null,
+                                                null,
+                                                null,
+                                                null)
                 else -> throw IllegalArgumentException()
             }
         }

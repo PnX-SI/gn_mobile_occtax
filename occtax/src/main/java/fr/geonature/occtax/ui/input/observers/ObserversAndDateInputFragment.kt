@@ -18,7 +18,7 @@ import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import fr.geonature.commons.data.Dataset
 import fr.geonature.commons.data.InputObserver
-import fr.geonature.commons.data.Provider
+import fr.geonature.commons.data.helper.Provider.buildUri
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
@@ -59,17 +59,17 @@ class ObserversAndDateInputFragment : Fragment(),
 
             return when (id) {
                 LOADER_OBSERVERS_IDS -> CursorLoader(requireContext(),
-                                                     Provider.buildUri(InputObserver.TABLE_NAME,
-                                                                       args?.getLongArray(KEY_SELECTED_INPUT_OBSERVER_IDS)?.joinToString(",")
-                                                                               ?: ""),
+                                                     buildUri(InputObserver.TABLE_NAME,
+                                                              args?.getLongArray(KEY_SELECTED_INPUT_OBSERVER_IDS)?.joinToString(",")
+                                                                      ?: ""),
                                                      null,
                                                      null,
                                                      null,
                                                      null)
                 LOADER_DATASET_ID -> CursorLoader(requireContext(),
-                                                  Provider.buildUri(Dataset.TABLE_NAME,
-                                                                    args?.getLong(KEY_SELECTED_DATASET_ID,
-                                                                                  -1).toString()),
+                                                  buildUri(Dataset.TABLE_NAME,
+                                                           args?.getLong(KEY_SELECTED_DATASET_ID,
+                                                                         -1).toString()),
                                                   null,
                                                   null,
                                                   null,

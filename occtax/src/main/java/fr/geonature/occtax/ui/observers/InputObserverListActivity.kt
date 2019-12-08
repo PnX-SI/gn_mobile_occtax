@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import fr.geonature.commons.data.InputObserver
+import fr.geonature.occtax.R
 
 /**
  * Let the user to choose an [InputObserver] from the list.
@@ -21,18 +22,18 @@ class InputObserverListActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(fr.geonature.occtax.R.layout.activity_toolbar)
+        setContentView(R.layout.activity_toolbar)
 
-        setSupportActionBar(findViewById(fr.geonature.occtax.R.id.toolbar))
+        setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // Display the fragment as the main content.
         supportFragmentManager.beginTransaction()
-                .replace(fr.geonature.occtax.R.id.container,
-                         InputObserverListFragment.newInstance(intent.getIntExtra(EXTRA_CHOICE_MODE,
-                                                                                  ListView.CHOICE_MODE_SINGLE),
-                                                               intent.getParcelableArrayListExtra(EXTRA_SELECTED_INPUT_OBSERVERS)))
-                .commit()
+            .replace(R.id.container,
+                     InputObserverListFragment.newInstance(intent.getIntExtra(EXTRA_CHOICE_MODE,
+                                                                              ListView.CHOICE_MODE_SINGLE),
+                                                           intent.getParcelableArrayListExtra(EXTRA_SELECTED_INPUT_OBSERVERS)))
+            .commit()
     }
 
     override fun onSelectedInputObservers(inputObservers: List<InputObserver>) {

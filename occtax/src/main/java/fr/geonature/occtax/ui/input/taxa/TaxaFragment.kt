@@ -18,8 +18,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.data.AbstractTaxon
-import fr.geonature.commons.data.Provider.buildUri
 import fr.geonature.commons.data.Taxon
+import fr.geonature.commons.data.helper.Provider.buildUri
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
@@ -44,39 +44,32 @@ class TaxaFragment : Fragment(),
         override fun onCreateLoader(id: Int,
                                     args: Bundle?): Loader<Cursor> {
 
-            when (id) {
+            return when (id) {
                 LOADER_TAXA -> {
                     val selectedFeatureId = args?.getString(KEY_SELECTED_FEATURE_ID,
                                                             null)
-                    val selections = if (args?.getString(KEY_FILTER,
-                                                         null) == null) Pair(null,
-                                                                             null)
-                    else {
-                        val filter = "%${args.getString(KEY_FILTER)}%"
-                        Pair("(${AbstractTaxon.COLUMN_NAME} LIKE ?)",
-                             arrayOf(filter))
-                    }
+                    val selections = Taxon.filter(args?.getString(KEY_FILTER))
 
-                    return CursorLoader(requireContext(),
-                                        buildUri(Taxon.TABLE_NAME,
-                                                 if (selectedFeatureId == null) "" else "area/${selectedFeatureId}"),
-                                        null,
-                                        selections.first,
-                                        selections.second,
-                                        null)
+                    CursorLoader(requireContext(),
+                                 buildUri(Taxon.TABLE_NAME,
+                                          if (selectedFeatureId == null) "" else "area/${selectedFeatureId}"),
+                                 null,
+                                 selections.first,
+                                 selections.second,
+                                 null)
                 }
                 LOADER_TAXON -> {
                     val selectedFeatureId = args?.getString(KEY_SELECTED_FEATURE_ID,
                                                             null)
 
-                    return CursorLoader(requireContext(),
-                                        buildUri(Taxon.TABLE_NAME,
-                                                 args?.getLong(KEY_SELECTED_TAXON_ID).toString(),
-                                                 if (selectedFeatureId == null) "" else "area/${selectedFeatureId}"),
-                                        null,
-                                        null,
-                                        null,
-                                        null)
+                    CursorLoader(requireContext(),
+                                 buildUri(Taxon.TABLE_NAME,
+                                          args?.getLong(KEY_SELECTED_TAXON_ID).toString(),
+                                          if (selectedFeatureId == null) "" else "area/${selectedFeatureId}"),
+                                 null,
+                                 null,
+                                 null,
+                                 null)
                 }
                 else -> throw IllegalArgumentException()
             }

@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.data.Dataset
-import fr.geonature.commons.data.Provider.buildUri
+import fr.geonature.commons.data.helper.Provider.buildUri
 import fr.geonature.occtax.R
 import fr.geonature.occtax.R.layout.fast_scroll_recycler_view
 
