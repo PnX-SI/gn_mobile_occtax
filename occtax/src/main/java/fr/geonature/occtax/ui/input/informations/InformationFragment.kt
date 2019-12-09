@@ -12,6 +12,7 @@ import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import fr.geonature.commons.data.DefaultNomenclatureWithType
 import fr.geonature.commons.data.Nomenclature
 import fr.geonature.commons.data.NomenclatureType
 import fr.geonature.commons.data.Taxonomy
@@ -20,7 +21,7 @@ import fr.geonature.commons.input.AbstractInput
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
-import fr.geonature.occtax.input.SelectedProperty
+import fr.geonature.occtax.input.PropertyValue
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.occtax.ui.input.dialog.ChooseNomenclatureDialogFragment
 import fr.geonature.viewpager.ui.IValidateFragment
@@ -48,6 +49,14 @@ class InformationFragment : Fragment(),
                                                           null,
                                                           null,
                                                           null)
+                LOADER_DEFAULT_NOMENCLATURE_VALUES -> CursorLoader(requireContext(),
+                                                                   buildUri(NomenclatureType.TABLE_NAME,
+                                                                            "occtax",
+                                                                            "default"),
+                                                                   null,
+                                                                   null,
+                                                                   null,
+                                                                   null)
                 else -> throw IllegalArgumentException()
             }
         }
@@ -64,7 +73,24 @@ class InformationFragment : Fragment(),
             when (loader.id) {
                 LOADER_NOMENCLATURE_TYPES -> {
                     adapter?.bind(data)
-                    setPropertyValues()
+                    loadDefaultNomenclatureValues()
+                }
+                LOADER_DEFAULT_NOMENCLATURE_VALUES -> {
+                    val defaultMnemonicFilter = adapter?.defaultMnemonicFilter() ?: emptyList()
+                    val defaultNomenclatureValues = mutableListOf<DefaultNomenclatureWithType>()
+                    data.moveToFirst()
+
+                    while (!data.isAfterLast) {
+                        val defaultNomenclatureValue = DefaultNomenclatureWithType.fromCursor(data)
+
+                        if (defaultNomenclatureValue != null && defaultMnemonicFilter.contains(defaultNomenclatureValue.nomenclatureWithType?.type?.mnemonic)) {
+                            defaultNomenclatureValues.add(defaultNomenclatureValue)
+                        }
+
+                        data.moveToNext()
+                    }
+
+                    setPropertyValues(defaultNomenclatureValues)
                 }
             }
         }
@@ -103,8 +129,8 @@ class InformationFragment : Fragment(),
             override fun onEdit(nomenclatureTypeMnemonic: String,
                                 value: String?) {
                 (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.set(nomenclatureTypeMnemonic,
-                                                                                        SelectedProperty.fromValue(nomenclatureTypeMnemonic,
-                                                                                                                   value))
+                                                                                        PropertyValue.fromValue(nomenclatureTypeMnemonic,
+                                                                                                                value))
             }
         })
 
@@ -143,12 +169,31 @@ class InformationFragment : Fragment(),
                                         nomenclature: Nomenclature) {
 
         (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.set(nomenclatureType,
-                                                                                SelectedProperty.fromNomenclature(nomenclatureType,
-                                                                                                                  nomenclature))
+                                                                                PropertyValue.fromNomenclature(nomenclatureType,
+                                                                                                               nomenclature))
         setPropertyValues()
     }
 
-    private fun setPropertyValues() {
+    private fun loadDefaultNomenclatureValues() {
+        LoaderManager.getInstance(this)
+            .restartLoader(LOADER_DEFAULT_NOMENCLATURE_VALUES,
+                           null,
+                           loaderCallbacks)
+    }
+
+    private fun setPropertyValues(defaultNomenclatureValues: List<DefaultNomenclatureWithType> = emptyList()) {
+        defaultNomenclatureValues.forEach {
+            val nomenclatureType = it.nomenclatureWithType?.type?.mnemonic ?: return@forEach
+
+            if ((input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.containsKey(nomenclatureType) == true) {
+                return@forEach
+            }
+
+            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.set(nomenclatureType,
+                                                                                    PropertyValue.fromNomenclature(nomenclatureType,
+                                                                                                                   it.nomenclatureWithType))
+        }
+
         adapter?.setPropertyValues((input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.values?.toList()
                                            ?: emptyList())
     }
@@ -157,6 +202,7 @@ class InformationFragment : Fragment(),
         private val TAG = InformationFragment::class.java.name
 
         private const val LOADER_NOMENCLATURE_TYPES = 1
+        private const val LOADER_DEFAULT_NOMENCLATURE_VALUES = 2
         private const val CHOOSE_NOMENCLATURE_DIALOG_FRAGMENT = "choose_nomenclature_dialog_fragment"
 
         /**

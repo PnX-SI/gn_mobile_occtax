@@ -37,19 +37,30 @@ class InputTaxonTest {
         assertTrue(inputTaxon.getCounting().isEmpty())
 
         // when adding valid counting metadata
-        inputTaxon.addCountingMetadata(CountingMetadata().apply { min = 1 })
-        inputTaxon.addCountingMetadata(CountingMetadata().apply {
-            min = 2
-            max = 3
-        })
+        with(inputTaxon) {
+            addCountingMetadata(CountingMetadata().apply {
+                properties["STADE_VIE"] = PropertyValue("STADE_VIE",
+                                                        null,
+                                                        2L)
+            })
+            addCountingMetadata(CountingMetadata().apply {
+                properties["SEXE"] = PropertyValue("SEXE",
+                                                   null,
+                                                   168L)
+            })
+        }
+
         assertArrayEquals(arrayOf(CountingMetadata().apply {
             index = 1
-            min = 1
+            properties["STADE_VIE"] = PropertyValue("STADE_VIE",
+                                                    null,
+                                                    2L)
         },
                                   CountingMetadata().apply {
                                       index = 2
-                                      min = 2
-                                      max = 3
+                                      properties["SEXE"] = PropertyValue("SEXE",
+                                                                         null,
+                                                                         168L)
                                   }),
                           inputTaxon.getCounting().toTypedArray())
 
@@ -63,7 +74,11 @@ class InputTaxonTest {
                                           Taxonomy("Animalia",
                                                    "Ascidies"),
                                           null)).apply {
-            addCountingMetadata(CountingMetadata().apply { min = 1 })
+            addCountingMetadata(CountingMetadata().apply {
+                properties["STADE_VIE"] = PropertyValue("STADE_VIE",
+                                                        null,
+                                                        2L)
+            })
         }
 
         // when deleting counting metadata
@@ -81,12 +96,12 @@ class InputTaxonTest {
                                           Taxonomy("Animalia",
                                                    "Ascidies"),
                                           null)).apply {
-            properties["ETA_BIO"] = SelectedProperty.fromNomenclature("ETA_BIO",
-                                                                      Nomenclature(1234L,
-                                                                                   "2",
-                                                                                   "1234:001",
-                                                                                   "label",
-                                                                                   123L))
+            properties["ETA_BIO"] = PropertyValue.fromNomenclature("ETA_BIO",
+                                                                   Nomenclature(1234L,
+                                                                                "2",
+                                                                                "1234:001",
+                                                                                "label",
+                                                                                123L))
             addCountingMetadata(CountingMetadata().apply {
                 properties.putAll(mutableMapOf(Pair("SEXE",
                                                     PropertyValue.fromNomenclature("SEXE",

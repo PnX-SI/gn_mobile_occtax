@@ -12,7 +12,6 @@ import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.input.PropertyValue
-import fr.geonature.occtax.input.SelectedProperty
 import java.io.Serializable
 import java.util.Date
 import java.util.Locale
@@ -179,7 +178,7 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
         var name: String? = null
         var kingdom: String? = null
         var group: String? = null
-        val properties = Pair(mutableMapOf<String, SelectedProperty>(),
+        val properties = Pair(mutableMapOf<String, PropertyValue>(),
                               mutableListOf<CountingMetadata>())
 
         while (reader.hasNext()) {
@@ -230,7 +229,6 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
      *  "counting": [
      *      {
      *          "property_code_x": {
-     *              "type": "PropertyType",
      *              "id": "Long",
      *              "label: "String"
      *          },
@@ -243,8 +241,8 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
      * }
      * ```
      */
-    private fun readInputTaxonProperties(reader: JsonReader): Pair<Map<String, SelectedProperty>, List<CountingMetadata>> {
-        val properties = Pair(mutableMapOf<String, SelectedProperty>(),
+    private fun readInputTaxonProperties(reader: JsonReader): Pair<Map<String, PropertyValue>, List<CountingMetadata>> {
+        val properties = Pair(mutableMapOf<String, PropertyValue>(),
                               mutableListOf<CountingMetadata>())
 
         reader.beginObject()
@@ -254,8 +252,8 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
                 JsonToken.NAME -> {
                     when (val propertyName = reader.nextName()) {
                         "counting" -> properties.second.addAll(readInputTaxonCounting(reader))
-                        else -> readInputTaxonProperty(reader,
-                                                       propertyName)?.also {
+                        else -> readInputTaxonPropertyValue(reader,
+                                                            propertyName)?.also {
                             properties.first[it.code] = it
                         }
                     }
@@ -276,7 +274,6 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
      * [
      *  {
      *      "property_code_x": {
-     *          "type": "PropertyType",
      *          "id": "Long",
      *          "label: "String"
      *      },
@@ -311,7 +308,6 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
      * {
      *  "index": "Int",
      *  "property_code_x": {
-     *      "type": "PropertyType",
      *      "id": "Long",
      *      "label: "String"
      *  },
@@ -346,47 +342,6 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
         reader.endObject()
 
         return if (countingMetadata.isEmpty()) null else countingMetadata
-    }
-
-    /**
-     * Reads input taxon property as object:
-     *
-     * ```
-     * {
-     *  "type": "PropertyType",
-     *  "id": "Long",
-     *  "label: "String"
-     * }
-     * ```
-     */
-    @Deprecated("use readInputTaxonPropertyValue")
-    private fun readInputTaxonProperty(reader: JsonReader,
-                                       code: String): SelectedProperty? {
-        reader.beginObject()
-
-        var type: SelectedProperty.PropertyType? = null
-        var id: Long? = null
-        var label: String? = null
-
-        while (reader.hasNext()) {
-            when (reader.nextName()) {
-                "type" -> type = SelectedProperty.PropertyType.fromString(reader.nextString())
-                "id" -> id = reader.nextLong()
-                "label" -> label = reader.nextString()
-                else -> reader.skipValue()
-            }
-        }
-
-        reader.endObject()
-
-        if (type == null) return null
-
-        val selectedProperty = SelectedProperty(type,
-                                                code.toUpperCase(Locale.ROOT),
-                                                id,
-                                                label)
-
-        return if (selectedProperty.isEmpty()) null else selectedProperty
     }
 
     /**

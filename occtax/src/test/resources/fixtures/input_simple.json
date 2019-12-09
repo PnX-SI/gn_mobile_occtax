@@ -22,36 +22,28 @@
         "group2_inpn": "Ascidies",
         "properties": {
           "meth_obs": {
-            "type": "nomenclature",
-            "id": 41
+            "value": 41
           },
           "eta_bio": {
-            "type": "nomenclature",
-            "id": 29
+            "value": 29
           },
           "meth_determin": {
-            "type": "nomenclature",
-            "id": 445
+            "value": 445
           },
           "determiner": {
-            "type": "text",
-            "label": "Determiner value"
+            "value": "Determiner value"
           },
           "statut_bio": {
-            "type": "nomenclature",
-            "id": 29
+            "value": 29
           },
           "naturalite": {
-            "type": "nomenclature",
-            "id": 160
+            "value": 160
           },
           "preuve_exist": {
-            "type": "nomenclature",
-            "id": 81
+            "value": 81
           },
           "comment": {
-            "type": "text",
-            "label": "Some comment"
+            "value": "Some comment"
           },
           "counting": [
             {

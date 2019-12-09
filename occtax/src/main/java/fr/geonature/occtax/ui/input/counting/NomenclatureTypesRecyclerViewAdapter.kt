@@ -73,6 +73,13 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             .second.ordinal
     }
 
+    fun defaultMnemonicFilter(): List<String> {
+        return mnemonicFilter.asSequence()
+            .filter { it.second == ViewType.NOMENCLATURE_TYPE }
+            .map { it.first }
+            .toList()
+    }
+
     fun bind(cursor: Cursor?) {
         availableNomenclatureTypes.clear()
 

@@ -75,7 +75,7 @@ class CountingMetadata() : Parcelable {
     }
 
     fun isEmpty(): Boolean {
-        return properties.filterNot { it.value.isEmpty() }.isEmpty() && min == 0 && max == 0
+        return properties.filterNot { it.value.isEmpty() }.isEmpty()
     }
 
     companion object {

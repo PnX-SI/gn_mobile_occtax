@@ -14,7 +14,7 @@ import java.util.TreeMap
  */
 class InputTaxon : AbstractInputTaxon {
 
-    val properties: SortedMap<String, SelectedProperty> = TreeMap<String, SelectedProperty>(Comparator { o1, o2 ->
+    val properties: SortedMap<String, PropertyValue> = TreeMap<String, PropertyValue>(Comparator { o1, o2 ->
         val i1 = defaultPropertiesMnemonicOrder.indexOfFirst { it == o1 }
         val i2 = defaultPropertiesMnemonicOrder.indexOfFirst { it == o2 }
 
@@ -28,8 +28,8 @@ class InputTaxon : AbstractInputTaxon {
 
     constructor(taxon: AbstractTaxon) : super(taxon)
     constructor(source: Parcel) : super(source) {
-        (source.createTypedArrayList(SelectedProperty.CREATOR)
-                ?: emptyList<SelectedProperty>())
+        (source.createTypedArrayList(PropertyValue.CREATOR)
+                ?: emptyList<PropertyValue>())
             .forEach {
                 this.properties[it.code] = it
             }

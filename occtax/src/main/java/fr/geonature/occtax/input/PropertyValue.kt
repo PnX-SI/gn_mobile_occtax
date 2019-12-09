@@ -2,7 +2,6 @@ package fr.geonature.occtax.input
 
 import android.os.Parcel
 import android.os.Parcelable
-import android.text.TextUtils
 import fr.geonature.commons.data.Nomenclature
 import fr.geonature.commons.input.AbstractInputTaxon
 import java.io.Serializable
@@ -34,7 +33,7 @@ data class PropertyValue(val code: String,
     }
 
     fun isEmpty(): Boolean {
-        return TextUtils.isEmpty(label) && value == null
+        return value == null
     }
 
     companion object {
@@ -50,20 +49,10 @@ data class PropertyValue(val code: String,
         }
 
         /**
-         * Creates a [PropertyValue] instance from given String value.
+         * Creates a [PropertyValue] instance from given value.
          */
         fun fromValue(code: String,
-                      value: String?): PropertyValue {
-            return PropertyValue(code,
-                                 null,
-                                 value)
-        }
-
-        /**
-         * Creates a [PropertyValue] instance from given Int value.
-         */
-        fun fromValue(code: String,
-                      value: Int?): PropertyValue {
+                      value: Serializable?): PropertyValue {
             return PropertyValue(code,
                                  null,
                                  value)

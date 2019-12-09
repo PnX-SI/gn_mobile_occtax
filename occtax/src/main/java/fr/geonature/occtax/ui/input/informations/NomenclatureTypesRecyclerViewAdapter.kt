@@ -16,7 +16,8 @@ import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.data.NomenclatureType
-import fr.geonature.occtax.input.SelectedProperty
+import fr.geonature.occtax.R
+import fr.geonature.occtax.input.PropertyValue
 import java.util.Locale
 
 /**
@@ -48,14 +49,14 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
                                                                       1))
 
     private val availableNomenclatureTypes = mutableListOf<Pair<String, ViewType>>()
-    private val properties = mutableListOf<SelectedProperty>()
+    private val properties = mutableListOf<PropertyValue>()
     private var showAllNomenclatureTypes = false
 
     private val onClickListener: View.OnClickListener
 
     init {
         onClickListener = View.OnClickListener { v ->
-            val selectedProperty = v.tag as SelectedProperty
+            val selectedProperty = v.tag as PropertyValue
             listener.onAction(selectedProperty.code)
         }
     }
@@ -85,6 +86,13 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         return if (property.code == moreViewType.first) moreViewType.second.ordinal
         else mnemonicFilter.first { it.first == properties[position].code }
             .second.ordinal
+    }
+
+    fun defaultMnemonicFilter(): List<String> {
+        return mnemonicFilter.asSequence()
+            .filter { it.second == ViewType.NOMENCLATURE_TYPE }
+            .map { it.first }
+            .toList()
     }
 
     fun bind(cursor: Cursor?) {
@@ -139,7 +147,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         setNomenclatureTypes(nomenclatureTypes)
     }
 
-    fun setPropertyValues(selectedProperties: List<SelectedProperty>) {
+    fun setPropertyValues(selectedProperties: List<PropertyValue>) {
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun getOldListSize(): Int {
                 return this@NomenclatureTypesRecyclerViewAdapter.properties.size
@@ -176,10 +184,10 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         if (this.properties.isEmpty()) {
             this.properties.addAll(nomenclatureTypes.map {
                 when (it.second) {
-                    ViewType.NOMENCLATURE_TYPE -> SelectedProperty.fromNomenclature(it.first,
-                                                                                    null)
-                    else -> SelectedProperty.fromValue(it.first,
-                                                       null)
+                    ViewType.NOMENCLATURE_TYPE -> PropertyValue.fromNomenclature(it.first,
+                                                                                 null)
+                    else -> PropertyValue.fromValue(it.first,
+                                                    null)
                 }
             })
 
@@ -222,21 +230,21 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         this.properties.clear()
         this.properties.addAll(nomenclatureTypes.map {
             when (it.second) {
-                ViewType.NOMENCLATURE_TYPE -> SelectedProperty.fromNomenclature(it.first,
-                                                                                null)
-                else -> SelectedProperty.fromValue(it.first,
-                                                   null)
+                ViewType.NOMENCLATURE_TYPE -> PropertyValue.fromNomenclature(it.first,
+                                                                             null)
+                else -> PropertyValue.fromValue(it.first,
+                                                null)
             }
         })
 
         diffResult.dispatchUpdatesTo(this)
     }
 
-    abstract inner class AbstractCardViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(fr.geonature.occtax.R.layout.card_view,
+    abstract inner class AbstractCardViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.card_view,
                                                                                                                                          parent,
                                                                                                                                          false)) {
         internal val contentView: View
-        internal var property: SelectedProperty? = null
+        internal var property: PropertyValue? = null
 
         init {
             contentView = LayoutInflater.from(itemView.context)
@@ -245,7 +253,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
                          true)
         }
 
-        fun bind(property: SelectedProperty) {
+        fun bind(property: PropertyValue) {
             this.property = property
 
             onBind(property)
@@ -254,7 +262,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         @LayoutRes
         abstract fun getLayoutResourceId(): Int
 
-        abstract fun onBind(property: SelectedProperty)
+        abstract fun onBind(property: PropertyValue)
 
         fun getNomenclatureTypeLabel(mnemonic: String): String {
             val resourceId = contentView.resources.getIdentifier("nomenclature_${mnemonic.toLowerCase(Locale.getDefault())}",
@@ -271,10 +279,10 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         private var button1: Button = contentView.findViewById(android.R.id.button1)
 
         override fun getLayoutResourceId(): Int {
-            return fr.geonature.occtax.R.layout.view_action_nomenclature_type
+            return R.layout.view_action_nomenclature_type
         }
 
-        override fun onBind(property: SelectedProperty) {
+        override fun onBind(property: PropertyValue) {
             title.text = getNomenclatureTypeLabel(property.code)
             text1.text = property.label
 
@@ -290,10 +298,10 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         private var button1: Button = contentView.findViewById(android.R.id.button1)
 
         override fun getLayoutResourceId(): Int {
-            return fr.geonature.occtax.R.layout.view_action_more
+            return R.layout.view_action_more
         }
 
-        override fun onBind(property: SelectedProperty) {
+        override fun onBind(property: PropertyValue) {
             title.text = getNomenclatureTypeLabel(property.code)
             button1.setOnClickListener {
                 showAllNomenclatureTypes = true
@@ -332,10 +340,10 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         }
 
         override fun getLayoutResourceId(): Int {
-            return fr.geonature.occtax.R.layout.view_action_edit_text
+            return R.layout.view_action_edit_text
         }
 
-        override fun onBind(property: SelectedProperty) {
+        override fun onBind(property: PropertyValue) {
             title.text = getNomenclatureTypeLabel(property.code)
             edit.hint = getEditTextHint(property.code)
 

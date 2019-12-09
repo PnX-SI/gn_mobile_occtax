@@ -9,7 +9,6 @@ import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.input.PropertyValue
-import fr.geonature.occtax.input.SelectedProperty
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
@@ -49,38 +48,38 @@ class InputJsonWriterTest {
                                            "taxon_01",
                                            Taxonomy("Animalia",
                                                     "Ascidies"))).apply {
-                properties["METH_OBS"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                          "METH_OBS",
-                                                          41,
-                                                          null)
-                properties["ETA_BIO"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                         "ETA_BIO",
-                                                         29,
-                                                         null)
-                properties["METH_DETERMIN"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                               "METH_DETERMIN",
-                                                               445,
-                                                               null)
-                properties["DETERMINER"] = SelectedProperty(SelectedProperty.PropertyType.TEXT,
-                                                            "DETERMINER",
-                                                            null,
-                                                            "Determiner value")
-                properties["STATUT_BIO"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                            "STATUT_BIO",
-                                                            29,
-                                                            null)
-                properties["NATURALITE"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                            "NATURALITE",
-                                                            160,
-                                                            null)
-                properties["PREUVE_EXIST"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                              "PREUVE_EXIST",
-                                                              81,
-                                                              null)
-                properties["COMMENT"] = SelectedProperty(SelectedProperty.PropertyType.TEXT,
-                                                         "COMMENT",
-                                                         null,
-                                                         "Some comment")
+                properties["METH_OBS"] = PropertyValue(
+                        "METH_OBS",
+                        null,
+                        41L)
+                properties["ETA_BIO"] = PropertyValue(
+                        "ETA_BIO",
+                        null,
+                        29L)
+                properties["METH_DETERMIN"] = PropertyValue(
+                        "METH_DETERMIN",
+                        null,
+                        445L)
+                properties["DETERMINER"] = PropertyValue(
+                        "DETERMINER",
+                        null,
+                        "Determiner value")
+                properties["STATUT_BIO"] = PropertyValue(
+                        "STATUT_BIO",
+                        null,
+                        29L)
+                properties["NATURALITE"] = PropertyValue(
+                        "NATURALITE",
+                        null,
+                        160L)
+                properties["PREUVE_EXIST"] = PropertyValue(
+                        "PREUVE_EXIST",
+                        null,
+                        81L)
+                properties["COMMENT"] = PropertyValue(
+                        "COMMENT",
+                        null,
+                        "Some comment")
                 addCountingMetadata(CountingMetadata().apply {
                     properties.putAll(mutableMapOf(Pair("STADE_VIE",
                                                         PropertyValue("STADE_VIE",
