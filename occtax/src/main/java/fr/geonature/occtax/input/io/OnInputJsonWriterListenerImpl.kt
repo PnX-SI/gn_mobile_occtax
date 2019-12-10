@@ -86,7 +86,7 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writer.name("observers")
             .beginArray()
 
-        input.getInputObserverIds()
+        input.getAllInputObserverIds()
             .forEach { writer.value(it) }
 
         writer.endArray()
