@@ -311,6 +311,9 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
 
                 if (minValue > maxValue) setMaxValue(minValue)
 
+                setMinValue(minValue)
+                editMin.setSelection(minValue.toString().length)
+
                 listener.onMinMaxValues(minValue,
                                         if (minValue > maxValue) minValue else maxValue)
             }
@@ -333,6 +336,9 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
                 val minValue = editMin.text?.toString()?.toIntOrNull() ?: 0
                 val maxValue = s?.toString()?.toIntOrNull() ?: 0
 
+                setMaxValue(maxValue)
+                editMax.setSelection(maxValue.toString().length)
+                
                 listener.onMinMaxValues(minValue,
                                         if (minValue > maxValue) minValue else maxValue)
             }
