@@ -15,8 +15,8 @@ import java.util.TreeMap
 class InputTaxon : AbstractInputTaxon {
 
     val properties: SortedMap<String, PropertyValue> = TreeMap<String, PropertyValue>(Comparator { o1, o2 ->
-        val i1 = defaultPropertiesMnemonicOrder.indexOfFirst { it == o1 }
-        val i2 = defaultPropertiesMnemonicOrder.indexOfFirst { it == o2 }
+        val i1 = defaultPropertiesMnemonic.indexOfFirst { it.first == o1 }
+        val i2 = defaultPropertiesMnemonic.indexOfFirst { it.first == o2 }
 
         when {
             i1 == -1 -> 1
@@ -90,14 +90,22 @@ class InputTaxon : AbstractInputTaxon {
 
     companion object {
 
-        private val defaultPropertiesMnemonicOrder = arrayOf("METH_OBS",
-                                                             "ETA_BIO",
-                                                             "METH_DETERMIN",
-                                                             "DETERMINER",
-                                                             "STATUT_BIO",
-                                                             "NATURALITE",
-                                                             "PREUVE_EXIST",
-                                                             "COMMENT")
+        val defaultPropertiesMnemonic = arrayOf(Pair("METH_OBS",
+                                                     NomenclatureTypeViewType.NOMENCLATURE_TYPE),
+                                                Pair("ETA_BIO",
+                                                     NomenclatureTypeViewType.NOMENCLATURE_TYPE),
+                                                Pair("METH_DETERMIN",
+                                                     NomenclatureTypeViewType.NOMENCLATURE_TYPE),
+                                                Pair("DETERMINER",
+                                                     NomenclatureTypeViewType.TEXT_SIMPLE),
+                                                Pair("STATUT_BIO",
+                                                     NomenclatureTypeViewType.NOMENCLATURE_TYPE),
+                                                Pair("NATURALITE",
+                                                     NomenclatureTypeViewType.NOMENCLATURE_TYPE),
+                                                Pair("PREUVE_EXIST",
+                                                     NomenclatureTypeViewType.NOMENCLATURE_TYPE),
+                                                Pair("COMMENT",
+                                                     NomenclatureTypeViewType.TEXT_MULTIPLE))
 
         @JvmField
         val CREATOR: Parcelable.Creator<InputTaxon> = object : Parcelable.Creator<InputTaxon> {

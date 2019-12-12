@@ -44,6 +44,8 @@
     <string name="snackbar_permission_external_storage_rationale">L\'application requiert la permission d\'accéder au contenu de la mémoire de stockage</string>
     <string name="snackbar_permission_external_storage_available">L\'accès à la mémoire de stockage a été accordée</string>
 
+    <string name="toast_technical_observation_loading_failed">Échec lors du chargement de la valeur par défaut des techniques d\'observation</string>
+
     <string name="dataset_created_at">Créé le %s</string>
     <string name="dataset_date">EEE dd MMM yyyy</string>
 

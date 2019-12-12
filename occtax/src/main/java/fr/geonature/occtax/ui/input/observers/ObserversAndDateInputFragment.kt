@@ -11,13 +11,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import fr.geonature.commons.data.Dataset
+import fr.geonature.commons.data.DefaultNomenclatureWithType
 import fr.geonature.commons.data.InputObserver
+import fr.geonature.commons.data.NomenclatureType
 import fr.geonature.commons.data.helper.Provider.buildUri
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.occtax.R
@@ -30,6 +33,7 @@ import fr.geonature.occtax.ui.shared.dialog.DatePickerDialogFragment
 import fr.geonature.occtax.ui.shared.view.ListItemActionView
 import fr.geonature.occtax.util.SettingsUtils.getDefaultDatasetId
 import fr.geonature.occtax.util.SettingsUtils.getDefaultObserverId
+import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
 import java.util.Calendar
 import java.util.Date
@@ -74,6 +78,14 @@ class ObserversAndDateInputFragment : Fragment(),
                                                   null,
                                                   null,
                                                   null)
+                LOADER_DEFAULT_NOMENCLATURE_VALUES -> CursorLoader(requireContext(),
+                                                                   buildUri(NomenclatureType.TABLE_NAME,
+                                                                            "occtax",
+                                                                            "default"),
+                                                                   null,
+                                                                   null,
+                                                                   null,
+                                                                   null)
                 else -> throw IllegalArgumentException()
             }
         }
@@ -111,6 +123,30 @@ class ObserversAndDateInputFragment : Fragment(),
                     if (data.moveToFirst()) {
                         selectedDataset = Dataset.fromCursor(data)
                         updateSelectedDatasetActionView(selectedDataset)
+                    }
+                }
+                LOADER_DEFAULT_NOMENCLATURE_VALUES -> {
+                    data.moveToFirst()
+
+                    while (!data.isAfterLast && input?.technicalObservationId == null) {
+                        val defaultNomenclatureValue = DefaultNomenclatureWithType.fromCursor(data)
+
+                        if (defaultNomenclatureValue != null && defaultNomenclatureValue.nomenclatureWithType?.type?.mnemonic == "TECHNIQUE_OBS") {
+                            input?.technicalObservationId = defaultNomenclatureValue.nomenclatureWithType?.id
+                        }
+
+                        data.moveToNext()
+                    }
+
+                    (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+
+                    if (input?.technicalObservationId == null) {
+                        val context = context ?: return
+
+                        Toast.makeText(context,
+                                       R.string.toast_technical_observation_loading_failed,
+                                       Toast.LENGTH_LONG)
+                            .show()
                     }
                 }
             }
@@ -234,7 +270,7 @@ class ObserversAndDateInputFragment : Fragment(),
     }
 
     override fun validate(): Boolean {
-        return this.input?.getAllInputObserverIds()?.isNotEmpty() ?: false && this.input?.datasetId != null
+        return this.input?.getAllInputObserverIds()?.isNotEmpty() ?: false && this.input?.datasetId != null && this.input?.technicalObservationId != null
     }
 
     override fun refreshView() {
@@ -260,6 +296,11 @@ class ObserversAndDateInputFragment : Fragment(),
                                                     selectedDatasetId)),
                                loaderCallbacks)
         }
+
+        LoaderManager.getInstance(this)
+            .initLoader(LOADER_DEFAULT_NOMENCLATURE_VALUES,
+                        null,
+                        loaderCallbacks)
 
         inputDateActionView?.setItems(listOf(Pair.create(DateFormat.format(getString(R.string.observers_and_date_date_format),
                                                                            input?.date
@@ -313,6 +354,7 @@ class ObserversAndDateInputFragment : Fragment(),
         private const val DATE_PICKER_DIALOG_FRAGMENT = "date_picker_dialog_fragment"
         private const val LOADER_OBSERVERS_IDS = 1
         private const val LOADER_DATASET_ID = 2
+        private const val LOADER_DEFAULT_NOMENCLATURE_VALUES = 3
         private const val KEY_SELECTED_INPUT_OBSERVER_IDS = "selected_input_observer_ids"
         private const val KEY_SELECTED_DATASET_ID = "selected_dataset_id"
 

@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.data.NomenclatureType
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.input.CountingMetadata
+import fr.geonature.occtax.input.NomenclatureTypeViewType
 import fr.geonature.occtax.input.PropertyValue
 import java.util.Locale
 
@@ -26,20 +27,8 @@ import java.util.Locale
  */
 class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureTypesRecyclerViewAdapterListener) : RecyclerView.Adapter<NomenclatureTypesRecyclerViewAdapter.AbstractCardViewHolder>() {
 
-    private val mnemonicFilter = arrayOf(Pair("STADE_VIE",
-                                              ViewType.NOMENCLATURE_TYPE),
-                                         Pair("SEXE",
-                                              ViewType.NOMENCLATURE_TYPE),
-                                         Pair("OBJ_DENBR",
-                                              ViewType.NOMENCLATURE_TYPE),
-                                         Pair("TYP_DENBR",
-                                              ViewType.NOMENCLATURE_TYPE),
-                                         Pair("MIN",
-                                              ViewType.MIN_MAX),
-                                         Pair("MAX",
-                                              ViewType.MIN_MAX))
-
-    private val availableNomenclatureTypes = mutableListOf<Pair<String, ViewType>>()
+    private val mnemonicFilter = CountingMetadata.defaultMnemonic
+    private val availableNomenclatureTypes = mutableListOf<Pair<String, NomenclatureTypeViewType>>()
     private val properties = mutableListOf<PropertyValue>()
 
     private val onClickListener: View.OnClickListener
@@ -53,8 +42,8 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
 
     override fun onCreateViewHolder(parent: ViewGroup,
                                     viewType: Int): AbstractCardViewHolder {
-        return when (ViewType.values()[viewType]) {
-            ViewType.MIN_MAX -> MinMaxViewHolder(parent)
+        return when (NomenclatureTypeViewType.values()[viewType]) {
+            NomenclatureTypeViewType.MIN_MAX -> MinMaxViewHolder(parent)
             else -> NomenclatureTypeViewHolder(parent)
         }
     }
@@ -75,7 +64,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
 
     fun defaultMnemonicFilter(): List<String> {
         return mnemonicFilter.asSequence()
-            .filter { it.second == ViewType.NOMENCLATURE_TYPE }
+            .filter { it.second == NomenclatureTypeViewType.NOMENCLATURE_TYPE }
             .map { it.first }
             .toList()
     }
@@ -100,7 +89,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             }
 
             // add default mnemonic filters
-            availableNomenclatureTypes.addAll(mnemonicFilter.filter { it.second != ViewType.NOMENCLATURE_TYPE })
+            availableNomenclatureTypes.addAll(mnemonicFilter.filter { it.second != NomenclatureTypeViewType.NOMENCLATURE_TYPE })
         }
 
         availableNomenclatureTypes.sortWith(Comparator { o1, o2 ->
@@ -139,8 +128,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
                     ?.second ?: return false
 
                 return when (viewType) {
-                    ViewType.NOMENCLATURE_TYPE -> countingMetadata.properties[oldProperty.code] == oldProperty
-                    ViewType.MIN_MAX -> {
+                    NomenclatureTypeViewType.MIN_MAX -> {
                         val minProperty = this@NomenclatureTypesRecyclerViewAdapter.properties.firstOrNull { it.code == "MIN" }
                         val maxProperty = this@NomenclatureTypesRecyclerViewAdapter.properties.firstOrNull { it.code == "MAX" }
 
@@ -148,20 +136,22 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
 
                         return minProperty.value as Int == countingMetadata.min && maxProperty.value as Int == countingMetadata.max
                     }
+                    else -> countingMetadata.properties[oldProperty.code] == oldProperty
                 }
             }
         })
 
         val newProperties = this.properties.map { p ->
             when (mnemonicFilter.firstOrNull { it.first == p.code }?.second ?: return@map p) {
-                ViewType.NOMENCLATURE_TYPE -> countingMetadata.properties[p.code] ?: p
-                ViewType.MIN_MAX -> when (p.code) {
+                NomenclatureTypeViewType.MIN_MAX -> when (p.code) {
                     "MIN" -> PropertyValue.fromValue(p.code,
                                                      countingMetadata.min)
                     "MAX" -> PropertyValue.fromValue(p.code,
                                                      countingMetadata.max)
                     else -> p
                 }
+                else -> countingMetadata.properties[p.code]
+                        ?: p
             }
         }
         this.properties.clear()
@@ -170,12 +160,12 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         diffResult.dispatchUpdatesTo(this)
     }
 
-    private fun setNomenclatureTypes(nomenclatureTypes: List<Pair<String, ViewType>>) {
+    private fun setNomenclatureTypes(nomenclatureTypes: List<Pair<String, NomenclatureTypeViewType>>) {
         if (this.properties.isEmpty()) {
             this.properties.addAll(nomenclatureTypes.map {
                 when (it.second) {
-                    ViewType.NOMENCLATURE_TYPE -> PropertyValue.fromNomenclature(it.first,
-                                                                                 null)
+                    NomenclatureTypeViewType.NOMENCLATURE_TYPE -> PropertyValue.fromNomenclature(it.first,
+                                                                                                 null)
                     else -> PropertyValue.fromValue(it.first,
                                                     0)
                 }
@@ -220,8 +210,8 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         this.properties.clear()
         this.properties.addAll(nomenclatureTypes.map {
             when (it.second) {
-                ViewType.NOMENCLATURE_TYPE -> PropertyValue.fromNomenclature(it.first,
-                                                                             null)
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE -> PropertyValue.fromNomenclature(it.first,
+                                                                                             null)
                 else -> PropertyValue.fromValue(it.first,
                                                 0)
             }
@@ -338,7 +328,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
 
                 setMaxValue(maxValue)
                 editMax.setSelection(maxValue.toString().length)
-                
+
                 listener.onMinMaxValues(minValue,
                                         if (minValue > maxValue) minValue else maxValue)
             }
@@ -405,11 +395,6 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             }
         }
 
-    }
-
-    enum class ViewType {
-        NOMENCLATURE_TYPE,
-        MIN_MAX
     }
 
     /**

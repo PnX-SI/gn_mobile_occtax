@@ -57,6 +57,9 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
 
         writer.name("id_dataset")
             .value(input.datasetId)
+        writer.name("id_nomenclature_obs_meth")
+            .value(input.technicalObservationId)
+
         writer.name("id_digitiser")
             .value(input.getPrimaryObserverId())
 

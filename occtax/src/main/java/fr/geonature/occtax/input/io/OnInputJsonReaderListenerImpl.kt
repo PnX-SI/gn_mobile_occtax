@@ -67,6 +67,14 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
                         reader.nextNull()
                     }
                 }
+                "id_nomenclature_obs_meth" -> {
+                    if (reader.peek() != JsonToken.NULL) {
+                        input.technicalObservationId = reader.nextLong()
+                    }
+                    else {
+                        reader.nextNull()
+                    }
+                }
                 "id_digitiser" -> {
                     if (reader.peek() != JsonToken.NULL) {
                         input.setPrimaryInputObserverId(reader.nextLong())

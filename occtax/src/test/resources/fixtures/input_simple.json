@@ -7,8 +7,10 @@
     "date_min": "2016-10-28T00:00:00Z",
     "date_max": "2016-10-28T00:00:00Z",
     "id_dataset": 17,
+    "id_nomenclature_obs_meth": 317,
     "id_digitiser": 1,
     "observers": [
+      1,
       5,
       2,
       3

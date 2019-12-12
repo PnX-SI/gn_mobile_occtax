@@ -38,6 +38,7 @@ class InputJsonWriterTest {
         val input = Input().apply {
             id = 1234
             datasetId = 17
+            technicalObservationId = 317
             date = toDate("2016-10-28") ?: Date()
             setPrimaryInputObserverId(1L)
             addInputObserverId(5L)

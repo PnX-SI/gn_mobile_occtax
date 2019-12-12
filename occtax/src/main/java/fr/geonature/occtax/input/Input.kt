@@ -16,11 +16,14 @@ class Input : AbstractInput {
     var geometry: Geometry? = null
     var selectedFeatureId: String? = null
     var comment: String? = null
+    var technicalObservationId: Long? = null
 
     constructor() : super("occtax")
     constructor(source: Parcel) : super(source) {
         this.geometry = source.readSerializable() as Geometry?
         this.comment = source.readString()
+        this.technicalObservationId = source.readLong()
+            .takeIf { it != -1L }
     }
 
     override fun writeToParcel(dest: Parcel,
@@ -30,6 +33,7 @@ class Input : AbstractInput {
 
         dest.writeSerializable(geometry)
         dest.writeString(comment)
+        dest.writeLong(technicalObservationId ?: -1L)
     }
 
     override fun getTaxaFromParcel(source: Parcel): List<AbstractInputTaxon> {
@@ -43,6 +47,8 @@ class Input : AbstractInput {
         if (!super.equals(other)) return false
 
         if (geometry != other.geometry) return false
+        if (comment != other.comment) return false
+        if (technicalObservationId != other.technicalObservationId) return false
 
         return true
     }
@@ -50,6 +56,9 @@ class Input : AbstractInput {
     override fun hashCode(): Int {
         var result = super.hashCode()
         result = 31 * result + (geometry?.hashCode() ?: 0)
+        result = 31 * result + (comment?.hashCode() ?: 0)
+        result = 31 * result + (technicalObservationId?.hashCode() ?: 0)
+
         return result
     }
 

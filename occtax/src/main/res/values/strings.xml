@@ -48,6 +48,8 @@
     <string name="snackbar_permission_external_storage_rationale">External storage permission is needed</string>
     <string name="snackbar_permission_external_storage_available">External storage Permissions have been granted</string>
 
+    <string name="toast_technical_observation_loading_failed">Failed to load default technical observation</string>
+
     <string name="dataset_created_at">Created at %s</string>
     <string name="dataset_date">EEE dd MMM yyyy</string>
 
