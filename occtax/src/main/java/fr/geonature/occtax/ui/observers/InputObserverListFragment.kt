@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.data.InputObserver
-import fr.geonature.commons.data.Provider.buildUri
+import fr.geonature.commons.data.helper.Provider.buildUri
 import fr.geonature.occtax.R
 import fr.geonature.occtax.R.layout.fast_scroll_recycler_view
 
@@ -41,26 +41,16 @@ class InputObserverListFragment : Fragment() {
                 id: Int,
                 args: Bundle?): Loader<Cursor> {
 
-            when (id) {
+            return when (id) {
                 LOADER_OBSERVERS -> {
-                    val selections = if (args?.getString(KEY_FILTER,
-                                                         null) == null) Pair(null,
-                                                                             null)
-                    else {
-                        val filter = "%${args.getString(KEY_FILTER)}%"
-                        Pair("(${InputObserver.COLUMN_LASTNAME} LIKE ? OR ${InputObserver.COLUMN_FIRSTNAME} LIKE ?)",
-                             arrayOf(filter,
-                                     filter))
-                    }
+                    val selections = InputObserver.filter(args?.getString(KEY_FILTER))
 
-                    return CursorLoader(requireContext(),
-                                        buildUri(InputObserver.TABLE_NAME),
-                                        arrayOf(InputObserver.COLUMN_ID,
-                                                InputObserver.COLUMN_LASTNAME,
-                                                InputObserver.COLUMN_FIRSTNAME),
-                                        selections.first,
-                                        selections.second,
-                                        null)
+                    CursorLoader(requireContext(),
+                                 buildUri(InputObserver.TABLE_NAME),
+                                 null,
+                                 selections.first,
+                                 selections.second,
+                                 null)
                 }
 
                 else -> throw IllegalArgumentException()

@@ -10,7 +10,6 @@ import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.input.PropertyValue
-import fr.geonature.occtax.input.SelectedProperty
 import java.util.Locale
 
 /**
@@ -56,15 +55,54 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writeDate(writer,
                   input)
 
+        writer.name("id_dataset")
+            .value(input.datasetId)
+
         writer.name("id_digitiser")
             .value(input.getPrimaryObserverId())
+
         writeInputObserverIds(writer,
                               input)
 
+        writer.name("comment")
+            .value(input.comment)
+
+        writeInputDefaultProperties(writer,
+                                    input.properties)
         writeInputTaxa(writer,
                        input)
 
         writer.endObject()
+    }
+
+    private fun writeInputDefaultProperties(writer: JsonWriter,
+                                            properties: Map<String, PropertyValue>) {
+        writer.name("default")
+
+        if (properties.isEmpty()) {
+            writer.nullValue()
+            return
+        }
+
+        writer.beginObject()
+
+        properties.forEach {
+            writePropertyValue(writer,
+                               it.key,
+                               it.value)
+        }
+
+        writer.endObject()
+
+        // GeoNature default properties mapping
+        properties.forEach {
+            if (it.value.isEmpty()) return@forEach
+
+            when (it.key) {
+                "TECHNIQUE_OBS" -> writer.name("id_nomenclature_obs_technique").value(it.value.value as Long)
+                "TYP_GRP" -> writer.name("id_nomenclature_grp_typ").value(it.value.value as Long)
+            }
+        }
     }
 
     private fun writeDate(writer: JsonWriter,
@@ -81,7 +119,7 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writer.name("observers")
             .beginArray()
 
-        input.getInputObserverIds()
+        input.getAllInputObserverIds()
             .forEach { writer.value(it) }
 
         writer.endArray()
@@ -122,7 +160,7 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
     }
 
     private fun writeInputTaxonProperties(writer: JsonWriter,
-                                          properties: Map<String, SelectedProperty>,
+                                          properties: Map<String, PropertyValue>,
                                           counting: List<CountingMetadata>) {
         writer.name("properties")
 
@@ -134,9 +172,9 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writer.beginObject()
 
         properties.forEach {
-            writeInputTaxonProperty(writer,
-                                    it.key,
-                                    it.value)
+            writePropertyValue(writer,
+                               it.key,
+                               it.value)
         }
 
         writeInputTaxonCounting(writer,
@@ -149,14 +187,14 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
             if (it.value.isEmpty()) return@forEach
 
             when (it.key) {
-                "METH_OBS" -> writer.name("id_nomenclature_obs_meth").value(it.value.id)
-                "ETA_BIO" -> writer.name("id_nomenclature_bio_condition").value(it.value.id)
-                "METH_DETERMIN" -> writer.name("id_nomenclature_determination_method").value(it.value.id)
-                "DETERMINER" -> writer.name("determiner").value(it.value.label)
-                "STATUT_BIO" -> writer.name("id_nomenclature_bio_status").value(it.value.id)
-                "NATURALITE" -> writer.name("id_nomenclature_naturalness").value(it.value.id)
-                "PREUVE_EXIST" -> writer.name("id_nomenclature_exist_proof").value(it.value.id)
-                "COMMENT" -> writer.name("comment").value(it.value.label)
+                "METH_OBS" -> writer.name("id_nomenclature_obs_meth").value(it.value.value as Long)
+                "ETA_BIO" -> writer.name("id_nomenclature_bio_condition").value(it.value.value as Long)
+                "METH_DETERMIN" -> writer.name("id_nomenclature_determination_method").value(it.value.value as Long)
+                "DETERMINER" -> writer.name("determiner").value(it.value.value as String?)
+                "STATUT_BIO" -> writer.name("id_nomenclature_bio_status").value(it.value.value as Long)
+                "NATURALITE" -> writer.name("id_nomenclature_naturalness").value(it.value.value as Long)
+                "PREUVE_EXIST" -> writer.name("id_nomenclature_exist_proof").value(it.value.value as Long)
+                "COMMENT" -> writer.name("comment").value(it.value.value as String?)
             }
         }
 
@@ -209,40 +247,15 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writer.name("index")
             .value(countingMetadata.index)
         countingMetadata.properties.forEach {
-            writeInputTaxonPropertyValue(writer,
-                                         it.key,
-                                         it.value)
+            writePropertyValue(writer,
+                               it.key,
+                               it.value)
         }
 
         writer.name("min")
             .value(countingMetadata.min)
         writer.name("max")
             .value(countingMetadata.max)
-
-        writer.endObject()
-    }
-
-    @Deprecated("use writeInputTaxonPropertyValue")
-    private fun writeInputTaxonProperty(writer: JsonWriter,
-                                        name: String,
-                                        selectedProperty: SelectedProperty) {
-        if (selectedProperty.isEmpty()) return
-
-        writer.name(name.toLowerCase(Locale.ROOT))
-            .beginObject()
-
-        writer.name("type")
-            .value(selectedProperty.type.name.toLowerCase(Locale.ROOT))
-
-        if (selectedProperty.id != null) {
-            writer.name("id")
-                .value(selectedProperty.id)
-        }
-
-        if (!TextUtils.isEmpty(selectedProperty.label)) {
-            writer.name("label")
-                .value(selectedProperty.label)
-        }
 
         writer.endObject()
     }
@@ -257,9 +270,9 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
      * }
      * ```
      */
-    private fun writeInputTaxonPropertyValue(writer: JsonWriter,
-                                             name: String,
-                                             propertyValue: PropertyValue) {
+    private fun writePropertyValue(writer: JsonWriter,
+                                   name: String,
+                                   propertyValue: PropertyValue) {
         if (propertyValue.isEmpty()) return
 
         writer.name(name.toLowerCase(Locale.ROOT))

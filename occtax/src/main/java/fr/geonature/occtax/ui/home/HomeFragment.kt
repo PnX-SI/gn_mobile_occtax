@@ -23,7 +23,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.data.AppSync
-import fr.geonature.commons.data.Provider.buildUri
+import fr.geonature.commons.data.helper.Provider.buildUri
+import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.commons.util.PermissionUtils
 import fr.geonature.commons.util.PermissionUtils.checkPermissions
 import fr.geonature.commons.util.PermissionUtils.checkSelfPermissions
@@ -57,17 +58,15 @@ class HomeFragment : Fragment() {
         override fun onCreateLoader(
                 id: Int,
                 args: Bundle?): Loader<Cursor> {
-            when (id) {
-                LOADER_APP_SYNC -> return CursorLoader(requireContext(),
-                                                       buildUri(AppSync.TABLE_NAME,
-                                                                args?.getString(AppSync.COLUMN_ID)
-                                                                        ?: ""),
-                                                       arrayOf(AppSync.COLUMN_ID,
-                                                               AppSync.COLUMN_LAST_SYNC,
-                                                               AppSync.COLUMN_INPUTS_TO_SYNCHRONIZE),
-                                                       null,
-                                                       null,
-                                                       null)
+            return when (id) {
+                LOADER_APP_SYNC -> CursorLoader(requireContext(),
+                                                buildUri(AppSync.TABLE_NAME,
+                                                         args?.getString(AppSync.COLUMN_ID)
+                                                                 ?: ""),
+                                                null,
+                                                null,
+                                                null,
+                                                null)
                 else -> throw IllegalArgumentException()
             }
         }
@@ -139,20 +138,20 @@ class HomeFragment : Fragment() {
             listener?.onStartInput(appSettings)
         }
 
-        adapter = InputRecyclerViewAdapter(object : InputRecyclerViewAdapter.OnInputRecyclerViewAdapterListener {
-            override fun onInputClicked(input: Input) {
+        adapter = InputRecyclerViewAdapter(object : AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<Input> {
+            override fun onClick(item: Input) {
                 val appSettings = appSettings ?: return
 
                 Log.i(TAG,
-                      "input selected: ${input.id}")
+                      "input selected: ${item.id}")
 
                 listener?.onStartInput(appSettings,
-                                       input)
+                                       item)
             }
 
-            override fun onInputLongClicked(position: Int,
-                                            input: Input) {
-                inputViewModel?.deleteInput(input)
+            override fun onLongClicked(position: Int,
+                                       item: Input) {
+                inputViewModel?.deleteInput(item)
 
                 Snackbar.make(homeContent,
                               R.string.home_snackbar_input_deleted,
@@ -199,9 +198,9 @@ class HomeFragment : Fragment() {
         super.onResume()
 
         LoaderManager.getInstance(this)
-            .initLoader(LOADER_APP_SYNC,
-                        bundleOf(AppSync.COLUMN_ID to requireContext().packageName),
-                        loaderCallbacks)
+            .restartLoader(LOADER_APP_SYNC,
+                           bundleOf(AppSync.COLUMN_ID to requireContext().packageName),
+                           loaderCallbacks)
     }
 
     override fun onAttach(context: Context) {
@@ -325,7 +324,7 @@ class HomeFragment : Fragment() {
         inputViewModel?.readInputs()
             ?.observe(this,
                       Observer {
-                          (inputRecyclerView.adapter as InputRecyclerViewAdapter).setInputs(it)
+                          adapter.setItems(it)
                       })
     }
 

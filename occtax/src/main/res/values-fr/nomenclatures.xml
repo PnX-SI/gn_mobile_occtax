@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="nomenclature_technique_obs">Techniques d\'observation</string>
     <string name="nomenclature_meth_obs">Méthodes d\'observation</string>
     <string name="nomenclature_eta_bio">État biologique de l\'observation</string>
     <string name="nomenclature_more">Informations avancées</string>

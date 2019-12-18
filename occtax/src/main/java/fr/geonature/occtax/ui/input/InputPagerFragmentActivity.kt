@@ -82,7 +82,7 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
         }
 
     override fun performFinishAction() {
-        inputViewModel.exportInput(input.id)
+        inputViewModel.exportInput(input)
 
         finish()
     }
@@ -90,16 +90,13 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
     override fun onPageSelected(position: Int) {
         super.onPageSelected(position)
 
-        setInputToCurrentPage()
-    }
-
-    private fun setInputToCurrentPage() {
         val pageFragment = getCurrentPageFragment()
 
         if (pageFragment is IInputFragment && ::input.isInitialized) {
             pageFragment.setInput(input)
             pageFragment.refreshView()
             validateCurrentPage()
+            inputViewModel.saveInput(input)
         }
     }
 

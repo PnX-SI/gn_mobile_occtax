@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.data.Nomenclature
 import fr.geonature.commons.data.NomenclatureType
-import fr.geonature.commons.data.Provider
 import fr.geonature.commons.data.Taxonomy
+import fr.geonature.commons.data.helper.Provider.buildUri
 import fr.geonature.occtax.R
 import java.util.Locale
 
@@ -33,7 +33,7 @@ class ChooseNomenclatureDialogFragment : DialogFragment() {
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(id: Int,
                                     args: Bundle?): Loader<Cursor> {
-            when (id) {
+            return when (id) {
                 LOADER_NOMENCLATURES -> {
                     val nomenclatureType = args?.getString(ARG_NOMENCLATURE_TYPE,
                                                            "") ?: ""
@@ -41,16 +41,16 @@ class ChooseNomenclatureDialogFragment : DialogFragment() {
                             ?: Taxonomy(Taxonomy.ANY,
                                         Taxonomy.ANY)
 
-                    return CursorLoader(requireContext(),
-                                        Provider.buildUri(NomenclatureType.TABLE_NAME,
-                                                          nomenclatureType,
-                                                          "items",
-                                                          taxonomy.kingdom,
-                                                          taxonomy.group),
-                                        null,
-                                        null,
-                                        null,
-                                        null)
+                    CursorLoader(requireContext(),
+                                 buildUri(NomenclatureType.TABLE_NAME,
+                                          nomenclatureType,
+                                          "items",
+                                          taxonomy.kingdom,
+                                          taxonomy.group),
+                                 null,
+                                 null,
+                                 null,
+                                 null)
                 }
                 else -> throw IllegalArgumentException()
             }

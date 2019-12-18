@@ -1,50 +1,36 @@
-package fr.geonature.occtax.input.io
+package fr.geonature.occtax.input
 
+import android.os.Parcel
 import fr.geonature.commons.data.Taxon
 import fr.geonature.commons.data.Taxonomy
-import fr.geonature.commons.input.io.InputJsonWriter
-import fr.geonature.commons.util.IsoDateUtils.toDate
-import fr.geonature.occtax.FixtureHelper.getFixture
-import fr.geonature.occtax.input.CountingMetadata
-import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.input.InputTaxon
-import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.commons.util.IsoDateUtils
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.util.Date
 
 /**
- * Unit tests about [InputJsonWriter].
+ * Unit tests about [Input].
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
 @RunWith(RobolectricTestRunner::class)
-class InputJsonWriterTest {
-
-    private lateinit var inputJsonWriter: InputJsonWriter<Input>
-
-    @Before
-    fun setUp() {
-        inputJsonWriter = InputJsonWriter(OnInputJsonWriterListenerImpl())
-    }
+class InputTest {
 
     @Test
-    fun testWriteInput() {
+    fun testParcelable() {
         // given an Input instance to write
         val input = Input().apply {
             id = 1234
             datasetId = 17
             properties["TECHNIQUE_OBS"] = PropertyValue("TECHNIQUE_OBS",
                                                         null,
-                                                        317L)
+                                                        317)
             properties["TYP_GRP"] = PropertyValue("TYP_GRP",
                                                   null,
-                                                  133L)
-            date = toDate("2016-10-28") ?: Date()
+                                                  133)
+            date = IsoDateUtils.toDate("2016-10-28") ?: Date()
             setPrimaryInputObserverId(1L)
             addInputObserverId(5L)
             addInputObserverId(2L)
@@ -109,13 +95,17 @@ class InputJsonWriterTest {
             })
         }
 
-        // when write this Input as JSON string
-        val json = inputJsonWriter.setIndent("  ")
-            .write(input)
+        // when we obtain a Parcel object to write the input instance to it
+        val parcel = Parcel.obtain()
+        input.writeToParcel(parcel,
+                            0)
+
+        // reset the parcel for reading
+        parcel.setDataPosition(0)
 
         // then
-        assertNotNull(json)
-        assertEquals(getFixture("input_simple.json"),
-                     json)
+        val inputFromParcel = Input.CREATOR.createFromParcel(parcel)
+        assertEquals(input,
+                     inputFromParcel)
     }
 }

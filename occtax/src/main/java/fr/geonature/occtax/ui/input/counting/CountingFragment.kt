@@ -15,12 +15,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.data.Taxonomy
 import fr.geonature.commons.input.AbstractInput
+import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.ui.input.IInputFragment
-import fr.geonature.occtax.ui.shared.adapter.ListItemRecyclerViewAdapter
+import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
 import kotlinx.android.synthetic.main.fragment_recycler_view_fab.content
 import kotlinx.android.synthetic.main.fragment_recycler_view_fab.empty
@@ -65,7 +66,7 @@ class CountingFragment : Fragment(),
                                    0)
         }
 
-        adapter = CountingRecyclerViewAdapter(object : ListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<CountingMetadata> {
+        adapter = CountingRecyclerViewAdapter(object : AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<CountingMetadata> {
             override fun onClick(item: CountingMetadata) {
                 val context = context ?: return
                 startActivityForResult(EditCountingMetadataActivity.newIntent(context,
@@ -80,6 +81,7 @@ class CountingFragment : Fragment(),
                                        item: CountingMetadata) {
                 adapter?.remove(item)
                 (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.deleteCountingMetadata(item.index)
+                (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
 
                 Snackbar.make(content,
                               R.string.counting_snackbar_counting_deleted,
@@ -152,7 +154,8 @@ class CountingFragment : Fragment(),
     }
 
     override fun validate(): Boolean {
-        return input?.getCurrentSelectedInputTaxon() != null
+        return (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()?.isNotEmpty()
+                ?: false
     }
 
     override fun refreshView() {

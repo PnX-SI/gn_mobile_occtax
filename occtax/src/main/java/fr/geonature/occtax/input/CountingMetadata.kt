@@ -16,8 +16,8 @@ class CountingMetadata() : Parcelable {
         internal set
 
     val properties: SortedMap<String, PropertyValue> = TreeMap<String, PropertyValue>(Comparator { o1, o2 ->
-        val i1 = defaultMnemonicOrder.indexOfFirst { it == o1 }
-        val i2 = defaultMnemonicOrder.indexOfFirst { it == o2 }
+        val i1 = defaultMnemonic.indexOfFirst { it.first == o1 }
+        val i2 = defaultMnemonic.indexOfFirst { it.first == o2 }
 
         when {
             i1 == -1 -> 1
@@ -25,8 +25,8 @@ class CountingMetadata() : Parcelable {
             else -> i1 - i2
         }
     })
-    var min: Int = 0
-    var max: Int = 0
+    var min: Int = 1
+    var max: Int = 1
 
     constructor(source: Parcel) : this() {
         index = source.readInt()
@@ -75,15 +75,24 @@ class CountingMetadata() : Parcelable {
     }
 
     fun isEmpty(): Boolean {
-        return properties.filterNot { it.value.isEmpty() }.isEmpty() && min == 0 && max == 0
+        return properties.filterNot { it.value.isEmpty() }
+            .isEmpty()
     }
 
     companion object {
 
-        private val defaultMnemonicOrder = arrayOf("STADE_VIE",
-                                                   "SEXE",
-                                                   "OBJ_DENBR",
-                                                   "TYP_DENBR")
+        val defaultMnemonic = arrayOf(Pair("STADE_VIE",
+                                           NomenclatureTypeViewType.NOMENCLATURE_TYPE),
+                                      Pair("SEXE",
+                                           NomenclatureTypeViewType.NOMENCLATURE_TYPE),
+                                      Pair("OBJ_DENBR",
+                                           NomenclatureTypeViewType.NOMENCLATURE_TYPE),
+                                      Pair("TYP_DENBR",
+                                           NomenclatureTypeViewType.NOMENCLATURE_TYPE),
+                                      Pair("MIN",
+                                           NomenclatureTypeViewType.MIN_MAX),
+                                      Pair("MAX",
+                                           NomenclatureTypeViewType.MIN_MAX))
 
         @JvmField
         val CREATOR: Parcelable.Creator<CountingMetadata> = object : Parcelable.Creator<CountingMetadata> {

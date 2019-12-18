@@ -6,6 +6,7 @@
 
     <string name="activity_main_title" translatable="false">@string/app_name</string>
     <string name="activity_preferences_title">Settings</string>
+    <string name="activity_dataset_title">Dataset</string>
     <string name="activity_observers_title">Observers</string>
 
     <string name="sync_device_status">Device status</string>
@@ -32,7 +33,12 @@
         <item quantity="one">%d selected</item>
         <item quantity="other">%d selected</item>
     </plurals>
+    <string name="action_comment_add">Add comment</string>
+    <string name="action_comment_edit">Edit comment</string>
 
+    <string name="alert_dialog_add_comment_title">Add a comment</string>
+    <string name="alert_dialog_edit_comment_title">Edit a comment</string>
+    <string name="alert_dialog_add_comment_hint">Add a comment</string>
     <string name="alert_dialog_ok">OK</string>
     <string name="alert_dialog_cancel">Cancel</string>
 
@@ -41,6 +47,11 @@
     <string name="snackbar_permissions_granted">Permissions were been granted</string>
     <string name="snackbar_permission_external_storage_rationale">External storage permission is needed</string>
     <string name="snackbar_permission_external_storage_available">External storage Permissions have been granted</string>
+
+    <string name="toast_input_default_properties_loading_failed">Failed to load default property values</string>
+
+    <string name="dataset_created_at">Created at %s</string>
+    <string name="dataset_date">EEE dd MMM yyyy</string>
 
     <string name="pager_fragment_observers_and_date_input_title">Observers &#38; date</string>
     <string name="pager_fragment_map_title">Pointing</string>
@@ -55,6 +66,7 @@
         <item quantity="other">%d selected observers</item>
     </plurals>
     <string name="observers_and_date_selected_observers_no_data">No selected observer.\nAdd one by tapping the "Add" button.</string>
+    <string name="observers_and_date_dataset">Dataset</string>
     <string name="observers_and_date_date">Date</string>
     <string name="observers_and_date_date_format">MMMM dd, yyyy</string>
 

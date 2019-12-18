@@ -10,7 +10,6 @@ import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.input.PropertyValue
-import fr.geonature.occtax.input.SelectedProperty
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -57,6 +56,7 @@ class InputJsonReaderTest {
                      input?.id)
         assertEquals(Input().module,
                      input?.module)
+        assertNull(input?.datasetId)
     }
 
     @Test
@@ -73,6 +73,8 @@ class InputJsonReaderTest {
                      input!!.id)
         assertEquals(Input().module,
                      input.module)
+        assertEquals(17L,
+                     input.datasetId)
         assertEquals(toDate("2016-10-28"),
                      input.date)
         assertEquals(1L,
@@ -87,42 +89,55 @@ class InputJsonReaderTest {
                                       3),
                           input.getInputObserverIds()
                               .toLongArray())
+        assertEquals("Global comment",
+                     input.comment)
+        assertEquals(mapOf(Pair("TECHNIQUE_OBS",
+                                PropertyValue(
+                                        "TECHNIQUE_OBS",
+                                        null,
+                                        317L)),
+                           Pair("TYP_GRP",
+                                PropertyValue(
+                                        "TYP_GRP",
+                                        null,
+                                        133L))),
+                     input.properties)
         assertEquals(listOf(InputTaxon(Taxon(10L,
                                              "taxon_01",
                                              Taxonomy("Animalia",
                                                       "Ascidies"))).apply {
-            properties["METH_OBS"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                      "METH_OBS",
-                                                      41,
-                                                      null)
-            properties["ETA_BIO"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                     "ETA_BIO",
-                                                     29,
-                                                     null)
-            properties["METH_DETERMIN"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                           "METH_DETERMIN",
-                                                           445,
-                                                           null)
-            properties["DETERMINER"] = SelectedProperty(SelectedProperty.PropertyType.TEXT,
-                                                        "DETERMINER",
-                                                        null,
-                                                        "Determiner value")
-            properties["STATUT_BIO"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                        "STATUT_BIO",
-                                                        29,
-                                                        null)
-            properties["NATURALITE"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                        "NATURALITE",
-                                                        160,
-                                                        null)
-            properties["PREUVE_EXIST"] = SelectedProperty(SelectedProperty.PropertyType.NOMENCLATURE,
-                                                          "PREUVE_EXIST",
-                                                          81,
-                                                          null)
-            properties["COMMENT"] = SelectedProperty(SelectedProperty.PropertyType.TEXT,
-                                                     "COMMENT",
-                                                     null,
-                                                     "Some comment")
+            properties["METH_OBS"] = PropertyValue(
+                    "METH_OBS",
+                    null,
+                    41L)
+            properties["ETA_BIO"] = PropertyValue(
+                    "ETA_BIO",
+                    null,
+                    29L)
+            properties["METH_DETERMIN"] = PropertyValue(
+                    "METH_DETERMIN",
+                    null,
+                    445L)
+            properties["DETERMINER"] = PropertyValue(
+                    "DETERMINER",
+                    null,
+                    "Determiner value")
+            properties["STATUT_BIO"] = PropertyValue(
+                    "STATUT_BIO",
+                    null,
+                    29L)
+            properties["NATURALITE"] = PropertyValue(
+                    "NATURALITE",
+                    null,
+                    160L)
+            properties["PREUVE_EXIST"] = PropertyValue(
+                    "PREUVE_EXIST",
+                    null,
+                    81L)
+            properties["COMMENT"] = PropertyValue(
+                    "COMMENT",
+                    null,
+                    "Some comment")
             addCountingMetadata(CountingMetadata().apply {
                 properties.putAll(mutableMapOf(Pair("STADE_VIE",
                                                     PropertyValue("STADE_VIE",
@@ -143,7 +158,7 @@ class InputJsonReaderTest {
                 min = 1
                 max = 2
             })
-        }),
+        }).toList(),
                      input.getInputTaxa())
     }
 
@@ -161,6 +176,7 @@ class InputJsonReaderTest {
                      input!!.id)
         assertEquals(Input().module,
                      input.module)
+        assertNull(input.datasetId)
         assertEquals(toDate("2016-10-28"),
                      input.date)
         assertNull(input.getPrimaryObserverId())

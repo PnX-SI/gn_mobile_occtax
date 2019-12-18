@@ -16,7 +16,10 @@ import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.data.NomenclatureType
-import fr.geonature.occtax.input.SelectedProperty
+import fr.geonature.occtax.R
+import fr.geonature.occtax.input.InputTaxon
+import fr.geonature.occtax.input.NomenclatureTypeViewType
+import fr.geonature.occtax.input.PropertyValue
 import java.util.Locale
 
 /**
@@ -26,46 +29,31 @@ import java.util.Locale
  */
 class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureTypesRecyclerViewAdapterListener) : RecyclerView.Adapter<NomenclatureTypesRecyclerViewAdapter.AbstractCardViewHolder>() {
 
-    private val mnemonicFilter = arrayOf(Pair("METH_OBS",
-                                              ViewType.NOMENCLATURE_TYPE),
-                                         Pair("ETA_BIO",
-                                              ViewType.NOMENCLATURE_TYPE),
-                                         Pair("METH_DETERMIN",
-                                              ViewType.NOMENCLATURE_TYPE),
-                                         Pair("DETERMINER",
-                                              ViewType.TEXT_SIMPLE),
-                                         Pair("STATUT_BIO",
-                                              ViewType.NOMENCLATURE_TYPE),
-                                         Pair("NATURALITE",
-                                              ViewType.NOMENCLATURE_TYPE),
-                                         Pair("PREUVE_EXIST",
-                                              ViewType.NOMENCLATURE_TYPE),
-                                         Pair("COMMENT",
-                                              ViewType.TEXT_MULTIPLE))
+    private val mnemonicFilter = InputTaxon.defaultPropertiesMnemonic
     private val moreViewType = Pair("MORE",
-                                    ViewType.MORE)
+                                    NomenclatureTypeViewType.MORE)
     private val defaultMnemonicFilter = mnemonicFilter.slice(IntRange(0,
                                                                       1))
 
-    private val availableNomenclatureTypes = mutableListOf<Pair<String, ViewType>>()
-    private val properties = mutableListOf<SelectedProperty>()
+    private val availableNomenclatureTypes = mutableListOf<Pair<String, NomenclatureTypeViewType>>()
+    private val properties = mutableListOf<PropertyValue>()
     private var showAllNomenclatureTypes = false
 
     private val onClickListener: View.OnClickListener
 
     init {
         onClickListener = View.OnClickListener { v ->
-            val selectedProperty = v.tag as SelectedProperty
+            val selectedProperty = v.tag as PropertyValue
             listener.onAction(selectedProperty.code)
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup,
                                     viewType: Int): AbstractCardViewHolder {
-        return when (ViewType.values()[viewType]) {
-            ViewType.MORE -> MoreViewHolder(parent)
-            ViewType.TEXT_SIMPLE -> TextSimpleViewHolder(parent)
-            ViewType.TEXT_MULTIPLE -> TextMultipleViewHolder(parent)
+        return when (NomenclatureTypeViewType.values()[viewType]) {
+            NomenclatureTypeViewType.MORE -> MoreViewHolder(parent)
+            NomenclatureTypeViewType.TEXT_SIMPLE -> TextSimpleViewHolder(parent)
+            NomenclatureTypeViewType.TEXT_MULTIPLE -> TextMultipleViewHolder(parent)
             else -> NomenclatureTypeViewHolder(parent)
         }
     }
@@ -87,6 +75,13 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             .second.ordinal
     }
 
+    fun defaultMnemonicFilter(): List<String> {
+        return mnemonicFilter.asSequence()
+            .filter { it.second == NomenclatureTypeViewType.NOMENCLATURE_TYPE }
+            .map { it.first }
+            .toList()
+    }
+
     fun bind(cursor: Cursor?) {
         availableNomenclatureTypes.clear()
 
@@ -106,7 +101,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
                 cursor.moveToNext()
             }
 
-            availableNomenclatureTypes.addAll(mnemonicFilter.filter { it.second != ViewType.NOMENCLATURE_TYPE })
+            availableNomenclatureTypes.addAll(mnemonicFilter.filter { it.second != NomenclatureTypeViewType.NOMENCLATURE_TYPE })
         }
 
         availableNomenclatureTypes.sortWith(Comparator { o1, o2 ->
@@ -139,7 +134,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         setNomenclatureTypes(nomenclatureTypes)
     }
 
-    fun setPropertyValues(selectedProperties: List<SelectedProperty>) {
+    fun setPropertyValues(selectedProperties: List<PropertyValue>) {
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun getOldListSize(): Int {
                 return this@NomenclatureTypesRecyclerViewAdapter.properties.size
@@ -172,14 +167,14 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         diffResult.dispatchUpdatesTo(this)
     }
 
-    private fun setNomenclatureTypes(nomenclatureTypes: List<Pair<String, ViewType>>) {
+    private fun setNomenclatureTypes(nomenclatureTypes: List<Pair<String, NomenclatureTypeViewType>>) {
         if (this.properties.isEmpty()) {
             this.properties.addAll(nomenclatureTypes.map {
                 when (it.second) {
-                    ViewType.NOMENCLATURE_TYPE -> SelectedProperty.fromNomenclature(it.first,
-                                                                                    null)
-                    else -> SelectedProperty.fromValue(it.first,
-                                                       null)
+                    NomenclatureTypeViewType.NOMENCLATURE_TYPE -> PropertyValue.fromNomenclature(it.first,
+                                                                                 null)
+                    else -> PropertyValue.fromValue(it.first,
+                                                    null)
                 }
             })
 
@@ -222,21 +217,21 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         this.properties.clear()
         this.properties.addAll(nomenclatureTypes.map {
             when (it.second) {
-                ViewType.NOMENCLATURE_TYPE -> SelectedProperty.fromNomenclature(it.first,
-                                                                                null)
-                else -> SelectedProperty.fromValue(it.first,
-                                                   null)
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE -> PropertyValue.fromNomenclature(it.first,
+                                                                             null)
+                else -> PropertyValue.fromValue(it.first,
+                                                null)
             }
         })
 
         diffResult.dispatchUpdatesTo(this)
     }
 
-    abstract inner class AbstractCardViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(fr.geonature.occtax.R.layout.card_view,
+    abstract inner class AbstractCardViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.card_view,
                                                                                                                                          parent,
                                                                                                                                          false)) {
         internal val contentView: View
-        internal var property: SelectedProperty? = null
+        internal var property: PropertyValue? = null
 
         init {
             contentView = LayoutInflater.from(itemView.context)
@@ -245,7 +240,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
                          true)
         }
 
-        fun bind(property: SelectedProperty) {
+        fun bind(property: PropertyValue) {
             this.property = property
 
             onBind(property)
@@ -254,7 +249,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         @LayoutRes
         abstract fun getLayoutResourceId(): Int
 
-        abstract fun onBind(property: SelectedProperty)
+        abstract fun onBind(property: PropertyValue)
 
         fun getNomenclatureTypeLabel(mnemonic: String): String {
             val resourceId = contentView.resources.getIdentifier("nomenclature_${mnemonic.toLowerCase(Locale.getDefault())}",
@@ -271,10 +266,10 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         private var button1: Button = contentView.findViewById(android.R.id.button1)
 
         override fun getLayoutResourceId(): Int {
-            return fr.geonature.occtax.R.layout.view_action_nomenclature_type
+            return R.layout.view_action_nomenclature_type
         }
 
-        override fun onBind(property: SelectedProperty) {
+        override fun onBind(property: PropertyValue) {
             title.text = getNomenclatureTypeLabel(property.code)
             text1.text = property.label
 
@@ -290,10 +285,10 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         private var button1: Button = contentView.findViewById(android.R.id.button1)
 
         override fun getLayoutResourceId(): Int {
-            return fr.geonature.occtax.R.layout.view_action_more
+            return R.layout.view_action_more
         }
 
-        override fun onBind(property: SelectedProperty) {
+        override fun onBind(property: PropertyValue) {
             title.text = getNomenclatureTypeLabel(property.code)
             button1.setOnClickListener {
                 showAllNomenclatureTypes = true
@@ -332,10 +327,10 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         }
 
         override fun getLayoutResourceId(): Int {
-            return fr.geonature.occtax.R.layout.view_action_edit_text
+            return R.layout.view_action_edit_text
         }
 
-        override fun onBind(property: SelectedProperty) {
+        override fun onBind(property: PropertyValue) {
             title.text = getNomenclatureTypeLabel(property.code)
             edit.hint = getEditTextHint(property.code)
 
@@ -364,13 +359,6 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
                 maxLines = 4
             }
         }
-    }
-
-    enum class ViewType {
-        NOMENCLATURE_TYPE,
-        MORE,
-        TEXT_SIMPLE,
-        TEXT_MULTIPLE
     }
 
     /**

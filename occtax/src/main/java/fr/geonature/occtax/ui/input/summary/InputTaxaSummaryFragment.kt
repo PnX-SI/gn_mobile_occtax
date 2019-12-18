@@ -1,7 +1,11 @@
 package fr.geonature.occtax.ui.input.summary
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
@@ -11,14 +15,14 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.BaseTransientBottomBar
-
 import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.commons.input.AbstractInputTaxon
+import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.ui.input.IInputFragment
-import fr.geonature.occtax.ui.shared.adapter.ListItemRecyclerViewAdapter
+import fr.geonature.occtax.ui.shared.dialog.CommentDialogFragment
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
 import kotlinx.android.synthetic.main.fragment_recycler_view_fab.content
@@ -38,6 +42,23 @@ class InputTaxaSummaryFragment : Fragment(),
     private var input: Input? = null
     private var adapter: InputTaxaSummaryRecyclerViewAdapter? = null
 
+    private val onCommentDialogFragmentListener = object : CommentDialogFragment.OnCommentDialogFragmentListener {
+        override fun onChanged(comment: String?) {
+            input?.comment = comment
+            activity?.invalidateOptionsMenu()
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val supportFragmentManager = activity?.supportFragmentManager ?: return
+
+        (supportFragmentManager.findFragmentByTag(COMMENT_DIALOG_FRAGMENT) as CommentDialogFragment?)?.also {
+            it.setOnCommentDialogFragmentListener(onCommentDialogFragmentListener)
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -51,6 +72,9 @@ class InputTaxaSummaryFragment : Fragment(),
             savedInstanceState: Bundle?) {
         super.onViewCreated(view,
                             savedInstanceState)
+
+        // we have a menu item to show in action bar
+        setHasOptionsMenu(true)
 
         empty.text = getString(R.string.summary_no_data)
 
@@ -69,7 +93,7 @@ class InputTaxaSummaryFragment : Fragment(),
             }
         }
 
-        adapter = InputTaxaSummaryRecyclerViewAdapter(object : ListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<AbstractInputTaxon> {
+        adapter = InputTaxaSummaryRecyclerViewAdapter(object : AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<AbstractInputTaxon> {
             override fun onClick(item: AbstractInputTaxon) {
                 input?.setCurrentSelectedInputTaxonId(item.taxon.id)
                 (activity as AbstractPagerFragmentActivity?)?.goToPageByKey(R.string.pager_fragment_information_title)
@@ -146,6 +170,41 @@ class InputTaxaSummaryFragment : Fragment(),
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu,
+                                     inflater: MenuInflater) {
+
+        super.onCreateOptionsMenu(menu,
+                                  inflater)
+
+        inflater.inflate(R.menu.comment,
+                         menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+
+        val commentItem = menu.findItem(R.id.menu_comment)
+        commentItem.title = if (TextUtils.isEmpty(input?.comment)) getString(R.string.action_comment_add) else getString(R.string.action_comment_edit)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_comment -> {
+                val supportFragmentManager = activity?.supportFragmentManager ?: return true
+
+                CommentDialogFragment.newInstance(input?.comment)
+                    .apply {
+                        setOnCommentDialogFragmentListener(onCommentDialogFragmentListener)
+                        show(supportFragmentManager,
+                             COMMENT_DIALOG_FRAGMENT)
+                    }
+
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     override fun getResourceTitle(): Int {
         return R.string.pager_fragment_summary_title
     }
@@ -167,6 +226,8 @@ class InputTaxaSummaryFragment : Fragment(),
     }
 
     companion object {
+
+        private const val COMMENT_DIALOG_FRAGMENT = "comment_dialog_fragment"
 
         /**
          * Use this factory method to create a new instance of [InputTaxaSummaryFragment].

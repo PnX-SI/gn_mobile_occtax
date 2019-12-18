@@ -6,12 +6,25 @@
     "meta_device_entry": "mobile",
     "date_min": "2016-10-28T00:00:00Z",
     "date_max": "2016-10-28T00:00:00Z",
+    "id_dataset": 17,
     "id_digitiser": 1,
     "observers": [
+      1,
       5,
       2,
       3
     ],
+    "comment": "Global comment",
+    "default": {
+      "technique_obs": {
+        "value": 317
+      },
+      "typ_grp": {
+        "value": 133
+      }
+    },
+    "id_nomenclature_obs_technique": 317,
+    "id_nomenclature_grp_typ": 133,
     "t_occurrences_occtax": [
       {
         "cd_nom": 10,
@@ -20,36 +33,28 @@
         "group2_inpn": "Ascidies",
         "properties": {
           "meth_obs": {
-            "type": "nomenclature",
-            "id": 41
+            "value": 41
           },
           "eta_bio": {
-            "type": "nomenclature",
-            "id": 29
+            "value": 29
           },
           "meth_determin": {
-            "type": "nomenclature",
-            "id": 445
+            "value": 445
           },
           "determiner": {
-            "type": "text",
-            "label": "Determiner value"
+            "value": "Determiner value"
           },
           "statut_bio": {
-            "type": "nomenclature",
-            "id": 29
+            "value": 29
           },
           "naturalite": {
-            "type": "nomenclature",
-            "id": 160
+            "value": 160
           },
           "preuve_exist": {
-            "type": "nomenclature",
-            "id": 81
+            "value": 81
           },
           "comment": {
-            "type": "text",
-            "label": "Some comment"
+            "value": "Some comment"
           },
           "counting": [
             {

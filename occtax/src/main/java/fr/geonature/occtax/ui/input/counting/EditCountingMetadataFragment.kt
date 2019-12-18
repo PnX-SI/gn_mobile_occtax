@@ -13,10 +13,11 @@ import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import fr.geonature.commons.data.DefaultNomenclatureWithType
 import fr.geonature.commons.data.Nomenclature
 import fr.geonature.commons.data.NomenclatureType
-import fr.geonature.commons.data.Provider
 import fr.geonature.commons.data.Taxonomy
+import fr.geonature.commons.data.helper.Provider.buildUri
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
@@ -40,15 +41,21 @@ class EditCountingMetadataFragment : Fragment(),
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(id: Int,
                                     args: Bundle?): Loader<Cursor> {
-            when (id) {
-                LOADER_NOMENCLATURE_TYPES -> {
-                    return CursorLoader(requireContext(),
-                                        Provider.buildUri(NomenclatureType.TABLE_NAME),
-                                        null,
-                                        null,
-                                        null,
-                                        null)
-                }
+            return when (id) {
+                LOADER_NOMENCLATURE_TYPES -> CursorLoader(requireContext(),
+                                                          buildUri(NomenclatureType.TABLE_NAME),
+                                                          null,
+                                                          null,
+                                                          null,
+                                                          null)
+                LOADER_DEFAULT_NOMENCLATURE_VALUES -> CursorLoader(requireContext(),
+                                                                   buildUri(NomenclatureType.TABLE_NAME,
+                                                                            "occtax",
+                                                                            "default"),
+                                                                   null,
+                                                                   null,
+                                                                   null,
+                                                                   null)
                 else -> throw IllegalArgumentException()
             }
         }
@@ -64,10 +71,37 @@ class EditCountingMetadataFragment : Fragment(),
 
             when (loader.id) {
                 LOADER_NOMENCLATURE_TYPES -> {
-                    adapter?.also {
-                        it.bind(data)
-                        it.setCountingMetata(countingMetadata)
+                    adapter?.bind(data)
+                    loadDefaultNomenclatureValues()
+                }
+                LOADER_DEFAULT_NOMENCLATURE_VALUES -> {
+                    val defaultMnemonicFilter = adapter?.defaultMnemonicFilter() ?: emptyList()
+                    val defaultNomenclatureValues = mutableListOf<DefaultNomenclatureWithType>()
+                    data.moveToFirst()
+
+                    while (!data.isAfterLast) {
+                        val defaultNomenclatureValue = DefaultNomenclatureWithType.fromCursor(data)
+
+                        if (defaultNomenclatureValue != null && defaultMnemonicFilter.contains(defaultNomenclatureValue.nomenclatureWithType?.type?.mnemonic)) {
+                            defaultNomenclatureValues.add(defaultNomenclatureValue)
+                        }
+
+                        data.moveToNext()
                     }
+
+                    defaultNomenclatureValues.forEach {
+                        val nomenclatureType = it.nomenclatureWithType?.type?.mnemonic
+                                ?: return@forEach
+
+                        if (countingMetadata.properties.contains(nomenclatureType)) {
+                            return@forEach
+                        }
+
+                        countingMetadata.properties[nomenclatureType] = PropertyValue.fromNomenclature(nomenclatureType,
+                                                                                                       it.nomenclatureWithType)
+                    }
+
+                    adapter?.setCountingMetata(countingMetadata)
                 }
             }
         }
@@ -155,6 +189,13 @@ class EditCountingMetadataFragment : Fragment(),
         adapter?.setCountingMetata(countingMetadata)
     }
 
+    private fun loadDefaultNomenclatureValues() {
+        LoaderManager.getInstance(this)
+            .initLoader(LOADER_DEFAULT_NOMENCLATURE_VALUES,
+                        null,
+                        loaderCallbacks)
+    }
+
     /**
      * Callback used by [EditCountingMetadataFragment].
      */
@@ -169,6 +210,7 @@ class EditCountingMetadataFragment : Fragment(),
         const val ARG_COUNTING_METADATA = "arg_counting_metadata"
 
         private const val LOADER_NOMENCLATURE_TYPES = 1
+        private const val LOADER_DEFAULT_NOMENCLATURE_VALUES = 2
         private const val CHOOSE_NOMENCLATURE_DIALOG_FRAGMENT = "choose_nomenclature_dialog_fragment"
 
         /**
