@@ -7,7 +7,6 @@
     "date_min": "2016-10-28T00:00:00Z",
     "date_max": "2016-10-28T00:00:00Z",
     "id_dataset": 17,
-    "id_nomenclature_obs_meth": 317,
     "id_digitiser": 1,
     "observers": [
       1,
@@ -16,6 +15,16 @@
       3
     ],
     "comment": "Global comment",
+    "default": {
+      "technique_obs": {
+        "value": 317
+      },
+      "typ_grp": {
+        "value": 133
+      }
+    },
+    "id_nomenclature_obs_technique": 317,
+    "id_nomenclature_grp_typ": 133,
     "t_occurrences_occtax": [
       {
         "cd_nom": 10,

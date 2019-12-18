@@ -25,6 +25,8 @@ import fr.geonature.commons.data.helper.Provider.buildUri
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
+import fr.geonature.occtax.input.NomenclatureTypeViewType
+import fr.geonature.occtax.input.PropertyValue
 import fr.geonature.occtax.ui.dataset.DatasetListActivity
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
@@ -128,11 +130,19 @@ class ObserversAndDateInputFragment : Fragment(),
                 LOADER_DEFAULT_NOMENCLATURE_VALUES -> {
                     data.moveToFirst()
 
-                    while (!data.isAfterLast && input?.technicalObservationId == null) {
-                        val defaultNomenclatureValue = DefaultNomenclatureWithType.fromCursor(data)
+                    val defaultMnemonicFilter = Input.defaultPropertiesMnemonic.asSequence()
+                        .filter { it.second == NomenclatureTypeViewType.NOMENCLATURE_TYPE }
+                        .map { it.first }
+                        .toList()
 
-                        if (defaultNomenclatureValue != null && defaultNomenclatureValue.nomenclatureWithType?.type?.mnemonic == "TECHNIQUE_OBS") {
-                            input?.technicalObservationId = defaultNomenclatureValue.nomenclatureWithType?.id
+                    while (!data.isAfterLast) {
+                        val defaultNomenclatureValue = DefaultNomenclatureWithType.fromCursor(data)
+                        val mnemonic = defaultNomenclatureValue?.nomenclatureWithType?.type?.mnemonic
+
+                        if (defaultNomenclatureValue != null && !mnemonic.isNullOrBlank() && defaultMnemonicFilter.contains(mnemonic)) {
+                            input?.properties?.set(mnemonic,
+                                                   PropertyValue.fromNomenclature(mnemonic,
+                                                                                  defaultNomenclatureValue.nomenclatureWithType))
                         }
 
                         data.moveToNext()
@@ -140,11 +150,11 @@ class ObserversAndDateInputFragment : Fragment(),
 
                     (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
 
-                    if (input?.technicalObservationId == null) {
+                    if (input?.properties?.isNotEmpty() == false) {
                         val context = context ?: return
 
                         Toast.makeText(context,
-                                       R.string.toast_technical_observation_loading_failed,
+                                       R.string.toast_input_default_properties_loading_failed,
                                        Toast.LENGTH_LONG)
                             .show()
                     }
@@ -270,7 +280,7 @@ class ObserversAndDateInputFragment : Fragment(),
     }
 
     override fun validate(): Boolean {
-        return this.input?.getAllInputObserverIds()?.isNotEmpty() ?: false && this.input?.datasetId != null && this.input?.technicalObservationId != null
+        return this.input?.getAllInputObserverIds()?.isNotEmpty() ?: false && this.input?.datasetId != null && this.input?.properties?.isNotEmpty() == true
     }
 
     override fun refreshView() {

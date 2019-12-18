@@ -57,8 +57,6 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
 
         writer.name("id_dataset")
             .value(input.datasetId)
-        writer.name("id_nomenclature_obs_meth")
-            .value(input.technicalObservationId)
 
         writer.name("id_digitiser")
             .value(input.getPrimaryObserverId())
@@ -69,10 +67,42 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writer.name("comment")
             .value(input.comment)
 
+        writeInputDefaultProperties(writer,
+                                    input.properties)
         writeInputTaxa(writer,
                        input)
 
         writer.endObject()
+    }
+
+    private fun writeInputDefaultProperties(writer: JsonWriter,
+                                            properties: Map<String, PropertyValue>) {
+        writer.name("default")
+
+        if (properties.isEmpty()) {
+            writer.nullValue()
+            return
+        }
+
+        writer.beginObject()
+
+        properties.forEach {
+            writePropertyValue(writer,
+                               it.key,
+                               it.value)
+        }
+
+        writer.endObject()
+
+        // GeoNature default properties mapping
+        properties.forEach {
+            if (it.value.isEmpty()) return@forEach
+
+            when (it.key) {
+                "TECHNIQUE_OBS" -> writer.name("id_nomenclature_obs_technique").value(it.value.value as Long)
+                "TYP_GRP" -> writer.name("id_nomenclature_grp_typ").value(it.value.value as Long)
+            }
+        }
     }
 
     private fun writeDate(writer: JsonWriter,
@@ -142,9 +172,9 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writer.beginObject()
 
         properties.forEach {
-            writeInputTaxonPropertyValue(writer,
-                                         it.key,
-                                         it.value)
+            writePropertyValue(writer,
+                               it.key,
+                               it.value)
         }
 
         writeInputTaxonCounting(writer,
@@ -217,9 +247,9 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writer.name("index")
             .value(countingMetadata.index)
         countingMetadata.properties.forEach {
-            writeInputTaxonPropertyValue(writer,
-                                         it.key,
-                                         it.value)
+            writePropertyValue(writer,
+                               it.key,
+                               it.value)
         }
 
         writer.name("min")
@@ -240,9 +270,9 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
      * }
      * ```
      */
-    private fun writeInputTaxonPropertyValue(writer: JsonWriter,
-                                             name: String,
-                                             propertyValue: PropertyValue) {
+    private fun writePropertyValue(writer: JsonWriter,
+                                   name: String,
+                                   propertyValue: PropertyValue) {
         if (propertyValue.isEmpty()) return
 
         writer.name(name.toLowerCase(Locale.ROOT))

@@ -67,14 +67,6 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
                         reader.nextNull()
                     }
                 }
-                "id_nomenclature_obs_meth" -> {
-                    if (reader.peek() != JsonToken.NULL) {
-                        input.technicalObservationId = reader.nextLong()
-                    }
-                    else {
-                        reader.nextNull()
-                    }
-                }
                 "id_digitiser" -> {
                     if (reader.peek() != JsonToken.NULL) {
                         input.setPrimaryInputObserverId(reader.nextLong())
@@ -100,6 +92,15 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
                         reader.nextNull()
                     }
                 }
+                "default" -> {
+                    if (reader.peek() != JsonToken.NULL) {
+                        readInputDefaultProperties(reader,
+                                                   input)
+                    }
+                    else {
+                        reader.nextNull()
+                    }
+                }
                 "t_occurrences_occtax" -> {
                     if (reader.peek() != JsonToken.NULL) {
                         readInputTaxa(reader,
@@ -107,6 +108,27 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
                     }
                     else {
                         reader.nextNull()
+                    }
+                }
+                else -> reader.skipValue()
+            }
+        }
+
+        reader.endObject()
+    }
+
+    private fun readInputDefaultProperties(reader: JsonReader,
+                                           input: Input) {
+        reader.beginObject()
+
+        while (reader.hasNext()) {
+            when (reader.peek()) {
+                JsonToken.NAME -> {
+                    when (val propertyName = reader.nextName()) {
+                        else -> readPropertyValue(reader,
+                                                  propertyName)?.also {
+                            input.properties[it.code] = it
+                        }
                     }
                 }
                 else -> reader.skipValue()
@@ -260,8 +282,8 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
                 JsonToken.NAME -> {
                     when (val propertyName = reader.nextName()) {
                         "counting" -> properties.second.addAll(readInputTaxonCounting(reader))
-                        else -> readInputTaxonPropertyValue(reader,
-                                                            propertyName)?.also {
+                        else -> readPropertyValue(reader,
+                                                  propertyName)?.also {
                             properties.first[it.code] = it
                         }
                     }
@@ -337,8 +359,8 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
                         "index" -> countingMetadata.index = reader.nextInt()
                         "min" -> countingMetadata.min = reader.nextInt()
                         "max" -> countingMetadata.max = reader.nextInt()
-                        else -> readInputTaxonPropertyValue(reader,
-                                                            propertyName)?.also {
+                        else -> readPropertyValue(reader,
+                                                  propertyName)?.also {
                             countingMetadata.properties[it.code] = it
                         }
                     }
@@ -353,7 +375,7 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
     }
 
     /**
-     * Reads input taxon property as object:
+     * Reads property value as object:
      *
      * ```
      * {
@@ -362,8 +384,8 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
      * }
      * ```
      */
-    private fun readInputTaxonPropertyValue(reader: JsonReader,
-                                            code: String): PropertyValue? {
+    private fun readPropertyValue(reader: JsonReader,
+                                  code: String): PropertyValue? {
         reader.beginObject()
 
         var label: String? = null

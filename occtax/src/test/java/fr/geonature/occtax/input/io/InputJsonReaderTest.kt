@@ -91,6 +91,17 @@ class InputJsonReaderTest {
                               .toLongArray())
         assertEquals("Global comment",
                      input.comment)
+        assertEquals(mapOf(Pair("TECHNIQUE_OBS",
+                                PropertyValue(
+                                        "TECHNIQUE_OBS",
+                                        null,
+                                        317L)),
+                           Pair("TYP_GRP",
+                                PropertyValue(
+                                        "TYP_GRP",
+                                        null,
+                                        133L))),
+                     input.properties)
         assertEquals(listOf(InputTaxon(Taxon(10L,
                                              "taxon_01",
                                              Taxonomy("Animalia",

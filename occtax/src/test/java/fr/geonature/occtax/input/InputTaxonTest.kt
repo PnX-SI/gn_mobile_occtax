@@ -127,6 +127,5 @@ class InputTaxonTest {
         val inputTaxonFromParcel = InputTaxon.CREATOR.createFromParcel(parcel)
         assertEquals(inputTaxon,
                      inputTaxonFromParcel)
-
     }
 }
