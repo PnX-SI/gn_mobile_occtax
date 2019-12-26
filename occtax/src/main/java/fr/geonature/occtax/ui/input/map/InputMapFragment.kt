@@ -30,8 +30,8 @@ import org.osmdroid.views.MapView
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
 class InputMapFragment : MapFragment(),
-                         IValidateFragment,
-                         IInputFragment {
+    IValidateFragment,
+    IInputFragment {
 
     private var input: Input? = null
 
@@ -42,8 +42,7 @@ class InputMapFragment : MapFragment(),
             override fun onSelectedPOIs(pois: List<GeoPoint>) {
                 if (pois.isEmpty()) {
                     clearInputSelection()
-                }
-                else {
+                } else {
                     selectPOI(pois[0])
                 }
             }
@@ -101,20 +100,25 @@ class InputMapFragment : MapFragment(),
             val accentColor = ThemeUtils.getAccentColor(context)
 
             // select matching Feature from Overlays
-            input?.selectedFeatureId = getOverlays { overlay -> overlay is FeatureCollectionOverlay }
-                .asSequence()
-                .map { it as FeatureCollectionOverlay }
-                .map { it.also { it.setStyle(it.layerStyle) } }
-                .map {
-                    val filter = ContainsFeaturesFilter(poi,
-                                                        it.layerStyle,
-                                                        LayerStyleSettings.Builder.newInstance().from(it.layerStyle).color(accentColor).build())
-                    it.apply(filter)
-                    filter.getSelectedFeatures()
-                }
-                .flatMap { it.asSequence() }
-                .map { it.id }
-                .firstOrNull()
+            input?.selectedFeatureId =
+                getOverlays { overlay -> overlay is FeatureCollectionOverlay }
+                    .asSequence()
+                    .map { it as FeatureCollectionOverlay }
+                    .map { it.also { it.setStyle(it.layerStyle) } }
+                    .map {
+                        val filter = ContainsFeaturesFilter(
+                            poi,
+                            it.layerStyle,
+                            LayerStyleSettings.Builder.newInstance().from(it.layerStyle).color(
+                                accentColor
+                            ).build()
+                        )
+                        it.apply(filter)
+                        filter.getSelectedFeatures()
+                    }
+                    .flatMap { it.asSequence() }
+                    .map { it.id }
+                    .firstOrNull()
 
             (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
         }
@@ -131,12 +135,12 @@ class InputMapFragment : MapFragment(),
         fun newInstance(mapSettings: MapSettings) = InputMapFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(
-                        ARG_MAP_SETTINGS,
-                        mapSettings
+                    ARG_MAP_SETTINGS,
+                    mapSettings
                 )
                 putSerializable(
-                        ARG_EDIT_MODE,
-                        EditFeatureButton.EditMode.SINGLE
+                    ARG_EDIT_MODE,
+                    EditFeatureButton.EditMode.SINGLE
                 )
             }
         }

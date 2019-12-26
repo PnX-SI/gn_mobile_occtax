@@ -21,8 +21,10 @@ object SettingsUtils {
      */
     fun getDefaultDatasetId(context: Context): Long? {
         return getDefaultSharedPreferences(context)
-            .getLong(context.getString(R.string.preference_category_dataset_default_key),
-                     0)
+            .getLong(
+                context.getString(R.string.preference_category_dataset_default_key),
+                0
+            )
             .takeIf { it > 0 }
     }
 
@@ -35,8 +37,10 @@ object SettingsUtils {
      */
     fun getDefaultObserverId(context: Context): Long? {
         return getDefaultSharedPreferences(context)
-            .getLong(context.getString(R.string.preference_category_observers_default_key),
-                     0)
+            .getLong(
+                context.getString(R.string.preference_category_observers_default_key),
+                0
+            )
             .takeIf { it > 0 }
     }
 
@@ -49,8 +53,10 @@ object SettingsUtils {
      */
     fun getMapShowScale(context: Context): Boolean {
         return getDefaultSharedPreferences(context)
-            .getBoolean(context.getString(R.string.preference_category_map_show_scale_key),
-                        true)
+            .getBoolean(
+                context.getString(R.string.preference_category_map_show_scale_key),
+                true
+            )
     }
 
     /**
@@ -62,7 +68,9 @@ object SettingsUtils {
      */
     fun getMapShowCompass(context: Context): Boolean {
         return getDefaultSharedPreferences(context)
-            .getBoolean(context.getString(R.string.preference_category_map_show_compass_key),
-                        true)
+            .getBoolean(
+                context.getString(R.string.preference_category_map_show_compass_key),
+                true
+            )
     }
 }

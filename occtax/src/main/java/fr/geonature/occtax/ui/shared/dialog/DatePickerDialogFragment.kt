@@ -24,34 +24,49 @@ class DatePickerDialogFragment : DialogFragment() {
 
         val context = requireContext()
 
-        val view = View.inflate(context,
-                                R.layout.dialog_date_picker,
-                                null)
+        val view = View.inflate(
+            context,
+            R.layout.dialog_date_picker,
+            null
+        )
 
         // restore the current selected date
         if (savedInstanceState != null) {
-            selectedDateCalendar.time = savedInstanceState.getSerializable(STATE_SELECTED_DATE) as Date
+            selectedDateCalendar.time =
+                savedInstanceState.getSerializable(STATE_SELECTED_DATE) as Date
         }
 
-        val dialog = AlertDialog.Builder(context,
-                                         R.style.DialogStyle)
+        val dialog = AlertDialog.Builder(
+            context,
+            R.style.DialogStyle
+        )
             .setView(view)
-            .setPositiveButton(R.string.alert_dialog_ok) { _, _ -> onCalendarSetListener?.onCalendarSet(selectedDateCalendar) }
-            .setNegativeButton(R.string.alert_dialog_cancel,
-                               null)
+            .setPositiveButton(R.string.alert_dialog_ok) { _, _ ->
+                onCalendarSetListener?.onCalendarSet(
+                    selectedDateCalendar
+                )
+            }
+            .setNegativeButton(
+                R.string.alert_dialog_cancel,
+                null
+            )
             .create()
 
-        configureDatePicker(view.findViewById(android.R.id.content) as DatePicker,
-                            null,
-                // set the current date as max date selection
-                            Calendar.getInstance().time)
+        configureDatePicker(
+            view.findViewById(android.R.id.content) as DatePicker,
+            null,
+            // set the current date as max date selection
+            Calendar.getInstance().time
+        )
 
         return dialog
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putSerializable(STATE_SELECTED_DATE,
-                                 selectedDateCalendar.time)
+        outState.putSerializable(
+            STATE_SELECTED_DATE,
+            selectedDateCalendar.time
+        )
 
         super.onSaveInstanceState(outState)
     }
@@ -61,22 +76,31 @@ class DatePickerDialogFragment : DialogFragment() {
         this.onCalendarSetListener = calendarSetListener
     }
 
-    private fun configureDatePicker(datePicker: DatePicker,
-                                    minDate: Date?,
-                                    maxDate: Date?) {
+    private fun configureDatePicker(
+        datePicker: DatePicker,
+        minDate: Date?,
+        maxDate: Date?
+    ) {
 
         datePicker.isSaveEnabled = true
 
-        datePicker.init(selectedDateCalendar.get(Calendar.YEAR),
-                        selectedDateCalendar.get(Calendar.MONTH),
-                        selectedDateCalendar.get(Calendar.DAY_OF_MONTH)
+        datePicker.init(
+            selectedDateCalendar.get(Calendar.YEAR),
+            selectedDateCalendar.get(Calendar.MONTH),
+            selectedDateCalendar.get(Calendar.DAY_OF_MONTH)
         ) { _, year, monthOfYear, dayOfMonth ->
-            selectedDateCalendar.set(Calendar.YEAR,
-                                     year)
-            selectedDateCalendar.set(Calendar.MONTH,
-                                     monthOfYear)
-            selectedDateCalendar.set(Calendar.DAY_OF_MONTH,
-                                     dayOfMonth)
+            selectedDateCalendar.set(
+                Calendar.YEAR,
+                year
+            )
+            selectedDateCalendar.set(
+                Calendar.MONTH,
+                monthOfYear
+            )
+            selectedDateCalendar.set(
+                Calendar.DAY_OF_MONTH,
+                dayOfMonth
+            )
         }
 
         if (minDate != null) {

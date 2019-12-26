@@ -31,36 +31,50 @@ class ChooseNomenclatureDialogFragment : DialogFragment() {
     private var adapter: NomenclatureRecyclerViewAdapter? = null
 
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
-        override fun onCreateLoader(id: Int,
-                                    args: Bundle?): Loader<Cursor> {
+        override fun onCreateLoader(
+            id: Int,
+            args: Bundle?
+        ): Loader<Cursor> {
             return when (id) {
                 LOADER_NOMENCLATURES -> {
-                    val nomenclatureType = args?.getString(ARG_NOMENCLATURE_TYPE,
-                                                           "") ?: ""
+                    val nomenclatureType = args?.getString(
+                        ARG_NOMENCLATURE_TYPE,
+                        ""
+                    ) ?: ""
                     val taxonomy = args?.getParcelable(ARG_TAXONOMY)
-                            ?: Taxonomy(Taxonomy.ANY,
-                                        Taxonomy.ANY)
+                        ?: Taxonomy(
+                            Taxonomy.ANY,
+                            Taxonomy.ANY
+                        )
 
-                    CursorLoader(requireContext(),
-                                 buildUri(NomenclatureType.TABLE_NAME,
-                                          nomenclatureType,
-                                          "items",
-                                          taxonomy.kingdom,
-                                          taxonomy.group),
-                                 null,
-                                 null,
-                                 null,
-                                 null)
+                    CursorLoader(
+                        requireContext(),
+                        buildUri(
+                            NomenclatureType.TABLE_NAME,
+                            nomenclatureType,
+                            "items",
+                            taxonomy.kingdom,
+                            taxonomy.group
+                        ),
+                        null,
+                        null,
+                        null,
+                        null
+                    )
                 }
                 else -> throw IllegalArgumentException()
             }
         }
 
-        override fun onLoadFinished(loader: Loader<Cursor>,
-                                    data: Cursor?) {
+        override fun onLoadFinished(
+            loader: Loader<Cursor>,
+            data: Cursor?
+        ) {
             if (data == null) {
-                Log.w(TAG,
-                      "Failed to load data from '${(loader as CursorLoader).uri}'")
+                Log.w(
+                    TAG,
+                    "Failed to load data from '${(loader as CursorLoader).uri}'"
+                )
 
                 return
             }
@@ -82,8 +96,7 @@ class ChooseNomenclatureDialogFragment : DialogFragment() {
 
         if (parentFragment is OnChooseNomenclatureDialogFragmentListener) {
             listener = parentFragment as OnChooseNomenclatureDialogFragmentListener
-        }
-        else {
+        } else {
             throw RuntimeException("$parentFragment must implement OnChooseNomenclatureDialogFragmentListener")
         }
     }
@@ -91,17 +104,22 @@ class ChooseNomenclatureDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val context = requireContext()
 
-        val recyclerView = View.inflate(context,
-                                        R.layout.recycler_view,
-                                        null)
+        val recyclerView = View.inflate(
+            context,
+            R.layout.recycler_view,
+            null
+        )
 
         // Set the adapter
-        adapter = NomenclatureRecyclerViewAdapter(object : NomenclatureRecyclerViewAdapter.OnNomenclatureRecyclerViewAdapterListener {
+        adapter = NomenclatureRecyclerViewAdapter(object :
+            NomenclatureRecyclerViewAdapter.OnNomenclatureRecyclerViewAdapterListener {
             override fun onSelectedNomenclature(nomenclature: Nomenclature) {
                 val nomenclatureType = arguments?.getString(ARG_NOMENCLATURE_TYPE)
-                        ?: return
-                listener?.onSelectedNomenclature(nomenclatureType,
-                                                 nomenclature)
+                    ?: return
+                listener?.onSelectedNomenclature(
+                    nomenclatureType,
+                    nomenclature
+                )
                 dismiss()
             }
         })
@@ -110,15 +128,19 @@ class ChooseNomenclatureDialogFragment : DialogFragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = this@ChooseNomenclatureDialogFragment.adapter
 
-            val dividerItemDecoration = DividerItemDecoration(context,
-                                                              (layoutManager as LinearLayoutManager).orientation)
+            val dividerItemDecoration = DividerItemDecoration(
+                context,
+                (layoutManager as LinearLayoutManager).orientation
+            )
             addItemDecoration(dividerItemDecoration)
         }
 
         return AlertDialog.Builder(context)
             .setView(recyclerView)
-            .setNegativeButton(R.string.alert_dialog_cancel,
-                               null)
+            .setNegativeButton(
+                R.string.alert_dialog_cancel,
+                null
+            )
             .also { builder ->
                 val nomenclatureType = arguments?.getString(ARG_NOMENCLATURE_TYPE) ?: return@also
                 getNomenclatureTypeLabel(nomenclatureType)?.also {
@@ -132,16 +154,20 @@ class ChooseNomenclatureDialogFragment : DialogFragment() {
         super.onResume()
 
         LoaderManager.getInstance(this)
-            .initLoader(LOADER_NOMENCLATURES,
-                        arguments,
-                        loaderCallbacks)
+            .initLoader(
+                LOADER_NOMENCLATURES,
+                arguments,
+                loaderCallbacks
+            )
     }
 
     private fun getNomenclatureTypeLabel(mnemonic: String): String? {
         val context = context ?: return null
-        val resourceId = resources.getIdentifier("nomenclature_${mnemonic.toLowerCase(Locale.getDefault())}",
-                                                 "string",
-                                                 context.packageName)
+        val resourceId = resources.getIdentifier(
+            "nomenclature_${mnemonic.toLowerCase(Locale.getDefault())}",
+            "string",
+            context.packageName
+        )
 
         return if (resourceId == 0) null else context.getString(resourceId)
     }
@@ -157,8 +183,10 @@ class ChooseNomenclatureDialogFragment : DialogFragment() {
          * @param nomenclatureType mnemonic of the nomenclature type
          * @param nomenclature the selected [Nomenclature] value
          */
-        fun onSelectedNomenclature(nomenclatureType: String,
-                                   nomenclature: Nomenclature)
+        fun onSelectedNomenclature(
+            nomenclatureType: String,
+            nomenclature: Nomenclature
+        )
     }
 
     companion object {
@@ -175,13 +203,19 @@ class ChooseNomenclatureDialogFragment : DialogFragment() {
          * @return A new instance of [ChooseNomenclatureDialogFragment]
          */
         @JvmStatic
-        fun newInstance(nomenclatureType: String,
-                        taxonomy: Taxonomy) = ChooseNomenclatureDialogFragment().apply {
+        fun newInstance(
+            nomenclatureType: String,
+            taxonomy: Taxonomy
+        ) = ChooseNomenclatureDialogFragment().apply {
             arguments = Bundle().apply {
-                putString(ARG_NOMENCLATURE_TYPE,
-                          nomenclatureType)
-                putParcelable(ARG_TAXONOMY,
-                              taxonomy)
+                putString(
+                    ARG_NOMENCLATURE_TYPE,
+                    nomenclatureType
+                )
+                putParcelable(
+                    ARG_TAXONOMY,
+                    taxonomy
+                )
             }
         }
     }

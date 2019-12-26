@@ -38,24 +38,38 @@ open class ListItemActionView : ConstraintLayout {
     private var actionEmptyText: Int = 0
 
     constructor(context: Context) : super(context) {
-        init(null,
-             0)
+        init(
+            null,
+            0
+        )
     }
 
-    constructor(context: Context,
-                attrs: AttributeSet) : super(context,
-                                             attrs) {
-        init(attrs,
-             0)
+    constructor(
+        context: Context,
+        attrs: AttributeSet
+    ) : super(
+        context,
+        attrs
+    ) {
+        init(
+            attrs,
+            0
+        )
     }
 
-    constructor(context: Context,
-                attrs: AttributeSet,
-                defStyleAttr: Int) : super(context,
-                                           attrs,
-                                           defStyleAttr) {
-        init(attrs,
-             defStyleAttr)
+    constructor(
+        context: Context,
+        attrs: AttributeSet,
+        defStyleAttr: Int
+    ) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
+        init(
+            attrs,
+            defStyleAttr
+        )
     }
 
     fun setListener(listener: OnListItemActionViewListener) {
@@ -96,9 +110,12 @@ open class ListItemActionView : ConstraintLayout {
     }
 
     fun setVisibleItems(visibleItems: Int = 1) {
-        val typedArray = context.theme.obtainStyledAttributes(intArrayOf(R.attr.listPreferredItemHeight))
-        val listPreferredItemHeight = typedArray.getDimension(0,
-                                                              0f)
+        val typedArray =
+            context.theme.obtainStyledAttributes(intArrayOf(R.attr.listPreferredItemHeight))
+        val listPreferredItemHeight = typedArray.getDimension(
+            0,
+            0f
+        )
 
         if (listPreferredItemHeight > 0) {
             recyclerView.layoutParams.height = visibleItems * listPreferredItemHeight.toInt()
@@ -111,11 +128,15 @@ open class ListItemActionView : ConstraintLayout {
         adapter.setItems(collection)
     }
 
-    private fun init(attrs: AttributeSet?,
-                     defStyle: Int) {
-        View.inflate(context,
-                     R.layout.view_action_list_item,
-                     this)
+    private fun init(
+        attrs: AttributeSet?,
+        defStyle: Int
+    ) {
+        View.inflate(
+            context,
+            R.layout.view_action_list_item,
+            this
+        )
 
         titleTextView = findViewById(android.R.id.title)
         recyclerView = findViewById(android.R.id.list)
@@ -133,10 +154,14 @@ open class ListItemActionView : ConstraintLayout {
                 showEmptyTextView(adapter.itemCount == 0)
             }
 
-            override fun onItemRangeInserted(positionStart: Int,
-                                             itemCount: Int) {
-                super.onItemRangeInserted(positionStart,
-                                          itemCount)
+            override fun onItemRangeInserted(
+                positionStart: Int,
+                itemCount: Int
+            ) {
+                super.onItemRangeInserted(
+                    positionStart,
+                    itemCount
+                )
 
                 actionButton.setText(actionText)
                 showEmptyTextView(false)
@@ -148,29 +173,56 @@ open class ListItemActionView : ConstraintLayout {
             adapter = this@ListItemActionView.adapter
         }
 
-        val dividerItemDecoration = DividerItemDecoration(recyclerView.context,
-                                                          (recyclerView.layoutManager as LinearLayoutManager).orientation)
+        val dividerItemDecoration = DividerItemDecoration(
+            recyclerView.context,
+            (recyclerView.layoutManager as LinearLayoutManager).orientation
+        )
         recyclerView.addItemDecoration(dividerItemDecoration)
 
         // load attributes
         val ta = context.obtainStyledAttributes(
-                attrs,
-                R.styleable.ListItemActionView,
-                defStyle,
-                0)
+            attrs,
+            R.styleable.ListItemActionView,
+            defStyle,
+            0
+        )
 
-        setTitle(ta.getResourceId(R.styleable.ListItemActionView_title,
-                                  0))
-        setEmptyText(ta.getResourceId(R.styleable.ListItemActionView_no_data,
-                                      R.string.no_data))
-        setActionText(ta.getResourceId(R.styleable.ListItemActionView_action,
-                                       0))
-        setActionText(ta.getResourceId(R.styleable.ListItemActionView_action,
-                                       0))
-        setActionEmptyText(ta.getResourceId(R.styleable.ListItemActionView_action_empty,
-                                            0))
-        setVisibleItems(ta.getInteger(R.styleable.ListItemActionView_visible_items,
-                                      1))
+        setTitle(
+            ta.getResourceId(
+                R.styleable.ListItemActionView_title,
+                0
+            )
+        )
+        setEmptyText(
+            ta.getResourceId(
+                R.styleable.ListItemActionView_no_data,
+                R.string.no_data
+            )
+        )
+        setActionText(
+            ta.getResourceId(
+                R.styleable.ListItemActionView_action,
+                0
+            )
+        )
+        setActionText(
+            ta.getResourceId(
+                R.styleable.ListItemActionView_action,
+                0
+            )
+        )
+        setActionEmptyText(
+            ta.getResourceId(
+                R.styleable.ListItemActionView_action_empty,
+                0
+            )
+        )
+        setVisibleItems(
+            ta.getInteger(
+                R.styleable.ListItemActionView_visible_items,
+                1
+            )
+        )
 
         ta.recycle()
     }
@@ -181,14 +233,20 @@ open class ListItemActionView : ConstraintLayout {
         }
 
         if (show) {
-            emptyTextView.startAnimation(loadAnimation(context,
-                                                       android.R.anim.fade_in))
+            emptyTextView.startAnimation(
+                loadAnimation(
+                    context,
+                    android.R.anim.fade_in
+                )
+            )
             emptyTextView.visibility = View.VISIBLE
-
-        }
-        else {
-            emptyTextView.startAnimation(loadAnimation(context,
-                                                       android.R.anim.fade_out))
+        } else {
+            emptyTextView.startAnimation(
+                loadAnimation(
+                    context,
+                    android.R.anim.fade_out
+                )
+            )
             emptyTextView.visibility = View.GONE
         }
     }
@@ -204,17 +262,22 @@ open class ListItemActionView : ConstraintLayout {
         fun onAction()
     }
 
-    private inner class EditListItemViewRecyclerViewAdapter : RecyclerView.Adapter<EditListItemViewRecyclerViewAdapter.ViewHolder>() {
+    private inner class EditListItemViewRecyclerViewAdapter :
+        RecyclerView.Adapter<EditListItemViewRecyclerViewAdapter.ViewHolder>() {
 
         internal val items: MutableList<Pair<String, String?>> = ArrayList()
 
-        override fun onCreateViewHolder(parent: ViewGroup,
-                                        viewType: Int): ViewHolder {
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int
+        ): ViewHolder {
             return ViewHolder(parent)
         }
 
-        override fun onBindViewHolder(holder: ViewHolder,
-                                      position: Int) {
+        override fun onBindViewHolder(
+            holder: ViewHolder,
+            position: Int
+        ) {
             holder.bind(items[position])
         }
 
@@ -229,21 +292,29 @@ open class ListItemActionView : ConstraintLayout {
             notifyDataSetChanged()
         }
 
-        internal inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context)
-                                                                                         .inflate(R.layout.list_item_2,
-                                                                                                  parent,
-                                                                                                  false)) {
+        internal inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
+            LayoutInflater.from(parent.context)
+                .inflate(
+                    R.layout.list_item_2,
+                    parent,
+                    false
+                )
+        ) {
 
             private val textView1: TextView = itemView.findViewById(android.R.id.text1)
             private val textView2: TextView = itemView.findViewById(android.R.id.text2)
 
             fun bind(pair: Pair<String, String?>) {
-                bind(pair.first,
-                     pair.second)
+                bind(
+                    pair.first,
+                    pair.second
+                )
             }
 
-            fun bind(label: String,
-                     description: String?) {
+            fun bind(
+                label: String,
+                description: String?
+            ) {
                 textView1.text = label
                 textView2.text = description.orEmpty()
             }

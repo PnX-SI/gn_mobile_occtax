@@ -17,24 +17,27 @@ class OnAppSettingsJsonReaderListenerImpl : AppSettingsJsonReader.OnAppSettingsJ
         return AppSettings()
     }
 
-    override fun readAdditionalAppSettingsData(reader: JsonReader,
-                                               keyName: String,
-                                               appSettings: AppSettings) {
+    override fun readAdditionalAppSettingsData(
+        reader: JsonReader,
+        keyName: String,
+        appSettings: AppSettings
+    ) {
         when (keyName) {
             "map" -> {
                 if (reader.peek() == JsonToken.BEGIN_OBJECT) {
                     readMapSettings(reader,
                                     appSettings)
-                }
-                else {
+                } else {
                     reader.skipValue()
                 }
             }
         }
     }
 
-    private fun readMapSettings(reader: JsonReader,
-                                appSettings: AppSettings) {
+    private fun readMapSettings(
+        reader: JsonReader,
+        appSettings: AppSettings
+    ) {
         appSettings.mapSettings = MapSettingsReader().read(reader)
     }
 }

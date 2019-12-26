@@ -11,20 +11,26 @@ import java.io.Serializable
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-data class PropertyValue(val code: String,
-                         val label: String?,
-                         val value: Serializable?) : Parcelable {
+data class PropertyValue(
+    val code: String,
+    val label: String?,
+    val value: Serializable?
+) : Parcelable {
 
-    internal constructor(source: Parcel) : this(source.readString()!!,
-                                                source.readString(),
-                                                source.readSerializable())
+    internal constructor(source: Parcel) : this(
+        source.readString()!!,
+        source.readString(),
+        source.readSerializable()
+    )
 
     override fun describeContents(): Int {
         return 0
     }
 
-    override fun writeToParcel(dest: Parcel?,
-                               flags: Int) {
+    override fun writeToParcel(
+        dest: Parcel?,
+        flags: Int
+    ) {
         dest?.also {
             it.writeString(code)
             it.writeString(label)
@@ -41,33 +47,42 @@ data class PropertyValue(val code: String,
         /**
          * Creates a [PropertyValue] instance from given [Nomenclature].
          */
-        fun fromNomenclature(code: String,
-                             nomenclature: Nomenclature?): PropertyValue {
-            return PropertyValue(code,
-                                 nomenclature?.defaultLabel,
-                                 nomenclature?.id)
+        fun fromNomenclature(
+            code: String,
+            nomenclature: Nomenclature?
+        ): PropertyValue {
+            return PropertyValue(
+                code,
+                nomenclature?.defaultLabel,
+                nomenclature?.id
+            )
         }
 
         /**
          * Creates a [PropertyValue] instance from given value.
          */
-        fun fromValue(code: String,
-                      value: Serializable?): PropertyValue {
-            return PropertyValue(code,
-                                 null,
-                                 value)
+        fun fromValue(
+            code: String,
+            value: Serializable?
+        ): PropertyValue {
+            return PropertyValue(
+                code,
+                null,
+                value
+            )
         }
 
         @JvmField
-        val CREATOR: Parcelable.Creator<PropertyValue> = object : Parcelable.Creator<PropertyValue> {
+        val CREATOR: Parcelable.Creator<PropertyValue> =
+            object : Parcelable.Creator<PropertyValue> {
 
-            override fun createFromParcel(source: Parcel): PropertyValue {
-                return PropertyValue(source)
-            }
+                override fun createFromParcel(source: Parcel): PropertyValue {
+                    return PropertyValue(source)
+                }
 
-            override fun newArray(size: Int): Array<PropertyValue?> {
-                return arrayOfNulls(size)
+                override fun newArray(size: Int): Array<PropertyValue?> {
+                    return arrayOfNulls(size)
+                }
             }
-        }
     }
 }

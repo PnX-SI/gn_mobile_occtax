@@ -34,53 +34,71 @@ import fr.geonature.viewpager.ui.IValidateFragment
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
 class TaxaFragment : Fragment(),
-                     IValidateFragment,
-                     IInputFragment {
+    IValidateFragment,
+    IInputFragment {
 
     private var input: Input? = null
     private var adapter: TaxaRecyclerViewAdapter? = null
 
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
-        override fun onCreateLoader(id: Int,
-                                    args: Bundle?): Loader<Cursor> {
+        override fun onCreateLoader(
+            id: Int,
+            args: Bundle?
+        ): Loader<Cursor> {
 
             return when (id) {
                 LOADER_TAXA -> {
-                    val selectedFeatureId = args?.getString(KEY_SELECTED_FEATURE_ID,
-                                                            null)
+                    val selectedFeatureId = args?.getString(
+                        KEY_SELECTED_FEATURE_ID,
+                        null
+                    )
                     val selections = Taxon.filter(args?.getString(KEY_FILTER))
 
-                    CursorLoader(requireContext(),
-                                 buildUri(Taxon.TABLE_NAME,
-                                          if (selectedFeatureId == null) "" else "area/${selectedFeatureId}"),
-                                 null,
-                                 selections.first,
-                                 selections.second,
-                                 null)
+                    CursorLoader(
+                        requireContext(),
+                        buildUri(
+                            Taxon.TABLE_NAME,
+                            if (selectedFeatureId == null) "" else "area/$selectedFeatureId"
+                        ),
+                        null,
+                        selections.first,
+                        selections.second,
+                        null
+                    )
                 }
                 LOADER_TAXON -> {
-                    val selectedFeatureId = args?.getString(KEY_SELECTED_FEATURE_ID,
-                                                            null)
+                    val selectedFeatureId = args?.getString(
+                        KEY_SELECTED_FEATURE_ID,
+                        null
+                    )
 
-                    CursorLoader(requireContext(),
-                                 buildUri(Taxon.TABLE_NAME,
-                                          args?.getLong(KEY_SELECTED_TAXON_ID).toString(),
-                                          if (selectedFeatureId == null) "" else "area/${selectedFeatureId}"),
-                                 null,
-                                 null,
-                                 null,
-                                 null)
+                    CursorLoader(
+                        requireContext(),
+                        buildUri(
+                            Taxon.TABLE_NAME,
+                            args?.getLong(KEY_SELECTED_TAXON_ID).toString(),
+                            if (selectedFeatureId == null) "" else "area/$selectedFeatureId"
+                        ),
+                        null,
+                        null,
+                        null,
+                        null
+                    )
                 }
                 else -> throw IllegalArgumentException()
             }
         }
 
-        override fun onLoadFinished(loader: Loader<Cursor>,
-                                    data: Cursor?) {
+        override fun onLoadFinished(
+            loader: Loader<Cursor>,
+            data: Cursor?
+        ) {
 
             if (data == null) {
-                Log.w(TAG,
-                      "Failed to load data from '${(loader as CursorLoader).uri}'")
+                Log.w(
+                    TAG,
+                    "Failed to load data from '${(loader as CursorLoader).uri}'"
+                )
 
                 return
             }
@@ -109,16 +127,21 @@ class TaxaFragment : Fragment(),
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater,
-                              container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_taxa,
-                                    container,
-                                    false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(
+            R.layout.fragment_taxa,
+            container,
+            false
+        )
         val recyclerView = view.findViewById<RecyclerView>(android.R.id.list)
 
         // Set the adapter
-        adapter = TaxaRecyclerViewAdapter(object : TaxaRecyclerViewAdapter.OnTaxaRecyclerViewAdapterListener {
+        adapter = TaxaRecyclerViewAdapter(object :
+            TaxaRecyclerViewAdapter.OnTaxaRecyclerViewAdapterListener {
             override fun onSelectedTaxon(taxon: AbstractTaxon) {
                 input?.getCurrentSelectedInputTaxon()
                     ?.also { input?.removeInputTaxon(it.taxon.id) }
@@ -145,30 +168,42 @@ class TaxaFragment : Fragment(),
             adapter = this@TaxaFragment.adapter
         }
 
-        val dividerItemDecoration = DividerItemDecoration(recyclerView.context,
-                                                          (recyclerView.layoutManager as LinearLayoutManager).orientation)
+        val dividerItemDecoration = DividerItemDecoration(
+            recyclerView.context,
+            (recyclerView.layoutManager as LinearLayoutManager).orientation
+        )
         recyclerView.addItemDecoration(dividerItemDecoration)
 
         return view
     }
 
-    override fun onViewCreated(view: View,
-                               savedInstanceState: Bundle?) {
-        super.onViewCreated(view,
-                            savedInstanceState)
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(
+            view,
+            savedInstanceState
+        )
 
         // we have a menu item to show in action bar
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu,
-                                     inflater: MenuInflater) {
+    override fun onCreateOptionsMenu(
+        menu: Menu,
+        inflater: MenuInflater
+    ) {
 
-        super.onCreateOptionsMenu(menu,
-                                  inflater)
+        super.onCreateOptionsMenu(
+            menu,
+            inflater
+        )
 
-        inflater.inflate(R.menu.search,
-                         menu)
+        inflater.inflate(
+            R.menu.search,
+            menu
+        )
 
         val searchItem = menu.findItem(R.id.action_search)
         val searchView = searchItem.actionView as SearchView
@@ -179,12 +214,20 @@ class TaxaFragment : Fragment(),
 
             override fun onQueryTextChange(newText: String): Boolean {
                 LoaderManager.getInstance(this@TaxaFragment)
-                    .restartLoader(LOADER_TAXA,
-                                   bundleOf(Pair(KEY_SELECTED_FEATURE_ID,
-                                                 input?.selectedFeatureId),
-                                            Pair(KEY_FILTER,
-                                                 newText)),
-                                   loaderCallbacks)
+                    .restartLoader(
+                        LOADER_TAXA,
+                        bundleOf(
+                            Pair(
+                                KEY_SELECTED_FEATURE_ID,
+                                input?.selectedFeatureId
+                            ),
+                            Pair(
+                                KEY_FILTER,
+                                newText
+                            )
+                        ),
+                        loaderCallbacks
+                    )
 
                 return true
             }
@@ -205,21 +248,35 @@ class TaxaFragment : Fragment(),
 
     override fun refreshView() {
         LoaderManager.getInstance(this)
-            .restartLoader(LOADER_TAXA,
-                           bundleOf(Pair(KEY_SELECTED_FEATURE_ID,
-                                         input?.selectedFeatureId)),
-                           loaderCallbacks)
+            .restartLoader(
+                LOADER_TAXA,
+                bundleOf(
+                    Pair(
+                        KEY_SELECTED_FEATURE_ID,
+                        input?.selectedFeatureId
+                    )
+                ),
+                loaderCallbacks
+            )
 
         val selectedInputTaxon = this.input?.getCurrentSelectedInputTaxon()
 
         if (selectedInputTaxon != null) {
             LoaderManager.getInstance(this)
-                .initLoader(LOADER_TAXON,
-                            bundleOf(Pair(KEY_SELECTED_FEATURE_ID,
-                                          input?.selectedFeatureId),
-                                     Pair(KEY_SELECTED_TAXON_ID,
-                                          selectedInputTaxon.taxon.id)),
-                            loaderCallbacks)
+                .initLoader(
+                    LOADER_TAXON,
+                    bundleOf(
+                        Pair(
+                            KEY_SELECTED_FEATURE_ID,
+                            input?.selectedFeatureId
+                        ),
+                        Pair(
+                            KEY_SELECTED_TAXON_ID,
+                            selectedInputTaxon.taxon.id
+                        )
+                    ),
+                    loaderCallbacks
+                )
         }
     }
 

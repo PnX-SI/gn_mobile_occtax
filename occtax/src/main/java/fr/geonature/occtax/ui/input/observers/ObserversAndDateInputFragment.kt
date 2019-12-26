@@ -47,8 +47,8 @@ import java.util.Locale
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
 class ObserversAndDateInputFragment : Fragment(),
-                                      IValidateFragment,
-                                      IInputFragment {
+    IValidateFragment,
+    IInputFragment {
 
     private var input: Input? = null
     private val selectedInputObservers: MutableList<InputObserver> = mutableListOf()
@@ -60,45 +60,63 @@ class ObserversAndDateInputFragment : Fragment(),
 
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(
-                id: Int,
-                args: Bundle?): Loader<Cursor> {
+            id: Int,
+            args: Bundle?
+        ): Loader<Cursor> {
 
             return when (id) {
-                LOADER_OBSERVERS_IDS -> CursorLoader(requireContext(),
-                                                     buildUri(InputObserver.TABLE_NAME,
-                                                              args?.getLongArray(KEY_SELECTED_INPUT_OBSERVER_IDS)?.joinToString(",")
-                                                                      ?: ""),
-                                                     null,
-                                                     null,
-                                                     null,
-                                                     null)
-                LOADER_DATASET_ID -> CursorLoader(requireContext(),
-                                                  buildUri(Dataset.TABLE_NAME,
-                                                           args?.getLong(KEY_SELECTED_DATASET_ID,
-                                                                         -1).toString()),
-                                                  null,
-                                                  null,
-                                                  null,
-                                                  null)
-                LOADER_DEFAULT_NOMENCLATURE_VALUES -> CursorLoader(requireContext(),
-                                                                   buildUri(NomenclatureType.TABLE_NAME,
-                                                                            "occtax",
-                                                                            "default"),
-                                                                   null,
-                                                                   null,
-                                                                   null,
-                                                                   null)
+                LOADER_OBSERVERS_IDS -> CursorLoader(
+                    requireContext(),
+                    buildUri(
+                        InputObserver.TABLE_NAME,
+                        args?.getLongArray(KEY_SELECTED_INPUT_OBSERVER_IDS)?.joinToString(",")
+                            ?: ""
+                    ),
+                    null,
+                    null,
+                    null,
+                    null
+                )
+                LOADER_DATASET_ID -> CursorLoader(
+                    requireContext(),
+                    buildUri(
+                        Dataset.TABLE_NAME,
+                        args?.getLong(
+                            KEY_SELECTED_DATASET_ID,
+                            -1
+                        ).toString()
+                    ),
+                    null,
+                    null,
+                    null,
+                    null
+                )
+                LOADER_DEFAULT_NOMENCLATURE_VALUES -> CursorLoader(
+                    requireContext(),
+                    buildUri(
+                        NomenclatureType.TABLE_NAME,
+                        "occtax",
+                        "default"
+                    ),
+                    null,
+                    null,
+                    null,
+                    null
+                )
                 else -> throw IllegalArgumentException()
             }
         }
 
         override fun onLoadFinished(
-                loader: Loader<Cursor>,
-                data: Cursor?) {
+            loader: Loader<Cursor>,
+            data: Cursor?
+        ) {
 
             if (data == null) {
-                Log.w(TAG,
-                      "Failed to load data from '${(loader as CursorLoader).uri}'")
+                Log.w(
+                    TAG,
+                    "Failed to load data from '${(loader as CursorLoader).uri}'"
+                )
 
                 return
             }
@@ -137,12 +155,20 @@ class ObserversAndDateInputFragment : Fragment(),
 
                     while (!data.isAfterLast) {
                         val defaultNomenclatureValue = DefaultNomenclatureWithType.fromCursor(data)
-                        val mnemonic = defaultNomenclatureValue?.nomenclatureWithType?.type?.mnemonic
+                        val mnemonic =
+                            defaultNomenclatureValue?.nomenclatureWithType?.type?.mnemonic
 
-                        if (defaultNomenclatureValue != null && !mnemonic.isNullOrBlank() && defaultMnemonicFilter.contains(mnemonic)) {
-                            input?.properties?.set(mnemonic,
-                                                   PropertyValue.fromNomenclature(mnemonic,
-                                                                                  defaultNomenclatureValue.nomenclatureWithType))
+                        if (defaultNomenclatureValue != null && !mnemonic.isNullOrBlank() && defaultMnemonicFilter.contains(
+                                mnemonic
+                            )
+                        ) {
+                            input?.properties?.set(
+                                mnemonic,
+                                PropertyValue.fromNomenclature(
+                                    mnemonic,
+                                    defaultNomenclatureValue.nomenclatureWithType
+                                )
+                            )
                         }
 
                         data.moveToNext()
@@ -153,9 +179,11 @@ class ObserversAndDateInputFragment : Fragment(),
                     if (input?.properties?.isNotEmpty() == false) {
                         val context = context ?: return
 
-                        Toast.makeText(context,
-                                       R.string.toast_input_default_properties_loading_failed,
-                                       Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            context,
+                            R.string.toast_input_default_properties_loading_failed,
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                     }
                 }
@@ -173,9 +201,17 @@ class ObserversAndDateInputFragment : Fragment(),
     private val onCalendarSetListener = object : DatePickerDialogFragment.OnCalendarSetListener {
         override fun onCalendarSet(calendar: Calendar) {
             input?.date = calendar.time
-            inputDateActionView?.setItems(listOf(Pair.create(DateFormat.format(getString(R.string.observers_and_date_date_format),
-                                                                               calendar.time).toString(),
-                                                             "")))
+            inputDateActionView?.setItems(
+                listOf(
+                    Pair.create(
+                        DateFormat.format(
+                            getString(R.string.observers_and_date_date_format),
+                            calendar.time
+                        ).toString(),
+                        ""
+                    )
+                )
+            )
         }
     }
 
@@ -184,38 +220,53 @@ class ObserversAndDateInputFragment : Fragment(),
 
         val supportFragmentManager = activity?.supportFragmentManager ?: return
 
-        val dialogFragment = supportFragmentManager.findFragmentByTag(DATE_PICKER_DIALOG_FRAGMENT) as DatePickerDialogFragment?
+        val dialogFragment =
+            supportFragmentManager.findFragmentByTag(DATE_PICKER_DIALOG_FRAGMENT) as DatePickerDialogFragment?
         dialogFragment?.setOnCalendarSetListener(onCalendarSetListener)
     }
 
-    override fun onCreateView(inflater: LayoutInflater,
-                              container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_observers_and_date_input,
-                                    container,
-                                    false)
+        val view = inflater.inflate(
+            R.layout.fragment_observers_and_date_input,
+            container,
+            false
+        )
 
         selectedInputObserversActionView = view.findViewById(R.id.selected_observers_action_view)
-        selectedInputObserversActionView?.setListener(object : ListItemActionView.OnListItemActionViewListener {
+        selectedInputObserversActionView?.setListener(object :
+            ListItemActionView.OnListItemActionViewListener {
             override fun onAction() {
                 val context = context ?: return
 
-                startActivityForResult(InputObserverListActivity.newIntent(context,
-                                                                           ListView.CHOICE_MODE_MULTIPLE,
-                                                                           selectedInputObservers),
-                                       LOADER_OBSERVERS_IDS)
+                startActivityForResult(
+                    InputObserverListActivity.newIntent(
+                        context,
+                        ListView.CHOICE_MODE_MULTIPLE,
+                        selectedInputObservers
+                    ),
+                    LOADER_OBSERVERS_IDS
+                )
             }
         })
 
         selectedDatasetActionView = view.findViewById(R.id.selected_dataset_action_view)
-        selectedDatasetActionView?.setListener(object : ListItemActionView.OnListItemActionViewListener {
+        selectedDatasetActionView?.setListener(object :
+            ListItemActionView.OnListItemActionViewListener {
             override fun onAction() {
                 val context = context ?: return
 
-                startActivityForResult(DatasetListActivity.newIntent(context,
-                                                                     selectedDataset),
-                                       LOADER_DATASET_ID)
+                startActivityForResult(
+                    DatasetListActivity.newIntent(
+                        context,
+                        selectedDataset
+                    ),
+                    LOADER_DATASET_ID
+                )
             }
         })
 
@@ -225,8 +276,10 @@ class ObserversAndDateInputFragment : Fragment(),
                 val supportFragmentManager = activity?.supportFragmentManager ?: return
                 val datePickerDialogFragment = DatePickerDialogFragment()
                 datePickerDialogFragment.setOnCalendarSetListener(onCalendarSetListener)
-                datePickerDialogFragment.show(supportFragmentManager,
-                                              DATE_PICKER_DIALOG_FRAGMENT)
+                datePickerDialogFragment.show(
+                    supportFragmentManager,
+                    DATE_PICKER_DIALOG_FRAGMENT
+                )
             }
         })
 
@@ -234,9 +287,10 @@ class ObserversAndDateInputFragment : Fragment(),
     }
 
     override fun onActivityResult(
-            requestCode: Int,
-            resultCode: Int,
-            data: Intent?) {
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         if ((resultCode != Activity.RESULT_OK) || (data == null)) {
             return
         }
@@ -244,14 +298,22 @@ class ObserversAndDateInputFragment : Fragment(),
         when (requestCode) {
             LOADER_OBSERVERS_IDS -> {
                 selectedInputObservers.clear()
-                selectedInputObservers.addAll(data.getParcelableArrayListExtra(InputObserverListActivity.EXTRA_SELECTED_INPUT_OBSERVERS))
+                selectedInputObservers.addAll(
+                    data.getParcelableArrayListExtra(
+                        InputObserverListActivity.EXTRA_SELECTED_INPUT_OBSERVERS
+                    )
+                )
 
                 input?.also {
                     it.clearAllInputObservers()
 
                     if (selectedInputObservers.isEmpty()) {
                         val context = context ?: return
-                        getDefaultObserverId(context).also { defaultObserverId -> if (defaultObserverId != null) it.setPrimaryInputObserverId(defaultObserverId) }
+                        getDefaultObserverId(context).also { defaultObserverId ->
+                            if (defaultObserverId != null) it.setPrimaryInputObserverId(
+                                defaultObserverId
+                            )
+                        }
                     }
 
                     it.setAllInputObservers(selectedInputObservers)
@@ -260,7 +322,8 @@ class ObserversAndDateInputFragment : Fragment(),
                 updateSelectedObserversActionView(selectedInputObservers)
             }
             LOADER_DATASET_ID -> {
-                selectedDataset = data.getParcelableExtra(DatasetListActivity.EXTRA_SELECTED_DATASET)
+                selectedDataset =
+                    data.getParcelableExtra(DatasetListActivity.EXTRA_SELECTED_DATASET)
 
                 input?.also {
                     it.datasetId = selectedDataset?.id
@@ -291,31 +354,53 @@ class ObserversAndDateInputFragment : Fragment(),
 
         if (selectedInputObserverIds.isNotEmpty()) {
             LoaderManager.getInstance(this)
-                .restartLoader(LOADER_OBSERVERS_IDS,
-                               bundleOf(kotlin.Pair(KEY_SELECTED_INPUT_OBSERVER_IDS,
-                                                    selectedInputObserverIds.toTypedArray().toLongArray())),
-                               loaderCallbacks)
+                .restartLoader(
+                    LOADER_OBSERVERS_IDS,
+                    bundleOf(
+                        kotlin.Pair(
+                            KEY_SELECTED_INPUT_OBSERVER_IDS,
+                            selectedInputObserverIds.toTypedArray().toLongArray()
+                        )
+                    ),
+                    loaderCallbacks
+                )
         }
 
         val selectedDatasetId = input?.datasetId
 
         if (selectedDatasetId != null) {
             LoaderManager.getInstance(this)
-                .restartLoader(LOADER_DATASET_ID,
-                               bundleOf(kotlin.Pair(KEY_SELECTED_DATASET_ID,
-                                                    selectedDatasetId)),
-                               loaderCallbacks)
+                .restartLoader(
+                    LOADER_DATASET_ID,
+                    bundleOf(
+                        kotlin.Pair(
+                            KEY_SELECTED_DATASET_ID,
+                            selectedDatasetId
+                        )
+                    ),
+                    loaderCallbacks
+                )
         }
 
         LoaderManager.getInstance(this)
-            .initLoader(LOADER_DEFAULT_NOMENCLATURE_VALUES,
-                        null,
-                        loaderCallbacks)
+            .initLoader(
+                LOADER_DEFAULT_NOMENCLATURE_VALUES,
+                null,
+                loaderCallbacks
+            )
 
-        inputDateActionView?.setItems(listOf(Pair.create(DateFormat.format(getString(R.string.observers_and_date_date_format),
-                                                                           input?.date
-                                                                                   ?: Date()).toString(),
-                                                         "")))
+        inputDateActionView?.setItems(
+            listOf(
+                Pair.create(
+                    DateFormat.format(
+                        getString(R.string.observers_and_date_date_format),
+                        input?.date
+                            ?: Date()
+                    ).toString(),
+                    ""
+                )
+            )
+        )
     }
 
     override fun setInput(input: AbstractInput) {
@@ -323,26 +408,42 @@ class ObserversAndDateInputFragment : Fragment(),
     }
 
     private fun updateSelectedObserversActionView(selectedInputObservers: List<InputObserver>) {
-        selectedInputObserversActionView?.setTitle(resources.getQuantityString(R.plurals.observers_and_date_selected_observers,
-                                                                               selectedInputObservers.size,
-                                                                               selectedInputObservers.size))
+        selectedInputObserversActionView?.setTitle(
+            resources.getQuantityString(
+                R.plurals.observers_and_date_selected_observers,
+                selectedInputObservers.size,
+                selectedInputObservers.size
+            )
+        )
         selectedInputObserversActionView?.setItems(selectedInputObservers.map { inputObserver ->
-            Pair.create(inputObserver.lastname?.toUpperCase(Locale.getDefault()) ?: "",
-                        inputObserver.firstname)
+            Pair.create(
+                inputObserver.lastname?.toUpperCase(Locale.getDefault()) ?: "",
+                inputObserver.firstname
+            )
         })
     }
 
     private fun updateSelectedDatasetActionView(selectedDataset: Dataset?) {
-        selectedDatasetActionView?.setItems(if (selectedDataset == null) emptyList()
-                                            else listOf(Pair.create(selectedDataset.name,
-                                                                    selectedDataset.description)))
+        selectedDatasetActionView?.setItems(
+            if (selectedDataset == null) emptyList()
+            else listOf(
+                Pair.create(
+                    selectedDataset.name,
+                    selectedDataset.description
+                )
+            )
+        )
     }
 
     private fun setDefaultObserverFromSettings() {
         input?.run {
             if (this.getAllInputObserverIds().isEmpty()) {
                 val context = context ?: return
-                getDefaultObserverId(context).also { defaultObserverId -> if (defaultObserverId != null) this.setPrimaryInputObserverId(defaultObserverId) }
+                getDefaultObserverId(context).also { defaultObserverId ->
+                    if (defaultObserverId != null) this.setPrimaryInputObserverId(
+                        defaultObserverId
+                    )
+                }
             }
         }
     }

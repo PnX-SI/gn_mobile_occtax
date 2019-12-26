@@ -21,17 +21,25 @@ class AppSyncView : ListItemActionView {
         init()
     }
 
-    constructor(context: Context,
-                attrs: AttributeSet) : super(context,
-                                             attrs) {
+    constructor(
+        context: Context,
+        attrs: AttributeSet
+    ) : super(
+        context,
+        attrs
+    ) {
         init()
     }
 
-    constructor(context: Context,
-                attrs: AttributeSet,
-                defStyleAttr: Int) : super(context,
-                                           attrs,
-                                           defStyleAttr) {
+    constructor(
+        context: Context,
+        attrs: AttributeSet,
+        defStyleAttr: Int
+    ) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         init()
     }
 
@@ -40,18 +48,36 @@ class AppSyncView : ListItemActionView {
             return
         }
 
-        setItems(listOf(Pair.create(context.getString(R.string.sync_last_synchronization),
-                                    if (appSync.lastSync == null) context.getString(R.string.sync_last_synchronization_never)
-                                    else DateFormat.format(context.getString(R.string.sync_last_synchronization_date),
-                                                           appSync.lastSync!!).toString()),
-                        Pair.create(context.getString(R.string.sync_inputs_not_synchronized),
-                                    NumberFormat.getInstance().format(appSync.inputsToSynchronize))))
+        setItems(
+            listOf(
+                Pair.create(
+                    context.getString(R.string.sync_last_synchronization),
+                    if (appSync.lastSync == null) context.getString(R.string.sync_last_synchronization_never)
+                    else DateFormat.format(
+                        context.getString(R.string.sync_last_synchronization_date),
+                        appSync.lastSync!!
+                    ).toString()
+                ),
+                Pair.create(
+                    context.getString(R.string.sync_inputs_not_synchronized),
+                    NumberFormat.getInstance().format(appSync.inputsToSynchronize)
+                )
+            )
+        )
     }
 
     private fun init() {
-        setItems(listOf(Pair.create(context.getString(R.string.sync_last_synchronization),
-                                    context.getString(R.string.sync_last_synchronization_never)),
-                        Pair.create(context.getString(R.string.sync_inputs_not_synchronized),
-                                    NumberFormat.getInstance().format(0))))
+        setItems(
+            listOf(
+                Pair.create(
+                    context.getString(R.string.sync_last_synchronization),
+                    context.getString(R.string.sync_last_synchronization_never)
+                ),
+                Pair.create(
+                    context.getString(R.string.sync_inputs_not_synchronized),
+                    NumberFormat.getInstance().format(0)
+                )
+            )
+        )
     }
 }

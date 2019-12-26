@@ -16,15 +16,17 @@ import fr.geonature.occtax.util.IntentUtils
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
 class HomeActivity : AppCompatActivity(),
-                     HomeFragment.OnHomeFragmentListener {
+    HomeFragment.OnHomeFragmentListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(android.R.id.content,
-                         HomeFragment.newInstance())
+                .replace(
+                    android.R.id.content,
+                    HomeFragment.newInstance()
+                )
                 .commit()
         }
     }
@@ -37,10 +39,16 @@ class HomeActivity : AppCompatActivity(),
         startActivity(IntentUtils.syncActivity(this))
     }
 
-    override fun onStartInput(appSettings: AppSettings,
-                              input: Input?) {
-        startActivity(InputPagerFragmentActivity.newIntent(this,
-                                                           appSettings,
-                                                           input))
+    override fun onStartInput(
+        appSettings: AppSettings,
+        input: Input?
+    ) {
+        startActivity(
+            InputPagerFragmentActivity.newIntent(
+                this,
+                appSettings,
+                input
+            )
+        )
     }
 }

@@ -15,23 +15,24 @@ class CountingMetadata() : Parcelable {
     var index: Int = 0
         internal set
 
-    val properties: SortedMap<String, PropertyValue> = TreeMap<String, PropertyValue>(Comparator { o1, o2 ->
-        val i1 = defaultMnemonic.indexOfFirst { it.first == o1 }
-        val i2 = defaultMnemonic.indexOfFirst { it.first == o2 }
+    val properties: SortedMap<String, PropertyValue> =
+        TreeMap<String, PropertyValue>(Comparator { o1, o2 ->
+            val i1 = defaultMnemonic.indexOfFirst { it.first == o1 }
+            val i2 = defaultMnemonic.indexOfFirst { it.first == o2 }
 
-        when {
-            i1 == -1 -> 1
-            i2 == -1 -> -1
-            else -> i1 - i2
-        }
-    })
+            when {
+                i1 == -1 -> 1
+                i2 == -1 -> -1
+                else -> i1 - i2
+            }
+        })
     var min: Int = 1
     var max: Int = 1
 
     constructor(source: Parcel) : this() {
         index = source.readInt()
         (source.createTypedArrayList(PropertyValue.CREATOR)
-                ?: emptyList<PropertyValue>())
+            ?: emptyList<PropertyValue>())
             .forEach {
                 this.properties[it.code] = it
             }
@@ -43,8 +44,10 @@ class CountingMetadata() : Parcelable {
         return 0
     }
 
-    override fun writeToParcel(dest: Parcel?,
-                               flags: Int) {
+    override fun writeToParcel(
+        dest: Parcel?,
+        flags: Int
+    ) {
         dest?.also {
             it.writeInt(index)
             it.writeTypedList(this.properties.values.toList())
@@ -81,29 +84,44 @@ class CountingMetadata() : Parcelable {
 
     companion object {
 
-        val defaultMnemonic = arrayOf(Pair("STADE_VIE",
-                                           NomenclatureTypeViewType.NOMENCLATURE_TYPE),
-                                      Pair("SEXE",
-                                           NomenclatureTypeViewType.NOMENCLATURE_TYPE),
-                                      Pair("OBJ_DENBR",
-                                           NomenclatureTypeViewType.NOMENCLATURE_TYPE),
-                                      Pair("TYP_DENBR",
-                                           NomenclatureTypeViewType.NOMENCLATURE_TYPE),
-                                      Pair("MIN",
-                                           NomenclatureTypeViewType.MIN_MAX),
-                                      Pair("MAX",
-                                           NomenclatureTypeViewType.MIN_MAX))
+        val defaultMnemonic = arrayOf(
+            Pair(
+                "STADE_VIE",
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+            ),
+            Pair(
+                "SEXE",
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+            ),
+            Pair(
+                "OBJ_DENBR",
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+            ),
+            Pair(
+                "TYP_DENBR",
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+            ),
+            Pair(
+                "MIN",
+                NomenclatureTypeViewType.MIN_MAX
+            ),
+            Pair(
+                "MAX",
+                NomenclatureTypeViewType.MIN_MAX
+            )
+        )
 
         @JvmField
-        val CREATOR: Parcelable.Creator<CountingMetadata> = object : Parcelable.Creator<CountingMetadata> {
+        val CREATOR: Parcelable.Creator<CountingMetadata> =
+            object : Parcelable.Creator<CountingMetadata> {
 
-            override fun createFromParcel(source: Parcel): CountingMetadata {
-                return CountingMetadata(source)
-            }
+                override fun createFromParcel(source: Parcel): CountingMetadata {
+                    return CountingMetadata(source)
+                }
 
-            override fun newArray(size: Int): Array<CountingMetadata?> {
-                return arrayOfNulls(size)
+                override fun newArray(size: Int): Array<CountingMetadata?> {
+                    return arrayOfNulls(size)
+                }
             }
-        }
     }
 }

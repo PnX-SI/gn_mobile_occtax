@@ -17,7 +17,7 @@ import fr.geonature.occtax.input.CountingMetadata
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
 class EditCountingMetadataActivity : AppCompatActivity(),
-                                     EditCountingMetadataFragment.OnEditCountingMetadataFragmentListener {
+    EditCountingMetadataFragment.OnEditCountingMetadataFragmentListener {
 
     private lateinit var countingMetadata: CountingMetadata
 
@@ -30,9 +30,13 @@ class EditCountingMetadataActivity : AppCompatActivity(),
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(android.R.id.content,
-                         EditCountingMetadataFragment.newInstance(intent.getParcelableExtra(EXTRA_TAXONOMY),
-                                                                  countingMetadata))
+                .replace(
+                    android.R.id.content,
+                    EditCountingMetadataFragment.newInstance(
+                        intent.getParcelableExtra(EXTRA_TAXONOMY),
+                        countingMetadata
+                    )
+                )
                 .commit()
         }
     }
@@ -60,10 +64,12 @@ class EditCountingMetadataActivity : AppCompatActivity(),
 
     private fun sendResult() {
         setResult(Activity.RESULT_OK,
-                  Intent().apply {
-                      putExtra(EXTRA_COUNTING_METADATA,
-                               countingMetadata)
-                  })
+            Intent().apply {
+                putExtra(
+                    EXTRA_COUNTING_METADATA,
+                    countingMetadata
+                )
+            })
     }
 
     companion object {
@@ -71,16 +77,24 @@ class EditCountingMetadataActivity : AppCompatActivity(),
         const val EXTRA_TAXONOMY = "extra_taxonomy"
         const val EXTRA_COUNTING_METADATA = "extra_counting_metadata"
 
-        fun newIntent(context: Context,
-                      taxonomy: Taxonomy,
-                      countingMetadata: CountingMetadata? = null): Intent {
-            return Intent(context,
-                          EditCountingMetadataActivity::class.java).apply {
-                putExtra(EXTRA_TAXONOMY,
-                         taxonomy)
+        fun newIntent(
+            context: Context,
+            taxonomy: Taxonomy,
+            countingMetadata: CountingMetadata? = null
+        ): Intent {
+            return Intent(
+                context,
+                EditCountingMetadataActivity::class.java
+            ).apply {
+                putExtra(
+                    EXTRA_TAXONOMY,
+                    taxonomy
+                )
                 countingMetadata?.let {
-                    putExtra(EXTRA_COUNTING_METADATA,
-                             countingMetadata)
+                    putExtra(
+                        EXTRA_COUNTING_METADATA,
+                        countingMetadata
+                    )
                 }
             }
         }

@@ -25,25 +25,31 @@ class CommentDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val context = requireContext()
 
-        val view = View.inflate(context,
-                                R.layout.dialog_comment,
-                                null)
+        val view = View.inflate(
+            context,
+            R.layout.dialog_comment,
+            null
+        )
         val editText = view.findViewById<EditText>(android.R.id.edit)
             .also {
                 it.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(s: CharSequence?,
-                                                   start: Int,
-                                                   count: Int,
-                                                   after: Int) {
+                    override fun beforeTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        count: Int,
+                        after: Int
+                    ) {
                     }
 
                     override fun afterTextChanged(s: Editable?) {
                     }
 
-                    override fun onTextChanged(s: CharSequence?,
-                                               start: Int,
-                                               before: Int,
-                                               count: Int) {
+                    override fun onTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        before: Int,
+                        count: Int
+                    ) {
                         comment = s?.toString()
                     }
                 })
@@ -69,16 +75,20 @@ class CommentDialogFragment : DialogFragment() {
             showSoftKeyboard(editText)
         }
 
-        return AlertDialog.Builder(context,
-                                   R.style.DialogStyle)
+        return AlertDialog.Builder(
+            context,
+            R.style.DialogStyle
+        )
             .setTitle(if (TextUtils.isEmpty(comment)) R.string.alert_dialog_add_comment_title else R.string.alert_dialog_edit_comment_title)
             .setView(view)
             .setPositiveButton(R.string.alert_dialog_ok) { _, _ ->
                 hideSoftKeyboard(editText)
                 onCommentDialogFragmentListener?.onChanged(comment)
             }
-            .setNegativeButton(R.string.alert_dialog_cancel,
-                               null)
+            .setNegativeButton(
+                R.string.alert_dialog_cancel,
+                null
+            )
             .create()
     }
 
@@ -87,14 +97,18 @@ class CommentDialogFragment : DialogFragment() {
 
         // resize the dialog width to match parent
         dialog?.also {
-            it.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
-                                 ViewGroup.LayoutParams.WRAP_CONTENT)
+            it.window?.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putSerializable(KEY_COMMENT,
-                                 comment)
+        outState.putSerializable(
+            KEY_COMMENT,
+            comment
+        )
 
         super.onSaveInstanceState(outState)
     }
@@ -116,8 +130,10 @@ class CommentDialogFragment : DialogFragment() {
         @JvmStatic
         fun newInstance(comment: String?) = CommentDialogFragment().apply {
             arguments = Bundle().apply {
-                putString(KEY_COMMENT,
-                          comment)
+                putString(
+                    KEY_COMMENT,
+                    comment
+                )
             }
         }
     }

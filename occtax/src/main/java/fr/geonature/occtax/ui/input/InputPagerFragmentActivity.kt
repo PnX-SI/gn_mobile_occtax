@@ -41,7 +41,9 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
         super.onCreate(savedInstanceState)
 
         inputViewModel = ViewModelProvider(this,
-                                           fr.geonature.commons.input.InputViewModel.Factory { InputViewModel(this.application) }).get(InputViewModel::class.java)
+            fr.geonature.commons.input.InputViewModel.Factory { InputViewModel(this.application) }).get(
+            InputViewModel::class.java
+        )
 
         appSettings = intent.getParcelableExtra(EXTRA_APP_SETTINGS)
         input = intent.getParcelableExtra(EXTRA_INPUT) ?: Input()
@@ -51,8 +53,10 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
             input.setCurrentSelectedInputTaxonId(lastAddedInputTaxon.taxon.id)
         }
 
-        Log.i(TAG,
-              "loading input: ${input.id}")
+        Log.i(
+            TAG,
+            "loading input: ${input.id}"
+        )
 
         GlobalScope.launch(Dispatchers.Main) {
             pagerManager.load(input.id)
@@ -67,18 +71,30 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
 
     override val pagerFragments: Map<Int, IValidateFragment>
         get() = LinkedHashMap<Int, IValidateFragment>().apply {
-            put(R.string.pager_fragment_observers_and_date_input_title,
-                ObserversAndDateInputFragment.newInstance())
-            put(R.string.pager_fragment_map_title,
-                InputMapFragment.newInstance(getMapSettings()))
-            put(R.string.pager_fragment_taxa_title,
-                TaxaFragment.newInstance())
-            put(R.string.pager_fragment_information_title,
-                InformationFragment.newInstance())
-            put(R.string.pager_fragment_counting_title,
-                CountingFragment.newInstance())
-            put(R.string.pager_fragment_summary_title,
-                InputTaxaSummaryFragment.newInstance())
+            put(
+                R.string.pager_fragment_observers_and_date_input_title,
+                ObserversAndDateInputFragment.newInstance()
+            )
+            put(
+                R.string.pager_fragment_map_title,
+                InputMapFragment.newInstance(getMapSettings())
+            )
+            put(
+                R.string.pager_fragment_taxa_title,
+                TaxaFragment.newInstance()
+            )
+            put(
+                R.string.pager_fragment_information_title,
+                InformationFragment.newInstance()
+            )
+            put(
+                R.string.pager_fragment_counting_title,
+                CountingFragment.newInstance()
+            )
+            put(
+                R.string.pager_fragment_summary_title,
+                InputTaxaSummaryFragment.newInstance()
+            )
         }
 
     override fun performFinishAction() {
@@ -115,15 +131,23 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
         private const val EXTRA_APP_SETTINGS = "extra_app_settings"
         private const val EXTRA_INPUT = "extra_input"
 
-        fun newIntent(context: Context,
-                      appSettings: AppSettings,
-                      input: Input? = null): Intent {
-            return Intent(context,
-                          InputPagerFragmentActivity::class.java).apply {
-                putExtra(EXTRA_APP_SETTINGS,
-                         appSettings)
-                putExtra(EXTRA_INPUT,
-                         input)
+        fun newIntent(
+            context: Context,
+            appSettings: AppSettings,
+            input: Input? = null
+        ): Intent {
+            return Intent(
+                context,
+                InputPagerFragmentActivity::class.java
+            ).apply {
+                putExtra(
+                    EXTRA_APP_SETTINGS,
+                    appSettings
+                )
+                putExtra(
+                    EXTRA_INPUT,
+                    input
+                )
             }
         }
     }

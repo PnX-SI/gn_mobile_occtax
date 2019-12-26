@@ -19,8 +19,9 @@ import fr.geonature.occtax.R
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class DatasetRecyclerViewAdapter(private val listener: OnDatasetRecyclerViewAdapterListener) : RecyclerView.Adapter<DatasetRecyclerViewAdapter.ViewHolder>(),
-                                                                                               FastScroller.SectionIndexer {
+class DatasetRecyclerViewAdapter(private val listener: OnDatasetRecyclerViewAdapterListener) :
+    RecyclerView.Adapter<DatasetRecyclerViewAdapter.ViewHolder>(),
+    FastScroller.SectionIndexer {
     private var cursor: Cursor? = null
     private var selectedDataset: Dataset? = null
     private val onClickListener: View.OnClickListener
@@ -46,8 +47,9 @@ class DatasetRecyclerViewAdapter(private val listener: OnDatasetRecyclerViewAdap
     }
 
     override fun onCreateViewHolder(
-            parent: ViewGroup,
-            viewType: Int): ViewHolder {
+        parent: ViewGroup,
+        viewType: Int
+    ): ViewHolder {
         return ViewHolder(parent)
     }
 
@@ -56,8 +58,9 @@ class DatasetRecyclerViewAdapter(private val listener: OnDatasetRecyclerViewAdap
     }
 
     override fun onBindViewHolder(
-            holder: ViewHolder,
-            position: Int) {
+        holder: ViewHolder,
+        position: Int
+    ) {
 
         holder.bind(position)
     }
@@ -122,10 +125,13 @@ class DatasetRecyclerViewAdapter(private val listener: OnDatasetRecyclerViewAdap
         }
     }
 
-    inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(
+    inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
+        LayoutInflater.from(parent.context).inflate(
             R.layout.list_selectable_item_3,
             parent,
-            false)) {
+            false
+        )
+    ) {
 
         private val title: TextView = itemView.findViewById(android.R.id.title)
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
@@ -142,9 +148,13 @@ class DatasetRecyclerViewAdapter(private val listener: OnDatasetRecyclerViewAdap
             if (dataset != null) {
                 title.text = dataset.name
                 text1.text = dataset.description
-                text2.text = itemView.context.getString(R.string.dataset_created_at,
-                                                        DateFormat.format(itemView.context.getString(R.string.dataset_date),
-                                                                          dataset.createdAt))
+                text2.text = itemView.context.getString(
+                    R.string.dataset_created_at,
+                    DateFormat.format(
+                        itemView.context.getString(R.string.dataset_date),
+                        dataset.createdAt
+                    )
+                )
                 checkbox.isChecked = selectedDataset?.id == dataset.id
 
                 with(itemView) {

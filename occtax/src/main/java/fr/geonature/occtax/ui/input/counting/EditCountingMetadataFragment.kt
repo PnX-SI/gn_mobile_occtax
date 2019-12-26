@@ -31,7 +31,7 @@ import fr.geonature.occtax.ui.input.dialog.ChooseNomenclatureDialogFragment
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
 class EditCountingMetadataFragment : Fragment(),
-                                     ChooseNomenclatureDialogFragment.OnChooseNomenclatureDialogFragmentListener {
+    ChooseNomenclatureDialogFragment.OnChooseNomenclatureDialogFragmentListener {
 
     private var listener: OnEditCountingMetadataFragmentListener? = null
     private var adapter: NomenclatureTypesRecyclerViewAdapter? = null
@@ -39,32 +39,44 @@ class EditCountingMetadataFragment : Fragment(),
     private lateinit var countingMetadata: CountingMetadata
 
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
-        override fun onCreateLoader(id: Int,
-                                    args: Bundle?): Loader<Cursor> {
+        override fun onCreateLoader(
+            id: Int,
+            args: Bundle?
+        ): Loader<Cursor> {
             return when (id) {
-                LOADER_NOMENCLATURE_TYPES -> CursorLoader(requireContext(),
-                                                          buildUri(NomenclatureType.TABLE_NAME),
-                                                          null,
-                                                          null,
-                                                          null,
-                                                          null)
-                LOADER_DEFAULT_NOMENCLATURE_VALUES -> CursorLoader(requireContext(),
-                                                                   buildUri(NomenclatureType.TABLE_NAME,
-                                                                            "occtax",
-                                                                            "default"),
-                                                                   null,
-                                                                   null,
-                                                                   null,
-                                                                   null)
+                LOADER_NOMENCLATURE_TYPES -> CursorLoader(
+                    requireContext(),
+                    buildUri(NomenclatureType.TABLE_NAME),
+                    null,
+                    null,
+                    null,
+                    null
+                )
+                LOADER_DEFAULT_NOMENCLATURE_VALUES -> CursorLoader(
+                    requireContext(),
+                    buildUri(
+                        NomenclatureType.TABLE_NAME,
+                        "occtax",
+                        "default"
+                    ),
+                    null,
+                    null,
+                    null,
+                    null
+                )
                 else -> throw IllegalArgumentException()
             }
         }
 
-        override fun onLoadFinished(loader: Loader<Cursor>,
-                                    data: Cursor?) {
+        override fun onLoadFinished(
+            loader: Loader<Cursor>,
+            data: Cursor?
+        ) {
             if (data == null) {
-                Log.w(TAG,
-                      "Failed to load data from '${(loader as CursorLoader).uri}'")
+                Log.w(
+                    TAG,
+                    "Failed to load data from '${(loader as CursorLoader).uri}'"
+                )
 
                 return
             }
@@ -82,7 +94,10 @@ class EditCountingMetadataFragment : Fragment(),
                     while (!data.isAfterLast) {
                         val defaultNomenclatureValue = DefaultNomenclatureWithType.fromCursor(data)
 
-                        if (defaultNomenclatureValue != null && defaultMnemonicFilter.contains(defaultNomenclatureValue.nomenclatureWithType?.type?.mnemonic)) {
+                        if (defaultNomenclatureValue != null && defaultMnemonicFilter.contains(
+                                defaultNomenclatureValue.nomenclatureWithType?.type?.mnemonic
+                            )
+                        ) {
                             defaultNomenclatureValues.add(defaultNomenclatureValue)
                         }
 
@@ -91,14 +106,17 @@ class EditCountingMetadataFragment : Fragment(),
 
                     defaultNomenclatureValues.forEach {
                         val nomenclatureType = it.nomenclatureWithType?.type?.mnemonic
-                                ?: return@forEach
+                            ?: return@forEach
 
                         if (countingMetadata.properties.contains(nomenclatureType)) {
                             return@forEach
                         }
 
-                        countingMetadata.properties[nomenclatureType] = PropertyValue.fromNomenclature(nomenclatureType,
-                                                                                                       it.nomenclatureWithType)
+                        countingMetadata.properties[nomenclatureType] =
+                            PropertyValue.fromNomenclature(
+                                nomenclatureType,
+                                it.nomenclatureWithType
+                            )
                     }
 
                     adapter?.setCountingMetata(countingMetadata)
@@ -117,20 +135,27 @@ class EditCountingMetadataFragment : Fragment(),
         super.onCreate(savedInstanceState)
 
         arguments?.also {
-            taxonomy = it.getParcelable(ARG_TAXONOMY) ?: Taxonomy(Taxonomy.ANY,
-                                                                  Taxonomy.ANY)
+            taxonomy = it.getParcelable(ARG_TAXONOMY) ?: Taxonomy(
+                Taxonomy.ANY,
+                Taxonomy.ANY
+            )
             countingMetadata = it.getParcelable(ARG_COUNTING_METADATA) ?: CountingMetadata()
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater,
-                              container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        val recyclerView = inflater.inflate(R.layout.recycler_view,
-                                            container,
-                                            false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val recyclerView = inflater.inflate(
+            R.layout.recycler_view,
+            container,
+            false
+        )
         // Set the adapter
-        adapter = NomenclatureTypesRecyclerViewAdapter(object : NomenclatureTypesRecyclerViewAdapter.OnNomenclatureTypesRecyclerViewAdapterListener {
+        adapter = NomenclatureTypesRecyclerViewAdapter(object :
+            NomenclatureTypesRecyclerViewAdapter.OnNomenclatureTypesRecyclerViewAdapterListener {
 
             override fun onAction(nomenclatureTypeMnemonic: String) {
                 // workaround to force hide the soft keyboard
@@ -138,14 +163,20 @@ class EditCountingMetadataFragment : Fragment(),
                     hideSoftKeyboard(it)
                 }
 
-                val chooseNomenclatureDialogFragment = ChooseNomenclatureDialogFragment.newInstance(nomenclatureTypeMnemonic,
-                                                                                                    taxonomy)
-                chooseNomenclatureDialogFragment.show(childFragmentManager,
-                                                      CHOOSE_NOMENCLATURE_DIALOG_FRAGMENT)
+                val chooseNomenclatureDialogFragment = ChooseNomenclatureDialogFragment.newInstance(
+                    nomenclatureTypeMnemonic,
+                    taxonomy
+                )
+                chooseNomenclatureDialogFragment.show(
+                    childFragmentManager,
+                    CHOOSE_NOMENCLATURE_DIALOG_FRAGMENT
+                )
             }
 
-            override fun onMinMaxValues(min: Int,
-                                        max: Int) {
+            override fun onMinMaxValues(
+                min: Int,
+                max: Int
+            ) {
                 countingMetadata.apply {
                     this.min = min
                     this.max = max
@@ -163,12 +194,16 @@ class EditCountingMetadataFragment : Fragment(),
         return recyclerView
     }
 
-    override fun onViewCreated(view: View,
-                               savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
         LoaderManager.getInstance(this)
-            .initLoader(LOADER_NOMENCLATURE_TYPES,
-                        null,
-                        loaderCallbacks)
+            .initLoader(
+                LOADER_NOMENCLATURE_TYPES,
+                null,
+                loaderCallbacks
+            )
     }
 
     override fun onAttach(context: Context) {
@@ -176,24 +211,29 @@ class EditCountingMetadataFragment : Fragment(),
 
         if (context is OnEditCountingMetadataFragmentListener) {
             listener = context
-        }
-        else {
+        } else {
             throw RuntimeException("$context must implement OnEditCountingMetadataFragmentListener")
         }
     }
 
-    override fun onSelectedNomenclature(nomenclatureType: String,
-                                        nomenclature: Nomenclature) {
-        countingMetadata.properties[nomenclatureType] = PropertyValue.fromNomenclature(nomenclatureType,
-                                                                                       nomenclature)
+    override fun onSelectedNomenclature(
+        nomenclatureType: String,
+        nomenclature: Nomenclature
+    ) {
+        countingMetadata.properties[nomenclatureType] = PropertyValue.fromNomenclature(
+            nomenclatureType,
+            nomenclature
+        )
         adapter?.setCountingMetata(countingMetadata)
     }
 
     private fun loadDefaultNomenclatureValues() {
         LoaderManager.getInstance(this)
-            .initLoader(LOADER_DEFAULT_NOMENCLATURE_VALUES,
-                        null,
-                        loaderCallbacks)
+            .initLoader(
+                LOADER_DEFAULT_NOMENCLATURE_VALUES,
+                null,
+                loaderCallbacks
+            )
     }
 
     /**
@@ -211,7 +251,8 @@ class EditCountingMetadataFragment : Fragment(),
 
         private const val LOADER_NOMENCLATURE_TYPES = 1
         private const val LOADER_DEFAULT_NOMENCLATURE_VALUES = 2
-        private const val CHOOSE_NOMENCLATURE_DIALOG_FRAGMENT = "choose_nomenclature_dialog_fragment"
+        private const val CHOOSE_NOMENCLATURE_DIALOG_FRAGMENT =
+            "choose_nomenclature_dialog_fragment"
 
         /**
          * Use this factory method to create a new instance of [EditCountingMetadataFragment].
@@ -219,14 +260,20 @@ class EditCountingMetadataFragment : Fragment(),
          * @return A new instance of [EditCountingMetadataFragment]
          */
         @JvmStatic
-        fun newInstance(taxonomy: Taxonomy,
-                        countingMetadata: CountingMetadata? = null) = EditCountingMetadataFragment().apply {
+        fun newInstance(
+            taxonomy: Taxonomy,
+            countingMetadata: CountingMetadata? = null
+        ) = EditCountingMetadataFragment().apply {
             arguments = Bundle().apply {
-                putParcelable(ARG_TAXONOMY,
-                              taxonomy)
+                putParcelable(
+                    ARG_TAXONOMY,
+                    taxonomy
+                )
                 countingMetadata?.let {
-                    putParcelable(ARG_COUNTING_METADATA,
-                                  countingMetadata)
+                    putParcelable(
+                        ARG_COUNTING_METADATA,
+                        countingMetadata
+                    )
                 }
             }
         }

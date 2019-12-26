@@ -21,39 +21,52 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
 
     private val geoJsonWriter = GeoJsonWriter()
 
-    override fun writeAdditionalInputData(writer: JsonWriter,
-                                          input: Input) {
-        writeGeometry(writer,
-                      input)
-        writeProperties(writer,
-                        input)
+    override fun writeAdditionalInputData(
+        writer: JsonWriter,
+        input: Input
+    ) {
+        writeGeometry(
+            writer,
+            input
+        )
+        writeProperties(
+            writer,
+            input
+        )
     }
 
-    private fun writeGeometry(writer: JsonWriter,
-                              input: Input) {
+    private fun writeGeometry(
+        writer: JsonWriter,
+        input: Input
+    ) {
         writer.name("geometry")
 
         val geometry = input.geometry
 
         if (geometry == null) {
             writer.nullValue()
-        }
-        else {
-            geoJsonWriter.writeGeometry(writer,
-                                        geometry)
+        } else {
+            geoJsonWriter.writeGeometry(
+                writer,
+                geometry
+            )
         }
     }
 
-    private fun writeProperties(writer: JsonWriter,
-                                input: Input) {
+    private fun writeProperties(
+        writer: JsonWriter,
+        input: Input
+    ) {
         writer.name("properties")
             .beginObject()
 
         writer.name("meta_device_entry")
             .value("mobile")
 
-        writeDate(writer,
-                  input)
+        writeDate(
+            writer,
+            input
+        )
 
         writer.name("id_dataset")
             .value(input.datasetId)
@@ -61,22 +74,30 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writer.name("id_digitiser")
             .value(input.getPrimaryObserverId())
 
-        writeInputObserverIds(writer,
-                              input)
+        writeInputObserverIds(
+            writer,
+            input
+        )
 
         writer.name("comment")
             .value(input.comment)
 
-        writeInputDefaultProperties(writer,
-                                    input.properties)
-        writeInputTaxa(writer,
-                       input)
+        writeInputDefaultProperties(
+            writer,
+            input.properties
+        )
+        writeInputTaxa(
+            writer,
+            input
+        )
 
         writer.endObject()
     }
 
-    private fun writeInputDefaultProperties(writer: JsonWriter,
-                                            properties: Map<String, PropertyValue>) {
+    private fun writeInputDefaultProperties(
+        writer: JsonWriter,
+        properties: Map<String, PropertyValue>
+    ) {
         writer.name("default")
 
         if (properties.isEmpty()) {
@@ -87,9 +108,11 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writer.beginObject()
 
         properties.forEach {
-            writePropertyValue(writer,
-                               it.key,
-                               it.value)
+            writePropertyValue(
+                writer,
+                it.key,
+                it.value
+            )
         }
 
         writer.endObject()
@@ -105,8 +128,10 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         }
     }
 
-    private fun writeDate(writer: JsonWriter,
-                          input: Input) {
+    private fun writeDate(
+        writer: JsonWriter,
+        input: Input
+    ) {
         val dateToIsoString = IsoDateUtils.toIsoDateString(input.date)
         writer.name("date_min")
             .value(dateToIsoString)
@@ -114,8 +139,10 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
             .value(dateToIsoString)
     }
 
-    private fun writeInputObserverIds(writer: JsonWriter,
-                                      input: Input) {
+    private fun writeInputObserverIds(
+        writer: JsonWriter,
+        input: Input
+    ) {
         writer.name("observers")
             .beginArray()
 
@@ -125,22 +152,28 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writer.endArray()
     }
 
-    private fun writeInputTaxa(writer: JsonWriter,
-                               input: Input) {
+    private fun writeInputTaxa(
+        writer: JsonWriter,
+        input: Input
+    ) {
         writer.name("t_occurrences_occtax")
             .beginArray()
 
         input.getInputTaxa()
             .forEach {
-                writeInputTaxon(writer,
-                                it)
+                writeInputTaxon(
+                    writer,
+                    it
+                )
             }
 
         writer.endArray()
     }
 
-    private fun writeInputTaxon(writer: JsonWriter,
-                                inputTaxon: AbstractInputTaxon) {
+    private fun writeInputTaxon(
+        writer: JsonWriter,
+        inputTaxon: AbstractInputTaxon
+    ) {
         writer.beginObject()
 
         writer.name("cd_nom")
@@ -152,16 +185,20 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writer.name("group2_inpn")
             .value(inputTaxon.taxon.taxonomy.group)
 
-        writeInputTaxonProperties(writer,
-                                  (inputTaxon as InputTaxon).properties,
-                                  inputTaxon.getCounting())
+        writeInputTaxonProperties(
+            writer,
+            (inputTaxon as InputTaxon).properties,
+            inputTaxon.getCounting()
+        )
 
         writer.endObject()
     }
 
-    private fun writeInputTaxonProperties(writer: JsonWriter,
-                                          properties: Map<String, PropertyValue>,
-                                          counting: List<CountingMetadata>) {
+    private fun writeInputTaxonProperties(
+        writer: JsonWriter,
+        properties: Map<String, PropertyValue>,
+        counting: List<CountingMetadata>
+    ) {
         writer.name("properties")
 
         if (properties.isEmpty() && counting.isEmpty()) {
@@ -172,13 +209,17 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writer.beginObject()
 
         properties.forEach {
-            writePropertyValue(writer,
-                               it.key,
-                               it.value)
+            writePropertyValue(
+                writer,
+                it.key,
+                it.value
+            )
         }
 
-        writeInputTaxonCounting(writer,
-                                counting)
+        writeInputTaxonCounting(
+            writer,
+            counting
+        )
 
         writer.endObject()
 
@@ -225,21 +266,27 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writer.endArray()
     }
 
-    private fun writeInputTaxonCounting(writer: JsonWriter,
-                                        counting: List<CountingMetadata>) {
+    private fun writeInputTaxonCounting(
+        writer: JsonWriter,
+        counting: List<CountingMetadata>
+    ) {
         writer.name("counting")
             .beginArray()
 
         counting.forEach {
-            writeInputTaxonCountingMetadata(writer,
-                                            it)
+            writeInputTaxonCountingMetadata(
+                writer,
+                it
+            )
         }
 
         writer.endArray()
     }
 
-    private fun writeInputTaxonCountingMetadata(writer: JsonWriter,
-                                                countingMetadata: CountingMetadata) {
+    private fun writeInputTaxonCountingMetadata(
+        writer: JsonWriter,
+        countingMetadata: CountingMetadata
+    ) {
         if (countingMetadata.isEmpty()) return
 
         writer.beginObject()
@@ -247,9 +294,11 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writer.name("index")
             .value(countingMetadata.index)
         countingMetadata.properties.forEach {
-            writePropertyValue(writer,
-                               it.key,
-                               it.value)
+            writePropertyValue(
+                writer,
+                it.key,
+                it.value
+            )
         }
 
         writer.name("min")
@@ -270,9 +319,11 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
      * }
      * ```
      */
-    private fun writePropertyValue(writer: JsonWriter,
-                                   name: String,
-                                   propertyValue: PropertyValue) {
+    private fun writePropertyValue(
+        writer: JsonWriter,
+        name: String,
+        propertyValue: PropertyValue
+    ) {
         if (propertyValue.isEmpty()) return
 
         writer.name(name.toLowerCase(Locale.ROOT))

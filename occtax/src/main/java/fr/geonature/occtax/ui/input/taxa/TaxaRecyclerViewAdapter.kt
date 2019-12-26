@@ -23,8 +23,9 @@ import java.text.NumberFormat
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterListener) : RecyclerView.Adapter<TaxaRecyclerViewAdapter.ViewHolder>(),
-                                                                                         FastScroller.SectionIndexer {
+class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterListener) :
+    RecyclerView.Adapter<TaxaRecyclerViewAdapter.ViewHolder>(),
+    FastScroller.SectionIndexer {
     private var cursor: Cursor? = null
     private var selectedTaxon: AbstractTaxon? = null
     private val onClickListener: View.OnClickListener
@@ -41,8 +42,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
             if (checkbox.isChecked) {
                 selectedTaxon = taxon
                 listener.onSelectedTaxon(taxon)
-            }
-            else {
+            } else {
                 selectedTaxon = null
                 listener.onNoTaxonSelected()
             }
@@ -53,8 +53,10 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup,
-                                    viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): ViewHolder {
         return ViewHolder(parent)
     }
 
@@ -62,8 +64,10 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         return cursor?.count ?: 0
     }
 
-    override fun onBindViewHolder(holder: ViewHolder,
-                                  position: Int) {
+    override fun onBindViewHolder(
+        holder: ViewHolder,
+        position: Int
+    ) {
 
         holder.bind(position)
     }
@@ -121,9 +125,13 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         }
     }
 
-    inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_taxon,
-                                                                                                                    parent,
-                                                                                                                    false)) {
+    inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
+        LayoutInflater.from(parent.context).inflate(
+            R.layout.list_item_taxon,
+            parent,
+            false
+        )
+    ) {
 
         private val title: TextView = itemView.findViewById(android.R.id.title)
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
@@ -131,7 +139,8 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         private val checkbox: CheckBox = itemView.findViewById(android.R.id.checkbox)
         private val taxonColorView: View = itemView.findViewById(R.id.taxon_color_view)
         private val taxonObserversView: TextView = itemView.findViewById(R.id.taxon_observers_view)
-        private val taxonLastUpdatedAtView: TextView = itemView.findViewById(R.id.taxon_last_updated_at_view)
+        private val taxonLastUpdatedAtView: TextView =
+            itemView.findViewById(R.id.taxon_last_updated_at_view)
 
         fun bind(position: Int) {
             val cursor = cursor ?: return
@@ -145,8 +154,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
                 TaxonWithArea.fromCursor(cursor)
                     ?.name?.elementAt(0)
                     .toString()
-            }
-            else {
+            } else {
                 ""
             }
 
@@ -159,7 +167,11 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
                 checkbox.isChecked = selectedTaxon?.id == taxon.id
 
                 taxon.taxonArea?.run {
-                    taxonColorView.setBackgroundColor(if (color.isNullOrBlank()) Color.TRANSPARENT else Color.parseColor(color))
+                    taxonColorView.setBackgroundColor(
+                        if (color.isNullOrBlank()) Color.TRANSPARENT else Color.parseColor(
+                            color
+                        )
+                    )
 
                     taxonObserversView.text = NumberFormat.getNumberInstance()
                         .format(numberOfObservers)

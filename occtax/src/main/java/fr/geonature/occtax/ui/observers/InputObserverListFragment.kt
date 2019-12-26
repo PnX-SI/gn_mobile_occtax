@@ -38,19 +38,22 @@ class InputObserverListFragment : Fragment() {
 
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(
-                id: Int,
-                args: Bundle?): Loader<Cursor> {
+            id: Int,
+            args: Bundle?
+        ): Loader<Cursor> {
 
             return when (id) {
                 LOADER_OBSERVERS -> {
                     val selections = InputObserver.filter(args?.getString(KEY_FILTER))
 
-                    CursorLoader(requireContext(),
-                                 buildUri(InputObserver.TABLE_NAME),
-                                 null,
-                                 selections.first,
-                                 selections.second,
-                                 null)
+                    CursorLoader(
+                        requireContext(),
+                        buildUri(InputObserver.TABLE_NAME),
+                        null,
+                        selections.first,
+                        selections.second,
+                        null
+                    )
                 }
 
                 else -> throw IllegalArgumentException()
@@ -58,8 +61,9 @@ class InputObserverListFragment : Fragment() {
         }
 
         override fun onLoadFinished(
-                loader: Loader<Cursor>,
-                data: Cursor?) {
+            loader: Loader<Cursor>,
+            data: Cursor?
+        ) {
 
             if (data == null) return
 
@@ -77,18 +81,24 @@ class InputObserverListFragment : Fragment() {
 
     private var actionMode: ActionMode? = null
     private val actionModeCallback = object : ActionMode.Callback {
-        override fun onCreateActionMode(mode: ActionMode?,
-                                        menu: Menu?): Boolean {
+        override fun onCreateActionMode(
+            mode: ActionMode?,
+            menu: Menu?
+        ): Boolean {
             return true
         }
 
-        override fun onPrepareActionMode(mode: ActionMode?,
-                                         menu: Menu?): Boolean {
+        override fun onPrepareActionMode(
+            mode: ActionMode?,
+            menu: Menu?
+        ): Boolean {
             return false
         }
 
-        override fun onActionItemClicked(mode: ActionMode?,
-                                         item: MenuItem?): Boolean {
+        override fun onActionItemClicked(
+            mode: ActionMode?,
+            item: MenuItem?
+        ): Boolean {
             return false
         }
 
@@ -99,16 +109,20 @@ class InputObserverListFragment : Fragment() {
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(fast_scroll_recycler_view,
-                                    container,
-                                    false)
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(
+            fast_scroll_recycler_view,
+            container,
+            false
+        )
 
         // Set the adapter
         if (view is RecyclerView) {
-            adapter = InputObserverRecyclerViewAdapter(object : InputObserverRecyclerViewAdapter.OnInputObserverRecyclerViewAdapterListener {
+            adapter = InputObserverRecyclerViewAdapter(object :
+                InputObserverRecyclerViewAdapter.OnInputObserverRecyclerViewAdapterListener {
                 override fun onSelectedInputObservers(inputObservers: List<InputObserver>) {
                     if (adapter?.isSingleChoice() == true) {
                         listener?.onSelectedInputObservers(inputObservers)
@@ -122,10 +136,14 @@ class InputObserverListFragment : Fragment() {
                     view.smoothScrollToPosition(position)
                 }
             })
-            adapter?.setChoiceMode(arguments?.getInt(ARG_CHOICE_MODE)
-                                           ?: ListView.CHOICE_MODE_SINGLE)
-            adapter?.setSelectedInputObservers(arguments?.getParcelableArrayList(ARG_SELECTED_INPUT_OBSERVERS)
-                                                       ?: listOf())
+            adapter?.setChoiceMode(
+                arguments?.getInt(ARG_CHOICE_MODE)
+                    ?: ListView.CHOICE_MODE_SINGLE
+            )
+            adapter?.setSelectedInputObservers(
+                arguments?.getParcelableArrayList(ARG_SELECTED_INPUT_OBSERVERS)
+                    ?: listOf()
+            )
                 .also { updateActionMode(adapter?.getSelectedInputObservers() ?: listOf()) }
 
             with(view) {
@@ -133,38 +151,50 @@ class InputObserverListFragment : Fragment() {
                 adapter = this@InputObserverListFragment.adapter
             }
 
-            val dividerItemDecoration = DividerItemDecoration(view.getContext(),
-                                                              (view.layoutManager as LinearLayoutManager).orientation)
+            val dividerItemDecoration = DividerItemDecoration(
+                view.getContext(),
+                (view.layoutManager as LinearLayoutManager).orientation
+            )
             view.addItemDecoration(dividerItemDecoration)
 
             LoaderManager.getInstance(this)
-                .initLoader(LOADER_OBSERVERS,
-                            null,
-                            loaderCallbacks)
+                .initLoader(
+                    LOADER_OBSERVERS,
+                    null,
+                    loaderCallbacks
+                )
         }
 
         return view
     }
 
     override fun onViewCreated(
-            view: View,
-            savedInstanceState: Bundle?) {
-        super.onViewCreated(view,
-                            savedInstanceState)
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(
+            view,
+            savedInstanceState
+        )
 
         // we have a menu item to show in action bar
         setHasOptionsMenu(true)
     }
 
     override fun onCreateOptionsMenu(
-            menu: Menu,
-            inflater: MenuInflater) {
+        menu: Menu,
+        inflater: MenuInflater
+    ) {
 
-        super.onCreateOptionsMenu(menu,
-                                  inflater)
+        super.onCreateOptionsMenu(
+            menu,
+            inflater
+        )
 
-        inflater.inflate(R.menu.search,
-                         menu)
+        inflater.inflate(
+            R.menu.search,
+            menu
+        )
 
         val searchItem = menu.findItem(R.id.action_search)
         val searchView = searchItem.actionView as SearchView
@@ -175,10 +205,16 @@ class InputObserverListFragment : Fragment() {
 
             override fun onQueryTextChange(newText: String): Boolean {
                 LoaderManager.getInstance(this@InputObserverListFragment)
-                    .restartLoader(LOADER_OBSERVERS,
-                                   bundleOf(Pair(KEY_FILTER,
-                                                 newText)),
-                                   loaderCallbacks)
+                    .restartLoader(
+                        LOADER_OBSERVERS,
+                        bundleOf(
+                            Pair(
+                                KEY_FILTER,
+                                newText
+                            )
+                        ),
+                        loaderCallbacks
+                    )
 
                 return true
             }
@@ -219,13 +255,16 @@ class InputObserverListFragment : Fragment() {
         }
 
         if (actionMode == null) {
-            actionMode = (activity as AppCompatActivity?)?.startSupportActionMode(actionModeCallback)
+            actionMode =
+                (activity as AppCompatActivity?)?.startSupportActionMode(actionModeCallback)
             actionMode?.setTitle(R.string.activity_observers_title)
         }
 
-        actionMode?.subtitle = resources.getQuantityString(R.plurals.action_title_item_count_selected,
-                                                           inputObservers.size,
-                                                           inputObservers.size)
+        actionMode?.subtitle = resources.getQuantityString(
+            R.plurals.action_title_item_count_selected,
+            inputObservers.size,
+            inputObservers.size
+        )
     }
 
     /**
@@ -254,13 +293,19 @@ class InputObserverListFragment : Fragment() {
          * @return A new instance of [InputObserverListFragment]
          */
         @JvmStatic
-        fun newInstance(choiceMode: Int = ListView.CHOICE_MODE_SINGLE,
-                        selectedObservers: List<InputObserver> = listOf()) = InputObserverListFragment().apply {
+        fun newInstance(
+            choiceMode: Int = ListView.CHOICE_MODE_SINGLE,
+            selectedObservers: List<InputObserver> = listOf()
+        ) = InputObserverListFragment().apply {
             arguments = Bundle().apply {
-                putInt(ARG_CHOICE_MODE,
-                       choiceMode)
-                putParcelableArrayList(ARG_SELECTED_INPUT_OBSERVERS,
-                                       ArrayList(selectedObservers))
+                putInt(
+                    ARG_CHOICE_MODE,
+                    choiceMode
+                )
+                putParcelableArrayList(
+                    ARG_SELECTED_INPUT_OBSERVERS,
+                    ArrayList(selectedObservers)
+                )
             }
         }
     }
