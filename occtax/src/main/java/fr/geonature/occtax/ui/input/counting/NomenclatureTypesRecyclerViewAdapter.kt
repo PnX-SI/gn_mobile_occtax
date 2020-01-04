@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.data.NomenclatureType
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
+import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.NomenclatureTypeViewType
 import fr.geonature.occtax.input.PropertyValue
@@ -253,7 +254,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
 
     abstract inner class AbstractCardViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
         LayoutInflater.from(parent.context).inflate(
-            fr.geonature.occtax.R.layout.card_view,
+            R.layout.card_view,
             parent,
             false
         )
@@ -303,7 +304,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         private var button1: Button = contentView.findViewById(android.R.id.button1)
 
         override fun getLayoutResourceId(): Int {
-            return fr.geonature.occtax.R.layout.view_action_nomenclature_type
+            return R.layout.view_action_nomenclature_type
         }
 
         override fun onBind(property: PropertyValue) {
@@ -318,8 +319,8 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
     }
 
     inner class MinMaxViewHolder(parent: ViewGroup) : AbstractCardViewHolder(parent) {
-        private var editMin: EditText = contentView.findViewById(fr.geonature.occtax.R.id.editMin)
-        private var editMax: EditText = contentView.findViewById(fr.geonature.occtax.R.id.editMax)
+        private var editMin: EditText = contentView.findViewById(R.id.editMin)
+        private var editMax: EditText = contentView.findViewById(R.id.editMax)
 
         private val minTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(
@@ -413,7 +414,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         }
 
         override fun getLayoutResourceId(): Int {
-            return fr.geonature.occtax.R.layout.view_action_min_max
+            return R.layout.view_action_min_max
         }
 
         override fun onBind(property: PropertyValue) {

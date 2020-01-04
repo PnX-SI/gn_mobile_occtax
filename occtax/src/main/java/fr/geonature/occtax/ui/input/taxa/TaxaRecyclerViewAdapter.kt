@@ -31,6 +31,50 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
     private val onClickListener: View.OnClickListener
 
     init {
+        this.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                super.onChanged()
+
+                listener.showEmptyTextView(itemCount == 0)
+            }
+
+            override fun onItemRangeChanged(
+                positionStart: Int,
+                itemCount: Int
+            ) {
+                super.onItemRangeChanged(
+                    positionStart,
+                    itemCount
+                )
+
+                listener.showEmptyTextView(itemCount == 0)
+            }
+
+            override fun onItemRangeInserted(
+                positionStart: Int,
+                itemCount: Int
+            ) {
+                super.onItemRangeInserted(
+                    positionStart,
+                    itemCount
+                )
+
+                listener.showEmptyTextView(false)
+            }
+
+            override fun onItemRangeRemoved(
+                positionStart: Int,
+                itemCount: Int
+            ) {
+                super.onItemRangeRemoved(
+                    positionStart,
+                    itemCount
+                )
+
+                listener.showEmptyTextView(itemCount == 0)
+            }
+        })
+
         onClickListener = View.OnClickListener { v ->
             val previousSelectedItemPosition = getItemPosition(selectedTaxon)
 
@@ -213,5 +257,10 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
          * @param position the current position of the first selected item
          */
         fun scrollToFirstSelectedItemPosition(position: Int)
+
+        /**
+         * Whether to show an empty text view when data changed.
+         */
+        fun showEmptyTextView(show: Boolean)
     }
 }

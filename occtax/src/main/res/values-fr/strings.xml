@@ -4,6 +4,7 @@
     <string name="activity_preferences_title">Paramètres</string>
     <string name="activity_dataset_title">Jeu de données</string>
     <string name="activity_observers_title">Observateurs</string>
+    <string name="activity_taxonomy_title">Rang taxonomique</string>
 
     <string name="sync_device_status">État du terminal</string>
     <string name="sync_last_synchronization">Dernière synchronisation</string>
@@ -23,6 +24,7 @@
 
     <string name="action_settings">Paramètres</string>
     <string name="action_search">Recherche</string>
+    <string name="action_filter">Filtres</string>
     <string name="action_add">Ajouter</string>
     <string name="action_edit">Modifier</string>
     <plurals name="action_title_item_count_selected">

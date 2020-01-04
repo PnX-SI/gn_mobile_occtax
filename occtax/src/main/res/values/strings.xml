@@ -8,6 +8,7 @@
     <string name="activity_preferences_title">Settings</string>
     <string name="activity_dataset_title">Dataset</string>
     <string name="activity_observers_title">Observers</string>
+    <string name="activity_taxonomy_title">Taxonomy</string>
 
     <string name="sync_device_status">Device status</string>
     <string name="sync_last_synchronization">Last synchronization</string>
@@ -27,6 +28,7 @@
 
     <string name="action_settings">Settings</string>
     <string name="action_search">Search</string>
+    <string name="action_filter">Apply filters</string>
     <string name="action_add">Add</string>
     <string name="action_edit">Edit</string>
     <plurals name="action_title_item_count_selected">
