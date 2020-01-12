@@ -30,6 +30,7 @@
     <string name="action_search">Search</string>
     <string name="action_filter">Apply filters</string>
     <string name="action_add">Add</string>
+    <string name="action_set">Set</string>
     <string name="action_edit">Edit</string>
     <plurals name="action_title_item_count_selected">
         <item quantity="one">%d selected</item>
@@ -45,6 +46,7 @@
     <string name="alert_dialog_cancel">Cancel</string>
 
     <string name="snackbar_settings_not_found">Unable to load settings \'%1$s\'</string>
+    <string name="snackbar_settings_map_invalid">Invalid map configuration from settings \'%1$s\'</string>
     <string name="snackbar_permissions_not_granted">Permissions were not granted</string>
     <string name="snackbar_permissions_granted">Permissions were been granted</string>
     <string name="snackbar_permission_external_storage_rationale">External storage permission is needed</string>

@@ -123,9 +123,14 @@ class ObserversAndDateInputFragment : Fragment(),
 
             when (loader.id) {
                 LOADER_OBSERVERS_IDS -> {
-                    if (data.moveToFirst()) {
-                        selectedInputObservers.clear()
+                    selectedInputObservers.clear()
 
+                    if (data.count == 0) {
+                        input?.clearAllInputObservers()
+                        (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+                    }
+
+                    if (data.moveToFirst()) {
                         while (!data.isAfterLast) {
                             val selectedInputObserver = InputObserver.fromCursor(data)
 
@@ -135,15 +140,22 @@ class ObserversAndDateInputFragment : Fragment(),
 
                             data.moveToNext()
                         }
-
-                        updateSelectedObserversActionView(selectedInputObservers)
                     }
+
+                    updateSelectedObserversActionView(selectedInputObservers)
                 }
                 LOADER_DATASET_ID -> {
+                    if (data.count == 0) {
+                        selectedDataset = null
+                        input?.datasetId = null
+                        (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+                    }
+
                     if (data.moveToFirst()) {
                         selectedDataset = Dataset.fromCursor(data)
-                        updateSelectedDatasetActionView(selectedDataset)
                     }
+
+                    updateSelectedDatasetActionView(selectedDataset)
                 }
                 LOADER_DEFAULT_NOMENCLATURE_VALUES -> {
                     data.moveToFirst()
@@ -365,6 +377,9 @@ class ObserversAndDateInputFragment : Fragment(),
                     loaderCallbacks
                 )
         }
+        else {
+            updateSelectedObserversActionView(emptyList())
+        }
 
         val selectedDatasetId = input?.datasetId
 
@@ -380,6 +395,9 @@ class ObserversAndDateInputFragment : Fragment(),
                     ),
                     loaderCallbacks
                 )
+        }
+        else {
+            updateSelectedDatasetActionView(null)
         }
 
         LoaderManager.getInstance(this)
