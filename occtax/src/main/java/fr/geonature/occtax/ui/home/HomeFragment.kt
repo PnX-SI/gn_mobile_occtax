@@ -349,7 +349,7 @@ class HomeFragment : Fragment() {
         appSettingsViewModel?.getAppSettings<AppSettings>()
             ?.observe(this,
                 Observer {
-                    if (it == null) {
+                    if (it?.mapSettings == null) {
                         fab.hide()
                         adapter.clear()
                         activity?.invalidateOptionsMenu()
@@ -357,7 +357,7 @@ class HomeFragment : Fragment() {
                         Snackbar.make(
                             homeContent,
                             getString(
-                                R.string.snackbar_settings_not_found,
+                                if (it == null) R.string.snackbar_settings_not_found else R.string.snackbar_settings_map_invalid,
                                 appSettingsViewModel?.getAppSettingsFilename()
                             ),
                             Snackbar.LENGTH_LONG
