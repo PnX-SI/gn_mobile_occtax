@@ -38,12 +38,19 @@ class InputMapFragment : MapFragment(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        onSelectedPOIsListener = object : OnSelectedPOIsListener {
-            override fun onSelectedPOIs(pois: List<GeoPoint>) {
-                if (pois.isEmpty()) {
-                    clearInputSelection()
-                } else {
-                    selectPOI(pois[0])
+        onSelectedPOIsListener = { pois ->
+            if (pois.isEmpty()) {
+                clearInputSelection()
+            } else {
+                selectPOI(pois[0])
+            }
+        }
+        onVectorLayersChangedListener = {
+            if (it.isNotEmpty()) {
+                val geometry = input?.geometry
+
+                if (geometry != null && geometry is Point) {
+                    selectPOI(fromPoint(geometry))
                 }
             }
         }
