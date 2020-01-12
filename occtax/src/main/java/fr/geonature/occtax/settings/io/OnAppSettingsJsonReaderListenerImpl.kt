@@ -31,6 +31,7 @@ class OnAppSettingsJsonReaderListenerImpl : AppSettingsJsonReader.OnAppSettingsJ
                     reader.skipValue()
                 }
             }
+            else -> reader.skipValue()
         }
     }
 

@@ -26,5 +26,6 @@
         "source": "nantes.mbtiles"
       }
     ]
-  }
+  },
+  "no_such_property": "no_such_value"
 }
