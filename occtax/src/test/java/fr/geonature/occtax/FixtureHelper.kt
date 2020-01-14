@@ -52,14 +52,11 @@ object FixtureHelper {
                 stringBuilder.append("\n")
                 line = bufferedReader.readLine()
             }
-        }
-        catch (ignored: IOException) {
-        }
-        finally {
+        } catch (ignored: IOException) {
+        } finally {
             try {
                 bufferedReader.close()
-            }
-            catch (ignored: IOException) {
+            } catch (ignored: IOException) {
             }
         }
 

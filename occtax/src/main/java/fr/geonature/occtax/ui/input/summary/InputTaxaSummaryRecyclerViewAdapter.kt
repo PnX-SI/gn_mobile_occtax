@@ -13,27 +13,35 @@ import fr.geonature.occtax.R
  */
 class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<AbstractInputTaxon>) : AbstractListItemRecyclerViewAdapter<AbstractInputTaxon>(listener) {
 
-    override fun getViewHolder(view: View,
-                               viewType: Int): AbstractViewHolder {
+    override fun getViewHolder(
+        view: View,
+        viewType: Int
+    ): AbstractViewHolder {
         return ViewHolder(view)
     }
 
-    override fun getLayoutResourceId(position: Int,
-                                     item: AbstractInputTaxon): Int {
+    override fun getLayoutResourceId(
+        position: Int,
+        item: AbstractInputTaxon
+    ): Int {
         return R.layout.list_item_2
     }
 
-    override fun areItemsTheSame(oldItems: List<AbstractInputTaxon>,
-                                 newItems: List<AbstractInputTaxon>,
-                                 oldItemPosition: Int,
-                                 newItemPosition: Int): Boolean {
+    override fun areItemsTheSame(
+        oldItems: List<AbstractInputTaxon>,
+        newItems: List<AbstractInputTaxon>,
+        oldItemPosition: Int,
+        newItemPosition: Int
+    ): Boolean {
         return oldItems[oldItemPosition].taxon.id == newItems[newItemPosition].taxon.id
     }
 
-    override fun areContentsTheSame(oldItems: List<AbstractInputTaxon>,
-                                    newItems: List<AbstractInputTaxon>,
-                                    oldItemPosition: Int,
-                                    newItemPosition: Int): Boolean {
+    override fun areContentsTheSame(
+        oldItems: List<AbstractInputTaxon>,
+        newItems: List<AbstractInputTaxon>,
+        oldItemPosition: Int,
+        newItemPosition: Int
+    ): Boolean {
         return oldItems[oldItemPosition] == newItems[newItemPosition]
     }
 

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.data.NomenclatureType
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
+import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.NomenclatureTypeViewType
 import fr.geonature.occtax.input.PropertyValue
@@ -25,7 +26,8 @@ import java.util.Locale
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureTypesRecyclerViewAdapterListener) : RecyclerView.Adapter<NomenclatureTypesRecyclerViewAdapter.AbstractCardViewHolder>() {
+class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureTypesRecyclerViewAdapterListener) :
+    RecyclerView.Adapter<NomenclatureTypesRecyclerViewAdapter.AbstractCardViewHolder>() {
 
     private val mnemonicFilter = CountingMetadata.defaultMnemonic
     private val availableNomenclatureTypes = mutableListOf<Pair<String, NomenclatureTypeViewType>>()
@@ -40,8 +42,10 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup,
-                                    viewType: Int): AbstractCardViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): AbstractCardViewHolder {
         return when (NomenclatureTypeViewType.values()[viewType]) {
             NomenclatureTypeViewType.MIN_MAX -> MinMaxViewHolder(parent)
             else -> NomenclatureTypeViewHolder(parent)
@@ -52,8 +56,10 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         return (properties.size - 1).coerceAtLeast(0)
     }
 
-    override fun onBindViewHolder(holder: AbstractCardViewHolder,
-                                  position: Int) {
+    override fun onBindViewHolder(
+        holder: AbstractCardViewHolder,
+        position: Int
+    ) {
         holder.bind(properties[position])
     }
 
@@ -80,7 +86,8 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             while (!this.isAfterLast) {
                 NomenclatureType.fromCursor(this)
                     ?.run {
-                        val validNomenclatureType = mnemonicFilter.find { it.first == this.mnemonic }
+                        val validNomenclatureType =
+                            mnemonicFilter.find { it.first == this.mnemonic }
                         if (validNomenclatureType != null) {
                             availableNomenclatureTypes.add(validNomenclatureType)
                         }
@@ -116,21 +123,28 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
                 return this@NomenclatureTypesRecyclerViewAdapter.properties.size
             }
 
-            override fun areItemsTheSame(oldItemPosition: Int,
-                                         newItemPosition: Int): Boolean {
+            override fun areItemsTheSame(
+                oldItemPosition: Int,
+                newItemPosition: Int
+            ): Boolean {
                 return true
             }
 
-            override fun areContentsTheSame(oldItemPosition: Int,
-                                            newItemPosition: Int): Boolean {
-                val oldProperty = this@NomenclatureTypesRecyclerViewAdapter.properties[oldItemPosition]
+            override fun areContentsTheSame(
+                oldItemPosition: Int,
+                newItemPosition: Int
+            ): Boolean {
+                val oldProperty =
+                    this@NomenclatureTypesRecyclerViewAdapter.properties[oldItemPosition]
                 val viewType = mnemonicFilter.firstOrNull { it.first == oldProperty.code }
                     ?.second ?: return false
 
                 return when (viewType) {
                     NomenclatureTypeViewType.MIN_MAX -> {
-                        val minProperty = this@NomenclatureTypesRecyclerViewAdapter.properties.firstOrNull { it.code == "MIN" }
-                        val maxProperty = this@NomenclatureTypesRecyclerViewAdapter.properties.firstOrNull { it.code == "MAX" }
+                        val minProperty =
+                            this@NomenclatureTypesRecyclerViewAdapter.properties.firstOrNull { it.code == "MIN" }
+                        val maxProperty =
+                            this@NomenclatureTypesRecyclerViewAdapter.properties.firstOrNull { it.code == "MAX" }
 
                         if (minProperty == null || maxProperty == null) return false
 
@@ -144,14 +158,18 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         val newProperties = this.properties.map { p ->
             when (mnemonicFilter.firstOrNull { it.first == p.code }?.second ?: return@map p) {
                 NomenclatureTypeViewType.MIN_MAX -> when (p.code) {
-                    "MIN" -> PropertyValue.fromValue(p.code,
-                                                     countingMetadata.min)
-                    "MAX" -> PropertyValue.fromValue(p.code,
-                                                     countingMetadata.max)
+                    "MIN" -> PropertyValue.fromValue(
+                        p.code,
+                        countingMetadata.min
+                    )
+                    "MAX" -> PropertyValue.fromValue(
+                        p.code,
+                        countingMetadata.max
+                    )
                     else -> p
                 }
                 else -> countingMetadata.properties[p.code]
-                        ?: p
+                    ?: p
             }
         }
         this.properties.clear()
@@ -164,16 +182,22 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         if (this.properties.isEmpty()) {
             this.properties.addAll(nomenclatureTypes.map {
                 when (it.second) {
-                    NomenclatureTypeViewType.NOMENCLATURE_TYPE -> PropertyValue.fromNomenclature(it.first,
-                                                                                                 null)
-                    else -> PropertyValue.fromValue(it.first,
-                                                    0)
+                    NomenclatureTypeViewType.NOMENCLATURE_TYPE -> PropertyValue.fromNomenclature(
+                        it.first,
+                        null
+                    )
+                    else -> PropertyValue.fromValue(
+                        it.first,
+                        0
+                    )
                 }
             })
 
             if (this.properties.isNotEmpty()) {
-                notifyItemRangeInserted(0,
-                                        this.properties.size)
+                notifyItemRangeInserted(
+                    0,
+                    this.properties.size
+                )
             }
 
             return
@@ -196,13 +220,17 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
                 return nomenclatureTypes.size
             }
 
-            override fun areItemsTheSame(oldItemPosition: Int,
-                                         newItemPosition: Int): Boolean {
+            override fun areItemsTheSame(
+                oldItemPosition: Int,
+                newItemPosition: Int
+            ): Boolean {
                 return this@NomenclatureTypesRecyclerViewAdapter.properties[oldItemPosition].code == nomenclatureTypes[newItemPosition].first
             }
 
-            override fun areContentsTheSame(oldItemPosition: Int,
-                                            newItemPosition: Int): Boolean {
+            override fun areContentsTheSame(
+                oldItemPosition: Int,
+                newItemPosition: Int
+            ): Boolean {
                 return this@NomenclatureTypesRecyclerViewAdapter.properties[oldItemPosition].code == nomenclatureTypes[newItemPosition].first
             }
         })
@@ -210,27 +238,37 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         this.properties.clear()
         this.properties.addAll(nomenclatureTypes.map {
             when (it.second) {
-                NomenclatureTypeViewType.NOMENCLATURE_TYPE -> PropertyValue.fromNomenclature(it.first,
-                                                                                             null)
-                else -> PropertyValue.fromValue(it.first,
-                                                0)
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE -> PropertyValue.fromNomenclature(
+                    it.first,
+                    null
+                )
+                else -> PropertyValue.fromValue(
+                    it.first,
+                    0
+                )
             }
         })
 
         diffResult.dispatchUpdatesTo(this)
     }
 
-    abstract inner class AbstractCardViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(fr.geonature.occtax.R.layout.card_view,
-                                                                                                                                         parent,
-                                                                                                                                         false)) {
+    abstract inner class AbstractCardViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
+        LayoutInflater.from(parent.context).inflate(
+            R.layout.card_view,
+            parent,
+            false
+        )
+    ) {
         internal val contentView: View
         private var property: PropertyValue? = null
 
         init {
             contentView = LayoutInflater.from(itemView.context)
-                .inflate(this.getLayoutResourceId(),
-                         itemView as FrameLayout,
-                         true)
+                .inflate(
+                    this.getLayoutResourceId(),
+                    itemView as FrameLayout,
+                    true
+                )
 
             // workaround to force hide the soft keyboard
             contentView.setOnClickListener {
@@ -250,9 +288,11 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         abstract fun onBind(property: PropertyValue)
 
         fun getNomenclatureTypeLabel(mnemonic: String): String {
-            val resourceId = contentView.resources.getIdentifier("nomenclature_${mnemonic.toLowerCase(Locale.getDefault())}",
-                                                                 "string",
-                                                                 contentView.context.packageName)
+            val resourceId = contentView.resources.getIdentifier(
+                "nomenclature_${mnemonic.toLowerCase(Locale.getDefault())}",
+                "string",
+                contentView.context.packageName
+            )
 
             return if (resourceId == 0) mnemonic else contentView.context.getString(resourceId)
         }
@@ -264,7 +304,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         private var button1: Button = contentView.findViewById(android.R.id.button1)
 
         override fun getLayoutResourceId(): Int {
-            return fr.geonature.occtax.R.layout.view_action_nomenclature_type
+            return R.layout.view_action_nomenclature_type
         }
 
         override fun onBind(property: PropertyValue) {
@@ -279,20 +319,24 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
     }
 
     inner class MinMaxViewHolder(parent: ViewGroup) : AbstractCardViewHolder(parent) {
-        private var editMin: EditText = contentView.findViewById(fr.geonature.occtax.R.id.editMin)
-        private var editMax: EditText = contentView.findViewById(fr.geonature.occtax.R.id.editMax)
+        private var editMin: EditText = contentView.findViewById(R.id.editMin)
+        private var editMax: EditText = contentView.findViewById(R.id.editMax)
 
         private val minTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?,
-                                           start: Int,
-                                           count: Int,
-                                           after: Int) {
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
             }
 
-            override fun onTextChanged(s: CharSequence?,
-                                       start: Int,
-                                       before: Int,
-                                       count: Int) {
+            override fun onTextChanged(
+                s: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int
+            ) {
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -304,22 +348,28 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
                 setMinValue(minValue)
                 editMin.setSelection(minValue.toString().length)
 
-                listener.onMinMaxValues(minValue,
-                                        if (minValue > maxValue) minValue else maxValue)
+                listener.onMinMaxValues(
+                    minValue,
+                    if (minValue > maxValue) minValue else maxValue
+                )
             }
         }
 
         private val maxTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?,
-                                           start: Int,
-                                           count: Int,
-                                           after: Int) {
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
             }
 
-            override fun onTextChanged(s: CharSequence?,
-                                       start: Int,
-                                       before: Int,
-                                       count: Int) {
+            override fun onTextChanged(
+                s: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int
+            ) {
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -329,8 +379,10 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
                 setMaxValue(maxValue)
                 editMax.setSelection(maxValue.toString().length)
 
-                listener.onMinMaxValues(minValue,
-                                        if (minValue > maxValue) minValue else maxValue)
+                listener.onMinMaxValues(
+                    minValue,
+                    if (minValue > maxValue) minValue else maxValue
+                )
             }
         }
 
@@ -362,7 +414,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         }
 
         override fun getLayoutResourceId(): Int {
-            return fr.geonature.occtax.R.layout.view_action_min_max
+            return R.layout.view_action_min_max
         }
 
         override fun onBind(property: PropertyValue) {
@@ -394,7 +446,6 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
                 it.addTextChangedListener(maxTextWatcher)
             }
         }
-
     }
 
     /**
@@ -415,7 +466,9 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
          * @param min the min value (default: 0)
          * @param max the max value (default: the min value)
          */
-        fun onMinMaxValues(min: Int = 0,
-                           max: Int = 0)
+        fun onMinMaxValues(
+            min: Int = 0,
+            max: Int = 0
+        )
     }
 }

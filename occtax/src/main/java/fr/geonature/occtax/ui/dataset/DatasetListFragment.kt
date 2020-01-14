@@ -34,24 +34,30 @@ class DatasetListFragment : Fragment() {
 
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(
-                id: Int,
-                args: Bundle?): Loader<Cursor> {
+            id: Int,
+            args: Bundle?
+        ): Loader<Cursor> {
 
             return when (id) {
-                LOADER_DATASET -> CursorLoader(requireContext(),
-                                               buildUri(Dataset.TABLE_NAME,
-                                                        "active"),
-                                               null,
-                                               null,
-                                               null,
-                                               null)
+                LOADER_DATASET -> CursorLoader(
+                    requireContext(),
+                    buildUri(
+                        Dataset.TABLE_NAME,
+                        "active"
+                    ),
+                    null,
+                    null,
+                    null,
+                    null
+                )
                 else -> throw IllegalArgumentException()
             }
         }
 
         override fun onLoadFinished(
-                loader: Loader<Cursor>,
-                data: Cursor?) {
+            loader: Loader<Cursor>,
+            data: Cursor?
+        ) {
 
             if (data == null) return
 
@@ -69,18 +75,24 @@ class DatasetListFragment : Fragment() {
 
     private var actionMode: ActionMode? = null
     private val actionModeCallback = object : ActionMode.Callback {
-        override fun onCreateActionMode(mode: ActionMode?,
-                                        menu: Menu?): Boolean {
+        override fun onCreateActionMode(
+            mode: ActionMode?,
+            menu: Menu?
+        ): Boolean {
             return true
         }
 
-        override fun onPrepareActionMode(mode: ActionMode?,
-                                         menu: Menu?): Boolean {
+        override fun onPrepareActionMode(
+            mode: ActionMode?,
+            menu: Menu?
+        ): Boolean {
             return false
         }
 
-        override fun onActionItemClicked(mode: ActionMode?,
-                                         item: MenuItem?): Boolean {
+        override fun onActionItemClicked(
+            mode: ActionMode?,
+            item: MenuItem?
+        ): Boolean {
             return false
         }
 
@@ -91,16 +103,20 @@ class DatasetListFragment : Fragment() {
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(fast_scroll_recycler_view,
-                                    container,
-                                    false)
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(
+            fast_scroll_recycler_view,
+            container,
+            false
+        )
 
         // Set the adapter
         if (view is RecyclerView) {
-            adapter = DatasetRecyclerViewAdapter(object : DatasetRecyclerViewAdapter.OnDatasetRecyclerViewAdapterListener {
+            adapter = DatasetRecyclerViewAdapter(object :
+                DatasetRecyclerViewAdapter.OnDatasetRecyclerViewAdapterListener {
                 override fun onSelectedDataset(dataset: Dataset) {
                     listener?.onSelectedDataset(dataset)
                 }
@@ -117,24 +133,31 @@ class DatasetListFragment : Fragment() {
                 adapter = this@DatasetListFragment.adapter
             }
 
-            val dividerItemDecoration = DividerItemDecoration(view.getContext(),
-                                                              (view.layoutManager as LinearLayoutManager).orientation)
+            val dividerItemDecoration = DividerItemDecoration(
+                view.getContext(),
+                (view.layoutManager as LinearLayoutManager).orientation
+            )
             view.addItemDecoration(dividerItemDecoration)
 
             LoaderManager.getInstance(this)
-                .initLoader(LOADER_DATASET,
-                            null,
-                            loaderCallbacks)
+                .initLoader(
+                    LOADER_DATASET,
+                    null,
+                    loaderCallbacks
+                )
         }
 
         return view
     }
 
     override fun onViewCreated(
-            view: View,
-            savedInstanceState: Bundle?) {
-        super.onViewCreated(view,
-                            savedInstanceState)
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(
+            view,
+            savedInstanceState
+        )
 
         // we have a menu item to show in action bar
         setHasOptionsMenu(true)
@@ -174,13 +197,16 @@ class DatasetListFragment : Fragment() {
         }
 
         if (actionMode == null) {
-            actionMode = (activity as AppCompatActivity?)?.startSupportActionMode(actionModeCallback)
+            actionMode =
+                (activity as AppCompatActivity?)?.startSupportActionMode(actionModeCallback)
             actionMode?.setTitle(R.string.activity_dataset_title)
         }
 
-        actionMode?.subtitle = resources.getQuantityString(R.plurals.action_title_item_count_selected,
-                                                           1,
-                                                           1)
+        actionMode?.subtitle = resources.getQuantityString(
+            R.plurals.action_title_item_count_selected,
+            1,
+            1
+        )
     }
 
     /**
@@ -209,8 +235,10 @@ class DatasetListFragment : Fragment() {
         @JvmStatic
         fun newInstance(selectedDataset: Dataset?) = DatasetListFragment().apply {
             arguments = Bundle().apply {
-                putParcelable(ARG_SELECTED_DATASET,
-                              selectedDataset)
+                putParcelable(
+                    ARG_SELECTED_DATASET,
+                    selectedDataset
+                )
             }
         }
     }

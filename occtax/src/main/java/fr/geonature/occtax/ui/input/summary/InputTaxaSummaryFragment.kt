@@ -25,10 +25,7 @@ import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.occtax.ui.shared.dialog.CommentDialogFragment
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
-import kotlinx.android.synthetic.main.fragment_recycler_view_fab.content
-import kotlinx.android.synthetic.main.fragment_recycler_view_fab.empty
-import kotlinx.android.synthetic.main.fragment_recycler_view_fab.fab
-import kotlinx.android.synthetic.main.fragment_recycler_view_fab.list
+import kotlinx.android.synthetic.main.fragment_recycler_view_fab.*
 
 /**
  * Summary of all edited taxa.
@@ -36,18 +33,19 @@ import kotlinx.android.synthetic.main.fragment_recycler_view_fab.list
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
 class InputTaxaSummaryFragment : Fragment(),
-                                 IValidateFragment,
-                                 IInputFragment {
+    IValidateFragment,
+    IInputFragment {
 
     private var input: Input? = null
     private var adapter: InputTaxaSummaryRecyclerViewAdapter? = null
 
-    private val onCommentDialogFragmentListener = object : CommentDialogFragment.OnCommentDialogFragmentListener {
-        override fun onChanged(comment: String?) {
-            input?.comment = comment
-            activity?.invalidateOptionsMenu()
+    private val onCommentDialogFragmentListener =
+        object : CommentDialogFragment.OnCommentDialogFragmentListener {
+            override fun onChanged(comment: String?) {
+                input?.comment = comment
+                activity?.invalidateOptionsMenu()
+            }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,19 +57,26 @@ class InputTaxaSummaryFragment : Fragment(),
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater,
-                              container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_recycler_view_fab,
-                                container,
-                                false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(
+            R.layout.fragment_recycler_view_fab,
+            container,
+            false
+        )
     }
 
     override fun onViewCreated(
-            view: View,
-            savedInstanceState: Bundle?) {
-        super.onViewCreated(view,
-                            savedInstanceState)
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(
+            view,
+            savedInstanceState
+        )
 
         // we have a menu item to show in action bar
         setHasOptionsMenu(true)
@@ -93,32 +98,44 @@ class InputTaxaSummaryFragment : Fragment(),
             }
         }
 
-        adapter = InputTaxaSummaryRecyclerViewAdapter(object : AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<AbstractInputTaxon> {
+        adapter = InputTaxaSummaryRecyclerViewAdapter(object :
+            AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<AbstractInputTaxon> {
             override fun onClick(item: AbstractInputTaxon) {
                 input?.setCurrentSelectedInputTaxonId(item.taxon.id)
                 (activity as AbstractPagerFragmentActivity?)?.goToPageByKey(R.string.pager_fragment_information_title)
             }
 
-            override fun onLongClicked(position: Int,
-                                       item: AbstractInputTaxon) {
+            override fun onLongClicked(
+                position: Int,
+                item: AbstractInputTaxon
+            ) {
                 adapter?.remove(item)
                 input?.removeInputTaxon(item.taxon.id)
                 (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
 
-                Snackbar.make(content,
-                              R.string.summary_snackbar_input_taxon_deleted,
-                              Snackbar.LENGTH_LONG)
-                    .setAction(R.string.summary_snackbar_input_taxon_undo
+                Snackbar.make(
+                    content,
+                    R.string.summary_snackbar_input_taxon_deleted,
+                    Snackbar.LENGTH_LONG
+                )
+                    .setAction(
+                        R.string.summary_snackbar_input_taxon_undo
                     ) {
-                        adapter?.add(item,
-                                     position)
+                        adapter?.add(
+                            item,
+                            position
+                        )
                         input?.addInputTaxon(item)
                     }
                     .addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
-                        override fun onDismissed(transientBottomBar: Snackbar?,
-                                                 event: Int) {
-                            super.onDismissed(transientBottomBar,
-                                              event)
+                        override fun onDismissed(
+                            transientBottomBar: Snackbar?,
+                            event: Int
+                        ) {
+                            super.onDismissed(
+                                transientBottomBar,
+                                event
+                            )
 
                             (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
 
@@ -126,9 +143,11 @@ class InputTaxaSummaryFragment : Fragment(),
                             if (!this@InputTaxaSummaryFragment.validate()) {
                                 val context = context ?: return
 
-                                Toast.makeText(context,
-                                               R.string.summary_toast_no_input_taxon,
-                                               Toast.LENGTH_LONG)
+                                Toast.makeText(
+                                    context,
+                                    R.string.summary_toast_no_input_taxon,
+                                    Toast.LENGTH_LONG
+                                )
                                     .show()
 
                                 ((activity as AbstractPagerFragmentActivity?))?.also {
@@ -147,14 +166,20 @@ class InputTaxaSummaryFragment : Fragment(),
                 }
 
                 if (show) {
-                    empty.startAnimation(AnimationUtils.loadAnimation(context,
-                                                                      android.R.anim.fade_in))
+                    empty.startAnimation(
+                        AnimationUtils.loadAnimation(
+                            context,
+                            android.R.anim.fade_in
+                        )
+                    )
                     empty.visibility = View.VISIBLE
-
-                }
-                else {
-                    empty.startAnimation(AnimationUtils.loadAnimation(context,
-                                                                      android.R.anim.fade_out))
+                } else {
+                    empty.startAnimation(
+                        AnimationUtils.loadAnimation(
+                            context,
+                            android.R.anim.fade_out
+                        )
+                    )
                     empty.visibility = View.GONE
                 }
             }
@@ -164,27 +189,38 @@ class InputTaxaSummaryFragment : Fragment(),
             layoutManager = LinearLayoutManager(context)
             adapter = this@InputTaxaSummaryFragment.adapter
 
-            val dividerItemDecoration = DividerItemDecoration(context,
-                                                              (layoutManager as LinearLayoutManager).orientation)
+            val dividerItemDecoration = DividerItemDecoration(
+                context,
+                (layoutManager as LinearLayoutManager).orientation
+            )
             addItemDecoration(dividerItemDecoration)
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu,
-                                     inflater: MenuInflater) {
+    override fun onCreateOptionsMenu(
+        menu: Menu,
+        inflater: MenuInflater
+    ) {
 
-        super.onCreateOptionsMenu(menu,
-                                  inflater)
+        super.onCreateOptionsMenu(
+            menu,
+            inflater
+        )
 
-        inflater.inflate(R.menu.comment,
-                         menu)
+        inflater.inflate(
+            R.menu.comment,
+            menu
+        )
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
 
         val commentItem = menu.findItem(R.id.menu_comment)
-        commentItem.title = if (TextUtils.isEmpty(input?.comment)) getString(R.string.action_comment_add) else getString(R.string.action_comment_edit)
+        commentItem.title =
+            if (TextUtils.isEmpty(input?.comment)) getString(R.string.action_comment_add) else getString(
+                R.string.action_comment_edit
+            )
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -195,8 +231,10 @@ class InputTaxaSummaryFragment : Fragment(),
                 CommentDialogFragment.newInstance(input?.comment)
                     .apply {
                         setOnCommentDialogFragmentListener(onCommentDialogFragmentListener)
-                        show(supportFragmentManager,
-                             COMMENT_DIALOG_FRAGMENT)
+                        show(
+                            supportFragmentManager,
+                            COMMENT_DIALOG_FRAGMENT
+                        )
                     }
 
                 return true

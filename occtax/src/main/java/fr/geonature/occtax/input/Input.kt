@@ -4,9 +4,9 @@ import android.os.Parcel
 import android.os.Parcelable
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.commons.input.AbstractInputTaxon
-import org.locationtech.jts.geom.Geometry
 import java.util.SortedMap
 import java.util.TreeMap
+import org.locationtech.jts.geom.Geometry
 
 /**
  * Describes a current input.
@@ -18,32 +18,37 @@ class Input : AbstractInput {
     var geometry: Geometry? = null
     var selectedFeatureId: String? = null
     var comment: String? = null
-    val properties: SortedMap<String, PropertyValue> = TreeMap<String, PropertyValue>(Comparator { o1, o2 ->
-        val i1 = defaultPropertiesMnemonic.indexOfFirst { it.first == o1 }
-        val i2 = defaultPropertiesMnemonic.indexOfFirst { it.first == o2 }
+    val properties: SortedMap<String, PropertyValue> =
+        TreeMap<String, PropertyValue>(Comparator { o1, o2 ->
+            val i1 = defaultPropertiesMnemonic.indexOfFirst { it.first == o1 }
+            val i2 = defaultPropertiesMnemonic.indexOfFirst { it.first == o2 }
 
-        when {
-            i1 == -1 -> 1
-            i2 == -1 -> -1
-            else -> i1 - i2
-        }
-    })
+            when {
+                i1 == -1 -> 1
+                i2 == -1 -> -1
+                else -> i1 - i2
+            }
+        })
 
     constructor() : super("occtax")
     constructor(source: Parcel) : super(source) {
         this.geometry = source.readSerializable() as Geometry?
         this.comment = source.readString()
         (source.createTypedArrayList(PropertyValue.CREATOR)
-                ?: emptyList<PropertyValue>())
+            ?: emptyList<PropertyValue>())
             .forEach {
                 this.properties[it.code] = it
             }
     }
 
-    override fun writeToParcel(dest: Parcel?,
-                               flags: Int) {
-        super.writeToParcel(dest,
-                            flags)
+    override fun writeToParcel(
+        dest: Parcel?,
+        flags: Int
+    ) {
+        super.writeToParcel(
+            dest,
+            flags
+        )
 
         dest?.also {
             it.writeSerializable(geometry)
@@ -80,10 +85,16 @@ class Input : AbstractInput {
 
     companion object {
 
-        val defaultPropertiesMnemonic = arrayOf(Pair("TECHNIQUE_OBS",
-                                                     NomenclatureTypeViewType.NOMENCLATURE_TYPE),
-                                                Pair("TYP_GRP",
-                                                     NomenclatureTypeViewType.NOMENCLATURE_TYPE))
+        val defaultPropertiesMnemonic = arrayOf(
+            Pair(
+                "TECHNIQUE_OBS",
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+            ),
+            Pair(
+                "TYP_GRP",
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+            )
+        )
 
         @JvmField
         val CREATOR: Parcelable.Creator<Input> = object : Parcelable.Creator<Input> {

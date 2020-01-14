@@ -29,20 +29,28 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
         return Input()
     }
 
-    override fun readAdditionalInputData(reader: JsonReader,
-                                         keyName: String,
-                                         input: Input) {
+    override fun readAdditionalInputData(
+        reader: JsonReader,
+        keyName: String,
+        input: Input
+    ) {
         when (keyName) {
-            "geometry" -> readGeometry(reader,
-                                       input)
-            "properties" -> readProperties(reader,
-                                           input)
+            "geometry" -> readGeometry(
+                reader,
+                input
+            )
+            "properties" -> readProperties(
+                reader,
+                input
+            )
             else -> reader.skipValue()
         }
     }
 
-    private fun readGeometry(reader: JsonReader,
-                             input: Input) {
+    private fun readGeometry(
+        reader: JsonReader,
+        input: Input
+    ) {
         when (reader.peek()) {
             JsonToken.NULL -> reader.nextNull()
             JsonToken.BEGIN_OBJECT -> {
@@ -52,8 +60,10 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
         }
     }
 
-    private fun readProperties(reader: JsonReader,
-                               input: Input) {
+    private fun readProperties(
+        reader: JsonReader,
+        input: Input
+    ) {
         reader.beginObject()
 
         while (reader.hasNext()) {
@@ -62,51 +72,51 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
                 "id_dataset" -> {
                     if (reader.peek() != JsonToken.NULL) {
                         input.datasetId = reader.nextLong()
-                    }
-                    else {
+                    } else {
                         reader.nextNull()
                     }
                 }
                 "id_digitiser" -> {
                     if (reader.peek() != JsonToken.NULL) {
                         input.setPrimaryInputObserverId(reader.nextLong())
-                    }
-                    else {
+                    } else {
                         reader.nextNull()
                     }
                 }
                 "observers" -> {
                     if (reader.peek() != JsonToken.NULL) {
-                        readInputObservers(reader,
-                                           input)
-                    }
-                    else {
+                        readInputObservers(
+                            reader,
+                            input
+                        )
+                    } else {
                         reader.nextNull()
                     }
                 }
                 "comment" -> {
                     if (reader.peek() != JsonToken.NULL) {
                         input.comment = reader.nextString()
-                    }
-                    else {
+                    } else {
                         reader.nextNull()
                     }
                 }
                 "default" -> {
                     if (reader.peek() != JsonToken.NULL) {
-                        readInputDefaultProperties(reader,
-                                                   input)
-                    }
-                    else {
+                        readInputDefaultProperties(
+                            reader,
+                            input
+                        )
+                    } else {
                         reader.nextNull()
                     }
                 }
                 "t_occurrences_occtax" -> {
                     if (reader.peek() != JsonToken.NULL) {
-                        readInputTaxa(reader,
-                                      input)
-                    }
-                    else {
+                        readInputTaxa(
+                            reader,
+                            input
+                        )
+                    } else {
                         reader.nextNull()
                     }
                 }
@@ -117,16 +127,20 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
         reader.endObject()
     }
 
-    private fun readInputDefaultProperties(reader: JsonReader,
-                                           input: Input) {
+    private fun readInputDefaultProperties(
+        reader: JsonReader,
+        input: Input
+    ) {
         reader.beginObject()
 
         while (reader.hasNext()) {
             when (reader.peek()) {
                 JsonToken.NAME -> {
                     when (val propertyName = reader.nextName()) {
-                        else -> readPropertyValue(reader,
-                                                  propertyName)?.also {
+                        else -> readPropertyValue(
+                            reader,
+                            propertyName
+                        )?.also {
                             input.properties[it.code] = it
                         }
                     }
@@ -138,8 +152,10 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
         reader.endObject()
     }
 
-    private fun readInputObservers(reader: JsonReader,
-                                   input: Input) {
+    private fun readInputObservers(
+        reader: JsonReader,
+        input: Input
+    ) {
         reader.beginArray()
 
         while (reader.hasNext()) {
@@ -152,14 +168,18 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
         reader.endArray()
     }
 
-    private fun readInputTaxa(reader: JsonReader,
-                              input: Input) {
+    private fun readInputTaxa(
+        reader: JsonReader,
+        input: Input
+    ) {
         reader.beginArray()
 
         while (reader.hasNext()) {
             when (reader.peek()) {
-                JsonToken.BEGIN_OBJECT -> readInputTaxon(reader,
-                                                         input)
+                JsonToken.BEGIN_OBJECT -> readInputTaxon(
+                    reader,
+                    input
+                )
                 else -> reader.skipValue()
             }
         }
@@ -200,16 +220,20 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
      * }
      * ```
      */
-    private fun readInputTaxon(reader: JsonReader,
-                               input: Input) {
+    private fun readInputTaxon(
+        reader: JsonReader,
+        input: Input
+    ) {
         reader.beginObject()
 
         var id: Long? = null
         var name: String? = null
         var kingdom: String? = null
         var group: String? = null
-        val properties = Pair(mutableMapOf<String, PropertyValue>(),
-                              mutableListOf<CountingMetadata>())
+        val properties = Pair(
+            mutableMapOf<String, PropertyValue>(),
+            mutableListOf<CountingMetadata>()
+        )
 
         while (reader.hasNext()) {
             when (reader.nextName()) {
@@ -223,8 +247,7 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
                             properties.first.putAll(it.first)
                             properties.second.addAll(it.second)
                         }
-                    }
-                    else {
+                    } else {
                         reader.nextNull()
                     }
                 }
@@ -236,10 +259,16 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
 
         if (id == null || TextUtils.isEmpty(name) || TextUtils.isEmpty(kingdom)) return
 
-        input.addInputTaxon(InputTaxon(Taxon(id,
-                                             name!!,
-                                             Taxonomy(kingdom!!,
-                                                      group))).apply {
+        input.addInputTaxon(InputTaxon(
+            Taxon(
+                id,
+                name!!,
+                Taxonomy(
+                    kingdom!!,
+                    group
+                )
+            )
+        ).apply {
             this.properties.putAll(properties.first)
             properties.second.forEach { this.addCountingMetadata(it) }
         })
@@ -272,8 +301,10 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
      * ```
      */
     private fun readInputTaxonProperties(reader: JsonReader): Pair<Map<String, PropertyValue>, List<CountingMetadata>> {
-        val properties = Pair(mutableMapOf<String, PropertyValue>(),
-                              mutableListOf<CountingMetadata>())
+        val properties = Pair(
+            mutableMapOf<String, PropertyValue>(),
+            mutableListOf<CountingMetadata>()
+        )
 
         reader.beginObject()
 
@@ -282,8 +313,10 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
                 JsonToken.NAME -> {
                     when (val propertyName = reader.nextName()) {
                         "counting" -> properties.second.addAll(readInputTaxonCounting(reader))
-                        else -> readPropertyValue(reader,
-                                                  propertyName)?.also {
+                        else -> readPropertyValue(
+                            reader,
+                            propertyName
+                        )?.also {
                             properties.first[it.code] = it
                         }
                     }
@@ -359,8 +392,10 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
                         "index" -> countingMetadata.index = reader.nextInt()
                         "min" -> countingMetadata.min = reader.nextInt()
                         "max" -> countingMetadata.max = reader.nextInt()
-                        else -> readPropertyValue(reader,
-                                                  propertyName)?.also {
+                        else -> readPropertyValue(
+                            reader,
+                            propertyName
+                        )?.also {
                             countingMetadata.properties[it.code] = it
                         }
                     }
@@ -384,8 +419,10 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
      * }
      * ```
      */
-    private fun readPropertyValue(reader: JsonReader,
-                                  code: String): PropertyValue? {
+    private fun readPropertyValue(
+        reader: JsonReader,
+        code: String
+    ): PropertyValue? {
         reader.beginObject()
 
         var label: String? = null
@@ -408,9 +445,10 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
         reader.endObject()
 
         val propertyValue = PropertyValue(
-                code.toUpperCase(Locale.ROOT),
-                label,
-                value)
+            code.toUpperCase(Locale.ROOT),
+            label,
+            value
+        )
 
         return if (propertyValue.isEmpty()) null else propertyValue
     }

@@ -48,6 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:action="@string/action_edit"
+                app:action_empty="@string/action_set"
                 app:title="@string/observers_and_date_dataset" />
 
         </androidx.cardview.widget.CardView>
@@ -67,6 +68,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:action="@string/action_edit"
+                app:action_empty="@string/action_set"
                 app:title="@string/observers_and_date_date" />
 
         </androidx.cardview.widget.CardView>

@@ -23,10 +23,7 @@ import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
-import kotlinx.android.synthetic.main.fragment_recycler_view_fab.content
-import kotlinx.android.synthetic.main.fragment_recycler_view_fab.empty
-import kotlinx.android.synthetic.main.fragment_recycler_view_fab.fab
-import kotlinx.android.synthetic.main.fragment_recycler_view_fab.list
+import kotlinx.android.synthetic.main.fragment_recycler_view_fab.*
 
 /**
  * [Fragment] to let the user to add additional counting information for the given [Input].
@@ -34,63 +31,92 @@ import kotlinx.android.synthetic.main.fragment_recycler_view_fab.list
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
 class CountingFragment : Fragment(),
-                         IValidateFragment,
-                         IInputFragment {
+    IValidateFragment,
+    IInputFragment {
 
     private var input: Input? = null
     private var adapter: CountingRecyclerViewAdapter? = null
 
-    override fun onCreateView(inflater: LayoutInflater,
-                              container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_recycler_view_fab,
-                                container,
-                                false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(
+            R.layout.fragment_recycler_view_fab,
+            container,
+            false
+        )
     }
 
     override fun onViewCreated(
-            view: View,
-            savedInstanceState: Bundle?) {
-        super.onViewCreated(view,
-                            savedInstanceState)
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(
+            view,
+            savedInstanceState
+        )
 
         empty.text = getString(R.string.counting_no_data)
 
         fab.setOnClickListener {
             val context = context ?: return@setOnClickListener
 
-            startActivityForResult(EditCountingMetadataActivity.newIntent(context,
-                                                                          input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
-                                                                                  ?: Taxonomy(Taxonomy.ANY,
-                                                                                              Taxonomy.ANY)),
-                                   0)
+            startActivityForResult(
+                EditCountingMetadataActivity.newIntent(
+                    context,
+                    input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
+                        ?: Taxonomy(
+                            Taxonomy.ANY,
+                            Taxonomy.ANY
+                        )
+                ),
+                0
+            )
         }
 
-        adapter = CountingRecyclerViewAdapter(object : AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<CountingMetadata> {
+        adapter = CountingRecyclerViewAdapter(object :
+            AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<CountingMetadata> {
             override fun onClick(item: CountingMetadata) {
                 val context = context ?: return
-                startActivityForResult(EditCountingMetadataActivity.newIntent(context,
-                                                                              input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
-                                                                                      ?: Taxonomy(Taxonomy.ANY,
-                                                                                                  Taxonomy.ANY),
-                                                                              item),
-                                       0)
+                startActivityForResult(
+                    EditCountingMetadataActivity.newIntent(
+                        context,
+                        input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
+                            ?: Taxonomy(
+                                Taxonomy.ANY,
+                                Taxonomy.ANY
+                            ),
+                        item
+                    ),
+                    0
+                )
             }
 
-            override fun onLongClicked(position: Int,
-                                       item: CountingMetadata) {
+            override fun onLongClicked(
+                position: Int,
+                item: CountingMetadata
+            ) {
                 adapter?.remove(item)
                 (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.deleteCountingMetadata(item.index)
                 (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
 
-                Snackbar.make(content,
-                              R.string.counting_snackbar_counting_deleted,
-                              Snackbar.LENGTH_LONG)
-                    .setAction(R.string.counting_snackbar_counting_undo
+                Snackbar.make(
+                    content,
+                    R.string.counting_snackbar_counting_deleted,
+                    Snackbar.LENGTH_LONG
+                )
+                    .setAction(
+                        R.string.counting_snackbar_counting_undo
                     ) {
-                        adapter?.add(item,
-                                     position)
-                        (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.addCountingMetadata(item)
+                        adapter?.add(
+                            item,
+                            position
+                        )
+                        (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.addCountingMetadata(
+                            item
+                        )
                     }
                     .show()
             }
@@ -101,14 +127,20 @@ class CountingFragment : Fragment(),
                 }
 
                 if (show) {
-                    empty.startAnimation(AnimationUtils.loadAnimation(context,
-                                                                      android.R.anim.fade_in))
+                    empty.startAnimation(
+                        AnimationUtils.loadAnimation(
+                            context,
+                            android.R.anim.fade_in
+                        )
+                    )
                     empty.visibility = View.VISIBLE
-
-                }
-                else {
-                    empty.startAnimation(AnimationUtils.loadAnimation(context,
-                                                                      android.R.anim.fade_out))
+                } else {
+                    empty.startAnimation(
+                        AnimationUtils.loadAnimation(
+                            context,
+                            android.R.anim.fade_out
+                        )
+                    )
                     empty.visibility = View.GONE
                 }
             }
@@ -118,30 +150,40 @@ class CountingFragment : Fragment(),
             layoutManager = LinearLayoutManager(context)
             adapter = this@CountingFragment.adapter
 
-            val dividerItemDecoration = DividerItemDecoration(context,
-                                                              (layoutManager as LinearLayoutManager).orientation)
+            val dividerItemDecoration = DividerItemDecoration(
+                context,
+                (layoutManager as LinearLayoutManager).orientation
+            )
             addItemDecoration(dividerItemDecoration)
         }
     }
 
     override fun onActivityResult(
-            requestCode: Int,
-            resultCode: Int,
-            data: Intent?) {
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         if ((resultCode == Activity.RESULT_OK) && (data != null)) {
-            val countingMetadata = data.getParcelableExtra<CountingMetadata>(EditCountingMetadataActivity.EXTRA_COUNTING_METADATA)
+            val countingMetadata =
+                data.getParcelableExtra<CountingMetadata>(EditCountingMetadataActivity.EXTRA_COUNTING_METADATA)
 
             if (countingMetadata.isEmpty()) {
-                (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.deleteCountingMetadata(countingMetadata.index)
-                Toast.makeText(context,
-                               R.string.counting_toast_empty,
-                               Toast.LENGTH_LONG)
+                (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.deleteCountingMetadata(
+                    countingMetadata.index
+                )
+                Toast.makeText(
+                    context,
+                    R.string.counting_toast_empty,
+                    Toast.LENGTH_LONG
+                )
                     .show()
 
                 return
             }
 
-            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.addCountingMetadata(countingMetadata)
+            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.addCountingMetadata(
+                countingMetadata
+            )
         }
     }
 
@@ -155,12 +197,14 @@ class CountingFragment : Fragment(),
 
     override fun validate(): Boolean {
         return (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()?.isNotEmpty()
-                ?: false
+            ?: false
     }
 
     override fun refreshView() {
-        adapter?.setItems((input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()
-                                  ?: emptyList())
+        adapter?.setItems(
+            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()
+                ?: emptyList()
+        )
     }
 
     override fun setInput(input: AbstractInput) {

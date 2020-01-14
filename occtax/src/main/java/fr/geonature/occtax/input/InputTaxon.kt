@@ -14,36 +14,43 @@ import java.util.TreeMap
  */
 class InputTaxon : AbstractInputTaxon {
 
-    val properties: SortedMap<String, PropertyValue> = TreeMap<String, PropertyValue>(Comparator { o1, o2 ->
-        val i1 = defaultPropertiesMnemonic.indexOfFirst { it.first == o1 }
-        val i2 = defaultPropertiesMnemonic.indexOfFirst { it.first == o2 }
+    val properties: SortedMap<String, PropertyValue> =
+        TreeMap<String, PropertyValue>(Comparator { o1, o2 ->
+            val i1 = defaultPropertiesMnemonic.indexOfFirst { it.first == o1 }
+            val i2 = defaultPropertiesMnemonic.indexOfFirst { it.first == o2 }
 
-        when {
-            i1 == -1 -> 1
-            i2 == -1 -> -1
-            else -> i1 - i2
-        }
-    })
+            when {
+                i1 == -1 -> 1
+                i2 == -1 -> -1
+                else -> i1 - i2
+            }
+        })
     private val counting: SortedMap<Int, CountingMetadata> = TreeMap<Int, CountingMetadata>()
 
     constructor(taxon: AbstractTaxon) : super(taxon)
     constructor(source: Parcel) : super(source) {
         (source.createTypedArrayList(PropertyValue.CREATOR)
-                ?: emptyList<PropertyValue>())
+            ?: emptyList<PropertyValue>())
             .forEach {
                 this.properties[it.code] = it
             }
 
         val countLingAsList = mutableListOf<CountingMetadata>()
-        source.readTypedList(countLingAsList,
-                             CountingMetadata.CREATOR)
+        source.readTypedList(
+            countLingAsList,
+            CountingMetadata.CREATOR
+        )
         countLingAsList.forEach { counting[it.index] = it }
     }
 
-    override fun writeToParcel(dest: Parcel?,
-                               flags: Int) {
-        super.writeToParcel(dest,
-                            flags)
+    override fun writeToParcel(
+        dest: Parcel?,
+        flags: Int
+    ) {
+        super.writeToParcel(
+            dest,
+            flags
+        )
 
         dest?.also {
             it.writeTypedList(this.properties.values.toList())
@@ -83,29 +90,46 @@ class InputTaxon : AbstractInputTaxon {
         counting[index] = countingMetadata.apply { this.index = index }
     }
 
-
     fun deleteCountingMetadata(index: Int): CountingMetadata? {
         return counting.remove(index)
     }
 
     companion object {
 
-        val defaultPropertiesMnemonic = arrayOf(Pair("METH_OBS",
-                                                     NomenclatureTypeViewType.NOMENCLATURE_TYPE),
-                                                Pair("ETA_BIO",
-                                                     NomenclatureTypeViewType.NOMENCLATURE_TYPE),
-                                                Pair("METH_DETERMIN",
-                                                     NomenclatureTypeViewType.NOMENCLATURE_TYPE),
-                                                Pair("DETERMINER",
-                                                     NomenclatureTypeViewType.TEXT_SIMPLE),
-                                                Pair("STATUT_BIO",
-                                                     NomenclatureTypeViewType.NOMENCLATURE_TYPE),
-                                                Pair("NATURALITE",
-                                                     NomenclatureTypeViewType.NOMENCLATURE_TYPE),
-                                                Pair("PREUVE_EXIST",
-                                                     NomenclatureTypeViewType.NOMENCLATURE_TYPE),
-                                                Pair("COMMENT",
-                                                     NomenclatureTypeViewType.TEXT_MULTIPLE))
+        val defaultPropertiesMnemonic = arrayOf(
+            Pair(
+                "METH_OBS",
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+            ),
+            Pair(
+                "ETA_BIO",
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+            ),
+            Pair(
+                "METH_DETERMIN",
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+            ),
+            Pair(
+                "DETERMINER",
+                NomenclatureTypeViewType.TEXT_SIMPLE
+            ),
+            Pair(
+                "STATUT_BIO",
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+            ),
+            Pair(
+                "NATURALITE",
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+            ),
+            Pair(
+                "PREUVE_EXIST",
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+            ),
+            Pair(
+                "COMMENT",
+                NomenclatureTypeViewType.TEXT_MULTIPLE
+            )
+        )
 
         @JvmField
         val CREATOR: Parcelable.Creator<InputTaxon> = object : Parcelable.Creator<InputTaxon> {

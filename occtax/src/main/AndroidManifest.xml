@@ -36,6 +36,9 @@
         <activity
             android:name=".ui.input.InputPagerFragmentActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.input.taxa.TaxonomyFilterActivity"
+            android:label="@string/activity_taxonomy_title" />
         <activity android:name=".ui.input.counting.EditCountingMetadataActivity" />
 
     </application>

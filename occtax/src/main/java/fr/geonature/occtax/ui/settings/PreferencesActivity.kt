@@ -18,7 +18,7 @@ import java.util.Date
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
 class PreferencesActivity : AppCompatActivity(),
-        PreferencesFragment.OnPreferencesFragmentListener {
+    PreferencesFragment.OnPreferencesFragmentListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,9 +27,11 @@ class PreferencesActivity : AppCompatActivity(),
 
         // Display the fragment as the main content.
         supportFragmentManager.beginTransaction()
-                .replace(android.R.id.content,
-                        PreferencesFragment.newInstance())
-                .commit()
+            .replace(
+                android.R.id.content,
+                PreferencesFragment.newInstance()
+            )
+            .commit()
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -43,11 +45,13 @@ class PreferencesActivity : AppCompatActivity(),
     }
 
     override fun getAppVersion(): String {
-        return getString(R.string.app_version,
-                         BuildConfig.VERSION_NAME,
-                         BuildConfig.VERSION_CODE,
-                         DateFormat.getDateTimeInstance()
-                        .format(Date(BuildConfig.BUILD_DATE.toLong())))
+        return getString(
+            R.string.app_version,
+            BuildConfig.VERSION_NAME,
+            BuildConfig.VERSION_CODE,
+            DateFormat.getDateTimeInstance()
+                .format(Date(BuildConfig.BUILD_DATE.toLong()))
+        )
     }
 
     companion object {

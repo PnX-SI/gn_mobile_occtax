@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.l4digital.fastscroll.FastScroller
 import fr.geonature.commons.data.InputObserver
+import java.util.Locale
 
 /**
  * Default RecyclerView Adapter used by [InputObserverListFragment].
@@ -18,8 +19,9 @@ import fr.geonature.commons.data.InputObserver
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecyclerViewAdapterListener) : RecyclerView.Adapter<InputObserverRecyclerViewAdapter.ViewHolder>(),
-                                                                                                           FastScroller.SectionIndexer {
+class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecyclerViewAdapterListener) :
+    RecyclerView.Adapter<InputObserverRecyclerViewAdapter.ViewHolder>(),
+    FastScroller.SectionIndexer {
     private var cursor: Cursor? = null
     private var choiceMode: Int = ListView.CHOICE_MODE_SINGLE
     private val selectedInputObservers: MutableList<InputObserver> = ArrayList()
@@ -41,8 +43,7 @@ class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecy
             if (isSelected) {
                 selectedInputObservers.remove(inputObserver)
                 checkbox.isChecked = false
-            }
-            else {
+            } else {
                 selectedInputObservers.add(inputObserver)
                 checkbox.isChecked = true
             }
@@ -52,8 +53,9 @@ class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecy
     }
 
     override fun onCreateViewHolder(
-            parent: ViewGroup,
-            viewType: Int): ViewHolder {
+        parent: ViewGroup,
+        viewType: Int
+    ): ViewHolder {
         return ViewHolder(parent)
     }
 
@@ -62,8 +64,9 @@ class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecy
     }
 
     override fun onBindViewHolder(
-            holder: ViewHolder,
-            position: Int) {
+        holder: ViewHolder,
+        position: Int
+    ) {
 
         holder.bind(position)
     }
@@ -147,10 +150,13 @@ class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecy
         }
     }
 
-    inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(
+    inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
+        LayoutInflater.from(parent.context).inflate(
             fr.geonature.occtax.R.layout.list_title_item_2,
             parent,
-            false)) {
+            false
+        )
+    ) {
 
         private val title: TextView = itemView.findViewById(android.R.id.title)
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
@@ -169,8 +175,7 @@ class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecy
                 InputObserver.fromCursor(cursor)
                     ?.lastname?.elementAt(0)
                     .toString()
-            }
-            else {
+            } else {
                 ""
             }
 
@@ -178,7 +183,7 @@ class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecy
                 val currentTitle = inputObserver.lastname?.elementAt(0)
                     .toString()
                 title.text = if (previousTitle == currentTitle) "" else currentTitle
-                text1.text = inputObserver.lastname?.toUpperCase()
+                text1.text = inputObserver.lastname?.toUpperCase(Locale.getDefault())
                 text2.text = inputObserver.firstname
                 checkbox.isChecked = selectedInputObservers.contains(inputObserver)
 

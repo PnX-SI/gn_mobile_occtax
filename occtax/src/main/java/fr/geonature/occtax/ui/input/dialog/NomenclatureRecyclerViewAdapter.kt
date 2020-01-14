@@ -27,8 +27,10 @@ class NomenclatureRecyclerViewAdapter(private val listener: OnNomenclatureRecycl
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup,
-                                    viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): ViewHolder {
         return ViewHolder(parent)
     }
 
@@ -36,8 +38,10 @@ class NomenclatureRecyclerViewAdapter(private val listener: OnNomenclatureRecycl
         return cursor?.count ?: 0
     }
 
-    override fun onBindViewHolder(holder: ViewHolder,
-                                  position: Int) {
+    override fun onBindViewHolder(
+        holder: ViewHolder,
+        position: Int
+    ) {
         holder.bind(position)
     }
 

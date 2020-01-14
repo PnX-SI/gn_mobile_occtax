@@ -35,11 +35,7 @@ import fr.geonature.occtax.input.InputViewModel
 import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.settings.AppSettingsViewModel
 import fr.geonature.occtax.ui.shared.view.ListItemActionView
-import kotlinx.android.synthetic.main.fragment_home.appSyncView
-import kotlinx.android.synthetic.main.fragment_home.fab
-import kotlinx.android.synthetic.main.fragment_home.homeContent
-import kotlinx.android.synthetic.main.fragment_home.inputEmptyTextView
-import kotlinx.android.synthetic.main.fragment_home.inputRecyclerView
+import kotlinx.android.synthetic.main.fragment_home.*
 
 /**
  * Home screen [Fragment].
@@ -56,28 +52,36 @@ class HomeFragment : Fragment() {
 
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(
-                id: Int,
-                args: Bundle?): Loader<Cursor> {
+            id: Int,
+            args: Bundle?
+        ): Loader<Cursor> {
             return when (id) {
-                LOADER_APP_SYNC -> CursorLoader(requireContext(),
-                                                buildUri(AppSync.TABLE_NAME,
-                                                         args?.getString(AppSync.COLUMN_ID)
-                                                                 ?: ""),
-                                                null,
-                                                null,
-                                                null,
-                                                null)
+                LOADER_APP_SYNC -> CursorLoader(
+                    requireContext(),
+                    buildUri(
+                        AppSync.TABLE_NAME,
+                        args?.getString(AppSync.COLUMN_ID)
+                            ?: ""
+                    ),
+                    null,
+                    null,
+                    null,
+                    null
+                )
                 else -> throw IllegalArgumentException()
             }
         }
 
         override fun onLoadFinished(
-                loader: Loader<Cursor>,
-                data: Cursor?) {
+            loader: Loader<Cursor>,
+            data: Cursor?
+        ) {
 
             if (data == null) {
-                Log.w(TAG,
-                      "Failed to load data from '${(loader as CursorLoader).uri}'")
+                Log.w(
+                    TAG,
+                    "Failed to load data from '${(loader as CursorLoader).uri}'"
+                )
 
                 return
             }
@@ -101,29 +105,41 @@ class HomeFragment : Fragment() {
 
         appSettingsViewModel = activity?.run {
             ViewModelProvider(this,
-                              fr.geonature.commons.settings.AppSettingsViewModel.Factory { AppSettingsViewModel(this.application) }).get(AppSettingsViewModel::class.java)
+                fr.geonature.commons.settings.AppSettingsViewModel.Factory {
+                    AppSettingsViewModel(
+                        this.application
+                    )
+                }).get(AppSettingsViewModel::class.java)
         }
 
         inputViewModel = activity?.run {
             ViewModelProvider(this,
-                              fr.geonature.commons.input.InputViewModel.Factory { InputViewModel(this.application) }).get(InputViewModel::class.java)
+                fr.geonature.commons.input.InputViewModel.Factory { InputViewModel(this.application) }).get(
+                InputViewModel::class.java
+            )
         }
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_home,
-                                container,
-                                false)
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return inflater.inflate(
+            R.layout.fragment_home,
+            container,
+            false
+        )
     }
 
     override fun onViewCreated(
-            view: View,
-            savedInstanceState: Bundle?) {
-        super.onViewCreated(view,
-                            savedInstanceState)
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(
+            view,
+            savedInstanceState
+        )
 
         setHasOptionsMenu(true)
 
@@ -138,25 +154,35 @@ class HomeFragment : Fragment() {
             listener?.onStartInput(appSettings)
         }
 
-        adapter = InputRecyclerViewAdapter(object : AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<Input> {
+        adapter = InputRecyclerViewAdapter(object :
+            AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<Input> {
             override fun onClick(item: Input) {
                 val appSettings = appSettings ?: return
 
-                Log.i(TAG,
-                      "input selected: ${item.id}")
+                Log.i(
+                    TAG,
+                    "input selected: ${item.id}"
+                )
 
-                listener?.onStartInput(appSettings,
-                                       item)
+                listener?.onStartInput(
+                    appSettings,
+                    item
+                )
             }
 
-            override fun onLongClicked(position: Int,
-                                       item: Input) {
+            override fun onLongClicked(
+                position: Int,
+                item: Input
+            ) {
                 inputViewModel?.deleteInput(item)
 
-                Snackbar.make(homeContent,
-                              R.string.home_snackbar_input_deleted,
-                              Snackbar.LENGTH_SHORT)
-                    .setAction(R.string.home_snackbar_input_undo
+                Snackbar.make(
+                    homeContent,
+                    R.string.home_snackbar_input_deleted,
+                    Snackbar.LENGTH_SHORT
+                )
+                    .setAction(
+                        R.string.home_snackbar_input_undo
                     ) {
                         inputViewModel?.restoreDeletedInput()
                     }
@@ -169,14 +195,20 @@ class HomeFragment : Fragment() {
                 }
 
                 if (show) {
-                    inputEmptyTextView.startAnimation(AnimationUtils.loadAnimation(context,
-                                                                                   android.R.anim.fade_in))
+                    inputEmptyTextView.startAnimation(
+                        AnimationUtils.loadAnimation(
+                            context,
+                            android.R.anim.fade_in
+                        )
+                    )
                     inputEmptyTextView.visibility = View.VISIBLE
-
-                }
-                else {
-                    inputEmptyTextView.startAnimation(AnimationUtils.loadAnimation(context,
-                                                                                   android.R.anim.fade_out))
+                } else {
+                    inputEmptyTextView.startAnimation(
+                        AnimationUtils.loadAnimation(
+                            context,
+                            android.R.anim.fade_out
+                        )
+                    )
                     inputEmptyTextView.visibility = View.GONE
                 }
             }
@@ -187,8 +219,10 @@ class HomeFragment : Fragment() {
             adapter = this@HomeFragment.adapter
         }
 
-        val dividerItemDecoration = DividerItemDecoration(inputRecyclerView.context,
-                                                          (inputRecyclerView.layoutManager as LinearLayoutManager).orientation)
+        val dividerItemDecoration = DividerItemDecoration(
+            inputRecyclerView.context,
+            (inputRecyclerView.layoutManager as LinearLayoutManager).orientation
+        )
         inputRecyclerView.addItemDecoration(dividerItemDecoration)
 
         checkSelfPermissions()
@@ -198,9 +232,11 @@ class HomeFragment : Fragment() {
         super.onResume()
 
         LoaderManager.getInstance(this)
-            .restartLoader(LOADER_APP_SYNC,
-                           bundleOf(AppSync.COLUMN_ID to requireContext().packageName),
-                           loaderCallbacks)
+            .restartLoader(
+                LOADER_APP_SYNC,
+                bundleOf(AppSync.COLUMN_ID to requireContext().packageName),
+                loaderCallbacks
+            )
     }
 
     override fun onAttach(context: Context) {
@@ -208,8 +244,7 @@ class HomeFragment : Fragment() {
 
         if (context is OnHomeFragmentListener) {
             listener = context
-        }
-        else {
+        } else {
             throw RuntimeException("$context must implement OnHomeFragmentListener")
         }
     }
@@ -221,13 +256,18 @@ class HomeFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(
-            menu: Menu,
-            inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu,
-                                  inflater)
+        menu: Menu,
+        inflater: MenuInflater
+    ) {
+        super.onCreateOptionsMenu(
+            menu,
+            inflater
+        )
 
-        inflater.inflate(R.menu.settings,
-                         menu)
+        inflater.inflate(
+            R.menu.settings,
+            menu
+        )
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -247,85 +287,98 @@ class HomeFragment : Fragment() {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<out String>,
-                                            grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         when (requestCode) {
             REQUEST_STORAGE_PERMISSIONS -> {
                 val requestPermissionsResult = checkPermissions(grantResults)
 
                 if (requestPermissionsResult) {
-                    Snackbar.make(homeContent,
-                                  R.string.snackbar_permission_external_storage_available,
-                                  Snackbar.LENGTH_LONG)
+                    Snackbar.make(
+                        homeContent,
+                        R.string.snackbar_permission_external_storage_available,
+                        Snackbar.LENGTH_LONG
+                    )
                         .show()
                     loadAppSettings()
-                }
-                else {
-                    Snackbar.make(homeContent,
-                                  R.string.snackbar_permissions_not_granted,
-                                  Snackbar.LENGTH_LONG)
+                } else {
+                    Snackbar.make(
+                        homeContent,
+                        R.string.snackbar_permissions_not_granted,
+                        Snackbar.LENGTH_LONG
+                    )
                         .show()
                 }
             }
-            else -> super.onRequestPermissionsResult(requestCode,
-                                                     permissions,
-                                                     grantResults)
+            else -> super.onRequestPermissionsResult(
+                requestCode,
+                permissions,
+                grantResults
+            )
         }
     }
 
     private fun checkSelfPermissions() {
         val context = context ?: return
 
-        checkSelfPermissions(context,
-                             object : PermissionUtils.OnCheckSelfPermissionListener {
-                                 override fun onPermissionsGranted() {
-                                     loadAppSettings()
-                                 }
+        checkSelfPermissions(
+            context,
+            object : PermissionUtils.OnCheckSelfPermissionListener {
+                override fun onPermissionsGranted() {
+                    loadAppSettings()
+                }
 
-                                 override fun onRequestPermissions(vararg permissions: String) {
-                                     requestPermissions(this@HomeFragment,
-                                                        homeContent,
-                                                        R.string.snackbar_permission_external_storage_rationale,
-                                                        REQUEST_STORAGE_PERMISSIONS,
-                                                        *permissions)
-                                 }
-                             },
-                             Manifest.permission.WRITE_EXTERNAL_STORAGE)
-
+                override fun onRequestPermissions(vararg permissions: String) {
+                    requestPermissions(
+                        this@HomeFragment,
+                        homeContent,
+                        R.string.snackbar_permission_external_storage_rationale,
+                        REQUEST_STORAGE_PERMISSIONS,
+                        *permissions
+                    )
+                }
+            },
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
     }
 
     private fun loadAppSettings() {
         appSettingsViewModel?.getAppSettings<AppSettings>()
             ?.observe(this,
-                      Observer {
-                          if (it == null) {
-                              fab.hide()
-                              adapter.clear()
-                              activity?.invalidateOptionsMenu()
+                Observer {
+                    if (it?.mapSettings == null) {
+                        fab.hide()
+                        adapter.clear()
+                        activity?.invalidateOptionsMenu()
 
-                              Snackbar.make(homeContent,
-                                            getString(R.string.snackbar_settings_not_found,
-                                                      appSettingsViewModel?.getAppSettingsFilename()),
-                                            Snackbar.LENGTH_LONG)
-                                  .show()
-                          }
-                          else {
-                              appSettings = it
-                              fab.show()
-                              activity?.invalidateOptionsMenu()
+                        Snackbar.make(
+                            homeContent,
+                            getString(
+                                if (it == null) R.string.snackbar_settings_not_found else R.string.snackbar_settings_map_invalid,
+                                appSettingsViewModel?.getAppSettingsFilename()
+                            ),
+                            Snackbar.LENGTH_LONG
+                        )
+                            .show()
+                    } else {
+                        appSettings = it
+                        fab.show()
+                        activity?.invalidateOptionsMenu()
 
-                              loadInputs()
-                          }
-                      })
+                        loadInputs()
+                    }
+                })
     }
 
     private fun loadInputs() {
         inputViewModel?.readInputs()
             ?.observe(this,
-                      Observer {
-                          adapter.setItems(it)
-                      })
+                Observer {
+                    adapter.setItems(it)
+                })
     }
 
     /**
@@ -334,8 +387,10 @@ class HomeFragment : Fragment() {
     interface OnHomeFragmentListener {
         fun onShowSettings()
         fun onStartSync()
-        fun onStartInput(appSettings: AppSettings,
-                         input: Input? = null)
+        fun onStartInput(
+            appSettings: AppSettings,
+            input: Input? = null
+        )
     }
 
     companion object {
