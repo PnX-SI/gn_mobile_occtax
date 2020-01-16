@@ -191,6 +191,10 @@ class CountingFragment : Fragment(),
         return R.string.pager_fragment_counting_title
     }
 
+    override fun getSubtitle(): CharSequence? {
+        return input?.getCurrentSelectedInputTaxon()?.taxon?.name
+    }
+
     override fun pagingEnabled(): Boolean {
         return true
     }
@@ -205,6 +209,21 @@ class CountingFragment : Fragment(),
             (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()
                 ?: emptyList()
         )
+
+        if ((input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()?.isEmpty() == true) {
+            val context = context ?: return
+            startActivityForResult(
+                EditCountingMetadataActivity.newIntent(
+                    context,
+                    input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
+                        ?: Taxonomy(
+                            Taxonomy.ANY,
+                            Taxonomy.ANY
+                        )
+                ),
+                0
+            )
+        }
     }
 
     override fun setInput(input: AbstractInput) {

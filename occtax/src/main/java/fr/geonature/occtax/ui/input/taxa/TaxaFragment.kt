@@ -124,7 +124,10 @@ class TaxaFragment : Fragment(),
             }
 
             when (loader.id) {
-                LOADER_TAXA -> adapter?.bind(data)
+                LOADER_TAXA -> {
+                    adapter?.bind(data)
+                    (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+                }
                 LOADER_TAXON -> {
                     if (data.moveToFirst()) {
                         val selectedTaxon = Taxon.fromCursor(data)
@@ -327,6 +330,16 @@ class TaxaFragment : Fragment(),
 
     override fun getResourceTitle(): Int {
         return R.string.pager_fragment_taxa_title
+    }
+
+    override fun getSubtitle(): CharSequence? {
+        val taxaFound = adapter?.itemCount ?: return null
+
+        return resources.getQuantityString(
+            R.plurals.taxa_found,
+            taxaFound,
+            taxaFound
+        )
     }
 
     override fun pagingEnabled(): Boolean {

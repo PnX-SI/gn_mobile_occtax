@@ -247,12 +247,16 @@ class InputTaxaSummaryFragment : Fragment(),
         return R.string.pager_fragment_summary_title
     }
 
+    override fun getSubtitle(): CharSequence? {
+        return input?.getCurrentSelectedInputTaxon()?.taxon?.name
+    }
+
     override fun pagingEnabled(): Boolean {
         return true
     }
 
     override fun validate(): Boolean {
-        return input?.getInputTaxa()?.isNotEmpty() ?: false
+        return this.input?.getCurrentSelectedInputTaxon() != null
     }
 
     override fun refreshView() {

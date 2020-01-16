@@ -178,6 +178,10 @@ class InformationFragment : Fragment(),
         return R.string.pager_fragment_information_title
     }
 
+    override fun getSubtitle(): CharSequence? {
+        return input?.getCurrentSelectedInputTaxon()?.taxon?.name
+    }
+
     override fun pagingEnabled(): Boolean {
         return true
     }

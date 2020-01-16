@@ -350,6 +350,10 @@ class ObserversAndDateInputFragment : Fragment(),
         return R.string.pager_fragment_observers_and_date_input_title
     }
 
+    override fun getSubtitle(): CharSequence? {
+        return null
+    }
+
     override fun pagingEnabled(): Boolean {
         return true
     }

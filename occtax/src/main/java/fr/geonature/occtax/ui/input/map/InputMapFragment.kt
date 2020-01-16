@@ -66,6 +66,10 @@ class InputMapFragment : MapFragment(),
         return R.string.pager_fragment_map_title
     }
 
+    override fun getSubtitle(): CharSequence? {
+        return null
+    }
+
     override fun pagingEnabled(): Boolean {
         return false
     }

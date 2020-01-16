@@ -5,6 +5,8 @@
     <string name="activity_dataset_title">Jeu de données</string>
     <string name="activity_observers_title">Observateurs</string>
     <string name="activity_taxonomy_title">Rang taxonomique</string>
+    <string name="activity_counting_add_title">Ajouter un dénombrement</string>
+    <string name="activity_counting_edit_title">Editer le dénombrement</string>
 
     <string name="sync_device_status">État du terminal</string>
     <string name="sync_last_synchronization">Dernière synchronisation</string>
@@ -25,9 +27,10 @@
     <string name="action_settings">Paramètres</string>
     <string name="action_search">Recherche</string>
     <string name="action_filter">Filtres</string>
-    <string name="action_add">Choisir</string>
+    <string name="action_add">Ajouter</string>
     <string name="action_set">Modifier</string>
     <string name="action_edit">Modifier</string>
+    <string name="action_choose">Choisir</string>
     <plurals name="action_title_item_count_selected">
         <item quantity="one">%d sélectionné</item>
         <item quantity="other">%d sélectionnés</item>
@@ -69,6 +72,11 @@
     <string name="observers_and_date_dataset">Jeu de données</string>
     <string name="observers_and_date_date">Date</string>
     <string name="observers_and_date_date_format">dd MMMM yyyy</string>
+
+    <plurals name="taxa_found">
+        <item quantity="one">%d taxon trouvé</item>
+        <item quantity="other">%d taxons trouvés</item>
+    </plurals>
 
     <string name="information_determiner_hint">Déterminateur</string>
     <string name="information_comment_hint">Ajouter un commentaire optionnel</string>
