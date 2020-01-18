@@ -49,6 +49,7 @@ class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<I
     inner class ViewHolder(itemView: View) :
         AbstractListItemRecyclerViewAdapter<Input>.AbstractViewHolder(itemView) {
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
+        private val text2: TextView = itemView.findViewById(android.R.id.text2)
 
         override fun onBind(item: Input) {
             text1.text = itemView.context.getString(
@@ -58,6 +59,14 @@ class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<I
                     item.date
                 )
             )
+
+            if (item.getInputTaxa().isNotEmpty()) {
+                text2.text = itemView.resources.getQuantityString(
+                    R.plurals.home_input_taxa_count,
+                    item.getInputTaxa().size,
+                    item.getInputTaxa().size
+                )
+            }
         }
     }
 }

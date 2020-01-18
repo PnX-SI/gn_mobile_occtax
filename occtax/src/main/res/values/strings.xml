@@ -23,6 +23,10 @@
     <string name="home_no_input">No existing input.\nCreate a new one by tapping the + button.</string>
     <string name="home_input_date">EEE dd MMM yyyy</string>
     <string name="home_input_created_at">Input created at %s</string>
+    <plurals name="home_input_taxa_count">
+        <item quantity="one">%d taxon added</item>
+        <item quantity="other">%d taxa added</item>
+    </plurals>
     <string name="home_snackbar_input_deleted">Input deleted</string>
     <string name="home_snackbar_input_undo">Undo</string>
 
