@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
@@ -43,6 +44,7 @@ class DatasetListFragment : Fragment() {
                     requireContext(),
                     buildUri(
                         Dataset.TABLE_NAME,
+                        args?.getString(Dataset.COLUMN_MODULE) ?: "",
                         "active"
                     ),
                     null,
@@ -142,7 +144,12 @@ class DatasetListFragment : Fragment() {
             LoaderManager.getInstance(this)
                 .initLoader(
                     LOADER_DATASET,
-                    null,
+                    bundleOf(
+                        Pair(
+                            Dataset.COLUMN_MODULE,
+                            context?.packageName
+                        )
+                    ),
                     loaderCallbacks
                 )
         }
