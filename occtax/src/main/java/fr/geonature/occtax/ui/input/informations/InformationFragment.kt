@@ -38,6 +38,7 @@ class InformationFragment : Fragment(),
 
     private var input: Input? = null
     private var adapter: NomenclatureTypesRecyclerViewAdapter? = null
+    private lateinit var savedState: Bundle
 
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(
@@ -117,6 +118,12 @@ class InformationFragment : Fragment(),
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        savedState = savedInstanceState ?: Bundle()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -131,6 +138,7 @@ class InformationFragment : Fragment(),
         adapter = NomenclatureTypesRecyclerViewAdapter(object :
             NomenclatureTypesRecyclerViewAdapter.OnNomenclatureTypesRecyclerViewAdapterListener {
             override fun showMore() {
+                savedState.putBoolean(KEY_SHOW_ALL_NOMENCLATURE_TYPES, true)
                 setPropertyValues()
             }
 
@@ -165,6 +173,12 @@ class InformationFragment : Fragment(),
                 )
             }
         })
+        adapter?.showAllNomenclatureTypes(
+            savedState.getBoolean(
+                KEY_SHOW_ALL_NOMENCLATURE_TYPES,
+                false
+            )
+        )
 
         with(recyclerView as RecyclerView) {
             layoutManager = LinearLayoutManager(context)
@@ -172,6 +186,10 @@ class InformationFragment : Fragment(),
         }
 
         return recyclerView
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(savedState.apply { putAll(outState) })
     }
 
     override fun getResourceTitle(): Int {
@@ -260,6 +278,8 @@ class InformationFragment : Fragment(),
         private const val LOADER_DEFAULT_NOMENCLATURE_VALUES = 2
         private const val CHOOSE_NOMENCLATURE_DIALOG_FRAGMENT =
             "choose_nomenclature_dialog_fragment"
+
+        private const val KEY_SHOW_ALL_NOMENCLATURE_TYPES = "show_all_nomenclature_types"
 
         /**
          * Use this factory method to create a new instance of [InformationFragment].

@@ -3,7 +3,6 @@ package fr.geonature.occtax.ui.input.informations
 import android.database.Cursor
 import android.text.Editable
 import android.text.InputType
-import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +15,7 @@ import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.data.NomenclatureType
+import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.input.NomenclatureTypeViewType
@@ -185,6 +185,11 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         diffResult.dispatchUpdatesTo(this)
     }
 
+    fun showAllNomenclatureTypes(showAllNomenclatureTypes: Boolean = false) {
+        this.showAllNomenclatureTypes = showAllNomenclatureTypes
+        setNomenclatureTypes(availableNomenclatureTypes)
+    }
+
     private fun setNomenclatureTypes(nomenclatureTypes: List<Pair<String, NomenclatureTypeViewType>>) {
         if (this.properties.isEmpty()) {
             this.properties.addAll(nomenclatureTypes.map {
@@ -242,19 +247,24 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             }
         })
 
-        this.properties.clear()
-        this.properties.addAll(nomenclatureTypes.map {
-            when (it.second) {
-                NomenclatureTypeViewType.NOMENCLATURE_TYPE -> PropertyValue.fromNomenclature(
-                    it.first,
-                    null
-                )
-                else -> PropertyValue.fromValue(
-                    it.first,
-                    null
-                )
+        val newProperties = nomenclatureTypes.map { pair ->
+            properties.firstOrNull {
+                it.code == pair.first
             }
-        })
+                ?: when (pair.second) {
+                    NomenclatureTypeViewType.NOMENCLATURE_TYPE -> PropertyValue.fromNomenclature(
+                        pair.first,
+                        null
+                    )
+                    else -> PropertyValue.fromValue(
+                        pair.first,
+                        null
+                    )
+                }
+        }
+
+        this.properties.clear()
+        this.properties.addAll(newProperties)
 
         diffResult.dispatchUpdatesTo(this)
     }
@@ -331,8 +341,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         override fun onBind(property: PropertyValue) {
             title.text = getNomenclatureTypeLabel(property.code)
             button1.setOnClickListener {
-                showAllNomenclatureTypes = true
-                setNomenclatureTypes(availableNomenclatureTypes)
+                showAllNomenclatureTypes(true)
                 listener.showMore()
             }
         }
@@ -367,7 +376,15 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         }
 
         init {
-            edit.addTextChangedListener(textWatcher)
+            with(edit) {
+                addTextChangedListener(textWatcher)
+                setOnFocusChangeListener { v, hasFocus ->
+                    if (!hasFocus) {
+                        // workaround to force hide the soft keyboard
+                        hideSoftKeyboard(v)
+                    }
+                }
+            }
         }
 
         override fun getLayoutResourceId(): Int {
@@ -378,10 +395,10 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             title.text = getNomenclatureTypeLabel(property.code)
             edit.hint = getEditTextHint(property.code)
 
-            if (!TextUtils.isEmpty(property.label)) {
+            if (property.value is String? && !property.value.isNullOrEmpty()) {
                 edit.removeTextChangedListener(textWatcher)
                 edit.text = Editable.Factory.getInstance()
-                    .newEditable(property.label)
+                    .newEditable(property.value)
                 edit.addTextChangedListener(textWatcher)
             }
         }
