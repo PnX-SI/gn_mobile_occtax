@@ -1,6 +1,7 @@
 # Occtax-mobile
 
-![Occtax-mobile launcher](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/main/res/mipmap-xxxhdpi/ic_launcher.png)
+![PNV](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnv/res/mipmap-xxxhdpi/ic_launcher.png)
+![PNE](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pne/res/mipmap-xxxhdpi/ic_launcher.png)
 
 GeoNature Android mobile application for Occtax module.
 
@@ -22,3 +23,11 @@ Any changes should be made from each underlying git repository:
 * Kotlin error, Redeclaration from class within imported module:
 
   clean project from menu *Build -> Clean Project*, then rebuild project.
+
+## Full Build
+
+A full build can be executed with the following command:
+
+```
+./gradlew clean assembleDebug
+```

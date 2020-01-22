@@ -18,6 +18,7 @@ import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import fr.geonature.commons.data.Dataset
+import fr.geonature.commons.data.DefaultNomenclature
 import fr.geonature.commons.data.DefaultNomenclatureWithType
 import fr.geonature.commons.data.InputObserver
 import fr.geonature.commons.data.NomenclatureType
@@ -81,8 +82,9 @@ class ObserversAndDateInputFragment : Fragment(),
                     requireContext(),
                     buildUri(
                         Dataset.TABLE_NAME,
+                        args?.getString(Dataset.COLUMN_MODULE) ?: "",
                         args?.getLong(
-                            KEY_SELECTED_DATASET_ID,
+                            Dataset.COLUMN_ID,
                             -1
                         ).toString()
                     ),
@@ -95,7 +97,7 @@ class ObserversAndDateInputFragment : Fragment(),
                     requireContext(),
                     buildUri(
                         NomenclatureType.TABLE_NAME,
-                        "occtax",
+                        args?.getString(Dataset.COLUMN_MODULE) ?: "",
                         "default"
                     ),
                     null,
@@ -350,6 +352,10 @@ class ObserversAndDateInputFragment : Fragment(),
         return R.string.pager_fragment_observers_and_date_input_title
     }
 
+    override fun getSubtitle(): CharSequence? {
+        return null
+    }
+
     override fun pagingEnabled(): Boolean {
         return true
     }
@@ -376,8 +382,7 @@ class ObserversAndDateInputFragment : Fragment(),
                     ),
                     loaderCallbacks
                 )
-        }
-        else {
+        } else {
             updateSelectedObserversActionView(emptyList())
         }
 
@@ -389,21 +394,29 @@ class ObserversAndDateInputFragment : Fragment(),
                     LOADER_DATASET_ID,
                     bundleOf(
                         kotlin.Pair(
-                            KEY_SELECTED_DATASET_ID,
+                            Dataset.COLUMN_MODULE,
+                            context?.packageName
+                        ),
+                        kotlin.Pair(
+                            Dataset.COLUMN_ID,
                             selectedDatasetId
                         )
                     ),
                     loaderCallbacks
                 )
-        }
-        else {
+        } else {
             updateSelectedDatasetActionView(null)
         }
 
         LoaderManager.getInstance(this)
             .initLoader(
                 LOADER_DEFAULT_NOMENCLATURE_VALUES,
-                null,
+                bundleOf(
+                    kotlin.Pair(
+                        DefaultNomenclature.COLUMN_MODULE,
+                        context?.packageName
+                    )
+                ),
                 loaderCallbacks
             )
 
@@ -485,7 +498,6 @@ class ObserversAndDateInputFragment : Fragment(),
         private const val LOADER_DATASET_ID = 2
         private const val LOADER_DEFAULT_NOMENCLATURE_VALUES = 3
         private const val KEY_SELECTED_INPUT_OBSERVER_IDS = "selected_input_observer_ids"
-        private const val KEY_SELECTED_DATASET_ID = "selected_dataset_id"
 
         /**
          * Use this factory method to create a new instance of [ObserversAndDateInputFragment].

@@ -26,7 +26,7 @@
         android:paddingStart="?attr/listPreferredItemPaddingStart"
         android:textAllCaps="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/accent"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -89,6 +89,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:background="@color/colorAccent" />
+        tools:background="@color/accent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

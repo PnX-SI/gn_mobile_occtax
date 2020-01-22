@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import fr.geonature.commons.data.Taxonomy
+import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
 
 /**
@@ -27,6 +28,8 @@ class EditCountingMetadataActivity : AppCompatActivity(),
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         countingMetadata = intent.getParcelableExtra(EXTRA_COUNTING_METADATA) ?: CountingMetadata()
+
+        setTitle(if (countingMetadata.isEmpty()) R.string.activity_counting_add_title else R.string.activity_counting_edit_title)
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()

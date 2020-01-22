@@ -7,12 +7,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import fr.geonature.commons.data.Dataset
+import fr.geonature.commons.data.DefaultNomenclature
 import fr.geonature.commons.data.DefaultNomenclatureWithType
 import fr.geonature.commons.data.Nomenclature
 import fr.geonature.commons.data.NomenclatureType
@@ -56,7 +59,7 @@ class EditCountingMetadataFragment : Fragment(),
                     requireContext(),
                     buildUri(
                         NomenclatureType.TABLE_NAME,
-                        "occtax",
+                        args?.getString(Dataset.COLUMN_MODULE) ?: "",
                         "default"
                     ),
                     null,
@@ -231,7 +234,12 @@ class EditCountingMetadataFragment : Fragment(),
         LoaderManager.getInstance(this)
             .initLoader(
                 LOADER_DEFAULT_NOMENCLATURE_VALUES,
-                null,
+                bundleOf(
+                    Pair(
+                        DefaultNomenclature.COLUMN_MODULE,
+                        context?.packageName
+                    )
+                ),
                 loaderCallbacks
             )
     }

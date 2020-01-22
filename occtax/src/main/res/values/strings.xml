@@ -9,6 +9,8 @@
     <string name="activity_dataset_title">Dataset</string>
     <string name="activity_observers_title">Observers</string>
     <string name="activity_taxonomy_title">Taxonomy</string>
+    <string name="activity_counting_add_title">Add counting</string>
+    <string name="activity_counting_edit_title">Edit counting</string>
 
     <string name="sync_device_status">Device status</string>
     <string name="sync_last_synchronization">Last synchronization</string>
@@ -21,6 +23,10 @@
     <string name="home_no_input">No existing input.\nCreate a new one by tapping the + button.</string>
     <string name="home_input_date">EEE dd MMM yyyy</string>
     <string name="home_input_created_at">Input created at %s</string>
+    <plurals name="home_input_taxa_count">
+        <item quantity="one">%d taxon added</item>
+        <item quantity="other">%d taxa added</item>
+    </plurals>
     <string name="home_snackbar_input_deleted">Input deleted</string>
     <string name="home_snackbar_input_undo">Undo</string>
 
@@ -32,6 +38,7 @@
     <string name="action_add">Add</string>
     <string name="action_set">Set</string>
     <string name="action_edit">Edit</string>
+    <string name="action_choose">Choose</string>
     <plurals name="action_title_item_count_selected">
         <item quantity="one">%d selected</item>
         <item quantity="other">%d selected</item>
@@ -73,6 +80,11 @@
     <string name="observers_and_date_dataset">Dataset</string>
     <string name="observers_and_date_date">Date</string>
     <string name="observers_and_date_date_format">MMMM dd, yyyy</string>
+
+    <plurals name="taxa_found">
+        <item quantity="one">%d taxon found</item>
+        <item quantity="other">%d taxa found</item>
+    </plurals>
 
     <string name="information_determiner_hint">Add determiner</string>
     <string name="information_comment_hint">Add comment</string>
