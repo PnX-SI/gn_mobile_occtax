@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:textAppearance="@style/TextAppearance.MaterialComponents.Chip"
     android:textColor="?android:attr/textColorPrimaryInverse"
-    app:chipBackgroundColor="@color/colorAccent"
+    app:chipBackgroundColor="@color/accent"
     app:closeIconEnabled="true"
     app:closeIconTint="?android:attr/textColorPrimaryInverse"
     app:closeIconVisible="true">
