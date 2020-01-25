@@ -22,6 +22,10 @@
             android:defaultValue="true"
             android:key="@string/preference_category_map_show_compass_key"
             android:title="@string/preference_category_map_show_compass" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/preference_category_map_show_zoom_key"
+            android:title="@string/preference_category_map_show_zoom" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/preference_category_about">
         <Preference

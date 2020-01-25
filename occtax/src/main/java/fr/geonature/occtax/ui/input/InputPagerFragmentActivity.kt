@@ -7,6 +7,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
 import fr.geonature.maps.settings.MapSettings
+import fr.geonature.maps.util.SettingsUtils.showCompass
+import fr.geonature.maps.util.SettingsUtils.showScale
+import fr.geonature.maps.util.SettingsUtils.showZoom
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputViewModel
@@ -17,8 +20,6 @@ import fr.geonature.occtax.ui.input.map.InputMapFragment
 import fr.geonature.occtax.ui.input.observers.ObserversAndDateInputFragment
 import fr.geonature.occtax.ui.input.summary.InputTaxaSummaryFragment
 import fr.geonature.occtax.ui.input.taxa.TaxaFragment
-import fr.geonature.occtax.util.SettingsUtils.getMapShowCompass
-import fr.geonature.occtax.util.SettingsUtils.getMapShowScale
 import fr.geonature.viewpager.ui.AbstractNavigationHistoryPagerFragmentActivity
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
@@ -119,8 +120,9 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
     private fun getMapSettings(): MapSettings {
         return MapSettings.Builder.newInstance()
             .from(appSettings.mapSettings!!)
-            .showScale(getMapShowScale(this))
-            .showCompass(getMapShowCompass(this))
+            .showCompass(showCompass(this))
+            .showScale(showScale(this))
+            .showZoom(showZoom(this))
             .build()
     }
 
