@@ -13,12 +13,15 @@ import android.content.pm.PackageManager
 object IntentUtils {
 
     fun syncActivity(context: Context): Intent {
-        val sharedUserId = context.packageManager.getPackageInfo(context.packageName,
-                PackageManager.GET_META_DATA)
-                .sharedUserId
+        val sharedUserId = context.packageManager.getPackageInfo(
+            context.packageName,
+            PackageManager.GET_META_DATA
+        )
+            .sharedUserId
 
         val intent = Intent()
-        intent.component = ComponentName("$sharedUserId.sync", "$sharedUserId.sync.ui.MainActivity")
+        intent.component =
+            ComponentName("$sharedUserId.sync", "$sharedUserId.sync.ui.home.HomeActivity")
 
         return intent
     }
