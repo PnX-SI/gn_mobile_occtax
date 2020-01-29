@@ -28,6 +28,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:action="@string/sync_action_synchronize"
+                app:action_enabled="false"
                 app:title="@string/sync_device_status"
                 app:visible_items="2" />
 
