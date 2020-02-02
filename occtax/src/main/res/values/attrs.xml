@@ -5,6 +5,7 @@
         <attr name="title" />
         <attr name="no_data" format="reference" />
         <attr name="action_empty" format="reference" />
+        <attr name="action_enabled" format="boolean" />
         <attr name="action" format="reference" />
         <attr name="visible_items" format="integer" />
     </declare-styleable>

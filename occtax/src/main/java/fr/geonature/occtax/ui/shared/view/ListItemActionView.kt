@@ -92,6 +92,10 @@ open class ListItemActionView : ConstraintLayout {
         emptyTextView.setText(if (emptyTextResourceId == 0) R.string.no_data else emptyTextResourceId)
     }
 
+    fun enableActionButton(enabled: Boolean = true) {
+        actionButton.isEnabled = enabled
+    }
+
     fun setActionText(@StringRes actionResourceId: Int) {
         if (actionResourceId == 0) {
             return
@@ -197,6 +201,12 @@ open class ListItemActionView : ConstraintLayout {
             ta.getResourceId(
                 R.styleable.ListItemActionView_no_data,
                 R.string.no_data
+            )
+        )
+        enableActionButton(
+            ta.getBoolean(
+                R.styleable.ListItemActionView_action_enabled,
+                true
             )
         )
         setActionText(

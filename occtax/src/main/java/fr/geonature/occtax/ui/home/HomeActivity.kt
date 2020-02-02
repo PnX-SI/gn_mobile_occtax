@@ -6,7 +6,7 @@ import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
 import fr.geonature.occtax.ui.settings.PreferencesActivity
-import fr.geonature.occtax.util.IntentUtils
+import fr.geonature.occtax.util.IntentUtils.syncActivity
 
 /**
  * Home screen Activity.
@@ -36,7 +36,9 @@ class HomeActivity : AppCompatActivity(),
     }
 
     override fun onStartSync() {
-        startActivity(IntentUtils.syncActivity(this))
+        syncActivity(this)?.also {
+            startActivity(it)
+        }
     }
 
     override fun onStartInput(

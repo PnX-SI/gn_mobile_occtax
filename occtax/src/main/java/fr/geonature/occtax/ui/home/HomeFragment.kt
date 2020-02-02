@@ -12,6 +12,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.TextView
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -21,6 +23,8 @@ import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.data.AppSync
 import fr.geonature.commons.data.helper.Provider.buildUri
@@ -35,7 +39,7 @@ import fr.geonature.occtax.input.InputViewModel
 import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.settings.AppSettingsViewModel
 import fr.geonature.occtax.ui.shared.view.ListItemActionView
-import kotlinx.android.synthetic.main.fragment_home.*
+import fr.geonature.occtax.util.IntentUtils.syncActivity
 
 /**
  * Home screen [Fragment].
@@ -49,6 +53,12 @@ class HomeFragment : Fragment() {
     private var appSettings: AppSettings? = null
     private var appSettingsViewModel: AppSettingsViewModel? = null
     private var inputViewModel: InputViewModel? = null
+
+    private var homeContent: CoordinatorLayout? = null
+    private var appSyncView: AppSyncView? = null
+    private var inputRecyclerView: RecyclerView? = null
+    private var inputEmptyTextView: TextView? = null
+    private var fab: FloatingActionButton? = null
 
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(
@@ -89,7 +99,7 @@ class HomeFragment : Fragment() {
             when (loader.id) {
                 LOADER_APP_SYNC -> {
                     if (data.moveToFirst()) {
-                        appSyncView.setAppSync(AppSync.fromCursor(data))
+                        appSyncView?.setAppSync(AppSync.fromCursor(data))
                     }
                 }
             }
@@ -125,11 +135,19 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(
+        val view = inflater.inflate(
             R.layout.fragment_home,
             container,
             false
         )
+
+        homeContent = view.findViewById(R.id.homeContent)
+        appSyncView = view.findViewById(R.id.appSyncView)
+        inputRecyclerView = view.findViewById(R.id.inputRecyclerView)
+        inputEmptyTextView = view.findViewById(R.id.inputEmptyTextView)
+        fab = view.findViewById(R.id.fab)
+
+        return view
     }
 
     override fun onViewCreated(
@@ -143,13 +161,13 @@ class HomeFragment : Fragment() {
 
         setHasOptionsMenu(true)
 
-        appSyncView.setListener(object : ListItemActionView.OnListItemActionViewListener {
+        appSyncView?.setListener(object : ListItemActionView.OnListItemActionViewListener {
             override fun onAction() {
                 listener?.onStartSync()
             }
         })
 
-        fab.setOnClickListener {
+        fab?.setOnClickListener {
             val appSettings = appSettings ?: return@setOnClickListener
             listener?.onStartInput(appSettings)
         }
@@ -176,56 +194,52 @@ class HomeFragment : Fragment() {
             ) {
                 inputViewModel?.deleteInput(item)
 
-                Snackbar.make(
-                    homeContent,
-                    R.string.home_snackbar_input_deleted,
-                    Snackbar.LENGTH_SHORT
-                )
-                    .setAction(
-                        R.string.home_snackbar_input_undo
-                    ) {
+                makeSnackbar(getString(R.string.home_snackbar_input_deleted))
+                    ?.setAction(R.string.home_snackbar_input_undo) {
                         inputViewModel?.restoreDeletedInput()
                     }
-                    .show()
+                    ?.show()
             }
 
             override fun showEmptyTextView(show: Boolean) {
-                if (inputEmptyTextView.visibility == View.VISIBLE == show) {
+                if (inputEmptyTextView?.visibility == View.VISIBLE == show) {
                     return
                 }
 
                 if (show) {
-                    inputEmptyTextView.startAnimation(
+                    inputEmptyTextView?.startAnimation(
                         AnimationUtils.loadAnimation(
                             context,
                             android.R.anim.fade_in
                         )
                     )
-                    inputEmptyTextView.visibility = View.VISIBLE
+                    inputEmptyTextView?.visibility = View.VISIBLE
                 } else {
-                    inputEmptyTextView.startAnimation(
+                    inputEmptyTextView?.startAnimation(
                         AnimationUtils.loadAnimation(
                             context,
                             android.R.anim.fade_out
                         )
                     )
-                    inputEmptyTextView.visibility = View.GONE
+                    inputEmptyTextView?.visibility = View.GONE
                 }
             }
         })
 
-        with(inputRecyclerView) {
+        inputRecyclerView?.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = this@HomeFragment.adapter
         }
 
         val dividerItemDecoration = DividerItemDecoration(
-            inputRecyclerView.context,
-            (inputRecyclerView.layoutManager as LinearLayoutManager).orientation
+            inputRecyclerView?.context,
+            (inputRecyclerView?.layoutManager as LinearLayoutManager).orientation
         )
-        inputRecyclerView.addItemDecoration(dividerItemDecoration)
+        inputRecyclerView?.addItemDecoration(dividerItemDecoration)
 
-        checkSelfPermissions()
+        if (checkAppSync()) {
+            checkSelfPermissions()
+        }
     }
 
     override fun onResume() {
@@ -297,20 +311,10 @@ class HomeFragment : Fragment() {
                 val requestPermissionsResult = checkPermissions(grantResults)
 
                 if (requestPermissionsResult) {
-                    Snackbar.make(
-                        homeContent,
-                        R.string.snackbar_permission_external_storage_available,
-                        Snackbar.LENGTH_LONG
-                    )
-                        .show()
+                    makeSnackbar(getString(R.string.snackbar_permission_external_storage_available))?.show()
                     loadAppSettings()
                 } else {
-                    Snackbar.make(
-                        homeContent,
-                        R.string.snackbar_permissions_not_granted,
-                        Snackbar.LENGTH_LONG
-                    )
-                        .show()
+                    makeSnackbar(getString(R.string.snackbar_permissions_not_granted))?.show()
                 }
             }
             else -> super.onRequestPermissionsResult(
@@ -332,17 +336,35 @@ class HomeFragment : Fragment() {
                 }
 
                 override fun onRequestPermissions(vararg permissions: String) {
-                    requestPermissions(
-                        this@HomeFragment,
-                        homeContent,
-                        R.string.snackbar_permission_external_storage_rationale,
-                        REQUEST_STORAGE_PERMISSIONS,
-                        *permissions
-                    )
+                    homeContent?.also {
+                        requestPermissions(
+                            this@HomeFragment,
+                            it,
+                            R.string.snackbar_permission_external_storage_rationale,
+                            REQUEST_STORAGE_PERMISSIONS,
+                            *permissions
+                        )
+                    }
                 }
             },
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
+    }
+
+    private fun checkAppSync(): Boolean {
+        val context = context ?: return true
+
+        if (syncActivity(context) == null) {
+            fab?.hide()
+            appSyncView?.enableActionButton(false)
+            makeSnackbar(getString(R.string.snackbar_app_sync_not_found))?.show()
+
+            return false
+        }
+
+        appSyncView?.enableActionButton()
+
+        return true
     }
 
     private fun loadAppSettings() {
@@ -350,22 +372,19 @@ class HomeFragment : Fragment() {
             ?.observe(this,
                 Observer {
                     if (it?.mapSettings == null) {
-                        fab.hide()
+                        fab?.hide()
                         adapter.clear()
                         activity?.invalidateOptionsMenu()
 
-                        Snackbar.make(
-                            homeContent,
+                        makeSnackbar(
                             getString(
                                 if (it == null) R.string.snackbar_settings_not_found else R.string.snackbar_settings_map_invalid,
                                 appSettingsViewModel?.getAppSettingsFilename()
-                            ),
-                            Snackbar.LENGTH_LONG
-                        )
-                            .show()
+                            )
+                        )?.show()
                     } else {
                         appSettings = it
-                        fab.show()
+                        fab?.show()
                         activity?.invalidateOptionsMenu()
 
                         loadInputs()
@@ -379,6 +398,16 @@ class HomeFragment : Fragment() {
                 Observer {
                     adapter.setItems(it)
                 })
+    }
+
+    private fun makeSnackbar(text: CharSequence): Snackbar? {
+        val view = homeContent ?: return null
+
+        return Snackbar.make(
+            view,
+            text,
+            Snackbar.LENGTH_LONG
+        )
     }
 
     /**

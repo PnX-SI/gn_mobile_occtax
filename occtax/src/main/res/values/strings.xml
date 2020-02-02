@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name" translatable="false">OccTax</string>
+    <string name="app_name" translatable="false">Occtax</string>
     <string name="app_version" translatable="false">%1$s (%2$d)\n%3$s</string>
 
     <string name="activity_main_title" translatable="false">@string/app_name</string>
@@ -52,6 +52,7 @@
     <string name="alert_dialog_ok">OK</string>
     <string name="alert_dialog_cancel">Cancel</string>
 
+    <string name="snackbar_app_sync_not_found">"Sync" app is not installed</string>
     <string name="snackbar_settings_not_found">Unable to load settings \'%1$s\'</string>
     <string name="snackbar_settings_map_invalid">Invalid map configuration from settings \'%1$s\'</string>
     <string name="snackbar_permissions_not_granted">Permissions were not granted</string>

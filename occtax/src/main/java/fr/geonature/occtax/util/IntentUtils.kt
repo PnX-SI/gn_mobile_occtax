@@ -1,6 +1,5 @@
 package fr.geonature.occtax.util
 
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,14 +11,15 @@ import android.content.pm.PackageManager
  */
 object IntentUtils {
 
-    fun syncActivity(context: Context): Intent {
-        val sharedUserId = context.packageManager.getPackageInfo(context.packageName,
-                PackageManager.GET_META_DATA)
-                .sharedUserId
+    fun syncActivity(context: Context): Intent? {
+        val sharedUserId = context.packageManager.getPackageInfo(
+            context.packageName,
+            PackageManager.GET_META_DATA
+        )
+            .sharedUserId
 
-        val intent = Intent()
-        intent.component = ComponentName("$sharedUserId.sync", "$sharedUserId.sync.ui.MainActivity")
-
-        return intent
+        return context.packageManager.getLaunchIntentForPackage("$sharedUserId.sync")?.also {
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
     }
 }
