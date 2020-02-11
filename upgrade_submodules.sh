@@ -5,6 +5,9 @@ APP_HOME="`pwd -P`"
 cd $APP_HOME/commons
 git checkout -- .
 
+cd $APP_HOME/mountpoint
+git checkout -- .
+
 cd $APP_HOME/viewpager
 git checkout -- .
 
