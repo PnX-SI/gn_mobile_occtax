@@ -7,10 +7,11 @@ GeoNature Android mobile application for Occtax module.
 
 ## Upgrade git sub modules
 
-Do **NOT** modify directly any git sub modules (e.g. `commons`, `viewpager` and `maps`).
+Do **NOT** modify directly any git sub modules (e.g. `commons`, `mountpoint`, `viewpager` and `maps`).
 Any changes should be made from each underlying git repository:
 
 * `commons`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
+* `mountpoint`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
 * `viewpager`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
 * `maps`: [gn_mobile_maps](https://github.com/PnX-SI/gn_mobile_maps) git repository
 
