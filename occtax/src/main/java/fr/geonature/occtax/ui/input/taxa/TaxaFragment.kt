@@ -64,15 +64,16 @@ class TaxaFragment : Fragment(),
                     )
 
                     val taxonFilter =
-                        Taxon.Filter().byName(args?.getString(KEY_FILTER_BY_NAME)).also {
-                            val filterByTaxonomy = args?.getParcelable<Taxonomy>(
-                                KEY_FILTER_BY_TAXONOMY
-                            )
+                        Taxon.Filter().byNameOrDescription(args?.getString(KEY_FILTER_BY_NAME))
+                            .also {
+                                val filterByTaxonomy = args?.getParcelable<Taxonomy>(
+                                    KEY_FILTER_BY_TAXONOMY
+                                )
 
-                            if (filterByTaxonomy != null) {
-                                (it as Taxon.Filter).byTaxonomy(filterByTaxonomy)
-                            }
-                        }.build()
+                                if (filterByTaxonomy != null) {
+                                    (it as Taxon.Filter).byTaxonomy(filterByTaxonomy)
+                                }
+                            }.build()
 
                     CursorLoader(
                         requireContext(),
@@ -190,7 +191,7 @@ class TaxaFragment : Fragment(),
             }
 
             override fun scrollToFirstSelectedItemPosition(position: Int) {
-                recyclerView.smoothScrollToPosition(position)
+                recyclerView.scrollToPosition(position)
             }
 
             override fun showEmptyTextView(show: Boolean) {
@@ -303,7 +304,10 @@ class TaxaFragment : Fragment(),
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                savedState.putString(KEY_FILTER_BY_NAME, newText)
+                savedState.putString(
+                    KEY_FILTER_BY_NAME,
+                    newText
+                )
                 loadTaxa()
 
                 return true
@@ -317,10 +321,12 @@ class TaxaFragment : Fragment(),
                 val context = context ?: return true
                 startActivityForResult(
                     TaxonomyFilterActivity.newIntent(
-                        context, savedState.getParcelable(
+                        context,
+                        savedState.getParcelable(
                             KEY_FILTER_BY_TAXONOMY
                         )
-                    ), RESULT_FILTER
+                    ),
+                    RESULT_FILTER
                 )
                 true
             }
@@ -372,7 +378,10 @@ class TaxaFragment : Fragment(),
 
     override fun setInput(input: AbstractInput) {
         this.input = input as Input
-        savedState.putString(KEY_SELECTED_FEATURE_ID, input.selectedFeatureId)
+        savedState.putString(
+            KEY_SELECTED_FEATURE_ID,
+            input.selectedFeatureId
+        )
     }
 
     private fun loadTaxa() {
@@ -413,7 +422,8 @@ class TaxaFragment : Fragment(),
             if (filterChipGroup.childCount > 0) View.VISIBLE else View.GONE
 
         if (selectedTaxonomy == null) savedState.remove(KEY_FILTER_BY_TAXONOMY) else savedState.putParcelable(
-            KEY_FILTER_BY_TAXONOMY, selectedTaxonomy
+            KEY_FILTER_BY_TAXONOMY,
+            selectedTaxonomy
         )
 
         if (selectedTaxonomy != null) {
@@ -436,7 +446,10 @@ class TaxaFragment : Fragment(),
                     filterByTaxonomy(null)
                 }
 
-                filterChipGroup.addView(this, taxonomyChipIndex)
+                filterChipGroup.addView(
+                    this,
+                    taxonomyChipIndex
+                )
             }
 
             // build group taxonomy filter chip
@@ -457,7 +470,10 @@ class TaxaFragment : Fragment(),
                         filterByTaxonomy(Taxonomy((it.tag as Taxonomy).kingdom))
                     }
 
-                    filterChipGroup.addView(this, taxonomyChipIndex + 1)
+                    filterChipGroup.addView(
+                        this,
+                        taxonomyChipIndex + 1
+                    )
                 }
             }
         }

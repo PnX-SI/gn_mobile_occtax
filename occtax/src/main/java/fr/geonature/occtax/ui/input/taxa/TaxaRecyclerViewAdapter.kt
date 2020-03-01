@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.l4digital.fastscroll.FastScroller
 import fr.geonature.commons.data.AbstractTaxon
@@ -207,7 +208,10 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
                     .toString()
                 title.text = if (previousTitle == currentTitle) "" else currentTitle
                 text1.text = taxon.name
-                text2.text = taxon.description
+                text2.text = HtmlCompat.fromHtml(
+                    taxon.description ?: "",
+                    HtmlCompat.FROM_HTML_MODE_COMPACT
+                )
                 checkbox.isChecked = selectedTaxon?.id == taxon.id
 
                 taxon.taxonArea?.run {
