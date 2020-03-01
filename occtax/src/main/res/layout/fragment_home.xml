@@ -76,11 +76,12 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/padding_default"
         android:layout_marginBottom="@dimen/padding_default"
+        android:backgroundTint="@color/accent"
         android:clickable="true"
         android:focusable="true"
-        android:tint="@android:color/white"
-        android:visibility="invisible"
+        android:visibility="visible"
         app:elevation="@dimen/fab_elevation"
-        app:srcCompat="@drawable/ic_add" />
+        app:srcCompat="@drawable/ic_add"
+        app:tint="@android:color/white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
