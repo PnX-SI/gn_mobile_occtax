@@ -12,7 +12,7 @@ import fr.geonature.maps.settings.MapSettings
  */
 data class AppSettings(var mapSettings: MapSettings? = null) : IAppSettings {
 
-    private constructor(source: Parcel) : this(source.readParcelable(MapSettings::class.java.classLoader) as MapSettings)
+    private constructor(source: Parcel) : this(source.readParcelable(MapSettings::class.java.classLoader) as MapSettings?)
 
     override fun describeContents(): Int {
         return 0
