@@ -38,7 +38,6 @@
     <string name="action_add">Add</string>
     <string name="action_set">Set</string>
     <string name="action_edit">Edit</string>
-    <string name="action_choose">Choose</string>
     <plurals name="action_title_item_count_selected">
         <item quantity="one">%d selected</item>
         <item quantity="other">%d selected</item>
