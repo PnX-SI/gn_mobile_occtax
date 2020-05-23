@@ -82,6 +82,7 @@
         <item quantity="other">%d taxons trouvés</item>
     </plurals>
 
+    <string name="information_action_more">Informations avancées</string>
     <string name="information_determiner_hint">Déterminateur</string>
     <string name="information_comment_hint">Ajouter un commentaire optionnel</string>
 

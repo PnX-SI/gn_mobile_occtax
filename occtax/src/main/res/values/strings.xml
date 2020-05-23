@@ -86,6 +86,7 @@
         <item quantity="other">%d taxa found</item>
     </plurals>
 
+    <string name="information_action_more">More information</string>
     <string name="information_determiner_hint">Add determiner</string>
     <string name="information_comment_hint">Add comment</string>
 
