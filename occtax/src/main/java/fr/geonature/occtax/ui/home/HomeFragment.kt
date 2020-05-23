@@ -33,6 +33,7 @@ import fr.geonature.commons.util.PermissionUtils
 import fr.geonature.commons.util.PermissionUtils.checkPermissions
 import fr.geonature.commons.util.PermissionUtils.checkSelfPermissions
 import fr.geonature.commons.util.PermissionUtils.requestPermissions
+import fr.geonature.commons.util.observeOnce
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputViewModel
@@ -368,28 +369,27 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadAppSettings() {
-        appSettingsViewModel?.getAppSettings<AppSettings>()
-            ?.observe(this,
-                Observer {
-                    if (it?.mapSettings == null) {
-                        fab?.hide()
-                        adapter.clear()
-                        activity?.invalidateOptionsMenu()
+        appSettingsViewModel?.loadAppSettings()
+            ?.observeOnce(this) {
+                if (it?.mapSettings == null) {
+                    fab?.hide()
+                    adapter.clear()
+                    activity?.invalidateOptionsMenu()
 
-                        makeSnackbar(
-                            getString(
-                                if (it == null) R.string.snackbar_settings_not_found else R.string.snackbar_settings_map_invalid,
-                                appSettingsViewModel?.getAppSettingsFilename()
-                            )
-                        )?.show()
-                    } else {
-                        appSettings = it
-                        fab?.show()
-                        activity?.invalidateOptionsMenu()
+                    makeSnackbar(
+                        getString(
+                            if (it == null) R.string.snackbar_settings_not_found else R.string.snackbar_settings_map_invalid,
+                            appSettingsViewModel?.getAppSettingsFilename()
+                        )
+                    )?.show()
+                } else {
+                    appSettings = it
+                    fab?.show()
+                    activity?.invalidateOptionsMenu()
 
-                        loadInputs()
-                    }
-                })
+                    loadInputs()
+                }
+            }
     }
 
     private fun loadInputs() {

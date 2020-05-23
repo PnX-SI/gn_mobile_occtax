@@ -167,6 +167,17 @@ class CountingFragment : Fragment(),
             val countingMetadata =
                 data.getParcelableExtra<CountingMetadata>(EditCountingMetadataActivity.EXTRA_COUNTING_METADATA)
 
+            if (countingMetadata == null) {
+                Toast.makeText(
+                    context,
+                    R.string.counting_toast_empty,
+                    Toast.LENGTH_LONG
+                )
+                    .show()
+
+                return
+            }
+
             if (countingMetadata.isEmpty()) {
                 (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.deleteCountingMetadata(
                     countingMetadata.index
@@ -210,7 +221,9 @@ class CountingFragment : Fragment(),
                 ?: emptyList()
         )
 
-        if ((input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()?.isEmpty() == true) {
+        if ((input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()
+                ?.isEmpty() == true
+        ) {
             val context = context ?: return
             startActivityForResult(
                 EditCountingMetadataActivity.newIntent(

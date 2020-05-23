@@ -144,7 +144,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             LOADER_OBSERVER -> {
                 val selectedInputObservers =
                     data.getParcelableArrayListExtra<InputObserver>(InputObserverListActivity.EXTRA_SELECTED_INPUT_OBSERVERS)
-                updateDefaultObserverPreference(if (selectedInputObservers.size > 0) selectedInputObservers[0] else null)
+                        ?: ArrayList()
+                updateDefaultObserverPreference(if (selectedInputObservers.isNotEmpty()) selectedInputObservers[0] else null)
             }
         }
     }

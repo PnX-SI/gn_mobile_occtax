@@ -37,6 +37,7 @@ class InputObserverListActivity : AppCompatActivity(),
                         ListView.CHOICE_MODE_SINGLE
                     ),
                     intent.getParcelableArrayListExtra(EXTRA_SELECTED_INPUT_OBSERVERS)
+                        ?: emptyList()
                 )
             )
             .commit()

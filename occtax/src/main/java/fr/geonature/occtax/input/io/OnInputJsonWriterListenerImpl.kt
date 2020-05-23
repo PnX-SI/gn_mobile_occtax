@@ -4,7 +4,7 @@ import android.text.TextUtils
 import android.util.JsonWriter
 import fr.geonature.commons.input.AbstractInputTaxon
 import fr.geonature.commons.input.io.InputJsonWriter
-import fr.geonature.commons.util.IsoDateUtils
+import fr.geonature.commons.util.toIsoDateString
 import fr.geonature.maps.jts.geojson.io.GeoJsonWriter
 import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
@@ -132,7 +132,7 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writer: JsonWriter,
         input: Input
     ) {
-        val dateToIsoString = IsoDateUtils.toIsoDateString(input.date)
+        val dateToIsoString = input.date.toIsoDateString()
         writer.name("date_min")
             .value(dateToIsoString)
         writer.name("date_max")

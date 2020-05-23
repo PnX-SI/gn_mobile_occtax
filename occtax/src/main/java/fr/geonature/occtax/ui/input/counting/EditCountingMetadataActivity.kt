@@ -36,7 +36,10 @@ class EditCountingMetadataActivity : AppCompatActivity(),
                 .replace(
                     android.R.id.content,
                     EditCountingMetadataFragment.newInstance(
-                        intent.getParcelableExtra(EXTRA_TAXONOMY),
+                        intent.getParcelableExtra(EXTRA_TAXONOMY) ?: Taxonomy(
+                            Taxonomy.ANY,
+                            Taxonomy.ANY
+                        ),
                         countingMetadata
                     )
                 )
@@ -44,8 +47,8 @@ class EditCountingMetadataActivity : AppCompatActivity(),
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
             android.R.id.home -> {
                 sendResult()
                 finish()
