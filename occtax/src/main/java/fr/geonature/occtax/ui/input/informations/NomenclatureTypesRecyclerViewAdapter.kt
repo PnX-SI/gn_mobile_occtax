@@ -28,7 +28,7 @@ import java.util.Locale
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
 class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureTypesRecyclerViewAdapterListener) :
-    RecyclerView.Adapter<NomenclatureTypesRecyclerViewAdapter.AbstractCardViewHolder>() {
+    RecyclerView.Adapter<NomenclatureTypesRecyclerViewAdapter.AbstractViewHolder>() {
 
     private val mnemonicFilter = InputTaxon.defaultPropertiesMnemonic
     private val moreViewType = Pair(
@@ -58,7 +58,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): AbstractCardViewHolder {
+    ): AbstractViewHolder {
         return when (NomenclatureTypeViewType.values()[viewType]) {
             NomenclatureTypeViewType.MORE -> MoreViewHolder(parent)
             NomenclatureTypeViewType.TEXT_SIMPLE -> TextSimpleViewHolder(parent)
@@ -72,7 +72,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
     }
 
     override fun onBindViewHolder(
-        holder: AbstractCardViewHolder,
+        holder: AbstractViewHolder,
         position: Int
     ) {
         holder.bind(properties[position])
@@ -269,7 +269,29 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         diffResult.dispatchUpdatesTo(this)
     }
 
-    abstract inner class AbstractCardViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
+    abstract inner class AbstractViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        internal var property: PropertyValue? = null
+
+        fun bind(property: PropertyValue) {
+            this.property = property
+
+            onBind(property)
+        }
+
+        abstract fun onBind(property: PropertyValue)
+
+        fun getNomenclatureTypeLabel(mnemonic: String): String {
+            val resourceId = itemView.resources.getIdentifier(
+                "nomenclature_${mnemonic.toLowerCase(Locale.getDefault())}",
+                "string",
+                itemView.context.packageName
+            )
+
+            return if (resourceId == 0) mnemonic else itemView.context.getString(resourceId)
+        }
+    }
+
+    abstract inner class AbstractCardViewHolder(parent: ViewGroup) : AbstractViewHolder(
         LayoutInflater.from(parent.context).inflate(
             R.layout.card_view,
             parent,
@@ -277,7 +299,6 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         )
     ) {
         internal val contentView: View
-        internal var property: PropertyValue? = null
 
         init {
             contentView = LayoutInflater.from(itemView.context)
@@ -288,26 +309,8 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
                 )
         }
 
-        fun bind(property: PropertyValue) {
-            this.property = property
-
-            onBind(property)
-        }
-
         @LayoutRes
         abstract fun getLayoutResourceId(): Int
-
-        abstract fun onBind(property: PropertyValue)
-
-        fun getNomenclatureTypeLabel(mnemonic: String): String {
-            val resourceId = contentView.resources.getIdentifier(
-                "nomenclature_${mnemonic.toLowerCase(Locale.getDefault())}",
-                "string",
-                contentView.context.packageName
-            )
-
-            return if (resourceId == 0) mnemonic else contentView.context.getString(resourceId)
-        }
     }
 
     inner class NomenclatureTypeViewHolder(parent: ViewGroup) : AbstractCardViewHolder(parent) {
@@ -330,19 +333,22 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         }
     }
 
-    inner class MoreViewHolder(parent: ViewGroup) : AbstractCardViewHolder(parent) {
-        private var title: TextView = contentView.findViewById(android.R.id.title)
-        private var button1: Button = contentView.findViewById(android.R.id.button1)
-
-        override fun getLayoutResourceId(): Int {
-            return R.layout.view_action_more
-        }
+    inner class MoreViewHolder(parent: ViewGroup) : AbstractViewHolder(
+        LayoutInflater.from(parent.context).inflate(
+            R.layout.view_action_more,
+            parent,
+            false
+        )
+    ) {
+        private var button1: Button = itemView.findViewById(android.R.id.button1)
 
         override fun onBind(property: PropertyValue) {
-            title.text = getNomenclatureTypeLabel(property.code)
-            button1.setOnClickListener {
-                showAllNomenclatureTypes(true)
-                listener.showMore()
+            with(button1) {
+                text = getNomenclatureTypeLabel(property.code)
+                setOnClickListener {
+                    showAllNomenclatureTypes(true)
+                    listener.showMore()
+                }
             }
         }
     }
@@ -416,7 +422,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
     inner class TextMultipleViewHolder(parent: ViewGroup) : TextSimpleViewHolder(parent) {
         init {
             edit.apply {
-                setSingleLine(false)
+                isSingleLine = false
                 inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 minLines = 2
                 maxLines = 4

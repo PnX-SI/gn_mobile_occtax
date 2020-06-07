@@ -315,7 +315,7 @@ class ObserversAndDateInputFragment : Fragment(),
                 selectedInputObservers.addAll(
                     data.getParcelableArrayListExtra(
                         InputObserverListActivity.EXTRA_SELECTED_INPUT_OBSERVERS
-                    )
+                    ) ?: ArrayList()
                 )
 
                 input?.also {
@@ -361,7 +361,8 @@ class ObserversAndDateInputFragment : Fragment(),
     }
 
     override fun validate(): Boolean {
-        return this.input?.getAllInputObserverIds()?.isNotEmpty() ?: false && this.input?.datasetId != null && this.input?.properties?.isNotEmpty() == true
+        return this.input?.getAllInputObserverIds()
+            ?.isNotEmpty() ?: false && this.input?.datasetId != null && this.input?.properties?.isNotEmpty() == true
     }
 
     override fun refreshView() {

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="activity_preferences_title">Paramètres</string>
     <string name="activity_dataset_title">Jeu de données</string>
     <string name="activity_observers_title">Observateurs</string>
-    <string name="activity_taxonomy_title">Rang taxonomique</string>
+    <string name="activity_taxa_filter_title">Filtres sur les taxons</string>
     <string name="activity_counting_add_title">Ajouter un dénombrement</string>
     <string name="activity_counting_edit_title">Editer le dénombrement</string>
 
@@ -34,7 +34,6 @@
     <string name="action_add">Ajouter</string>
     <string name="action_set">Modifier</string>
     <string name="action_edit">Modifier</string>
-    <string name="action_choose">Choisir</string>
     <plurals name="action_title_item_count_selected">
         <item quantity="one">%d sélectionné</item>
         <item quantity="other">%d sélectionnés</item>
@@ -82,7 +81,29 @@
         <item quantity="one">%d taxon trouvé</item>
         <item quantity="other">%d taxons trouvés</item>
     </plurals>
+    <string name="taxa_filter_area_observation_title">Selon la durée d\'observation</string>
+    <string name="taxa_filter_taxonomy_title">Selon le rang taxonomique</string>
+    <string name="taxa_filter_area_observation_more_than_duration">Observé depuis plus %1$s</string>
+    <string name="taxa_filter_area_observation_less_than_duration">Observé depuis moins %1$s</string>
+    <string name="taxa_filter_area_observation_none">Jamais observé</string>
+    <string name="taxa_filter_area_observation_short_more_than_duration">plus %1$s</string>
+    <string name="taxa_filter_area_observation_short_less_than_duration">moins %1$s</string>
+    <string name="taxa_filter_area_observation_short_none">Jamais</string>
 
+    <plurals name="duration_year">
+        <item quantity="one" tools:ignore="ImpliedQuantity">d\'un an</item>
+        <item quantity="other">de %d ans</item>
+    </plurals>
+    <plurals name="duration_month">
+        <item quantity="one" tools:ignore="ImpliedQuantity">d\'un mois</item>
+        <item quantity="other">de %d mois</item>
+    </plurals>
+    <plurals name="duration_days">
+        <item quantity="one" tools:ignore="ImpliedQuantity">d\'un jour</item>
+        <item quantity="other">de %d jours</item>
+    </plurals>
+
+    <string name="information_action_more">Informations avancées</string>
     <string name="information_determiner_hint">Déterminateur</string>
     <string name="information_comment_hint">Ajouter un commentaire optionnel</string>
 

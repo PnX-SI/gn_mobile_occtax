@@ -2,6 +2,7 @@ package fr.geonature.occtax.ui.input.taxa
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.database.Cursor
 import android.os.Bundle
 import android.util.Log
@@ -25,15 +26,18 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import fr.geonature.commons.data.AbstractTaxon
 import fr.geonature.commons.data.Taxon
+import fr.geonature.commons.data.TaxonWithArea
 import fr.geonature.commons.data.Taxonomy
 import fr.geonature.commons.data.helper.Provider.buildUri
 import fr.geonature.commons.input.AbstractInput
+import fr.geonature.commons.util.ThemeUtils
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
+import java.util.Locale
 
 /**
  * [Fragment] to let the user to choose a [Taxon] from the list.
@@ -56,6 +60,10 @@ class TaxaFragment : Fragment(),
             args: Bundle?
         ): Loader<Cursor> {
 
+            val selectedFilters =
+                args?.getParcelableArray(KEY_SELECTED_FILTERS)?.map { it as Filter<*> }
+                    ?.toList() ?: emptyList()
+
             return when (id) {
                 LOADER_TAXA -> {
                     val selectedFeatureId = args?.getString(
@@ -64,14 +72,29 @@ class TaxaFragment : Fragment(),
                     )
 
                     val taxonFilter =
-                        Taxon.Filter().byNameOrDescription(args?.getString(KEY_FILTER_BY_NAME))
+                        TaxonWithArea.Filter()
+                            .byNameOrDescription(args?.getString(KEY_FILTER_BY_NAME))
                             .also {
-                                val filterByTaxonomy = args?.getParcelable<Taxonomy>(
-                                    KEY_FILTER_BY_TAXONOMY
-                                )
+                                val filterByAreaObservation =
+                                    selectedFilters.asSequence()
+                                        .filter { filter -> filter.type == Filter.FilterType.AREA_OBSERVATION }
+                                        .map { filter -> filter.value as FilterAreaObservation.AreaObservation }
+                                        .map { areaObsevation ->
+                                            when (areaObsevation.type) {
+                                                FilterAreaObservation.AreaObservationType.MORE_THAN_DURATION -> "red"
+                                                FilterAreaObservation.AreaObservationType.LESS_THAN_DURATION -> "grey"
+                                                else -> "none"
+                                            }
+                                        }.toList()
+                                val filterByTaxonomy =
+                                    selectedFilters.find { filter -> filter.type == Filter.FilterType.TAXONOMY }?.value as Taxonomy?
+
+                                if (filterByAreaObservation.isNotEmpty()) {
+                                    (it as TaxonWithArea.Filter).byAreaColors(*filterByAreaObservation.toTypedArray())
+                                }
 
                                 if (filterByTaxonomy != null) {
-                                    (it as Taxon.Filter).byTaxonomy(filterByTaxonomy)
+                                    it.byTaxonomy(filterByTaxonomy)
                                 }
                             }.build()
 
@@ -248,7 +271,7 @@ class TaxaFragment : Fragment(),
         // we have a menu item to show in action bar
         setHasOptionsMenu(true)
 
-        filterByTaxonomy(savedState.getParcelable(KEY_FILTER_BY_TAXONOMY))
+        applyFilters(*getSelectedFilters().toTypedArray())
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -266,11 +289,10 @@ class TaxaFragment : Fragment(),
 
         when (requestCode) {
             RESULT_FILTER -> {
-                val selectedTaxonomy =
-                    if (data.hasExtra(TaxonomyFilterActivity.EXTRA_SELECTED_TAXONOMY)) data.getParcelableExtra<Taxonomy>(
-                        TaxonomyFilterActivity.EXTRA_SELECTED_TAXONOMY
-                    ) else null
-                filterByTaxonomy(selectedTaxonomy)
+                val selectedFilters =
+                    data.getParcelableArrayExtra(TaxaFilterActivity.EXTRA_SELECTED_FILTERS)
+                        ?.map { it as Filter<*> }?.toTypedArray() ?: emptyArray()
+                applyFilters(*selectedFilters)
             }
         }
     }
@@ -320,11 +342,9 @@ class TaxaFragment : Fragment(),
             R.id.menu_filter -> {
                 val context = context ?: return true
                 startActivityForResult(
-                    TaxonomyFilterActivity.newIntent(
+                    TaxaFilterActivity.newIntent(
                         context,
-                        savedState.getParcelable(
-                            KEY_FILTER_BY_TAXONOMY
-                        )
+                        *getSelectedFilters().toTypedArray()
                     ),
                     RESULT_FILTER
                 )
@@ -393,38 +413,121 @@ class TaxaFragment : Fragment(),
             )
     }
 
-    private fun filterByTaxonomy(selectedTaxonomy: Taxonomy?) {
+    private fun applyFilters(vararg filter: Filter<*>) {
+        savedState.putParcelableArray(
+            KEY_SELECTED_FILTERS,
+            filter
+        )
+
+        val selectedAreaObservation =
+            filter.filter { it.type == Filter.FilterType.AREA_OBSERVATION }
+                .map { it.value as FilterAreaObservation.AreaObservation }
+        val selectedTaxonomy =
+            filter.find { it.type == Filter.FilterType.TAXONOMY }?.value as Taxonomy?
+
+        filterByAreaObservation(*selectedAreaObservation.toTypedArray())
+        filterByTaxonomy(selectedTaxonomy)
+
+        loadTaxa()
+    }
+
+    private fun filterByAreaObservation(vararg areaObservation: FilterAreaObservation.AreaObservation) {
         val filterChipGroup = filterChipGroup ?: return
         val context = context ?: return
 
-        var taxonomyChipIndex = 0
-        val taxonomyChips = arrayListOf<Chip>()
+        val areaObservationChipsToDelete = arrayListOf<Chip>()
 
         for (i in 0 until filterChipGroup.childCount) {
             with(filterChipGroup[i]) {
-                val tag = tag
-
-                if (this is Chip && tag is Taxonomy && tag.group == Taxonomy.ANY) {
-                    taxonomyChipIndex = i
-                }
-
-                if (this is Chip && tag is Taxonomy) {
-                    taxonomyChips.add(this)
+                if (this is Chip && tag is FilterAreaObservation.AreaObservation) {
+                    areaObservationChipsToDelete.add(this)
                 }
             }
         }
 
-        taxonomyChips.forEach {
+        areaObservationChipsToDelete.forEach {
             filterChipGroup.removeView(it)
         }
 
-        filterChipGroup.visibility =
-            if (filterChipGroup.childCount > 0) View.VISIBLE else View.GONE
+        filterChipGroup.visibility = if (filterChipGroup.childCount > 0) View.VISIBLE else View.GONE
 
-        if (selectedTaxonomy == null) savedState.remove(KEY_FILTER_BY_TAXONOMY) else savedState.putParcelable(
-            KEY_FILTER_BY_TAXONOMY,
-            selectedTaxonomy
-        )
+        if (areaObservation.isEmpty()) {
+            return
+        }
+
+        // nothing to do if all area observation types are selected
+        if (areaObservation.size == FilterAreaObservation.AreaObservationType.values().size) {
+            return
+        }
+
+        filterChipGroup.visibility = View.VISIBLE
+
+        areaObservation.toList().sortedBy { it.type }
+            .forEachIndexed { index, areaObservationToAdd ->
+                with(
+                    LayoutInflater.from(context).inflate(
+                        R.layout.chip,
+                        filterChipGroup,
+                        false
+                    ) as Chip
+                ) {
+                    tag = areaObservationToAdd
+                    text = areaObservationToAdd.short
+
+                    setChipBackgroundColorResource(context.resources.getIdentifier(
+                        "area_observation_${areaObservationToAdd.type.name.toLowerCase(Locale.ROOT)}",
+                        "color",
+                        context.packageName
+                    ).takeIf { it > 0 } ?: R.color.accent)
+                    setTextColor(
+                        ThemeUtils.getColor(
+                            context,
+                            if (areaObservationToAdd.type == FilterAreaObservation.AreaObservationType.NONE) android.R.attr.textColorPrimary else android.R.attr.textColorPrimaryInverse
+                        )
+                    )
+                    closeIconTint = ColorStateList.valueOf(
+                        ThemeUtils.getColor(
+                            context,
+                            if (areaObservationToAdd.type == FilterAreaObservation.AreaObservationType.NONE) android.R.attr.textColorPrimary else android.R.attr.textColorPrimaryInverse
+                        )
+                    )
+
+                    setOnClickListener {
+                        applyFilters(*getSelectedFilters().filter { it.type != Filter.FilterType.AREA_OBSERVATION || (it.value is FilterAreaObservation.AreaObservation && it.value.type != areaObservationToAdd.type) }
+                            .toTypedArray())
+                    }
+                    setOnCloseIconClickListener {
+                        applyFilters(*getSelectedFilters().filter { it.type != Filter.FilterType.AREA_OBSERVATION || (it.value is FilterAreaObservation.AreaObservation && it.value.type != areaObservationToAdd.type) }
+                            .toTypedArray())
+                    }
+
+                    filterChipGroup.addView(
+                        this,
+                        index
+                    )
+                }
+            }
+    }
+
+    private fun filterByTaxonomy(selectedTaxonomy: Taxonomy?) {
+        val filterChipGroup = filterChipGroup ?: return
+        val context = context ?: return
+
+        val taxonomyChipsToDelete = arrayListOf<Chip>()
+
+        for (i in 0 until filterChipGroup.childCount) {
+            with(filterChipGroup[i]) {
+                if (this is Chip && tag is Taxonomy) {
+                    taxonomyChipsToDelete.add(this)
+                }
+            }
+        }
+
+        taxonomyChipsToDelete.forEach {
+            filterChipGroup.removeView(it)
+        }
+
+        filterChipGroup.visibility = if (filterChipGroup.childCount > 0) View.VISIBLE else View.GONE
 
         if (selectedTaxonomy != null) {
             filterChipGroup.visibility = View.VISIBLE
@@ -440,16 +543,15 @@ class TaxaFragment : Fragment(),
                 tag = Taxonomy(selectedTaxonomy.kingdom)
                 text = selectedTaxonomy.kingdom
                 setOnClickListener {
-                    filterByTaxonomy(null)
+                    applyFilters(*getSelectedFilters().filter { it.type == Filter.FilterType.AREA_OBSERVATION }
+                        .toTypedArray())
                 }
                 setOnCloseIconClickListener {
-                    filterByTaxonomy(null)
+                    applyFilters(*getSelectedFilters().filter { it.type == Filter.FilterType.AREA_OBSERVATION }
+                        .toTypedArray())
                 }
 
-                filterChipGroup.addView(
-                    this,
-                    taxonomyChipIndex
-                )
+                filterChipGroup.addView(this)
             }
 
             // build group taxonomy filter chip
@@ -464,21 +566,23 @@ class TaxaFragment : Fragment(),
                     tag = selectedTaxonomy
                     text = selectedTaxonomy.group
                     setOnClickListener {
-                        filterByTaxonomy(Taxonomy((it.tag as Taxonomy).kingdom))
+                        applyFilters(*(getSelectedFilters().filter { filter -> filter.type == Filter.FilterType.AREA_OBSERVATION }
+                            .toTypedArray() + mutableListOf(FilterTaxonomy(Taxonomy((it.tag as Taxonomy).kingdom)))))
                     }
                     setOnCloseIconClickListener {
-                        filterByTaxonomy(Taxonomy((it.tag as Taxonomy).kingdom))
+                        applyFilters(*(getSelectedFilters().filter { filter -> filter.type == Filter.FilterType.AREA_OBSERVATION }
+                            .toTypedArray() + mutableListOf(FilterTaxonomy(Taxonomy((it.tag as Taxonomy).kingdom)))))
                     }
 
-                    filterChipGroup.addView(
-                        this,
-                        taxonomyChipIndex + 1
-                    )
+                    filterChipGroup.addView(this)
                 }
             }
         }
+    }
 
-        loadTaxa()
+    private fun getSelectedFilters(): List<Filter<*>> {
+        return savedState.getParcelableArray(KEY_SELECTED_FILTERS)?.map { it as Filter<*> }
+            ?.toList() ?: emptyList()
     }
 
     companion object {
@@ -488,10 +592,10 @@ class TaxaFragment : Fragment(),
         private const val LOADER_TAXA = 1
         private const val LOADER_TAXON = 2
         private const val RESULT_FILTER = 3
-        private const val KEY_FILTER_BY_NAME = "filter_by_name"
-        private const val KEY_FILTER_BY_TAXONOMY = "filter_by_taxonomy"
+        private const val KEY_FILTER_BY_NAME = "key_filter_by_name"
+        private const val KEY_SELECTED_FILTERS = "key_selected_filters"
         private const val KEY_SELECTED_FEATURE_ID = "key_selected_feature_id"
-        private const val KEY_SELECTED_TAXON_ID = "selected_taxon_id"
+        private const val KEY_SELECTED_TAXON_ID = "key_selected_taxon_id"
 
         /**
          * Use this factory method to create a new instance of [TaxaFragment].

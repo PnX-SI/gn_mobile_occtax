@@ -6,7 +6,7 @@ import android.util.JsonToken
 import fr.geonature.commons.data.Taxon
 import fr.geonature.commons.data.Taxonomy
 import fr.geonature.commons.input.io.InputJsonReader
-import fr.geonature.commons.util.IsoDateUtils
+import fr.geonature.commons.util.toDate
 import fr.geonature.maps.jts.geojson.io.GeoJsonReader
 import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
@@ -68,7 +68,7 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
 
         while (reader.hasNext()) {
             when (reader.nextName()) {
-                "date_min" -> input.date = IsoDateUtils.toDate(reader.nextString()) ?: Date()
+                "date_min" -> input.date = toDate(reader.nextString()) ?: Date()
                 "id_dataset" -> {
                     if (reader.peek() != JsonToken.NULL) {
                         input.datasetId = reader.nextLong()
