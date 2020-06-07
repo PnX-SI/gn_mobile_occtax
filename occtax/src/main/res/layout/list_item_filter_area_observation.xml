@@ -5,18 +5,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/grey_200"
-    android:clickable="true"
-    android:elevation="4dp"
-    android:focusable="true"
-    android:minHeight="?attr/listPreferredItemHeight"
-    android:paddingStart="?attr/listPreferredItemPaddingStart"
-    android:paddingEnd="?attr/listPreferredItemPaddingEnd">
+    android:background="?attr/selectableItemBackground"
+    android:minHeight="?attr/listPreferredItemHeight">
 
     <CheckBox
         android:id="@android:id/checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
         android:clickable="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -28,12 +24,23 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
         android:ellipsize="end"
+        android:paddingStart="?attr/listPreferredItemPaddingStart"
         android:singleLine="true"
         android:textAppearance="?attr/textAppearanceListItem"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@android:id/checkbox"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="RtlSymmetry"
         tools:text="@tools:sample/last_names" />
+
+    <View
+        android:id="@+id/color_view"
+        android:layout_width="8dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="@color/accent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

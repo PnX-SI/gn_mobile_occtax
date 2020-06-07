@@ -135,8 +135,8 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
 
     fun bind(cursor: Cursor?) {
         this.cursor = cursor
-        scrollToFirstItemSelected()
         notifyDataSetChanged()
+        scrollToFirstItemSelected()
     }
 
     private fun getItemPosition(taxon: AbstractTaxon?): Int {

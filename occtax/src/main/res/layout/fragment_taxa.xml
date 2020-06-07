@@ -5,19 +5,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chip_group_filter"
+    <HorizontalScrollView
+        android:id="@+id/chip_group_filter_wrapper"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="?android:attr/colorBackground"
-        android:elevation="4dp"
-        android:padding="@dimen/padding_default"
-        android:visibility="gone"
-        app:chipSpacing="@dimen/padding_default"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:singleLine="true"
-        app:singleSelection="true" />
+        android:layout_height="wrap_content"
+        android:background="@color/grey_200"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_group_filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="4dp"
+            android:padding="@dimen/padding_default"
+            android:visibility="gone"
+            app:chipSpacing="@dimen/padding_default"
+            app:singleLine="true"
+            app:singleSelection="true" />
+
+    </HorizontalScrollView>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -25,7 +31,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chip_group_filter">
+        app:layout_constraintTop_toBottomOf="@+id/chip_group_filter_wrapper">
 
         <include
             layout="@layout/fast_scroll_recycler_view"

@@ -6,17 +6,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import fr.geonature.commons.data.Taxonomy
 
 /**
  * Apply filters on taxa list.
  *
- * @see TaxonomyFilterFragment
+ * @see TaxaFilterFragment
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class TaxonomyFilterActivity : AppCompatActivity(),
-    TaxonomyFilterFragment.OnTaxaFilterFragmentListener {
+class TaxaFilterActivity : AppCompatActivity(), TaxaFilterFragment.OnTaxaFilterFragmentListener {
+
+    private val selectedFilters: MutableList<Filter<*>> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,14 +24,15 @@ class TaxonomyFilterActivity : AppCompatActivity(),
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         if (savedInstanceState == null) {
+            selectedFilters.addAll(
+                intent.getParcelableArrayExtra(EXTRA_SELECTED_FILTERS)?.map { it as Filter<*> }
+                    ?.toTypedArray() ?: emptyArray()
+            )
+
             supportFragmentManager.beginTransaction()
                 .replace(
                     android.R.id.content,
-                    TaxonomyFilterFragment.newInstance(
-                        intent.getParcelableExtra(
-                            EXTRA_SELECTED_TAXONOMY
-                        )
-                    )
+                    TaxaFilterFragment.newInstance(*selectedFilters.toTypedArray())
                 )
                 .commit()
         }
@@ -40,26 +41,28 @@ class TaxonomyFilterActivity : AppCompatActivity(),
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                finish()
+                setResultAndFinish()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    override fun onSelectedTaxonomy(taxonomy: Taxonomy) {
-        setResultAndFinish(taxonomy)
+    override fun onBackPressed() {
+        setResultAndFinish()
     }
 
-    override fun onNoTaxonomySelected() {
-        setResultAndFinish(null)
+    override fun onSelectedFilters(vararg filter: Filter<*>) {
+        selectedFilters.clear()
+        selectedFilters.addAll(filter)
     }
 
-    private fun setResultAndFinish(taxonomy: Taxonomy?) {
+    private fun setResultAndFinish() {
         val intent = Intent().also {
-            if (taxonomy != null) {
-                it.putExtra(EXTRA_SELECTED_TAXONOMY, taxonomy)
-            }
+            it.putExtra(
+                EXTRA_SELECTED_FILTERS,
+                selectedFilters.toTypedArray()
+            )
         }
 
         setResult(
@@ -72,13 +75,18 @@ class TaxonomyFilterActivity : AppCompatActivity(),
 
     companion object {
 
-        const val EXTRA_SELECTED_TAXONOMY = "extra_selected_taxonomy"
+        const val EXTRA_SELECTED_FILTERS = "extra_selected_filters"
 
-        fun newIntent(context: Context, selectedTaxonomy: Taxonomy? = null): Intent {
+        fun newIntent(context: Context, vararg filter: Filter<*>): Intent {
             return Intent(
                 context,
-                TaxonomyFilterActivity::class.java
-            ).apply { putExtra(EXTRA_SELECTED_TAXONOMY, selectedTaxonomy) }
+                TaxaFilterActivity::class.java
+            ).apply {
+                putExtra(
+                    EXTRA_SELECTED_FILTERS,
+                    filter
+                )
+            }
         }
     }
 }

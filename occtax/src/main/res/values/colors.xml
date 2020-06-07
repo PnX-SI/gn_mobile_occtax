@@ -7,5 +7,10 @@
 
     <color name="bright_foreground_dark">@android:color/white</color>
     <color name="bright_foreground_dark_disabled">#80ffffff</color>
+    <color name="grey_200">#eeeeee</color>
+    <color name="grey_300">#e0e0e0</color>
 
+    <color name="area_observation_more_than_duration">#f00</color>
+    <color name="area_observation_less_than_duration">#808080</color>
+    <color name="area_observation_none">#fff</color>
 </resources>
