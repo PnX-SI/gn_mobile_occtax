@@ -79,8 +79,8 @@ class TaxaFragment : Fragment(),
                                     selectedFilters.asSequence()
                                         .filter { filter -> filter.type == Filter.FilterType.AREA_OBSERVATION }
                                         .map { filter -> filter.value as FilterAreaObservation.AreaObservation }
-                                        .map { areaObsevation ->
-                                            when (areaObsevation.type) {
+                                        .map { areaObservation ->
+                                            when (areaObservation.type) {
                                                 FilterAreaObservation.AreaObservationType.MORE_THAN_DURATION -> "red"
                                                 FilterAreaObservation.AreaObservationType.LESS_THAN_DURATION -> "grey"
                                                 else -> "none"
@@ -89,7 +89,7 @@ class TaxaFragment : Fragment(),
                                 val filterByTaxonomy =
                                     selectedFilters.find { filter -> filter.type == Filter.FilterType.TAXONOMY }?.value as Taxonomy?
 
-                                if (filterByAreaObservation.isNotEmpty()) {
+                                if (filterByAreaObservation.isNotEmpty() && !selectedFeatureId.isNullOrBlank()) {
                                     (it as TaxonWithArea.Filter).byAreaColors(*filterByAreaObservation.toTypedArray())
                                 }
 
@@ -102,7 +102,7 @@ class TaxaFragment : Fragment(),
                         requireContext(),
                         buildUri(
                             Taxon.TABLE_NAME,
-                            if (selectedFeatureId == null) "" else "area/$selectedFeatureId"
+                            if (selectedFeatureId.isNullOrBlank()) "" else "area/$selectedFeatureId"
                         ),
                         null,
                         taxonFilter.first,
