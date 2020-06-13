@@ -1,7 +1,9 @@
 # Occtax-mobile
 
-![PNV](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnv/res/mipmap-xxxhdpi/ic_launcher.png)
+![PNC](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnc/res/mipmap-xxxhdpi/ic_launcher.png)
 ![PNE](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pne/res/mipmap-xxxhdpi/ic_launcher.png)
+![PNM](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnm/res/mipmap-xxxhdpi/ic_launcher.png)
+![PNV](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnv/res/mipmap-xxxhdpi/ic_launcher.png)
 
 GeoNature Android mobile application for Occtax module.
 
