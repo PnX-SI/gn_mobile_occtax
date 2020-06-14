@@ -137,7 +137,10 @@ class TaxaFilterFragment : Fragment() {
     ) {
         progressBar?.visibility = View.VISIBLE
 
-        loadFilterAreaObservation()
+        if (arguments?.getBoolean(ARG_WITH_AREA_OBSERVATION, false) == true) {
+            loadFilterAreaObservation()
+        }
+
         LoaderManager.getInstance(this)
             .initLoader(
                 LOADER_TAXONOMY,
@@ -243,6 +246,7 @@ class TaxaFilterFragment : Fragment() {
 
         private val TAG = TaxaFilterFragment::class.java.name
 
+        private const val ARG_WITH_AREA_OBSERVATION = "arg_with_area_observation"
         private const val ARG_FILTERS = "arg_filters"
         private const val LOADER_TAXONOMY = 1
 
@@ -252,13 +256,18 @@ class TaxaFilterFragment : Fragment() {
          * @return A new instance of [TaxaFilterFragment]
          */
         @JvmStatic
-        fun newInstance(vararg filter: Filter<*>) = TaxaFilterFragment().apply {
-            arguments = Bundle().apply {
-                putParcelableArray(
-                    ARG_FILTERS,
-                    filter
-                )
+        fun newInstance(withAreaObservation: Boolean = false, vararg filter: Filter<*>) =
+            TaxaFilterFragment().apply {
+                arguments = Bundle().apply {
+                    putBoolean(
+                        ARG_WITH_AREA_OBSERVATION,
+                        withAreaObservation
+                    )
+                    putParcelableArray(
+                        ARG_FILTERS,
+                        filter
+                    )
+                }
             }
-        }
     }
 }

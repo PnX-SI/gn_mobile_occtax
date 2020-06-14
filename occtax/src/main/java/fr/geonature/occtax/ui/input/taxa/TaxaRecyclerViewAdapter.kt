@@ -214,16 +214,21 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
                 )
                 checkbox.isChecked = selectedTaxon?.id == taxon.id
 
-                taxon.taxonArea?.run {
-                    taxonColorView.setBackgroundColor(if (color.isNullOrBlank()) Color.TRANSPARENT else Color.parseColor(color))
+                with(taxon.taxonArea) {
+                    if (this == null) {
+                        taxonColorView.setBackgroundColor(Color.TRANSPARENT)
+                        taxonObserversView.text = ""
+                        taxonLastUpdatedAtView.text = ""
 
+                        return@with
+                    }
+
+                    taxonColorView.setBackgroundColor(if (color.isNullOrBlank()) Color.TRANSPARENT else Color.parseColor(color))
                     taxonObserversView.text =
                         NumberFormat.getNumberInstance().format(numberOfObservers)
-
-                    lastUpdatedAt?.run {
-                        taxonLastUpdatedAtView.text =
-                            DateFormat.getDateFormat(itemView.context).format(this)
-                    }
+                    taxonLastUpdatedAtView.text =
+                        lastUpdatedAt?.let { DateFormat.getDateFormat(itemView.context).format(it) }
+                            ?: ""
                 }
 
                 with(itemView) {
