@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="primary">#81197F</color>
-    <color name="primary_dark">#5a1158</color>
-    <color name="accent">#00A3DE</color>
+    <!-- https://material.io/resources/color/#!/?primary.color=81197f&secondary.color=00a3de -->
+    <color name="primary">#81197f</color>
+    <color name="primary_dark">#510052</color>
+    <color name="accent">#00a3de</color>
 
 </resources>

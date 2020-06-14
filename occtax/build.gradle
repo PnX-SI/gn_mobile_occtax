@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
-version = "0.3.2"
+version = "0.3.3"
 
 android {
     compileSdkVersion 29
@@ -38,12 +38,11 @@ android {
 
     flavorDimensions "version"
     productFlavors {
-        generic {
-        }
-        pne {
-        }
-        pnv {
-        }
+        generic {}
+        pnc {}
+        pne {}
+        pnm {}
+        pnv {}
     }
 
     testOptions {

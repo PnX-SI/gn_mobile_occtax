@@ -32,7 +32,13 @@ class TaxaFilterActivity : AppCompatActivity(), TaxaFilterFragment.OnTaxaFilterF
             supportFragmentManager.beginTransaction()
                 .replace(
                     android.R.id.content,
-                    TaxaFilterFragment.newInstance(*selectedFilters.toTypedArray())
+                    TaxaFilterFragment.newInstance(
+                        intent.getBooleanExtra(
+                            EXTRA_WITH_AREA_OBSERVATION,
+                            false
+                        ),
+                        *selectedFilters.toTypedArray()
+                    )
                 )
                 .commit()
         }
@@ -76,12 +82,21 @@ class TaxaFilterActivity : AppCompatActivity(), TaxaFilterFragment.OnTaxaFilterF
     companion object {
 
         const val EXTRA_SELECTED_FILTERS = "extra_selected_filters"
+        const val EXTRA_WITH_AREA_OBSERVATION = "extra_with_area_observation"
 
-        fun newIntent(context: Context, vararg filter: Filter<*>): Intent {
+        fun newIntent(
+            context: Context,
+            withAreaObservation: Boolean = false,
+            vararg filter: Filter<*>
+        ): Intent {
             return Intent(
                 context,
                 TaxaFilterActivity::class.java
             ).apply {
+                putExtra(
+                    EXTRA_WITH_AREA_OBSERVATION,
+                    withAreaObservation
+                )
                 putExtra(
                     EXTRA_SELECTED_FILTERS,
                     filter

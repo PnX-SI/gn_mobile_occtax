@@ -71,6 +71,11 @@ class TaxaFragment : Fragment(),
                         null
                     )
 
+                    Log.d(
+                        TAG,
+                        "load taxa with selected feature ID: $selectedFeatureId"
+                    )
+
                     val taxonFilter =
                         TaxonWithArea.Filter()
                             .byNameOrDescription(args?.getString(KEY_FILTER_BY_NAME))
@@ -344,6 +349,7 @@ class TaxaFragment : Fragment(),
                 startActivityForResult(
                     TaxaFilterActivity.newIntent(
                         context,
+                        !savedState.getString(KEY_SELECTED_FEATURE_ID).isNullOrEmpty(),
                         *getSelectedFilters().toTypedArray()
                     ),
                     RESULT_FILTER
@@ -398,10 +404,15 @@ class TaxaFragment : Fragment(),
 
     override fun setInput(input: AbstractInput) {
         this.input = input as Input
+
         savedState.putString(
             KEY_SELECTED_FEATURE_ID,
             input.selectedFeatureId
         )
+
+        if (input.selectedFeatureId.isNullOrEmpty()) {
+            savedState.remove(KEY_SELECTED_FEATURE_ID)
+        }
     }
 
     private fun loadTaxa() {

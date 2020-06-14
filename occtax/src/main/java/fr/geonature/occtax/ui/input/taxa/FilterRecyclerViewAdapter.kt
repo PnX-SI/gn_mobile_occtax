@@ -249,6 +249,7 @@ class FilterRecyclerViewAdapter(val listener: FilterRecyclerViewAdapterListener<
 
             if (position == 0) {
                 label.text = filterTitleAreaObservationRecyclerViewAdapter.items.getOrNull(0)
+                    ?: filterTitleTaxonomyRecyclerViewAdapter.items.getOrNull(0)
                 return
             }
 
