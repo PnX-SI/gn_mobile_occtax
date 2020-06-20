@@ -10,9 +10,15 @@ import fr.geonature.maps.settings.MapSettings
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-data class AppSettings(var mapSettings: MapSettings? = null) : IAppSettings {
+data class AppSettings(
+    var areaObservationDuration: Int = DEFAULT_AREA_OBSERVATION_DURATION,
+    var mapSettings: MapSettings? = null
+) : IAppSettings {
 
-    private constructor(source: Parcel) : this(source.readParcelable(MapSettings::class.java.classLoader) as MapSettings?)
+    private constructor(source: Parcel) : this(
+        source.readInt(),
+        source.readParcelable(MapSettings::class.java.classLoader) as MapSettings?
+    )
 
     override fun describeContents(): Int {
         return 0
@@ -22,34 +28,44 @@ data class AppSettings(var mapSettings: MapSettings? = null) : IAppSettings {
         dest: Parcel?,
         flags: Int
     ) {
-        dest?.writeParcelable(
+        dest?.also {
+            it.writeInt(areaObservationDuration)
+            it.writeParcelable(
                 mapSettings,
                 0
-        )
+            )
+        }
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other !is AppSettings) return false
 
-        other as AppSettings
-
+        if (areaObservationDuration != other.areaObservationDuration) return false
         if (mapSettings != other.mapSettings) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return mapSettings.hashCode()
+        var result = areaObservationDuration
+        result = 31 * result + (mapSettings?.hashCode() ?: 0)
+
+        return result
     }
 
-    companion object CREATOR : Parcelable.Creator<AppSettings> {
-        override fun createFromParcel(parcel: Parcel): AppSettings {
-            return AppSettings(parcel)
-        }
+    companion object {
+        const val DEFAULT_AREA_OBSERVATION_DURATION = 365
 
-        override fun newArray(size: Int): Array<AppSettings?> {
-            return arrayOfNulls(size)
+        @JvmField
+        val CREATOR: Parcelable.Creator<AppSettings> = object : Parcelable.Creator<AppSettings> {
+            override fun createFromParcel(parcel: Parcel): AppSettings {
+                return AppSettings(parcel)
+            }
+
+            override fun newArray(size: Int): Array<AppSettings?> {
+                return arrayOfNulls(size)
+            }
         }
     }
 }

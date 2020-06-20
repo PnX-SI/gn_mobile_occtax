@@ -34,6 +34,7 @@ import fr.geonature.commons.util.ThemeUtils
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
+import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
@@ -350,6 +351,10 @@ class TaxaFragment : Fragment(),
                     TaxaFilterActivity.newIntent(
                         context,
                         !savedState.getString(KEY_SELECTED_FEATURE_ID).isNullOrEmpty(),
+                        arguments?.getInt(
+                            ARG_AREA_OBSERVATION_DURATION,
+                            AppSettings.DEFAULT_AREA_OBSERVATION_DURATION
+                        ) ?: AppSettings.DEFAULT_AREA_OBSERVATION_DURATION,
                         *getSelectedFilters().toTypedArray()
                     ),
                     RESULT_FILTER
@@ -600,6 +605,7 @@ class TaxaFragment : Fragment(),
 
         private val TAG = TaxaFragment::class.java.name
 
+        private const val ARG_AREA_OBSERVATION_DURATION = "arg_area_observation_duration"
         private const val LOADER_TAXA = 1
         private const val LOADER_TAXON = 2
         private const val RESULT_FILTER = 3
@@ -614,6 +620,14 @@ class TaxaFragment : Fragment(),
          * @return A new instance of [TaxaFragment]
          */
         @JvmStatic
-        fun newInstance() = TaxaFragment()
+        fun newInstance(areaObservationDuration: Int = AppSettings.DEFAULT_AREA_OBSERVATION_DURATION) =
+            TaxaFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(
+                        ARG_AREA_OBSERVATION_DURATION,
+                        areaObservationDuration
+                    )
+                }
+            }
     }
 }

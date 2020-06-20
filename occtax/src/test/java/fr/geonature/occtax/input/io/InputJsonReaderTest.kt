@@ -4,7 +4,7 @@ import fr.geonature.commons.data.Taxon
 import fr.geonature.commons.data.Taxonomy
 import fr.geonature.commons.input.AbstractInputTaxon
 import fr.geonature.commons.input.io.InputJsonReader
-import fr.geonature.commons.util.IsoDateUtils.toDate
+import fr.geonature.commons.util.toDate
 import fr.geonature.occtax.FixtureHelper.getFixture
 import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
