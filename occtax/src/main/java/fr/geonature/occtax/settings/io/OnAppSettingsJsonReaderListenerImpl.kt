@@ -11,7 +11,8 @@ import fr.geonature.occtax.settings.AppSettings
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
-class OnAppSettingsJsonReaderListenerImpl : AppSettingsJsonReader.OnAppSettingsJsonReaderListener<AppSettings> {
+class OnAppSettingsJsonReaderListenerImpl :
+    AppSettingsJsonReader.OnAppSettingsJsonReaderListener<AppSettings> {
 
     override fun createAppSettings(): AppSettings {
         return AppSettings()
@@ -23,10 +24,13 @@ class OnAppSettingsJsonReaderListenerImpl : AppSettingsJsonReader.OnAppSettingsJ
         appSettings: AppSettings
     ) {
         when (keyName) {
+            "area_observation_duration" -> appSettings.areaObservationDuration = reader.nextInt()
             "map" -> {
                 if (reader.peek() == JsonToken.BEGIN_OBJECT) {
-                    readMapSettings(reader,
-                                    appSettings)
+                    readMapSettings(
+                        reader,
+                        appSettings
+                    )
                 } else {
                     reader.skipValue()
                 }

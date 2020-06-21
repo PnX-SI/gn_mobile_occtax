@@ -82,7 +82,7 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
             )
             put(
                 R.string.pager_fragment_taxa_title,
-                TaxaFragment.newInstance()
+                TaxaFragment.newInstance(appSettings.areaObservationDuration)
             )
             put(
                 R.string.pager_fragment_information_title,

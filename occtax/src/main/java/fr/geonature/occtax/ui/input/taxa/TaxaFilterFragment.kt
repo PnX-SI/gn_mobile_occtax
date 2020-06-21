@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.data.Taxonomy
 import fr.geonature.commons.data.helper.Provider
 import fr.geonature.occtax.R
+import fr.geonature.occtax.settings.AppSettings
 
 /**
  * [Fragment] to let the user to apply filters on taxa list.
@@ -137,8 +138,17 @@ class TaxaFilterFragment : Fragment() {
     ) {
         progressBar?.visibility = View.VISIBLE
 
-        if (arguments?.getBoolean(ARG_WITH_AREA_OBSERVATION, false) == true) {
-            loadFilterAreaObservation()
+        if (arguments?.getBoolean(
+                ARG_WITH_AREA_OBSERVATION,
+                false
+            ) == true
+        ) {
+            loadFilterAreaObservation(
+                arguments?.getInt(
+                    ARG_AREA_OBSERVATION_DURATION,
+                    AppSettings.DEFAULT_AREA_OBSERVATION_DURATION
+                ) ?: AppSettings.DEFAULT_AREA_OBSERVATION_DURATION
+            )
         }
 
         LoaderManager.getInstance(this)
@@ -165,17 +175,17 @@ class TaxaFilterFragment : Fragment() {
         listener = null
     }
 
-    private fun loadFilterAreaObservation(duration: Int = 365) {
+    private fun loadFilterAreaObservation(duration: Int) {
         val context = context ?: return
 
         val formatDuration: (Int) -> String = {
             when {
-                (it >= 365) -> context.resources.getQuantityString(
+                (it % 365 == 0) -> context.resources.getQuantityString(
                     R.plurals.duration_year,
                     (it / 365),
                     (it / 365)
                 )
-                (it >= 30) -> context.resources.getQuantityString(
+                (it % 30 == 0) -> context.resources.getQuantityString(
                     R.plurals.duration_month,
                     (it / 30),
                     (it / 30)
@@ -247,6 +257,7 @@ class TaxaFilterFragment : Fragment() {
         private val TAG = TaxaFilterFragment::class.java.name
 
         private const val ARG_WITH_AREA_OBSERVATION = "arg_with_area_observation"
+        private const val ARG_AREA_OBSERVATION_DURATION = "arg_area_observation_duration"
         private const val ARG_FILTERS = "arg_filters"
         private const val LOADER_TAXONOMY = 1
 
@@ -256,12 +267,20 @@ class TaxaFilterFragment : Fragment() {
          * @return A new instance of [TaxaFilterFragment]
          */
         @JvmStatic
-        fun newInstance(withAreaObservation: Boolean = false, vararg filter: Filter<*>) =
+        fun newInstance(
+            withAreaObservation: Boolean = false,
+            areaObservationDuration: Int = AppSettings.DEFAULT_AREA_OBSERVATION_DURATION,
+            vararg filter: Filter<*>
+        ) =
             TaxaFilterFragment().apply {
                 arguments = Bundle().apply {
                     putBoolean(
                         ARG_WITH_AREA_OBSERVATION,
                         withAreaObservation
+                    )
+                    putInt(
+                        ARG_AREA_OBSERVATION_DURATION,
+                        areaObservationDuration
                     )
                     putParcelableArray(
                         ARG_FILTERS,

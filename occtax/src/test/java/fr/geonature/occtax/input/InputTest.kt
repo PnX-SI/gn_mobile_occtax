@@ -3,7 +3,7 @@ package fr.geonature.occtax.input
 import android.os.Parcel
 import fr.geonature.commons.data.Taxon
 import fr.geonature.commons.data.Taxonomy
-import fr.geonature.commons.util.IsoDateUtils
+import fr.geonature.commons.util.toDate
 import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -34,7 +34,7 @@ class InputTest {
                 null,
                 133
             )
-            date = IsoDateUtils.toDate("2016-10-28") ?: Date()
+            date = toDate("2016-10-28") ?: Date()
             setPrimaryInputObserverId(1L)
             addInputObserverId(5L)
             addInputObserverId(2L)

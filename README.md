@@ -7,15 +7,51 @@
 
 GeoNature Android mobile application for Occtax module.
 
+## Settings
+
+Example:
+
+```json
+{
+  "area_observation_duration": 365,
+  "map": {
+    "show_scale": true,
+    "show_compass": true,
+    "max_bounds": [
+      [47.253369, -1.605721],
+      [47.173845, -1.482811]
+    ],
+    "center": [47.225827, -1.55447],
+    "start_zoom": 10.0,
+    "min_zoom": 8.0,
+    "max_zoom": 19.0,
+    "min_zoom_editing": 12.0,
+    "layers": [
+      {
+        "label": "Nantes",
+        "source": "nantes.mbtiles"
+      }
+    ]
+  }
+}
+```
+
+### Parameters description
+
+| Parameter                   | UI      | Description                                                                    | Default value |
+| --------------------------- | ------- | ------------------------------------------------------------------------------ | ------------- |
+| `area_observation_duration` | &#9744; | Area observation duration period (in days)                                     | 365           |
+| `map`                       | &#9744; | Maps settings (cf. https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps) |               |
+
 ## Upgrade git sub modules
 
 Do **NOT** modify directly any git sub modules (e.g. `commons`, `mountpoint`, `viewpager` and `maps`).
 Any changes should be made from each underlying git repository:
 
-* `commons`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
-* `mountpoint`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
-* `viewpager`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
-* `maps`: [gn_mobile_maps](https://github.com/PnX-SI/gn_mobile_maps) git repository
+- `commons`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
+- `mountpoint`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
+- `viewpager`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
+- `maps`: [gn_mobile_maps](https://github.com/PnX-SI/gn_mobile_maps) git repository
 
 ```bash
 ./upgrade_submodules.sh
@@ -23,9 +59,9 @@ Any changes should be made from each underlying git repository:
 
 ## Troubleshooting
 
-* Kotlin error, Redeclaration from class within imported module:
+- Kotlin error, Redeclaration from class within imported module:
 
-  clean project from menu *Build -> Clean Project*, then rebuild project.
+  clean project from menu _Build -> Clean Project_, then rebuild project.
 
 ## Full Build
 

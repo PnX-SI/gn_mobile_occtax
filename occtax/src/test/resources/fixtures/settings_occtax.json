@@ -1,4 +1,5 @@
 {
+  "area_observation_duration": 365,
   "map": {
     "show_scale": true,
     "show_compass": true,

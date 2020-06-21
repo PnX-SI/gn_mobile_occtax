@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import fr.geonature.occtax.settings.AppSettings
 
 /**
  * Apply filters on taxa list.
@@ -37,7 +38,11 @@ class TaxaFilterActivity : AppCompatActivity(), TaxaFilterFragment.OnTaxaFilterF
                             EXTRA_WITH_AREA_OBSERVATION,
                             false
                         ),
-                        *selectedFilters.toTypedArray()
+                        intent.getIntExtra(
+                            EXTRA_AREA_OBSERVATION_DURATION,
+                            AppSettings.DEFAULT_AREA_OBSERVATION_DURATION
+                        ),
+                        * selectedFilters.toTypedArray()
                     )
                 )
                 .commit()
@@ -83,10 +88,12 @@ class TaxaFilterActivity : AppCompatActivity(), TaxaFilterFragment.OnTaxaFilterF
 
         const val EXTRA_SELECTED_FILTERS = "extra_selected_filters"
         const val EXTRA_WITH_AREA_OBSERVATION = "extra_with_area_observation"
+        const val EXTRA_AREA_OBSERVATION_DURATION = "extra_area_observation_duration"
 
         fun newIntent(
             context: Context,
             withAreaObservation: Boolean = false,
+            areaObservationDuration: Int = AppSettings.DEFAULT_AREA_OBSERVATION_DURATION,
             vararg filter: Filter<*>
         ): Intent {
             return Intent(
@@ -96,6 +103,10 @@ class TaxaFilterActivity : AppCompatActivity(), TaxaFilterFragment.OnTaxaFilterF
                 putExtra(
                     EXTRA_WITH_AREA_OBSERVATION,
                     withAreaObservation
+                )
+                putExtra(
+                    EXTRA_AREA_OBSERVATION_DURATION,
+                    areaObservationDuration
                 )
                 putExtra(
                     EXTRA_SELECTED_FILTERS,

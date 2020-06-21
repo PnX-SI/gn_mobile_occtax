@@ -40,39 +40,41 @@ class AppSettingsJsonReaderTest {
         // then
         assertNotNull(appSettings)
         assertEquals(
-                AppSettings(
-                        MapSettings(
-                                arrayListOf(
-                                        LayerSettings(
-                                                "Nantes",
-                                                "nantes.mbtiles"
-                                        )
-                                ),
-                                null,
-                                showScale = true,
-                                showCompass = true,
-                                zoom = 10.0,
-                                minZoomLevel = 8.0,
-                                maxZoomLevel = 19.0,
-                                minZoomEditing = 12.0,
-                                maxBounds = BoundingBox.fromGeoPoints(
-                                        arrayListOf(
-                                                GeoPoint(
-                                                        47.253369,
-                                                        -1.605721
-                                                ),
-                                                GeoPoint(
-                                                        47.173845,
-                                                        -1.482811
-                                                )
-                                        )
-                                ),
-                                center = GeoPoint(
-                                        47.225827,
-                                        -1.554470
-                                )
-                        )),
-                appSettings
+            AppSettings(
+                365,
+                MapSettings(
+                    arrayListOf(
+                        LayerSettings(
+                            "Nantes",
+                            "nantes.mbtiles"
+                        )
+                    ),
+                    null,
+                    showScale = true,
+                    showCompass = true,
+                    zoom = 10.0,
+                    minZoomLevel = 8.0,
+                    maxZoomLevel = 19.0,
+                    minZoomEditing = 12.0,
+                    maxBounds = BoundingBox.fromGeoPoints(
+                        arrayListOf(
+                            GeoPoint(
+                                47.253369,
+                                -1.605721
+                            ),
+                            GeoPoint(
+                                47.173845,
+                                -1.482811
+                            )
+                        )
+                    ),
+                    center = GeoPoint(
+                        47.225827,
+                        -1.554470
+                    )
+                )
+            ),
+            appSettings
         )
     }
 
