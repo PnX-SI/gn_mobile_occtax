@@ -180,12 +180,12 @@ class TaxaFilterFragment : Fragment() {
 
         val formatDuration: (Int) -> String = {
             when {
-                (it >= 365) -> context.resources.getQuantityString(
+                (it % 365 == 0) -> context.resources.getQuantityString(
                     R.plurals.duration_year,
                     (it / 365),
                     (it / 365)
                 )
-                (it >= 30) -> context.resources.getQuantityString(
+                (it % 30 == 0) -> context.resources.getQuantityString(
                     R.plurals.duration_month,
                     (it / 30),
                     (it / 30)
