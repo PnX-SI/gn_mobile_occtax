@@ -229,6 +229,39 @@ Elle proposera aussi d'installer les applications mobiles disponibles et de réc
 Si vous faites évoluer la configuration et/ou les versions des applications mobiles sur le serveur GeoNature et dans la table ``gn_commons.t_mobile_apps``, 
 alors ils seront mis à jour sur le terminal mobile au prochaine lancement de l'application Sync-mobile.
 
+## Logs
+
+Pour obtenir des logs de l'application mobile, on peut utiliser l'utilitaire ADB (Android Debug Bridge) sur PC. Il est intégré au kit de développement d'Android Studio mais peut aussi être installé à part.
+
+Sur Linux : 
+
+```
+sudo apt-get install android-tools-adb
+```
+
+Sur Windows, vous pouvez installer le petit logiciel Minimal ADB and Fastboot (https://forum.xda-developers.com/showthread.php?t=2317790).
+
+Pour en savoir plus : https://www.frandroid.com/android/rom-custom-2/403222_comment-telecharger-les-outils-adb-et-fastboot-sur-windows-macos-et-linux
+
+Activer le "Debugage USB" dans les options développeur de votre terminal mobile et connectez-le en USB à votre PC.
+
+Sur linux, dans le terminal ou sur Windows dans le terminal de Minimal ADB, lancer la commande permettant les appareils mobiles connectés :
+
+```
+adb devices
+```
+
+Cette commande doit lister votre appareil mobile si celui-ci est bien détecté. Il peut être nécessaire d'autoriser la connexion sur l'appareil mobile.
+
+Pour obtenir les logs liés aux applications Sync-mobile ou Occtax-mobile, exécutez la commande : 
+
+```
+# Sur Linux :
+adb logcat | grep fr.geonature
+# Sur Windows :
+adb logcat findstr fr.geonature
+```
+
 # Utilisation
 
 Voir https://geonature.fr/documents/0.25-occtax-mobile.pdf (à mettre à jour et migrer en fichier .md à part)
