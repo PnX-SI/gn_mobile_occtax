@@ -229,6 +229,19 @@ Elle proposera aussi d'installer les applications mobiles disponibles et de réc
 Si vous faites évoluer la configuration et/ou les versions des applications mobiles sur le serveur GeoNature et dans la table ``gn_commons.t_mobile_apps``, 
 alors ils seront mis à jour sur le terminal mobile au prochaine lancement de l'application Sync-mobile.
 
+## Démonstration
+
+Il est possible de tester l'application mobile en la connectant sur le serveur de démonstration http://demo.geonature.fr.
+
+Pour cela, télécharger uniquement l'application Sync-mobile et installez-la sur un terminal mobile. Renseignez dans ses paramètres l'URL du serveur de démo de GeoNature et TaxHub :
+
+- URL de GeoNature : http://demo.geonature.fr/geonature
+- URL de TaxHub : http://demo.geonature.fr/taxhub
+
+Authentifiez-vous avec l'utilisateur de démo (admin / admin). L'application Sync-mobile se chargera de télécharger le fichier de configuration complet et proposera aussi l'installation automatique de l'application Occtax-mobile et de sa configuration.
+
+TODO : Fournir un fond offline de base, ainsi qu'une couche des unités géographiques (mailles 10x10km) pour les couleurs des taxons.
+
 ## Logs
 
 Pour obtenir des logs de l'application mobile, on peut utiliser l'utilitaire ADB (Android Debug Bridge) sur PC. Il est intégré au kit de développement d'Android Studio mais peut aussi être installé à part.
