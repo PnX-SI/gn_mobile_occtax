@@ -272,7 +272,7 @@ Pour obtenir les logs liés aux applications Sync-mobile ou Occtax-mobile, exéc
 # Sur Linux :
 adb logcat | grep fr.geonature
 # Sur Windows :
-adb logcat findstr fr.geonature
+adb logcat | findstr fr.geonature
 ```
 
 # Utilisation
