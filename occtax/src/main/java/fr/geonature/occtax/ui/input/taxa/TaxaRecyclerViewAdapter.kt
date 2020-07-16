@@ -32,6 +32,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
     private val onClickListener: View.OnClickListener
 
     init {
+        setHasStableIds(true)
         this.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onChanged() {
                 super.onChanged()
@@ -82,6 +83,9 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
             val checkbox: CheckBox = v.findViewById(android.R.id.checkbox)
             checkbox.isChecked = !checkbox.isChecked
 
+            val text2: TextView = v.findViewById(android.R.id.text2)
+            text2.isSelected = true
+
             val taxon = v.tag as AbstractTaxon
 
             if (checkbox.isChecked) {
@@ -115,6 +119,15 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
     ) {
 
         holder.bind(position)
+    }
+
+    override fun getItemId(position: Int): Long {
+        val cursor = cursor ?: return super.getItemId(position)
+        cursor.moveToPosition(position)
+
+        val taxon = Taxon.fromCursor(cursor) ?: return super.getItemId(position)
+
+        return taxon.id
     }
 
     override fun getSectionText(position: Int): CharSequence {
@@ -209,9 +222,10 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
                 title.text = if (previousTitle == currentTitle) "" else currentTitle
                 text1.text = taxon.name
                 text2.text = HtmlCompat.fromHtml(
-                    taxon.description ?: "",
+                    "${if (taxon.description.isNullOrBlank()) "" else "<i>${taxon.description ?: ""}</i>"}${if (taxon.rank.isNullOrBlank()) "" else "${if (taxon.description.isNullOrBlank()) "" else " - [${taxon.rank}]"} "}",
                     HtmlCompat.FROM_HTML_MODE_COMPACT
                 )
+                text2.isSelected = selectedTaxon?.id == taxon.id
                 checkbox.isChecked = selectedTaxon?.id == taxon.id
 
                 with(taxon.taxonArea) {

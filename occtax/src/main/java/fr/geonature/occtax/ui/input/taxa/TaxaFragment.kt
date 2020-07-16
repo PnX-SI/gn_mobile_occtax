@@ -13,6 +13,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.ProgressBar
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
@@ -52,6 +53,7 @@ class TaxaFragment : Fragment(),
     private var input: Input? = null
     private var adapter: TaxaRecyclerViewAdapter? = null
     private lateinit var savedState: Bundle
+    private var progressBar: ProgressBar? = null
     private var emptyTextView: View? = null
     private var filterChipGroup: ChipGroup? = null
 
@@ -79,7 +81,7 @@ class TaxaFragment : Fragment(),
 
                     val taxonFilter =
                         TaxonWithArea.Filter()
-                            .byNameOrDescription(args?.getString(KEY_FILTER_BY_NAME))
+                            .byNameOrDescriptionOrRank(args?.getString(KEY_FILTER_BY_NAME))
                             .also {
                                 val filterByAreaObservation =
                                     selectedFilters.asSequence()
@@ -197,6 +199,7 @@ class TaxaFragment : Fragment(),
             false
         )
         val recyclerView = view.findViewById<RecyclerView>(android.R.id.list)
+        progressBar = view.findViewById(android.R.id.progress)
         emptyTextView = view.findViewById(R.id.emptyTextView)
         filterChipGroup = view.findViewById(R.id.chip_group_filter)
 
@@ -227,6 +230,8 @@ class TaxaFragment : Fragment(),
                 val emptyTextView = emptyTextView ?: return
                 val context = context ?: return
 
+                progressBar?.visibility = View.GONE
+
                 if (emptyTextView.visibility == View.VISIBLE == show) {
                     return
                 }
@@ -252,6 +257,8 @@ class TaxaFragment : Fragment(),
         })
 
         with(recyclerView) {
+            setHasFixedSize(true)
+            setItemViewCacheSize(1000)
             layoutManager = LinearLayoutManager(context)
             adapter = this@TaxaFragment.adapter
         }
@@ -370,6 +377,10 @@ class TaxaFragment : Fragment(),
     }
 
     override fun getSubtitle(): CharSequence? {
+        if (progressBar?.visibility == View.VISIBLE && adapter?.itemCount == 0) {
+            return null
+        }
+
         val taxaFound = adapter?.itemCount ?: return null
 
         return resources.getQuantityString(
@@ -421,6 +432,8 @@ class TaxaFragment : Fragment(),
     }
 
     private fun loadTaxa() {
+        progressBar?.visibility = View.VISIBLE
+
         LoaderManager.getInstance(this)
             .restartLoader(
                 LOADER_TAXA,
