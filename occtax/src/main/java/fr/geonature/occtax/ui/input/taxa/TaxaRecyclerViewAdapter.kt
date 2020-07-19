@@ -210,6 +210,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         private val text2: TextView = itemView.findViewById(android.R.id.text2)
         private val checkbox: CheckBox = itemView.findViewById(android.R.id.checkbox)
         private val taxonColorView: View = itemView.findViewById(R.id.taxon_color_view)
+        private val taxonObserversImageView: View = itemView.findViewById(R.id.taxon_observers_image_view)
         private val taxonObserversView: TextView = itemView.findViewById(R.id.taxon_observers_view)
         private val taxonLastUpdatedAtView: TextView =
             itemView.findViewById(R.id.taxon_last_updated_at_view)
@@ -245,6 +246,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
                 with(taxon.taxonArea) {
                     if (this == null) {
                         taxonColorView.setBackgroundColor(Color.TRANSPARENT)
+                        taxonObserversImageView.visibility = View.GONE
                         taxonObserversView.text = ""
                         taxonLastUpdatedAtView.text = ""
 
@@ -252,6 +254,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
                     }
 
                     taxonColorView.setBackgroundColor(if (color.isNullOrBlank()) Color.TRANSPARENT else Color.parseColor(color))
+                    taxonObserversImageView.visibility = View.VISIBLE
                     taxonObserversView.text =
                         NumberFormat.getNumberInstance().format(numberOfObservers)
                     taxonLastUpdatedAtView.text =
