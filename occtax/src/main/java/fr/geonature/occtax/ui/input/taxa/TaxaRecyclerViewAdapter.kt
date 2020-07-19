@@ -28,6 +28,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
     RecyclerView.Adapter<TaxaRecyclerViewAdapter.ViewHolder>(),
     FastScroller.SectionIndexer {
     private var cursor: Cursor? = null
+    private var showCommonName = false
     private var selectedTaxon: AbstractTaxon? = null
     private val onClickListener: View.OnClickListener
 
@@ -133,10 +134,10 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
     override fun getSectionText(position: Int): CharSequence {
         val cursor = cursor ?: return ""
         cursor.moveToPosition(position)
-        val taxon = Taxon.fromCursor(cursor) ?: return ""
-        val name = taxon.name
 
-        return name.elementAt(0)
+        val taxon = Taxon.fromCursor(cursor) ?: return ""
+
+        return taxonName(taxon).elementAt(0)
             .toString()
     }
 
@@ -150,6 +151,15 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         this.cursor = cursor
         notifyDataSetChanged()
         scrollToFirstItemSelected()
+    }
+
+    fun toggleCommonName(toggle: Boolean = false, notify: Boolean = false) {
+        this.showCommonName = toggle
+
+        if (notify) {
+            notifyDataSetChanged()
+            scrollToFirstItemSelected()
+        }
     }
 
     private fun getItemPosition(taxon: AbstractTaxon?): Int {
@@ -183,6 +193,10 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         }
     }
 
+    private fun taxonName(taxon: AbstractTaxon): String {
+        return if (showCommonName) taxon.commonName ?: taxon.name else taxon.name
+    }
+
     inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
         LayoutInflater.from(parent.context).inflate(
             R.layout.list_item_taxon,
@@ -210,17 +224,17 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
             val previousTitle = if (position > 0) {
                 cursor.moveToPosition(position - 1)
                 TaxonWithArea.fromCursor(cursor)
-                    ?.name?.elementAt(0)
-                    .toString()
+                    ?.let { taxonName(it).elementAt(0).toString() } ?: ""
             } else {
                 ""
             }
 
             if (taxon != null) {
-                val currentTitle = taxon.name.elementAt(0)
+                val taxonName = taxonName(taxon)
+                val currentTitle = taxonName.elementAt(0)
                     .toString()
                 title.text = if (previousTitle == currentTitle) "" else currentTitle
-                text1.text = taxon.name
+                text1.text = taxonName
                 text2.text = HtmlCompat.fromHtml(
                     "${if (taxon.description.isNullOrBlank()) "" else "<i>${taxon.description ?: ""}</i>"}${if (taxon.rank.isNullOrBlank()) "" else "${if (taxon.description.isNullOrBlank()) "" else " - [${taxon.rank}]"} "}",
                     HtmlCompat.FROM_HTML_MODE_COMPACT
