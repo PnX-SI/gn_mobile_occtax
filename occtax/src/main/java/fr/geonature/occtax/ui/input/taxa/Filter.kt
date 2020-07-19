@@ -58,6 +58,7 @@ open class Filter<T : Parcelable>(
      * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
      */
     enum class FilterType {
+        NAME,
         AREA_OBSERVATION,
         TAXONOMY
     }

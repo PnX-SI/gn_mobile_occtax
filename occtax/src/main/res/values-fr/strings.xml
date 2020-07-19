@@ -81,6 +81,9 @@
         <item quantity="one">%d taxon trouvé</item>
         <item quantity="other">%d taxons trouvés</item>
     </plurals>
+
+    <string name="taxa_filter_name_switch">Afficher le nom vernaculaire</string>
+    <string name="taxa_filter_name_short">Nom vernaculaire</string>
     <string name="taxa_filter_area_observation_title">Selon la durée d\'observation</string>
     <string name="taxa_filter_taxonomy_title">Selon le rang taxonomique</string>
     <string name="taxa_filter_area_observation_more_than_duration">Observé depuis plus %1$s</string>

@@ -28,10 +28,12 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
     RecyclerView.Adapter<TaxaRecyclerViewAdapter.ViewHolder>(),
     FastScroller.SectionIndexer {
     private var cursor: Cursor? = null
+    private var showCommonName = false
     private var selectedTaxon: AbstractTaxon? = null
     private val onClickListener: View.OnClickListener
 
     init {
+        setHasStableIds(true)
         this.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onChanged() {
                 super.onChanged()
@@ -82,6 +84,9 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
             val checkbox: CheckBox = v.findViewById(android.R.id.checkbox)
             checkbox.isChecked = !checkbox.isChecked
 
+            val text2: TextView = v.findViewById(android.R.id.text2)
+            text2.isSelected = true
+
             val taxon = v.tag as AbstractTaxon
 
             if (checkbox.isChecked) {
@@ -117,13 +122,22 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         holder.bind(position)
     }
 
+    override fun getItemId(position: Int): Long {
+        val cursor = cursor ?: return super.getItemId(position)
+        cursor.moveToPosition(position)
+
+        val taxon = Taxon.fromCursor(cursor) ?: return super.getItemId(position)
+
+        return taxon.id
+    }
+
     override fun getSectionText(position: Int): CharSequence {
         val cursor = cursor ?: return ""
         cursor.moveToPosition(position)
-        val taxon = Taxon.fromCursor(cursor) ?: return ""
-        val name = taxon.name
 
-        return name.elementAt(0)
+        val taxon = Taxon.fromCursor(cursor) ?: return ""
+
+        return taxonName(taxon).elementAt(0)
             .toString()
     }
 
@@ -137,6 +151,15 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         this.cursor = cursor
         notifyDataSetChanged()
         scrollToFirstItemSelected()
+    }
+
+    fun toggleCommonName(toggle: Boolean = false, notify: Boolean = false) {
+        this.showCommonName = toggle
+
+        if (notify) {
+            notifyDataSetChanged()
+            scrollToFirstItemSelected()
+        }
     }
 
     private fun getItemPosition(taxon: AbstractTaxon?): Int {
@@ -170,6 +193,10 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         }
     }
 
+    private fun taxonName(taxon: AbstractTaxon): String {
+        return if (showCommonName) taxon.commonName ?: taxon.name else taxon.name
+    }
+
     inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
         LayoutInflater.from(parent.context).inflate(
             R.layout.list_item_taxon,
@@ -183,6 +210,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
         private val text2: TextView = itemView.findViewById(android.R.id.text2)
         private val checkbox: CheckBox = itemView.findViewById(android.R.id.checkbox)
         private val taxonColorView: View = itemView.findViewById(R.id.taxon_color_view)
+        private val taxonObserversImageView: View = itemView.findViewById(R.id.taxon_observers_image_view)
         private val taxonObserversView: TextView = itemView.findViewById(R.id.taxon_observers_view)
         private val taxonLastUpdatedAtView: TextView =
             itemView.findViewById(R.id.taxon_last_updated_at_view)
@@ -197,26 +225,28 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
             val previousTitle = if (position > 0) {
                 cursor.moveToPosition(position - 1)
                 TaxonWithArea.fromCursor(cursor)
-                    ?.name?.elementAt(0)
-                    .toString()
+                    ?.let { taxonName(it).elementAt(0).toString() } ?: ""
             } else {
                 ""
             }
 
             if (taxon != null) {
-                val currentTitle = taxon.name.elementAt(0)
+                val taxonName = taxonName(taxon)
+                val currentTitle = taxonName.elementAt(0)
                     .toString()
                 title.text = if (previousTitle == currentTitle) "" else currentTitle
-                text1.text = taxon.name
+                text1.text = taxonName
                 text2.text = HtmlCompat.fromHtml(
-                    taxon.description ?: "",
+                    "${if (taxon.description.isNullOrBlank()) "" else "<i>${taxon.description ?: ""}</i>"}${if (taxon.rank.isNullOrBlank()) "" else "${if (taxon.description.isNullOrBlank()) "" else " - [${taxon.rank}]"} "}",
                     HtmlCompat.FROM_HTML_MODE_COMPACT
                 )
+                text2.isSelected = selectedTaxon?.id == taxon.id
                 checkbox.isChecked = selectedTaxon?.id == taxon.id
 
                 with(taxon.taxonArea) {
                     if (this == null) {
                         taxonColorView.setBackgroundColor(Color.TRANSPARENT)
+                        taxonObserversImageView.visibility = View.GONE
                         taxonObserversView.text = ""
                         taxonLastUpdatedAtView.text = ""
 
@@ -224,6 +254,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
                     }
 
                     taxonColorView.setBackgroundColor(if (color.isNullOrBlank()) Color.TRANSPARENT else Color.parseColor(color))
+                    taxonObserversImageView.visibility = View.VISIBLE
                     taxonObserversView.text =
                         NumberFormat.getNumberInstance().format(numberOfObservers)
                     taxonLastUpdatedAtView.text =

@@ -86,6 +86,8 @@
         <item quantity="other">%d taxa found</item>
     </plurals>
 
+    <string name="taxa_filter_name_switch">Show common name</string>
+    <string name="taxa_filter_name_short">Common name</string>
     <string name="taxa_filter_area_observation_title">By area observation</string>
     <string name="taxa_filter_taxonomy_title">By taxonomy</string>
     <string name="taxa_filter_area_observation_more_than_duration">Last observed for more than %1$s</string>
