@@ -7,6 +7,8 @@
 
 GeoNature Android mobile application for Occtax module.
 
+Installation documentation (French) : https://github.com/PnX-SI/gn_mobile_occtax/blob/master/docs/installation-fr.md
+
 ## Settings
 
 Example:
