@@ -23,13 +23,20 @@ android {
         archivesBaseName = module.name + "-" + versionName
     }
 
+    signingConfigs {
+        release {
+            readKeystoreProperties(module.name)
+        }
+    }
+
     buildTypes {
         debug {
-            versionNameSuffix "." + getVersionCode(module.name) + "-DEV"
+            versionNameSuffix ".${defaultConfig.versionCode}-DEV"
         }
 
         release {
-            versionNameSuffix "." + getVersionCode(module.name)
+            signingConfig signingConfigs.release
+            versionNameSuffix ".${defaultConfig.versionCode}"
             debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

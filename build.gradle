@@ -34,10 +34,10 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-File getVersionPropertiesFile(moduleName) {
-    def versionPropsFile = file(moduleName + '/version.properties')
+private File loadVersionPropertiesFile(String moduleName) {
+    def versionPropsFile = file("$moduleName/version.properties")
 
-    println("getVersionCode: loading '" + versionPropsFile + "'")
+    println "reading '${versionPropsFile.name}' for module '$moduleName' ..."
 
     if (!versionPropsFile.exists()) {
         versionPropsFile.createNewFile()
@@ -46,32 +46,41 @@ File getVersionPropertiesFile(moduleName) {
     return versionPropsFile
 }
 
-Properties readVersionProperties(moduleName) {
-    Properties versionProps = new Properties()
-    versionProps.load(new FileInputStream(getVersionPropertiesFile(moduleName)))
+@SuppressWarnings("unused")
+int updateVersionCode(moduleName) {
+    File propertiesFile = loadVersionPropertiesFile(moduleName)
 
-    if (!versionProps['VERSION_CODE']) {
-        versionProps['VERSION_CODE'] = "1"
-    }
+    Properties versionProperties = new Properties()
+    versionProperties.load(new FileInputStream(propertiesFile))
 
-    return versionProps
-}
+    int versionCode = Integer.parseInt(versionProperties.getProperty('VERSION_CODE', '0').toString()).intValue() + 1
 
-int getVersionCode(moduleName) {
-    Properties versionProps = readVersionProperties(moduleName)
+    versionProperties['VERSION_CODE'] = versionCode.toString()
+    versionProperties.store(propertiesFile.newWriter(), null)
 
-    return Integer.parseInt(versionProps['VERSION_CODE'].toString()).intValue()
+    println "version code: $versionCode"
+
+    return versionCode
 }
 
 @SuppressWarnings("unused")
-int updateVersionCode(moduleName) {
-    Properties versionProps = readVersionProperties(moduleName)
-    def versionCode = getVersionCode(moduleName) + 1
+def readKeystoreProperties(moduleName) {
+    def propertiesFile = rootProject.file('keystore.properties')
+    def configName = 'release'
 
-    versionProps['VERSION_CODE'] = versionCode.toString()
-    versionProps.store(getVersionPropertiesFile(moduleName).newWriter(), null)
+    println "reading '${propertiesFile.absolutePath}' for module '$moduleName' ..."
 
-    println("updateVersionCode: " + versionCode)
+    Project moduleProject = project.project(moduleName)
 
-    return versionCode
+    if (propertiesFile.exists() && moduleProject.hasProperty("android") && moduleProject.android.signingConfigs.hasProperty(configName)) {
+        def props = new Properties()
+        props.load(new FileInputStream(propertiesFile))
+
+        moduleProject.android.signingConfigs[configName].storeFile = file(props['STORE_FILE'])
+        moduleProject.android.signingConfigs[configName].storePassword = props['STORE_PASSWORD']
+        moduleProject.android.signingConfigs[configName].keyAlias = props['KEY_ALIAS']
+        moduleProject.android.signingConfigs[configName].keyPassword = props['KEY_PASSWORD']
+
+        println 'done'
+    }
 }
