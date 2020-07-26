@@ -1,13 +1,18 @@
 # Occtax-mobile
 
-![PNC](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnc/res/mipmap-xxxhdpi/ic_launcher.png)
-![PNE](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pne/res/mipmap-xxxhdpi/ic_launcher.png)
-![PNM](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnm/res/mipmap-xxxhdpi/ic_launcher.png)
-![PNV](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnv/res/mipmap-xxxhdpi/ic_launcher.png)
-
 GeoNature Android mobile application for Occtax module.
 
 Installation documentation (French) : https://github.com/PnX-SI/gn_mobile_occtax/blob/master/docs/installation-fr.md
+
+## Launcher icons
+
+| Name                                                                 | Flavor    | Launcher icon                                                                                                          |
+| -------------------------------------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Default                                                              | _generic_ | ![PNX](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/main/res/mipmap-xhdpi/ic_launcher.png) |
+| [Parc National des Cévennes](http://www.cevennes-parcnational.fr)    | _pnc_     | ![PNC](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnc/res/mipmap-xhdpi/ic_launcher.png)  |
+| [Parc National des Écrins](http://www.ecrins-parcnational.fr)        | _pne_     | ![PNE](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pne/res/mipmap-xhdpi/ic_launcher.png)  |
+| [Parc National du Mercantour](http://www.mercantour-parcnational.fr) | _pnm_     | ![PNE](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnm/res/mipmap-xhdpi/ic_launcher.png)  |
+| [Parc National de la Vanoise](http://www.vanoise-parcnational.fr)    | _pnv_     | ![PNE](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnv/res/mipmap-xhdpi/ic_launcher.png)  |
 
 ## Settings
 
