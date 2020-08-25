@@ -4,7 +4,6 @@
     <string name="app_name" translatable="false">Occtax</string>
     <string name="app_version" translatable="false">%1$s (%2$d)\n%3$s</string>
 
-    <string name="activity_main_title" translatable="false">@string/app_name</string>
     <string name="activity_preferences_title">Settings</string>
     <string name="activity_dataset_title">Dataset</string>
     <string name="activity_observers_title">Observers</string>
