@@ -16,7 +16,7 @@ class CountingMetadata() : Parcelable {
         internal set
 
     val properties: SortedMap<String, PropertyValue> =
-        TreeMap<String, PropertyValue>(Comparator { o1, o2 ->
+        TreeMap<String, PropertyValue> { o1, o2 ->
             val i1 = defaultMnemonic.indexOfFirst { it.first == o1 }
             val i2 = defaultMnemonic.indexOfFirst { it.first == o2 }
 
@@ -25,9 +25,19 @@ class CountingMetadata() : Parcelable {
                 i2 == -1 -> -1
                 else -> i1 - i2
             }
-        })
+        }
     var min: Int = 1
+        get() = field.coerceAtLeast(0)
+        set(value) {
+            field = value.coerceAtLeast(0)
+            if (field > max) max = field
+        }
     var max: Int = 1
+        get() = field.coerceAtLeast(0)
+        set(value) {
+            field = value.coerceAtLeast(0)
+            if (field < min) min = field
+        }
 
     constructor(source: Parcel) : this() {
         index = source.readInt()
@@ -84,6 +94,12 @@ class CountingMetadata() : Parcelable {
 
     companion object {
 
+        /**
+         * default properties as pair:
+         *
+         * * first value: mnemonic code from nomenclature type
+         * * second value: the corresponding view type
+         */
         val defaultMnemonic = arrayOf(
             Pair(
                 "STADE_VIE",

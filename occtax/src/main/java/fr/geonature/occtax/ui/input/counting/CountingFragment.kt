@@ -20,6 +20,7 @@ import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
+import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
@@ -70,7 +71,11 @@ class CountingFragment : Fragment(),
                         ?: Taxonomy(
                             Taxonomy.ANY,
                             Taxonomy.ANY
-                        )
+                        ),
+                    null,
+                    *(arguments?.getParcelableArray(ARG_PROPERTIES)
+                        ?.map { it as PropertySettings }
+                        ?.toTypedArray() ?: emptyArray())
                 ),
                 0
             )
@@ -88,7 +93,10 @@ class CountingFragment : Fragment(),
                                 Taxonomy.ANY,
                                 Taxonomy.ANY
                             ),
-                        item
+                        item,
+                        *(arguments?.getParcelableArray(ARG_PROPERTIES)
+                            ?.map { it as PropertySettings }
+                            ?.toTypedArray() ?: emptyArray())
                     ),
                     0
                 )
@@ -245,12 +253,21 @@ class CountingFragment : Fragment(),
 
     companion object {
 
+        private const val ARG_PROPERTIES = "arg_properties"
+
         /**
          * Use this factory method to create a new instance of [CountingFragment].
          *
          * @return A new instance of [CountingFragment]
          */
         @JvmStatic
-        fun newInstance() = CountingFragment()
+        fun newInstance(vararg propertySettings: PropertySettings) = CountingFragment().apply {
+            arguments = Bundle().apply {
+                putParcelableArray(
+                    ARG_PROPERTIES,
+                    propertySettings
+                )
+            }
+        }
     }
 }

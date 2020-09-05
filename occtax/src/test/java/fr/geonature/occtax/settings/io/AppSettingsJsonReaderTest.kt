@@ -5,6 +5,8 @@ import fr.geonature.maps.settings.LayerSettings
 import fr.geonature.maps.settings.MapSettings
 import fr.geonature.occtax.FixtureHelper.getFixture
 import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.settings.NomenclatureSettings
+import fr.geonature.occtax.settings.PropertySettings
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -72,6 +74,62 @@ class AppSettingsJsonReaderTest {
                         47.225827,
                         -1.554470
                     )
+                ),
+                NomenclatureSettings(
+                    arrayListOf(
+                        PropertySettings(
+                            "METH_OBS",
+                            visible = true,
+                            default = true
+                        ),
+                        PropertySettings(
+                            "ETA_BIO",
+                            visible = true,
+                            default = true
+                        ),
+                        PropertySettings(
+                            "METH_DETERMIN",
+                            visible = true,
+                            default = false
+                        ),
+                        PropertySettings(
+                            "STATUT_BIO",
+                            visible = true,
+                            default = false
+                        ),
+                        PropertySettings(
+                            "NATURALITE",
+                            visible = true,
+                            default = false
+                        ),
+                        PropertySettings(
+                            "PREUVE_EXIST",
+                            visible = true,
+                            default = false
+                        )
+                    ),
+                    arrayListOf(
+                        PropertySettings(
+                            "STADE_VIE",
+                            visible = true,
+                            default = true
+                        ),
+                        PropertySettings(
+                            "SEXE",
+                            visible = true,
+                            default = true
+                        ),
+                        PropertySettings(
+                            "OBJ_DENBR",
+                            visible = true,
+                            default = true
+                        ),
+                        PropertySettings(
+                            "TYP_DENBR",
+                            visible = true,
+                            default = true
+                        )
+                    )
                 )
             ),
             appSettings
@@ -95,5 +153,15 @@ class AppSettingsJsonReaderTest {
         // then
         assertNotNull(appSettings)
         assertNull(appSettings?.mapSettings)
+    }
+
+    @Test
+    fun testReadAppSettingsFromJsonStringWithNoNomenclatureSettings() {
+        // when read an empty JSON as AppSettings
+        val appSettings = appSettingsJsonReader.read("{\"nomenclature\":null}")
+
+        // then
+        assertNotNull(appSettings)
+        assertNull(appSettings?.nomenclatureSettings)
     }
 }

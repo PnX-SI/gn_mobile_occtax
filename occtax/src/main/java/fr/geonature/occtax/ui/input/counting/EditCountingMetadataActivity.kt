@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import fr.geonature.commons.data.Taxonomy
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
+import fr.geonature.occtax.settings.PropertySettings
 
 /**
  * Edit additional counting information Activity.
@@ -40,7 +41,10 @@ class EditCountingMetadataActivity : AppCompatActivity(),
                             Taxonomy.ANY,
                             Taxonomy.ANY
                         ),
-                        countingMetadata
+                        countingMetadata,
+                        *(intent.getParcelableArrayExtra(EXTRA_PROPERTIES)
+                            ?.map { it as PropertySettings }
+                            ?.toTypedArray() ?: emptyArray())
                     )
                 )
                 .commit()
@@ -82,11 +86,13 @@ class EditCountingMetadataActivity : AppCompatActivity(),
 
         const val EXTRA_TAXONOMY = "extra_taxonomy"
         const val EXTRA_COUNTING_METADATA = "extra_counting_metadata"
+        const val EXTRA_PROPERTIES = "extra_properties"
 
         fun newIntent(
             context: Context,
             taxonomy: Taxonomy,
-            countingMetadata: CountingMetadata? = null
+            countingMetadata: CountingMetadata? = null,
+            vararg propertySettings: PropertySettings
         ): Intent {
             return Intent(
                 context,
@@ -102,6 +108,10 @@ class EditCountingMetadataActivity : AppCompatActivity(),
                         countingMetadata
                     )
                 }
+                putExtra(
+                    EXTRA_PROPERTIES,
+                    propertySettings
+                )
             }
         }
     }

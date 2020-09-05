@@ -12,12 +12,14 @@ import fr.geonature.maps.settings.MapSettings
  */
 data class AppSettings(
     var areaObservationDuration: Int = DEFAULT_AREA_OBSERVATION_DURATION,
-    var mapSettings: MapSettings? = null
+    var mapSettings: MapSettings? = null,
+    var nomenclatureSettings: NomenclatureSettings? = null
 ) : IAppSettings {
 
     private constructor(source: Parcel) : this(
         source.readInt(),
-        source.readParcelable(MapSettings::class.java.classLoader) as MapSettings?
+        source.readParcelable(MapSettings::class.java.classLoader) as MapSettings?,
+        source.readParcelable(NomenclatureSettings::class.java.classLoader) as NomenclatureSettings?
     )
 
     override fun describeContents(): Int {
@@ -34,6 +36,10 @@ data class AppSettings(
                 mapSettings,
                 0
             )
+            it.writeParcelable(
+                nomenclatureSettings,
+                0
+            )
         }
     }
 
@@ -43,6 +49,7 @@ data class AppSettings(
 
         if (areaObservationDuration != other.areaObservationDuration) return false
         if (mapSettings != other.mapSettings) return false
+        if (nomenclatureSettings != other.nomenclatureSettings) return false
 
         return true
     }
@@ -50,6 +57,7 @@ data class AppSettings(
     override fun hashCode(): Int {
         var result = areaObservationDuration
         result = 31 * result + (mapSettings?.hashCode() ?: 0)
+        result = 31 * result + (nomenclatureSettings?.hashCode() ?: 0)
 
         return result
     }

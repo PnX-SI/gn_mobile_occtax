@@ -28,5 +28,39 @@
       }
     ]
   },
+  "nomenclature": {
+    "information": [
+      "METH_OBS",
+      {
+        "key": "ETA_BIO"
+      },
+      {
+        "key": "METH_DETERMIN",
+        "visible": true,
+        "default": false
+      },
+      {
+        "key": "STATUT_BIO",
+        "visible": true,
+        "default": false
+      },
+      {
+        "key": "NATURALITE",
+        "visible": true,
+        "default": false
+      },
+      {
+        "key": "PREUVE_EXIST",
+        "visible": true,
+        "default": false
+      }
+    ],
+    "counting": [
+      "STADE_VIE",
+      "SEXE",
+      "OBJ_DENBR",
+      "TYP_DENBR"
+    ]
+  },
   "no_such_property": "no_such_value"
 }

@@ -119,6 +119,8 @@
     <string name="counting_snackbar_counting_deleted">Counting deleted</string>
     <string name="counting_snackbar_counting_undo">Undo</string>
     <string name="counting_toast_empty">Empty counting: Nothing to save</string>
+    <string name="counting_min_title">Min</string>
+    <string name="counting_max_title">Max</string>
     <string name="counting_min_max_title">Min &amp; Max</string>
     <string name="counting_min_label">Min</string>
     <string name="counting_max_label">Max</string>
