@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.database.Cursor
 import android.os.Bundle
+import android.os.Vibrator
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -14,6 +15,7 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -194,6 +196,14 @@ class HomeFragment : Fragment() {
                 item: Input
             ) {
                 inputViewModel?.deleteInput(item)
+
+                context?.run {
+                    @Suppress("DEPRECATION")
+                    ContextCompat.getSystemService(
+                        this,
+                        Vibrator::class.java
+                    )?.vibrate(50)
+                }
 
                 makeSnackbar(getString(R.string.home_snackbar_input_deleted))
                     ?.setAction(R.string.home_snackbar_input_undo) {
