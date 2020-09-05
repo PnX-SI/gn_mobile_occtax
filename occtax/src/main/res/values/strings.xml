@@ -41,9 +41,14 @@
         <item quantity="one">%d selected</item>
         <item quantity="other">%d selected</item>
     </plurals>
+    <string name="action_save">Save</string>
     <string name="action_comment_add">Add comment</string>
     <string name="action_comment_edit">Edit comment</string>
 
+    <string name="alert_counting_title_discard">Discard this counting?</string>
+    <string name="alert_counting_title_discard_changes">Discard changes to this counting?</string>
+    <string name="alert_counting_action_discard">Discard</string>
+    <string name="alert_counting_action_keep">Keep editing</string>
     <string name="alert_dialog_add_comment_title">Add a comment</string>
     <string name="alert_dialog_edit_comment_title">Edit a comment</string>
     <string name="alert_dialog_add_comment_hint">Add a comment</string>
