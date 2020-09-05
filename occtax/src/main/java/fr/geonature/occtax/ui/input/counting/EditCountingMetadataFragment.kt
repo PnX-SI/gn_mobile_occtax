@@ -236,6 +236,7 @@ class EditCountingMetadataFragment : Fragment(),
             nomenclature
         )
         adapter?.setCountingMetata(countingMetadata)
+        listener?.onCountingMetadata(countingMetadata)
     }
 
     private fun loadDefaultNomenclatureValues() {

@@ -4,7 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import fr.geonature.commons.data.Taxonomy
 import fr.geonature.occtax.R
@@ -23,13 +25,23 @@ class EditCountingMetadataActivity : AppCompatActivity(),
 
     private lateinit var countingMetadata: CountingMetadata
 
+    // whether the current counting metadata is new or not
+    private var isNew: Boolean =  true
+
+    // whether the current counting metadata has been modified or not
+    private var isDirty: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.run {
+            setDisplayHomeAsUpEnabled(true)
+            setHomeAsUpIndicator(R.drawable.ic_close)
+        }
 
         countingMetadata = intent.getParcelableExtra(EXTRA_COUNTING_METADATA) ?: CountingMetadata()
 
+        isNew = countingMetadata.isEmpty()
         setTitle(if (countingMetadata.isEmpty()) R.string.activity_counting_add_title else R.string.activity_counting_edit_title)
 
         if (savedInstanceState == null) {
@@ -51,9 +63,22 @@ class EditCountingMetadataActivity : AppCompatActivity(),
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(
+            R.menu.save,
+            menu
+        )
+
+        return true
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
+                confirmBeforeQuit()
+                true
+            }
+            R.id.action_save -> {
                 sendResult()
                 finish()
                 true
@@ -63,13 +88,12 @@ class EditCountingMetadataActivity : AppCompatActivity(),
     }
 
     override fun onBackPressed() {
-        sendResult()
-
-        super.onBackPressed()
+        confirmBeforeQuit()
     }
 
     override fun onCountingMetadata(countingMetadata: CountingMetadata) {
         this.countingMetadata = countingMetadata
+        this.isDirty = true
     }
 
     private fun sendResult() {
@@ -80,6 +104,26 @@ class EditCountingMetadataActivity : AppCompatActivity(),
                     countingMetadata
                 )
             })
+    }
+
+    private fun confirmBeforeQuit() {
+        if (!isDirty) {
+            finish()
+            return
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle(if (isNew && isDirty) R.string.alert_counting_title_discard else R.string.alert_counting_title_discard_changes)
+            .setPositiveButton(
+                R.string.alert_counting_action_discard
+            ) { dialog, _ ->
+                dialog.dismiss()
+                finish()
+            }
+            .setNegativeButton(
+                R.string.alert_counting_action_keep
+            ) { dialog, _ -> dialog.dismiss() }
+            .show()
     }
 
     companion object {
