@@ -13,12 +13,11 @@ import fr.geonature.commons.ui.adapter.StickyHeaderItemDecorator
 import fr.geonature.occtax.R
 
 /**
- * Default RecyclerView Adapter used by [TaxaFilterFragment], combining [FilterNameRecyclerViewAdapter],
+ * Default RecyclerView Adapter used by [TaxaFilterFragment], combining
  * [FilterAreaObservationRecyclerViewAdapter] and [FilterTaxonomyRecyclerViewAdapter].
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  *
- * @see FilterNameRecyclerViewAdapter
  * @see FilterAreaObservationRecyclerViewAdapter
  * @see FilterTaxonomyRecyclerViewAdapter
  */
@@ -26,16 +25,6 @@ class FilterRecyclerViewAdapter(val listener: FilterRecyclerViewAdapterListener<
     RecyclerView.Adapter<RecyclerView.ViewHolder>(),
     IStickyRecyclerViewAdapter<FilterRecyclerViewAdapter.HeaderViewHolder> {
 
-    private val filterNameRecyclerViewAdapter: FilterNameRecyclerViewAdapter =
-        FilterNameRecyclerViewAdapter(object : FilterRecyclerViewAdapterListener<FilterName> {
-            override fun onSelectedFilters(vararg filter: FilterName) {
-                val existingFilters =
-                    selectedFilters.filter { it.type != Filter.FilterType.NAME }
-                selectedFilters.clear()
-                selectedFilters.addAll(existingFilters + filter)
-                listener.onSelectedFilters(*selectedFilters.toTypedArray())
-            }
-        })
     private val filterTitleAreaObservationRecyclerViewAdapter = FilterTitleRecyclerViewAdapter()
     private val filterAreaObservationRecyclerViewAdapter: FilterAreaObservationRecyclerViewAdapter =
         FilterAreaObservationRecyclerViewAdapter(object :
@@ -61,7 +50,6 @@ class FilterRecyclerViewAdapter(val listener: FilterRecyclerViewAdapterListener<
             }
         })
     private val mergeAdapter = MergeAdapter(
-        filterNameRecyclerViewAdapter,
         filterTitleAreaObservationRecyclerViewAdapter,
         filterAreaObservationRecyclerViewAdapter,
         filterTitleTaxonomyRecyclerViewAdapter,
@@ -180,30 +168,24 @@ class FilterRecyclerViewAdapter(val listener: FilterRecyclerViewAdapterListener<
     }
 
     override fun getHeaderPositionForItem(itemPosition: Int): Int {
-        // the first adapter has no header
-        if (itemPosition < filterNameRecyclerViewAdapter.itemCount) {
-
-            return -1
-        }
-
         // if filter area observation have some items
-        if (filterAreaObservationRecyclerViewAdapter.itemCount > 0 && itemPosition < (filterNameRecyclerViewAdapter.itemCount + filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount)) {
-            return filterNameRecyclerViewAdapter.itemCount
+        if (filterAreaObservationRecyclerViewAdapter.itemCount > 0 && itemPosition < (filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount)) {
+            return 0
         }
 
-        if (itemPosition == filterNameRecyclerViewAdapter.itemCount + filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount + filterTitleTaxonomyRecyclerViewAdapter.itemCount - 1) {
+        if (itemPosition == filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount + filterTitleTaxonomyRecyclerViewAdapter.itemCount - 1) {
             return itemPosition
         }
 
         val currentFilterTaxonomy =
-            filterTaxonomyRecyclerViewAdapter.items.getOrNull(itemPosition - (filterNameRecyclerViewAdapter.itemCount + filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount + filterTitleTaxonomyRecyclerViewAdapter.itemCount))
-                ?: return filterNameRecyclerViewAdapter.itemCount + filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount + filterTitleTaxonomyRecyclerViewAdapter.itemCount
+            filterTaxonomyRecyclerViewAdapter.items.getOrNull(itemPosition - (filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount + filterTitleTaxonomyRecyclerViewAdapter.itemCount))
+                ?: return filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount + filterTitleTaxonomyRecyclerViewAdapter.itemCount
 
         return filterTaxonomyRecyclerViewAdapter.items.indexOfFirst {
             it.value.kingdom == currentFilterTaxonomy.value.kingdom && it.value.group == Taxonomy.ANY
         }.takeIf { it >= 0 }
-            ?.plus(filterNameRecyclerViewAdapter.itemCount + filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount + filterTitleTaxonomyRecyclerViewAdapter.itemCount)
-            ?: filterNameRecyclerViewAdapter.itemCount + filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount + filterTitleTaxonomyRecyclerViewAdapter.itemCount - 1
+            ?.plus(filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount + filterTitleTaxonomyRecyclerViewAdapter.itemCount)
+            ?: filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount + filterTitleTaxonomyRecyclerViewAdapter.itemCount - 1
     }
 
     override fun onBindHeaderViewHolder(holder: HeaderViewHolder, headerPosition: Int) {
@@ -230,10 +212,6 @@ class FilterRecyclerViewAdapter(val listener: FilterRecyclerViewAdapterListener<
     fun setSelectedFilters(vararg filter: Filter<*>) {
         this.selectedFilters.clear()
         this.selectedFilters.addAll(filter)
-
-        (filter.find { it.type == Filter.FilterType.NAME } as FilterName?)?.also {
-            this.filterNameRecyclerViewAdapter.setSelectedFilter(it)
-        }
 
         this.filterAreaObservationRecyclerViewAdapter.setSelectedFilters(*filter.filter { it.type == Filter.FilterType.AREA_OBSERVATION }
             .map { FilterAreaObservation(it.value as FilterAreaObservation.AreaObservation) }
@@ -266,18 +244,18 @@ class FilterRecyclerViewAdapter(val listener: FilterRecyclerViewAdapterListener<
                 Typeface.BOLD
             )
 
-            if (filterAreaObservationRecyclerViewAdapter.itemCount > 0 && position < (filterNameRecyclerViewAdapter.itemCount + filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount)) {
+            if (filterAreaObservationRecyclerViewAdapter.itemCount > 0 && position < (filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount)) {
                 label.text = filterTitleAreaObservationRecyclerViewAdapter.items.getOrNull(0)
                 return
             }
 
-            if (position == filterNameRecyclerViewAdapter.itemCount + filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount + filterTitleTaxonomyRecyclerViewAdapter.itemCount - 1) {
+            if (position == filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount + filterTitleTaxonomyRecyclerViewAdapter.itemCount - 1) {
                 label.text = filterTitleTaxonomyRecyclerViewAdapter.items.getOrNull(0)
                 return
             }
 
             val taxonomyAsHeader =
-                filterTaxonomyRecyclerViewAdapter.items.getOrNull(position - (filterNameRecyclerViewAdapter.itemCount + filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount + filterTitleTaxonomyRecyclerViewAdapter.itemCount))
+                filterTaxonomyRecyclerViewAdapter.items.getOrNull(position - (filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount + filterTitleTaxonomyRecyclerViewAdapter.itemCount))
 
             if (taxonomyAsHeader == null) {
                 label.text = filterTitleTaxonomyRecyclerViewAdapter.items.getOrNull(0)
