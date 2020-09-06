@@ -79,14 +79,13 @@ class TaxaFragment : Fragment(),
                         "load taxa with selected feature ID: $selectedFeatureId"
                     )
 
-                    adapter?.toggleCommonName((selectedFilters.find { it.type == Filter.FilterType.NAME }?.value as FilterName.Name?)?.type == FilterName.NameType.COMMON)
-
                     val taxonFilter =
                         TaxonWithArea.Filter()
                             .byNameOrDescriptionOrRank(args?.getString(KEY_FILTER_BY_NAME))
                             .also {
                                 val filterByAreaObservation =
-                                    selectedFilters.asSequence()
+                                    selectedFilters
+                                        .asSequence()
                                         .filter { filter -> filter.type == Filter.FilterType.AREA_OBSERVATION }
                                         .map { filter -> filter.value as FilterAreaObservation.AreaObservation }
                                         .map { areaObservation ->
@@ -117,9 +116,7 @@ class TaxaFragment : Fragment(),
                         null,
                         taxonFilter.first,
                         taxonFilter.second.map { it.toString() }.toTypedArray(),
-                        (if ((selectedFilters.find { it.type == Filter.FilterType.NAME }?.value as FilterName.Name?)?.type == FilterName.NameType.COMMON) TaxonWithArea.OrderBy()
-                            .byCommonName() else TaxonWithArea.OrderBy()
-                            .by(AbstractTaxon.COLUMN_NAME)).build()
+                        TaxonWithArea.OrderBy().by(AbstractTaxon.COLUMN_NAME).build()
                     )
                 }
                 LOADER_TAXON -> {
@@ -451,66 +448,16 @@ class TaxaFragment : Fragment(),
             filter
         )
 
-        val filterName =
-            filter.find { it.type == Filter.FilterType.NAME }?.value as FilterName.Name?
         val selectedAreaObservation =
             filter.filter { it.type == Filter.FilterType.AREA_OBSERVATION }
                 .map { it.value as FilterAreaObservation.AreaObservation }
         val selectedTaxonomy =
             filter.find { it.type == Filter.FilterType.TAXONOMY }?.value as Taxonomy?
 
-        filterByName(filterName)
         filterByAreaObservation(*selectedAreaObservation.toTypedArray())
         filterByTaxonomy(selectedTaxonomy)
 
         loadTaxa()
-    }
-
-    private fun filterByName(filterName: FilterName.Name?) {
-        val filterChipGroup = filterChipGroup ?: return
-        val context = context ?: return
-
-        val nameChipsToDelete = arrayListOf<Chip>()
-
-        for (i in 0 until filterChipGroup.childCount) {
-            with(filterChipGroup[i]) {
-                if (this is Chip && tag is FilterName.Name) {
-                    nameChipsToDelete.add(this)
-                }
-            }
-        }
-
-        nameChipsToDelete.forEach {
-            filterChipGroup.removeView(it)
-        }
-
-        filterChipGroup.visibility = if (filterChipGroup.childCount > 0) View.VISIBLE else View.GONE
-
-        if (filterName != null && filterName.type == FilterName.NameType.COMMON) {
-            filterChipGroup.visibility = View.VISIBLE
-
-            // build name filter chip
-            with(
-                LayoutInflater.from(context).inflate(
-                    R.layout.chip,
-                    filterChipGroup,
-                    false
-                ) as Chip
-            ) {
-                tag = filterName
-                text = context.getText(R.string.taxa_filter_name_short)
-                setOnClickListener {
-                    applyFilters(*getSelectedFilters().filter { it.type != Filter.FilterType.NAME }
-                        .toTypedArray())
-                }
-                setOnCloseIconClickListener {
-                    applyFilters(*getSelectedFilters().filter { it.type != Filter.FilterType.NAME }
-                        .toTypedArray())
-                }
-
-                filterChipGroup.addView(this)
-            }
-        }
     }
 
     private fun filterByAreaObservation(vararg areaObservation: FilterAreaObservation.AreaObservation) {

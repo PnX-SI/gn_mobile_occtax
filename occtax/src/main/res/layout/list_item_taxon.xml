@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
-    android:minHeight="?attr/listPreferredItemHeight">
+    android:minHeight="?attr/listPreferredItemHeightLarge">
 
     <CheckBox
         android:id="@android:id/checkbox"
@@ -40,11 +40,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="?attr/listPreferredItemHeight"
         android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
+        android:layout_marginTop="?attr/listPreferredItemPaddingStart"
         android:ellipsize="end"
         android:maxLines="1"
         android:textAppearance="?attr/textAppearanceListItem"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@android:id/text2"
         app:layout_constraintEnd_toStartOf="@+id/taxon_observers_image_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -56,6 +56,20 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="?attr/listPreferredItemHeight"
         android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="?attr/textAppearanceListItemSecondary"
+        app:layout_constraintTop_toBottomOf="@android:id/text1"
+        app:layout_constraintEnd_toStartOf="@+id/taxon_observers_image_view"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="@tools:sample/first_names" />
+
+    <TextView
+        android:id="@android:id/summary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="?attr/listPreferredItemHeight"
+        android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
         android:ellipsize="marquee"
         android:marqueeRepeatLimit="marquee_forever"
         android:scrollHorizontally="true"
@@ -63,8 +77,8 @@
         android:textAppearance="?attr/textAppearanceListItemSecondary"
         app:layout_constraintEnd_toStartOf="@+id/taxon_last_updated_at_view"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@android:id/text1"
-        tools:text="@tools:sample/first_names" />
+        app:layout_constraintTop_toBottomOf="@android:id/text2"
+        tools:text="@tools:sample/lorem/random" />
 
     <ImageView
         android:id="@+id/taxon_observers_image_view"
@@ -95,9 +109,9 @@
         android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
         android:textAlignment="textEnd"
         android:textAppearance="?attr/textAppearanceListItemSmall"
-        app:layout_constraintBottom_toBottomOf="@android:id/text2"
+        app:layout_constraintBottom_toBottomOf="@android:id/summary"
         app:layout_constraintEnd_toStartOf="@android:id/checkbox"
-        app:layout_constraintTop_toTopOf="@android:id/text2"
+        app:layout_constraintTop_toTopOf="@android:id/summary"
         tools:text="@tools:sample/date/ddmmyy" />
 
     <View
