@@ -46,7 +46,7 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
             InputViewModel::class.java
         )
 
-        appSettings = intent.getParcelableExtra(EXTRA_APP_SETTINGS)
+        appSettings = intent.getParcelableExtra(EXTRA_APP_SETTINGS)!!
         input = intent.getParcelableExtra(EXTRA_INPUT) ?: Input()
         val lastAddedInputTaxon = input.getLastAddedInputTaxon()
 
@@ -86,11 +86,15 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
             )
             put(
                 R.string.pager_fragment_information_title,
-                InformationFragment.newInstance()
+                InformationFragment.newInstance(
+                    *appSettings.nomenclatureSettings?.information?.toTypedArray() ?: emptyArray()
+                )
             )
             put(
                 R.string.pager_fragment_counting_title,
-                CountingFragment.newInstance()
+                CountingFragment.newInstance(
+                    *appSettings.nomenclatureSettings?.counting?.toTypedArray() ?: emptyArray()
+                )
             )
             put(
                 R.string.pager_fragment_summary_title,

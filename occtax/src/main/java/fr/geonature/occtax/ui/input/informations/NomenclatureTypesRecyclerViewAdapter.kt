@@ -20,6 +20,7 @@ import fr.geonature.occtax.R
 import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.input.NomenclatureTypeViewType
 import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.settings.PropertySettings
 import java.util.Locale
 
 /**
@@ -31,18 +32,14 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
     RecyclerView.Adapter<NomenclatureTypesRecyclerViewAdapter.AbstractViewHolder>() {
 
     private val mnemonicFilter = InputTaxon.defaultPropertiesMnemonic
-    private val moreViewType = Pair(
+    private val moreViewType = Triple(
         "MORE",
-        NomenclatureTypeViewType.MORE
-    )
-    private val defaultMnemonicFilter = mnemonicFilter.slice(
-        IntRange(
-            0,
-            1
-        )
+        NomenclatureTypeViewType.MORE,
+        true
     )
 
-    private val availableNomenclatureTypes = mutableListOf<Pair<String, NomenclatureTypeViewType>>()
+    private val availableNomenclatureTypes =
+        mutableListOf<Triple<String, NomenclatureTypeViewType, Boolean>>()
     private val properties = mutableListOf<PropertyValue>()
     private var showAllNomenclatureTypes = false
 
@@ -93,7 +90,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             .toList()
     }
 
-    fun bind(cursor: Cursor?) {
+    fun bind(cursor: Cursor?, vararg defaultPropertySettings: PropertySettings) {
         availableNomenclatureTypes.clear()
 
         cursor?.run {
@@ -104,16 +101,23 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             while (!this.isAfterLast) {
                 NomenclatureType.fromCursor(this)
                     ?.run {
-                        val validNomenclatureType =
-                            mnemonicFilter.find { it.first == this.mnemonic }
-                        if (validNomenclatureType != null) {
-                            availableNomenclatureTypes.add(validNomenclatureType)
+                        (if (defaultPropertySettings.isEmpty()) {
+                            mnemonicFilter.find { it.first == mnemonic }
+                        } else {
+                            defaultPropertySettings.find { it.key == mnemonic && it.visible }
+                                ?.let { property -> mnemonicFilter.find { it.first == property.key } }
+                        })?.also {
+                            availableNomenclatureTypes.add(it)
                         }
                     }
                 cursor.moveToNext()
             }
 
-            availableNomenclatureTypes.addAll(mnemonicFilter.filter { it.second != NomenclatureTypeViewType.NOMENCLATURE_TYPE })
+            // add default mnemonic filters
+            availableNomenclatureTypes.addAll(mnemonicFilter.filter {
+                it.second != NomenclatureTypeViewType.NOMENCLATURE_TYPE &&
+                    (defaultPropertySettings.isEmpty() || defaultPropertySettings.any { p -> p.key == it.first })
+            })
         }
 
         availableNomenclatureTypes.sortWith(Comparator { o1, o2 ->
@@ -131,10 +135,13 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             availableNomenclatureTypes
         } else {
             val defaultNomenclatureTypes =
-                availableNomenclatureTypes.filter { availableNomenclatureType -> defaultMnemonicFilter.any { it.first == availableNomenclatureType.first } }
+                availableNomenclatureTypes.filter { availableNomenclatureType ->
+                    if (defaultPropertySettings.isEmpty()) availableNomenclatureType.third
+                    else defaultPropertySettings.any { it.key == availableNomenclatureType.first && it.default }
+                }
 
             // add MORE ViewType if default nomenclature types are presents
-            if (defaultNomenclatureTypes.size == defaultMnemonicFilter.size) {
+            if (defaultNomenclatureTypes.size < availableNomenclatureTypes.size) {
                 listOf(
                     *defaultNomenclatureTypes.toTypedArray(),
                     moreViewType
@@ -190,7 +197,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         setNomenclatureTypes(availableNomenclatureTypes)
     }
 
-    private fun setNomenclatureTypes(nomenclatureTypes: List<Pair<String, NomenclatureTypeViewType>>) {
+    private fun setNomenclatureTypes(nomenclatureTypes: List<Triple<String, NomenclatureTypeViewType, Boolean>>) {
         if (this.properties.isEmpty()) {
             this.properties.addAll(nomenclatureTypes.map {
                 when (it.second) {

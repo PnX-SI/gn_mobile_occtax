@@ -4,7 +4,6 @@
     <string name="app_name" translatable="false">Occtax</string>
     <string name="app_version" translatable="false">%1$s (%2$d)\n%3$s</string>
 
-    <string name="activity_main_title" translatable="false">@string/app_name</string>
     <string name="activity_preferences_title">Settings</string>
     <string name="activity_dataset_title">Dataset</string>
     <string name="activity_observers_title">Observers</string>
@@ -42,9 +41,14 @@
         <item quantity="one">%d selected</item>
         <item quantity="other">%d selected</item>
     </plurals>
+    <string name="action_save">Save</string>
     <string name="action_comment_add">Add comment</string>
     <string name="action_comment_edit">Edit comment</string>
 
+    <string name="alert_counting_title_discard">Discard this counting?</string>
+    <string name="alert_counting_title_discard_changes">Discard changes to this counting?</string>
+    <string name="alert_counting_action_discard">Discard</string>
+    <string name="alert_counting_action_keep">Keep editing</string>
     <string name="alert_dialog_add_comment_title">Add a comment</string>
     <string name="alert_dialog_edit_comment_title">Edit a comment</string>
     <string name="alert_dialog_add_comment_hint">Add a comment</string>
@@ -120,6 +124,8 @@
     <string name="counting_snackbar_counting_deleted">Counting deleted</string>
     <string name="counting_snackbar_counting_undo">Undo</string>
     <string name="counting_toast_empty">Empty counting: Nothing to save</string>
+    <string name="counting_min_title">Min</string>
+    <string name="counting_max_title">Max</string>
     <string name="counting_min_max_title">Min &amp; Max</string>
     <string name="counting_min_label">Min</string>
     <string name="counting_max_label">Max</string>

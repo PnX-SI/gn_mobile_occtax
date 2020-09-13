@@ -38,11 +38,6 @@ class InputJsonWriterTest {
         val input = Input().apply {
             id = 1234
             datasetId = 17
-            properties["TECHNIQUE_OBS"] = PropertyValue(
-                "TECHNIQUE_OBS",
-                null,
-                317L
-            )
             properties["TYP_GRP"] = PropertyValue(
                 "TYP_GRP",
                 null,
@@ -88,6 +83,11 @@ class InputJsonWriterTest {
                     "STATUT_BIO",
                     null,
                     29L
+                )
+                properties["OCC_COMPORTEMENT"] = PropertyValue(
+                    "OCC_COMPORTEMENT",
+                    null,
+                    580L
                 )
                 properties["NATURALITE"] = PropertyValue(
                     "NATURALITE",

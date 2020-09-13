@@ -4,9 +4,9 @@ import android.os.Parcel
 import android.os.Parcelable
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.commons.input.AbstractInputTaxon
+import org.locationtech.jts.geom.Geometry
 import java.util.SortedMap
 import java.util.TreeMap
-import org.locationtech.jts.geom.Geometry
 
 /**
  * Describes a current input.
@@ -86,10 +86,6 @@ class Input : AbstractInput {
     companion object {
 
         val defaultPropertiesMnemonic = arrayOf(
-            Pair(
-                "TECHNIQUE_OBS",
-                NomenclatureTypeViewType.NOMENCLATURE_TYPE
-            ),
             Pair(
                 "TYP_GRP",
                 NomenclatureTypeViewType.NOMENCLATURE_TYPE

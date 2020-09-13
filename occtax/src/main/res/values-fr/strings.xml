@@ -38,9 +38,14 @@
         <item quantity="one">%d sélectionné</item>
         <item quantity="other">%d sélectionnés</item>
     </plurals>
+    <string name="action_save">Save</string>
     <string name="action_comment_add">Ajouter un commentaire</string>
     <string name="action_comment_edit">Supprimer un commentaire</string>
 
+    <string name="alert_counting_title_discard">Supprimer ce dénombrement ?</string>
+    <string name="alert_counting_title_discard_changes">Supprimer les changements apportés à ce dénombrement ?</string>
+    <string name="alert_counting_action_discard">Supprimer</string>
+    <string name="alert_counting_action_keep">Continuer la saisie</string>
     <string name="alert_dialog_add_comment_title">Ajouter un commentaire</string>
     <string name="alert_dialog_edit_comment_title">Editer un commentaire</string>
     <string name="alert_dialog_add_comment_hint">Ajouter un commentaire</string>
@@ -116,6 +121,8 @@
     <string name="counting_snackbar_counting_deleted">Dénombrement supprimé</string>
     <string name="counting_snackbar_counting_undo">Annuler</string>
     <string name="counting_toast_empty">Aucune information à sauvegarder</string>
+    <string name="counting_min_title">Min</string>
+    <string name="counting_max_title">Max</string>
     <string name="counting_min_max_title">Min &amp; Max</string>
     <string name="counting_min_label">Min</string>
     <string name="counting_max_label">Max</string>

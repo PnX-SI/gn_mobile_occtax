@@ -22,6 +22,7 @@ import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.occtax.ui.input.dialog.ChooseNomenclatureDialogFragment
 import fr.geonature.viewpager.ui.IValidateFragment
@@ -85,7 +86,14 @@ class InformationFragment : Fragment(),
 
             when (loader.id) {
                 LOADER_NOMENCLATURE_TYPES -> {
-                    adapter?.bind(data)
+                    val defaultProperties = arguments?.getParcelableArray(ARG_PROPERTIES)
+                        ?.map { it as PropertySettings }
+                        ?.toTypedArray() ?: emptyArray()
+
+                    adapter?.bind(
+                        data,
+                        *defaultProperties
+                    )
                     loadDefaultNomenclatureValues()
                 }
                 LOADER_DEFAULT_NOMENCLATURE_VALUES -> {
@@ -138,7 +146,10 @@ class InformationFragment : Fragment(),
         adapter = NomenclatureTypesRecyclerViewAdapter(object :
             NomenclatureTypesRecyclerViewAdapter.OnNomenclatureTypesRecyclerViewAdapterListener {
             override fun showMore() {
-                savedState.putBoolean(KEY_SHOW_ALL_NOMENCLATURE_TYPES, true)
+                savedState.putBoolean(
+                    KEY_SHOW_ALL_NOMENCLATURE_TYPES,
+                    true
+                )
                 setPropertyValues()
             }
 
@@ -274,6 +285,7 @@ class InformationFragment : Fragment(),
     companion object {
         private val TAG = InformationFragment::class.java.name
 
+        private const val ARG_PROPERTIES = "arg_properties"
         private const val LOADER_NOMENCLATURE_TYPES = 1
         private const val LOADER_DEFAULT_NOMENCLATURE_VALUES = 2
         private const val CHOOSE_NOMENCLATURE_DIALOG_FRAGMENT =
@@ -287,6 +299,13 @@ class InformationFragment : Fragment(),
          * @return A new instance of [InformationFragment]
          */
         @JvmStatic
-        fun newInstance() = InformationFragment()
+        fun newInstance(vararg propertySettings: PropertySettings) = InformationFragment().apply {
+            arguments = Bundle().apply {
+                putParcelableArray(
+                    ARG_PROPERTIES,
+                    propertySettings
+                )
+            }
+        }
     }
 }

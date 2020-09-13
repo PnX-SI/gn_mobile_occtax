@@ -96,38 +96,58 @@ class InputTaxon : AbstractInputTaxon {
 
     companion object {
 
+        /**
+         * default properties as triple:
+         *
+         * * first value: mnemonic code from nomenclature type
+         * * second value: the corresponding view type
+         * * third value: if this property is visible by default
+         */
         val defaultPropertiesMnemonic = arrayOf(
-            Pair(
+            Triple(
                 "METH_OBS",
-                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE,
+                true
             ),
-            Pair(
+            Triple(
                 "ETA_BIO",
-                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE,
+                true
             ),
-            Pair(
+            Triple(
                 "METH_DETERMIN",
-                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE,
+                false
             ),
-            Pair(
+            Triple(
                 "DETERMINER",
-                NomenclatureTypeViewType.TEXT_SIMPLE
+                NomenclatureTypeViewType.TEXT_SIMPLE,
+                false
             ),
-            Pair(
+            Triple(
                 "STATUT_BIO",
-                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE,
+                false
             ),
-            Pair(
+            Triple(
+                "OCC_COMPORTEMENT",
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE,
+                false
+            ),
+            Triple(
                 "NATURALITE",
-                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE,
+                false
             ),
-            Pair(
+            Triple(
                 "PREUVE_EXIST",
-                NomenclatureTypeViewType.NOMENCLATURE_TYPE
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE,
+                false
             ),
-            Pair(
+            Triple(
                 "COMMENT",
-                NomenclatureTypeViewType.TEXT_MULTIPLE
+                NomenclatureTypeViewType.TEXT_MULTIPLE,
+                false
             )
         )
 

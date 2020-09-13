@@ -26,6 +26,7 @@ import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.input.dialog.ChooseNomenclatureDialogFragment
 
 /**
@@ -86,7 +87,14 @@ class EditCountingMetadataFragment : Fragment(),
 
             when (loader.id) {
                 LOADER_NOMENCLATURE_TYPES -> {
-                    adapter?.bind(data)
+                    val defaultProperties = arguments?.getParcelableArray(ARG_PROPERTIES)
+                        ?.map { it as PropertySettings }
+                        ?.toTypedArray() ?: emptyArray()
+
+                    adapter?.bind(
+                        data,
+                        *defaultProperties
+                    )
                     loadDefaultNomenclatureValues()
                 }
                 LOADER_DEFAULT_NOMENCLATURE_VALUES -> {
@@ -228,6 +236,7 @@ class EditCountingMetadataFragment : Fragment(),
             nomenclature
         )
         adapter?.setCountingMetata(countingMetadata)
+        listener?.onCountingMetadata(countingMetadata)
     }
 
     private fun loadDefaultNomenclatureValues() {
@@ -256,6 +265,7 @@ class EditCountingMetadataFragment : Fragment(),
 
         const val ARG_TAXONOMY = "arg_taxonomy"
         const val ARG_COUNTING_METADATA = "arg_counting_metadata"
+        const val ARG_PROPERTIES = "arg_properties"
 
         private const val LOADER_NOMENCLATURE_TYPES = 1
         private const val LOADER_DEFAULT_NOMENCLATURE_VALUES = 2
@@ -270,7 +280,8 @@ class EditCountingMetadataFragment : Fragment(),
         @JvmStatic
         fun newInstance(
             taxonomy: Taxonomy,
-            countingMetadata: CountingMetadata? = null
+            countingMetadata: CountingMetadata? = null,
+            vararg propertySettings: PropertySettings
         ) = EditCountingMetadataFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(
@@ -283,6 +294,10 @@ class EditCountingMetadataFragment : Fragment(),
                         countingMetadata
                     )
                 }
+                putParcelableArray(
+                    ARG_PROPERTIES,
+                    propertySettings
+                )
             }
         }
     }

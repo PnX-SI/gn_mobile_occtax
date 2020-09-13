@@ -118,14 +118,6 @@ class InputJsonReaderTest {
         assertEquals(
             mapOf(
                 Pair(
-                    "TECHNIQUE_OBS",
-                    PropertyValue(
-                        "TECHNIQUE_OBS",
-                        null,
-                        317L
-                    )
-                ),
-                Pair(
                     "TYP_GRP",
                     PropertyValue(
                         "TYP_GRP",
@@ -171,6 +163,11 @@ class InputJsonReaderTest {
                     "STATUT_BIO",
                     null,
                     29L
+                )
+                properties["OCC_COMPORTEMENT"] = PropertyValue(
+                    "OCC_COMPORTEMENT",
+                    null,
+                    580L
                 )
                 properties["NATURALITE"] = PropertyValue(
                     "NATURALITE",

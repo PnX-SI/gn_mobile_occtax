@@ -24,11 +24,6 @@ class InputTest {
         val input = Input().apply {
             id = 1234
             datasetId = 17
-            properties["TECHNIQUE_OBS"] = PropertyValue(
-                "TECHNIQUE_OBS",
-                null,
-                317
-            )
             properties["TYP_GRP"] = PropertyValue(
                 "TYP_GRP",
                 null,
