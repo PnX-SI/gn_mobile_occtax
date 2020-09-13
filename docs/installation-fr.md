@@ -279,8 +279,8 @@ Il est possible de tester l'application mobile en la connectant sur le [serveur 
 Pour cela, télécharger uniquement l'application **_Sync-mobile_** et installez-la sur un terminal mobile. Renseignez
 dans ses paramètres l'URL du serveur de démo de GeoNature et TaxHub :
 
-- URL de GeoNature : http://demo.geonature.fr/geonature
-- URL de TaxHub : http://demo.geonature.fr/taxhub
+- URL de GeoNature : https://demo.geonature.fr/geonature
+- URL de TaxHub : https://demo.geonature.fr/taxhub
 
 Authentifiez-vous avec l'utilisateur de démo (admin / admin). L'application **_Sync-mobile_** se chargera de télécharger
 le fichier de configuration complet et proposera aussi l'installation automatique de l'application **_Occtax-mobile_**
