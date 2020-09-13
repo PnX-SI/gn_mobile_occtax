@@ -6,8 +6,8 @@ Installation documentation (French) : https://github.com/PnX-SI/gn_mobile_occtax
 
 ## Launcher icons
 
-| Name                                                                 | Flavor    | Launcher icon                                                                                                          |
-| -------------------------------------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Name                                                                 | Flavor    | Launcher icon                                                                                                              |
+| -------------------------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------- |
 | Default                                                              | _generic_ | ![PNX](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/main/res/mipmap-xhdpi/ic_launcher.png) |
 | [Parc National des Cévennes](http://www.cevennes-parcnational.fr)    | _pnc_     | ![PNC](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnc/res/mipmap-xhdpi/ic_launcher.png)  |
 | [Parc National des Écrins](http://www.ecrins-parcnational.fr)        | _pne_     | ![PNE](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pne/res/mipmap-xhdpi/ic_launcher.png)  |
@@ -49,6 +49,136 @@ Example:
 | --------------------------- | ------- | ------------------------------------------------------------------------------ | ------------- |
 | `area_observation_duration` | &#9744; | Area observation duration period (in days)                                     | 365           |
 | `map`                       | &#9744; | Maps settings (cf. https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps) |               |
+| `nomenclature`              | &#9744; | Nomemclature settings                                                          |               |
+| `nomenclature/information`  | &#9744; | Information settings (as array)                                                |               |
+| `nomenclature/counting`     | &#9744; | Counting settings (as array)                                                   |               |
+
+#### Nomenclature settings
+
+All these settings may be not defined and the default values will be used instead:
+
+**Information settings**
+
+| Nomemclature     | Label                            | Visible by default | Editable |
+| ---------------- | -------------------------------- | ------------------ | -------- |
+| METH_OBS         | Observation methods              | `true`             | `true`   |
+| ETA_BIO          | Biological state of observation  | `true`             | `true`   |
+| METH_DETERMIN    | Determination method             | `false`            | `true`   |
+| DETERMINER       | Determiner                       | `false`            | `true`   |
+| STATUT_BIO       | Biological status                | `false`            | `true`   |
+| OCC_COMPORTEMENT | Behavior of observed occurrences | `false`            | `true`   |
+| NATURALITE       | Level of naturalness             | `false`            | `true`   |
+| PREUVE_EXIST     | Proof of existence               | `false`            | `true`   |
+| COMMENT          | Comment                          | `false`            | `true`   |
+
+**Counting settings**
+
+| Nomemclature | Label                      | Visible by default | Editable |
+| ------------ | -------------------------- | ------------------ | -------- |
+| STADE_VIE    | Life stage                 | `true`             | `true`   |
+| SEXE         | Sex                        | `true`             | `true`   |
+| OBJ_DENBR    | Purpose of the enumeration | `true`             | `true`   |
+| TYP_DENBR    | Type of enumeration        | `true`             | `true`   |
+| MIN          | Min                        | `true`             | `true`   |
+| MAX          | Max                        | `true`             | `true`   |
+
+**Note:** Any unknown nomenclature attribute added will be simply ignored at startup.
+
+You can override these default settings by adding a property for each nomenclature settings, e.g:
+
+```json
+{
+  "nomenclature": {
+    "information": [
+      "METH_OBS",
+      {
+        "key": "ETA_BIO"
+      },
+      {
+        "key": "METH_DETERMIN",
+        "visible": true,
+        "default": true
+      },
+      {
+        "key": "STATUT_BIO",
+        "visible": true,
+        "default": false
+      },
+       {
+        "key": "OCC_COMPORTEMENT",
+        "visible": true,
+        "default": false
+      },
+      {
+        "key": "NATURALITE",
+        "visible": true,
+        "default": false
+      },
+      {
+        "key": "PREUVE_EXIST",
+        "visible": true,
+        "default": false
+      }
+    ],
+    "counting": ["STADE_VIE", "SEXE", "OBJ_DENBR", "TYP_DENBR"]
+  }
+}
+```
+
+Each property may be a simple string representing the nomenclature attribute to show or an object with the following properties:
+
+| Property  | Description                                                           | Mandatory |
+| --------- | --------------------------------------------------------------------- | --------- |
+| `key`     | The nomenclature attribute                                            | &#9745;   |
+| `visible` | If this attribute is visible (thus editable) or not (default: `true`) | &#9744;   |
+| `default` | If this attribute is shown by default (default: `true`)               | &#9744;   |
+
+**Example:**
+
+- `"METH_OBS"` has the same meaning like
+
+  ```json
+  {
+    "key": "METH_OBS"
+  }
+  ```
+
+  or
+
+  ```json
+  {
+    "key": "METH_OBS",
+    "visible": true
+  }
+  ```
+
+  or
+
+  ```json
+  {
+    "key": "METH_OBS",
+    "default": true
+  }
+  ```
+
+  or
+
+  ```json
+  {
+    "key": "METH_OBS",
+    "visible": true,
+    "default": true
+  }
+  ```
+
+- An omitted property (e.g. `METH_OBS`) has the same meaning like
+
+  ```json
+  {
+    "key": "METH_OBS",
+    "visible": false
+  }
+  ```
 
 ## Upgrade git sub modules
 
