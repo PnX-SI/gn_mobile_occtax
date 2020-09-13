@@ -130,6 +130,11 @@ class InputTaxon : AbstractInputTaxon {
                 false
             ),
             Triple(
+                "OCC_COMPORTEMENT",
+                NomenclatureTypeViewType.NOMENCLATURE_TYPE,
+                false
+            ),
+            Triple(
                 "NATURALITE",
                 NomenclatureTypeViewType.NOMENCLATURE_TYPE,
                 false

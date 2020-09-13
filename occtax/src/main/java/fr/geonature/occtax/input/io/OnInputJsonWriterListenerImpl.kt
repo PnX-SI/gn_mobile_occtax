@@ -122,7 +122,6 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
             if (it.value.isEmpty()) return@forEach
 
             when (it.key) {
-                "TECHNIQUE_OBS" -> writer.name("id_nomenclature_obs_technique").value(it.value.value as Long)
                 "TYP_GRP" -> writer.name("id_nomenclature_grp_typ").value(it.value.value as Long)
             }
         }
@@ -228,13 +227,20 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
             if (it.value.isEmpty()) return@forEach
 
             when (it.key) {
-                "METH_OBS" -> writer.name("id_nomenclature_obs_meth").value(it.value.value as Long)
-                "ETA_BIO" -> writer.name("id_nomenclature_bio_condition").value(it.value.value as Long)
-                "METH_DETERMIN" -> writer.name("id_nomenclature_determination_method").value(it.value.value as Long)
+                "METH_OBS" -> writer.name("id_nomenclature_obs_technique").value(it.value.value as Long)
+                "ETA_BIO" -> writer.name("id_nomenclature_bio_condition")
+                    .value(it.value.value as Long)
+                "METH_DETERMIN" -> writer.name("id_nomenclature_determination_method")
+                    .value(it.value.value as Long)
                 "DETERMINER" -> writer.name("determiner").value(it.value.value as String?)
-                "STATUT_BIO" -> writer.name("id_nomenclature_bio_status").value(it.value.value as Long)
-                "NATURALITE" -> writer.name("id_nomenclature_naturalness").value(it.value.value as Long)
-                "PREUVE_EXIST" -> writer.name("id_nomenclature_exist_proof").value(it.value.value as Long)
+                "STATUT_BIO" -> writer.name("id_nomenclature_bio_status")
+                    .value(it.value.value as Long)
+                "OCC_COMPORTEMENT" -> writer.name("id_nomenclature_behaviour")
+                    .value(it.value.value as Long)
+                "NATURALITE" -> writer.name("id_nomenclature_naturalness")
+                    .value(it.value.value as Long)
+                "PREUVE_EXIST" -> writer.name("id_nomenclature_exist_proof")
+                    .value(it.value.value as Long)
                 "COMMENT" -> writer.name("comment").value(it.value.value as String?)
             }
         }
@@ -249,10 +255,13 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
 
             c.properties.forEach { p ->
                 when (p.key) {
-                    "STADE_VIE" -> writer.name("id_nomenclature_life_stage").value(p.value.value as Long)
+                    "STADE_VIE" -> writer.name("id_nomenclature_life_stage")
+                        .value(p.value.value as Long)
                     "SEXE" -> writer.name("id_nomenclature_sex").value(p.value.value as Long)
-                    "OBJ_DENBR" -> writer.name("id_nomenclature_obj_count").value(p.value.value as Long)
-                    "TYP_DENBR" -> writer.name("id_nomenclature_type_count").value(p.value.value as Long)
+                    "OBJ_DENBR" -> writer.name("id_nomenclature_obj_count")
+                        .value(p.value.value as Long)
+                    "TYP_DENBR" -> writer.name("id_nomenclature_type_count")
+                        .value(p.value.value as Long)
                 }
             }
 
