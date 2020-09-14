@@ -2,12 +2,12 @@
 <resources>
 
     <string name="nomenclature_meth_obs">Technical observation</string>
-    <string name="nomenclature_eta_bio">Biological state of observation</string>
+    <string name="nomenclature_eta_bio">Biological state</string>
     <string name="nomenclature_more">More information</string>
     <string name="nomenclature_meth_determin">Determination method</string>
     <string name="nomenclature_determiner">Determiner</string>
     <string name="nomenclature_statut_bio">Biological status</string>
-    <string name="nomenclature_occ_comportement">Behavior of observed occurrences</string>
+    <string name="nomenclature_occ_comportement">Behaviour</string>
     <string name="nomenclature_naturalite">Level of naturalness</string>
     <string name="nomenclature_preuve_exist">Proof of existence</string>
     <string name="nomenclature_comment">Comment</string>

@@ -38,7 +38,7 @@
         <item quantity="one">%d sélectionné</item>
         <item quantity="other">%d sélectionnés</item>
     </plurals>
-    <string name="action_save">Save</string>
+    <string name="action_save">Sauvegarder</string>
     <string name="action_comment_add">Ajouter un commentaire</string>
     <string name="action_comment_edit">Supprimer un commentaire</string>
 
