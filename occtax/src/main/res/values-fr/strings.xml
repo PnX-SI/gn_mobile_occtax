@@ -117,7 +117,7 @@
 
     <string name="counting_no_data">Aucun dénombrement effectué.\nCréer un nouveau dénombrement via le bouton +</string>
     <string name="counting_main_label">Dénombrement #%d</string>
-    <string name="counting_description_separator">%1$s : %2$s</string>
+    <string name="counting_description_separator"><![CDATA[<b>%1$s :</b>]]> <![CDATA[<i>%2$s</i>]]></string>
     <string name="counting_snackbar_counting_deleted">Dénombrement supprimé</string>
     <string name="counting_snackbar_counting_undo">Annuler</string>
     <string name="counting_toast_empty">Aucune information à sauvegarder</string>
