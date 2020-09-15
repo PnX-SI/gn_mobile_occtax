@@ -274,7 +274,7 @@ l'application **_Sync-mobile_**.
 
 ## Démonstration
 
-Il est possible de tester l'application mobile en la connectant sur le [serveur de démonstration](http://demo.geonature.fr).
+Il est possible de tester l'application mobile en la connectant sur le [serveur de démonstration](https://demo.geonature.fr).
 
 Pour cela, télécharger uniquement l'application **_Sync-mobile_** et installez-la sur un terminal mobile. Renseignez
 dans ses paramètres l'URL du serveur de démo de GeoNature et TaxHub :
@@ -286,8 +286,8 @@ Authentifiez-vous avec l'utilisateur de démo (admin / admin). L'application **_
 le fichier de configuration complet et proposera aussi l'installation automatique de l'application **_Occtax-mobile_**
 et de sa configuration.
 
-**TODO :** Fournir un fond offline de base, ainsi qu'une couche des unités géographiques (mailles 10x10km) pour les
-couleurs des taxons.
+Vous pouvez aussi utiliser les fichiers d'exemple de fond de carte et d'unités géographiques (mailles 10x10km), 
+disponibles dans le dossier https://geonature.fr/data/maps/. A placer dans un répertoire ``DCIM/maps`` du stockage interne.
 
 ## Logs
 
