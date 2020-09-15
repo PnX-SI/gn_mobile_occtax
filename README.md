@@ -49,38 +49,41 @@ Example:
 | --------------------------- | ------- | ------------------------------------------------------------------------------ | ------------- |
 | `area_observation_duration` | &#9744; | Area observation duration period (in days)                                     | 365           |
 | `map`                       | &#9744; | Maps settings (cf. https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps) |               |
-| `nomenclature`              | &#9744; | Nomemclature settings                                                          |               |
+| `nomenclature`              | &#9744; | Nomenclature settings                                                          |               |
 | `nomenclature/information`  | &#9744; | Information settings (as array)                                                |               |
 | `nomenclature/counting`     | &#9744; | Counting settings (as array)                                                   |               |
 
 #### Nomenclature settings
 
-All these settings may be not defined and the default values will be used instead:
+Allows to define if fields are displayed by default and if they are editable (visible). If a field is not editable (visible),
+it will use the default value set in Occtax database.
+
+All these settings may not be defined and the default values will then be used instead:
 
 **Information settings**
 
-| Nomemclature     | Label                            | Visible by default | Editable |
-| ---------------- | -------------------------------- | ------------------ | -------- |
-| METH_OBS         | Observation methods              | `true`             | `true`   |
-| ETA_BIO          | Biological state of observation  | `true`             | `true`   |
-| METH_DETERMIN    | Determination method             | `false`            | `true`   |
-| DETERMINER       | Determiner                       | `false`            | `true`   |
-| STATUT_BIO       | Biological status                | `false`            | `true`   |
-| OCC_COMPORTEMENT | Behavior of observed occurrences | `false`            | `true`   |
-| NATURALITE       | Level of naturalness             | `false`            | `true`   |
-| PREUVE_EXIST     | Proof of existence               | `false`            | `true`   |
-| COMMENT          | Comment                          | `false`            | `true`   |
+| Nomenclature     | Label                            | Displayed by default | Editable (visible) |
+| ---------------- | -------------------------------- | -------------------- | ------------------ |
+| METH_OBS         | Observation methods              | `true`               | `true`             |
+| ETA_BIO          | Biological state                 | `true`               | `true`             |
+| METH_DETERMIN    | Determination method             | `false`              | `true`             |
+| DETERMINER       | Determiner                       | `false`              | `true`             |
+| STATUT_BIO       | Biological status                | `false`              | `true`             |
+| OCC_COMPORTEMENT | Behaviour                        | `false`              | `true`             |
+| NATURALITE       | Level of naturalness             | `false`              | `true`             |
+| PREUVE_EXIST     | Proof of existence               | `false`              | `true`             |
+| COMMENT          | Comment                          | `false`              | `true`             |
 
 **Counting settings**
 
-| Nomemclature | Label                      | Visible by default | Editable |
-| ------------ | -------------------------- | ------------------ | -------- |
-| STADE_VIE    | Life stage                 | `true`             | `true`   |
-| SEXE         | Sex                        | `true`             | `true`   |
-| OBJ_DENBR    | Purpose of the enumeration | `true`             | `true`   |
-| TYP_DENBR    | Type of enumeration        | `true`             | `true`   |
-| MIN          | Min                        | `true`             | `true`   |
-| MAX          | Max                        | `true`             | `true`   |
+| Nomemclature | Label                      | Displayed by default | Editable (visible) |
+| ------------ | -------------------------- | -------------------- | ------------------ |
+| STADE_VIE    | Life stage                 | `true`               | `true`             |
+| SEXE         | Sex                        | `true`               | `true`             |
+| OBJ_DENBR    | Purpose of the enumeration | `true`               | `true`             |
+| TYP_DENBR    | Type of enumeration        | `true`               | `true`             |
+| MIN          | Min                        | `true`               | `true`             |
+| MAX          | Max                        | `true`               | `true`             |
 
 **Note:** Any unknown nomenclature attribute added will be simply ignored at startup.
 
