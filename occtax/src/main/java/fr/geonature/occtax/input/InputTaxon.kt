@@ -15,7 +15,7 @@ import java.util.TreeMap
 class InputTaxon : AbstractInputTaxon {
 
     val properties: SortedMap<String, PropertyValue> =
-        TreeMap<String, PropertyValue>(Comparator { o1, o2 ->
+        TreeMap<String, PropertyValue> { o1, o2 ->
             val i1 = defaultPropertiesMnemonic.indexOfFirst { it.first == o1 }
             val i2 = defaultPropertiesMnemonic.indexOfFirst { it.first == o2 }
 
@@ -24,7 +24,7 @@ class InputTaxon : AbstractInputTaxon {
                 i2 == -1 -> -1
                 else -> i1 - i2
             }
-        })
+        }
     private val counting: SortedMap<Int, CountingMetadata> = TreeMap<Int, CountingMetadata>()
 
     constructor(taxon: AbstractTaxon) : super(taxon)
