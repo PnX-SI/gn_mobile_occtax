@@ -26,7 +26,7 @@ class EditCountingMetadataActivity : AppCompatActivity(),
     private lateinit var countingMetadata: CountingMetadata
 
     // whether the current counting metadata is new or not
-    private var isNew: Boolean =  true
+    private var isNew: Boolean = true
 
     // whether the current counting metadata has been modified or not
     private var isDirty: Boolean = false
@@ -156,6 +156,7 @@ class EditCountingMetadataActivity : AppCompatActivity(),
                     EXTRA_PROPERTIES,
                     propertySettings
                 )
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             }
         }
     }

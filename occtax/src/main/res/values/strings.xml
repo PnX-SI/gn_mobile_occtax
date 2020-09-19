@@ -21,7 +21,7 @@
     <string name="home_last_inputs">Last inputs</string>
     <string name="home_no_input">No existing input.\nCreate a new one by tapping the + button.</string>
     <string name="home_input_date">EEE dd MMM yyyy</string>
-    <string name="home_input_created_at">Input created at %s</string>
+    <string name="home_input_created_at">Input from %s</string>
     <plurals name="home_input_taxa_count">
         <item quantity="one">%d taxon added</item>
         <item quantity="other">%d taxa added</item>
@@ -120,7 +120,7 @@
 
     <string name="counting_no_data">No counting.\nCreate a new one by tapping the + button.</string>
     <string name="counting_main_label">Counting #%d</string>
-    <string name="counting_description_separator">%1$s: %2$s</string>
+    <string name="counting_description_separator"><![CDATA[<b>%1$s:</b>]]> <![CDATA[<i>%2$s</i>]]></string>
     <string name="counting_snackbar_counting_deleted">Counting deleted</string>
     <string name="counting_snackbar_counting_undo">Undo</string>
     <string name="counting_toast_empty">Empty counting: Nothing to save</string>
@@ -131,6 +131,12 @@
     <string name="counting_max_label">Max</string>
 
     <string name="summary_no_data">No input taxon.\nCreate a new one by tapping the + button.</string>
+    <string name="summary_taxon_information"><![CDATA[<b>%1$s:</b>]]> <![CDATA[<i>%2$s</i>]]></string>
+    <plurals name="summary_taxon_counting">
+        <item quantity="one">one counting</item>
+        <item quantity="other">%d counting</item>
+    </plurals>
+    <string name="summary_taxon_counting_zero">no counting</string>
     <string name="summary_snackbar_input_taxon_deleted">Input taxon deleted</string>
     <string name="summary_snackbar_input_taxon_undo">Undo</string>
     <string name="summary_toast_no_input_taxon">No input taxon.\nRedirecting to the last valid step.</string>

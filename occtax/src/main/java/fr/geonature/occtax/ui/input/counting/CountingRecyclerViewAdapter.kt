@@ -1,7 +1,9 @@
 package fr.geonature.occtax.ui.input.counting
 
+import android.text.Spanned
 import android.view.View
 import android.widget.TextView
+import androidx.core.text.HtmlCompat
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
@@ -26,7 +28,7 @@ class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListene
         position: Int,
         item: CountingMetadata
     ): Int {
-        return R.layout.list_item_3
+        return R.layout.list_item_counting
     }
 
     override fun areItemsTheSame(
@@ -60,10 +62,11 @@ class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListene
             )
             text1.text = buildCountingDescription(item)
             text2.text = buildDescription(item)
+            text2.isSelected = true
         }
 
-        private fun buildCountingDescription(countingMetadata: CountingMetadata): String {
-            return arrayOf(
+        private fun buildCountingDescription(countingMetadata: CountingMetadata): Spanned {
+            return HtmlCompat.fromHtml(arrayOf(
                 Pair(
                     itemView.context.getString(R.string.counting_min_label),
                     countingMetadata.min.toString()
@@ -80,11 +83,13 @@ class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListene
                         it.second
                     )
                 }
-                .joinToString(", ")
+                .joinToString(", "),
+                HtmlCompat.FROM_HTML_MODE_LEGACY)
         }
 
-        private fun buildDescription(countingMetadata: CountingMetadata): String {
-            return countingMetadata.properties.values.asSequence()
+        private fun buildDescription(countingMetadata: CountingMetadata): Spanned {
+            return HtmlCompat.fromHtml(countingMetadata.properties.values
+                .asSequence()
                 .filterNot { it.isEmpty() }
                 .map {
                     itemView.context.getString(
@@ -93,7 +98,8 @@ class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListene
                         it.label
                     )
                 }
-                .joinToString(", ")
+                .joinToString(", "),
+                HtmlCompat.FROM_HTML_MODE_LEGACY)
         }
 
         private fun getNomenclatureTypeLabel(mnemonic: String): String {
