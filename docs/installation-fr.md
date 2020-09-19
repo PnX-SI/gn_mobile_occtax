@@ -16,7 +16,7 @@ Cela permet d'envisager le développement d'autres applications mobiles connect�
 synchronisation des données dans une seule application dédiée à cela.
 
 **_Sync-mobile_** permet de récupérer des données (observateurs, JDD, liste de taxons, etc.) en appelant les routes d'une
-instance GeoNature après authentification de l'utilisateur pour lui appliquer ses droits.
+instance GeoNature (obligatoirement sécurisée en HTTPS) après authentification de l'utilisateur pour lui appliquer ses droits.
 Toutes ces données sont stockées dans une base de données locale au format SQLite dans le terminal mobile pour disposer
 des données localement et ainsi pouvoir fonctionner hors-ligne.
 
@@ -258,8 +258,8 @@ Exemple de contenu de la table `gn_commons.t_mobile_apps` :
 2;"SYNC";"static/mobile/sync/sync-0.2.8-pne-debug.apk";"";"fr.geonature.sync";"2280"
 ```
 
-Le résultat peut être testé en interrogeant la route <URL*GEONATURE>/api/gn_commons/t_mobile_apps qui est celle utilisée
-par l'application \*\*\_Sync-mobile*\*\* pour mettre à jour les applications et leur configuration.
+Le résultat peut être testé en interrogeant la route <URL_GEONATURE>/api/gn_commons/t_mobile_apps qui est celle utilisée
+par l'application **_Sync-mobile_** pour mettre à jour les applications et leur configuration.
 
 Installez ensuite uniquement l'application **_Sync-mobile_** sur le terminal mobile, lancez-la et déclarez l'URL de
 GeoNature et de TaxHub dans sa configuration.
