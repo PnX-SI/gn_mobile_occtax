@@ -117,7 +117,7 @@ class CountingFragment : Fragment(),
                     getSystemService(
                         this,
                         Vibrator::class.java
-                    )?.vibrate(50)
+                    )?.vibrate(100)
                 }
 
                 Snackbar.make(
@@ -213,6 +213,11 @@ class CountingFragment : Fragment(),
             (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.addCountingMetadata(
                 countingMetadata
             )
+
+            val counting = (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()
+                ?: emptyList()
+
+            adapter?.setItems(counting)
         }
     }
 
@@ -234,14 +239,16 @@ class CountingFragment : Fragment(),
     }
 
     override fun refreshView() {
-        adapter?.setItems(
-            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()
-                ?: emptyList()
-        )
+        if (input == null) {
+            return
+        }
 
-        if ((input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()
-                ?.isEmpty() == true
-        ) {
+        val counting = (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()
+            ?: emptyList()
+
+        adapter?.setItems(counting)
+
+        if (counting.isEmpty()) {
             val context = context ?: return
             startActivityForResult(
                 EditCountingMetadataActivity.newIntent(
