@@ -202,7 +202,7 @@ class HomeFragment : Fragment() {
                     ContextCompat.getSystemService(
                         this,
                         Vibrator::class.java
-                    )?.vibrate(50)
+                    )?.vibrate(100)
                 }
 
                 makeSnackbar(getString(R.string.home_snackbar_input_deleted))

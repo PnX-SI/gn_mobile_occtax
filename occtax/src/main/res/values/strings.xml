@@ -131,6 +131,12 @@
     <string name="counting_max_label">Max</string>
 
     <string name="summary_no_data">No input taxon.\nCreate a new one by tapping the + button.</string>
+    <string name="summary_taxon_information"><![CDATA[<b>%1$s:</b>]]> <![CDATA[<i>%2$s</i>]]></string>
+    <plurals name="summary_taxon_counting">
+        <item quantity="one">one counting</item>
+        <item quantity="other">%d counting</item>
+    </plurals>
+    <string name="summary_taxon_counting_zero">no counting</string>
     <string name="summary_snackbar_input_taxon_deleted">Input taxon deleted</string>
     <string name="summary_snackbar_input_taxon_undo">Undo</string>
     <string name="summary_toast_no_input_taxon">No input taxon.\nRedirecting to the last valid step.</string>

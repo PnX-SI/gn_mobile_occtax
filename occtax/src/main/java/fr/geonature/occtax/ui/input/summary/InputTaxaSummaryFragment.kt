@@ -1,6 +1,7 @@
 package fr.geonature.occtax.ui.input.summary
 
 import android.os.Bundle
+import android.os.Vibrator
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.Menu
@@ -10,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -84,15 +86,8 @@ class InputTaxaSummaryFragment : Fragment(),
         empty.text = getString(R.string.summary_no_data)
 
         fab.setOnClickListener {
-            input?.clearCurrentSelectedInputTaxon()
-
             ((activity as AbstractPagerFragmentActivity?))?.also {
-                if (this@InputTaxaSummaryFragment.validate()) {
-                    it.goToPageByKey(R.string.pager_fragment_taxa_title)
-
-                    return@also
-                }
-
+                input?.clearCurrentSelectedInputTaxon()
                 it.goToPreviousPage()
                 it.goToNextPage()
             }
@@ -112,6 +107,14 @@ class InputTaxaSummaryFragment : Fragment(),
                 adapter?.remove(item)
                 input?.removeInputTaxon(item.taxon.id)
                 (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+
+                context?.run {
+                    @Suppress("DEPRECATION")
+                    getSystemService(
+                        this,
+                        Vibrator::class.java
+                    )?.vibrate(100)
+                }
 
                 Snackbar.make(
                     content,
