@@ -7,7 +7,7 @@
 Si vous souhaitez customiser l'application (nom, couleurs, icône), vous devez générer l'APK à partir des fichiers source
 comme détaillé dans la documentation (https://github.com/PnX-SI/gn_mobile_core/tree/master/docs).
 
-Sinon vous pouvez utiliser les APK fournies dans les Assets de chaque release (aux couleurs de certains parcs nationaux
+Sinon vous pouvez utiliser les APK fournies dans les fichiers (assets) de chaque release (aux couleurs de certains parcs nationaux
 ou la version générique verte et rouge).
 
 Pour fonctionner, l'application **_Occtax-mobile_** a besoin de l'application **_Sync-mobile_** qui centralise la
@@ -47,18 +47,19 @@ première synchronisation avec le serveur GeoNature configuré
 
 Les paramètres `page_size` et `page_max_retry` permettent de paginer les appels aux routes renvoyant de nombreux
 résultats et ainsi les récupérer par lots (voir [#37](https://github.com/PnX-SI/gn_mobile_occtax/issues/37)).
+
 Exemples des routes paginées :
 
-- <URL_TAXHUB>/api/taxref/allnamebylist/100?limit=100&offset=200 (pour renvoyer les noms des 100 taxons à partir du
+- `<URL_TAXHUB>/api/taxref/allnamebylist/100?limit=100&offset=200` (pour renvoyer les noms des 100 taxons à partir du
   200ième résultat des taxons de la liste 100)
-- <URL_GEONATURE>/api/synthese/color_taxon?code_area_type=M10&limit=10&offset=20 (pour renvoyer 10 résultats à partir du
+- `<URL_GEONATURE>/api/synthese/color_taxon?code_area_type=M10&limit=10&offset=20` (pour renvoyer 10 résultats à partir du
   vingtième résultat des couleurs des taxons pour les zonages de type Mailles de 10km)
 
 Ainsi la valeur du paramètre `page_size` multipliée par la valeur du paramètre `page_max_retry` doit être au moins égale
 au nombre total de résultats renvoyé par ces routes.
 
 Le comportement de l'application de synchronisation consiste à appeler au maximum n fois (où n = `page_max_retry`) la
-route paginée tant que celle-ci retourne un tableau de valeurs non vides et que ce tableau à la même taille que
+route paginée tant que celle-ci retourne un tableau de valeurs non vides et que ce tableau a la même taille que
 `page_size`.
 
 Les conditions d'arrêt de l'interrogation de ces routes sont :
@@ -83,7 +84,7 @@ Le paramètre `taxa_list_id` permet de renseigner l'`id_liste` des taxons saisis
 
 ### Occtax-mobile
 
-Installer l'application **_Occtax-mobile_** manuellement via son APK ou via l'application **_Sync-mobile_**.
+Installer l'application **_Occtax-mobile_** manuellement via son APK ou automatiquement via l'application **_Sync-mobile_**.
 
 Si l'installation se fait manuellement, il faut copier son fichier de configuration `settings_occtax.json` dans le
 répertoire `Android/data/fr.geonature.occtax` sur le stockage interne du terminal mobile.
@@ -93,6 +94,7 @@ répertoire `Android/data/fr.geonature.occtax` sur le stockage interne du termin
 
 Le paramètre `area_observation_duration` est lié aux couleurs des taxons dans chaque unités géographiques en fonction de
 la date de dernière observation du taxon dans l'unité géographique.
+
 Il correspond à la durée en jours définie dans la vue `gn_synthese.v_color_taxon_area` permettant d'ajuster à quelle
 fréquence un taxon change de couleur selon sa date de dernière observation dans l'unité géographique (plus d'un mois,
 plus d'un an, plus de 5 ans, etc.).
@@ -100,17 +102,18 @@ plus d'un an, plus de 5 ans, etc.).
 Voir [#617](https://github.com/PnX-SI/GeoNature/issues/617) et [#50](https://github.com/PnX-SI/gn_mobile_occtax/issues/50)
 pour plus de détails.
 
-<img src="https://user-images.githubusercontent.com/11782642/75454154-3ac11700-5975-11ea-997c-7c33484e43bb.jpg" width="400"/>
+<img src="https://user-images.githubusercontent.com/4418840/93030565-42e85780-f624-11ea-8093-e8d49cb7057c.jpg" width="400"/>
 
 Pour la configuration de la partie cartographique (bloc `map` du fichier `settings_occtax.json`),
-se référer au [README](https://github.com/PnX-SI/gn_mobile_maps/blob/develop/maps/README.md) du module **maps**.
+se référer au [README](https://github.com/PnX-SI/gn_mobile_maps/blob/develop/maps/README.md) du module **Maps**.
 
 Cette partie permet de définir l'affichage des outils cartographiques, le centrage, l'étendue et les niveaux de zoom,
 mais aussi les fonds et couches cartographiques de l'application.
 
-Le module **maps** s'appuie sur la bibliothèque [osmdroid](https://github.com/osmdroid/osmdroid) et gère notamment les
+Le module **Maps** s'appuie sur la bibliothèque [osmdroid](https://github.com/osmdroid/osmdroid) et gère notamment les
 sources locales (https://github.com/osmdroid/osmdroid/wiki/Offline-Map-Tiles) pouvant être généré via l'outil
 [MOBAC](https://mobac.sourceforge.io) ou [Maperitive](http://maperitive.net).
+
 Charger un fond de carte (MBTiles, les autres formats doivent aussi fonctionner) sur le terminal mobile et renseigner
 son chemin dans le paramètre `base_path`.
 
@@ -128,7 +131,7 @@ couches vectorielles.
 
 On peut ajouter autant de couches vectorielles et pour chacune on peut appliquer des styles différents.
 Vous pouvez vous référer au [README](https://github.com/PnX-SI/gn_mobile_maps/blob/develop/maps/README.md) du module
-**maps** pour le paramétrage.
+**Maps** pour le paramétrage.
 
 Pour l'affichage et l'utilisation des unités géographiques permettant d'afficher les taxons de couleur différente selon
 la date de dernière observation dans l'unité, il est nécessaire de charger une couche vectorielle des polygones des
@@ -142,7 +145,7 @@ les données additionnelles venant des unités géographiques.
 
 Il est important que l'ID de chaque zone corresponde à ce que remonte GeoNature pour faire la correspondance.
 
-L'attribut `area_id` des données de la route `/geonature/api/synthese/color_taxon` correspondent aux identifiants
+L'attribut `area_id` des données de la route `/geonature/api/synthese/color_taxon` correspond à l'identifiant
 présent dans la couche vectorielle.
 
 Par exemple, si la source vectorielle est du WKT :
@@ -154,7 +157,7 @@ Par exemple, si la source vectorielle est du WKT :
 
 Les couches vectorielles peuvent être au format `json`, `geojson` ou `wkt`.
 
-Concernant l'exemple au format WKT, il est au format CSV et le module **maps** doit suivre le schéma suivant :
+Concernant l'exemple au format WKT, il est au format CSV et le module **Maps** doit suivre le schéma suivant :
 
 ```
 id,wkt
@@ -248,6 +251,7 @@ Exemple pour **_Occtax-mobile_** :
 Dans tous les cas, le fichier de configuration sur le serveur doit être nommé `settings.json`.
 
 Renseigner ensuite la table `gn_commons.t_mobile_apps`.
+
 Pour trouver la valeur à renseigner dans le champs `version_code`, voir les fichiers https://github.com/PnX-SI/gn_mobile_core/blob/master/sync/version.properties
 et https://github.com/PnX-SI/gn_mobile_occtax/blob/master/occtax/version.properties
 
@@ -258,7 +262,7 @@ Exemple de contenu de la table `gn_commons.t_mobile_apps` :
 2;"SYNC";"static/mobile/sync/sync-0.2.8-pne-debug.apk";"";"fr.geonature.sync";"2280"
 ```
 
-Le résultat peut être testé en interrogeant la route <URL_GEONATURE>/api/gn_commons/t_mobile_apps qui est celle utilisée
+Le résultat peut être testé en interrogeant la route `<URL_GEONATURE>/api/gn_commons/t_mobile_apps` qui est celle utilisée
 par l'application **_Sync-mobile_** pour mettre à jour les applications et leur configuration.
 
 Installez ensuite uniquement l'application **_Sync-mobile_** sur le terminal mobile, lancez-la et déclarez l'URL de
@@ -269,7 +273,7 @@ L'application de synchronisation se chargera de récupérer le fichier de config
 Elle proposera aussi d'installer les applications mobiles disponibles et de récupérer leur fichier de configuration.
 
 Si vous faites évoluer la configuration et/ou les versions des applications mobiles sur le serveur GeoNature et dans la
-table `gn_commons.t_mobile_apps`, alors ils seront mis à jour sur le terminal mobile au prochaine lancement de
+table `gn_commons.t_mobile_apps`, alors ils seront mis à jour sur le terminal mobile au prochain lancement de
 l'application **_Sync-mobile_**.
 
 ## Démonstration
