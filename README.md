@@ -2,6 +2,8 @@
 
 GeoNature Android mobile application for Occtax module.
 
+Based on Sync-mobile (https://github.com/PnX-SI/gn_mobile_core) to synchronize data and Maps-mobile (https://github.com/PnX-SI/gn_mobile_maps) as map module.
+
 Installation documentation (French) : https://github.com/PnX-SI/gn_mobile_occtax/blob/master/docs/installation-fr.md
 
 ## Launcher icons
@@ -76,7 +78,7 @@ All these settings may not be defined and the default values will then be used i
 
 **Counting settings**
 
-| Nomemclature | Label                      | Displayed by default | Editable (visible) |
+| Nomenclature | Label                      | Displayed by default | Editable (visible) |
 | ------------ | -------------------------- | -------------------- | ------------------ |
 | STADE_VIE    | Life stage                 | `true`               | `true`             |
 | SEXE         | Sex                        | `true`               | `true`             |
