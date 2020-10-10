@@ -26,6 +26,7 @@
         <item quantity="one">%d taxon added</item>
         <item quantity="other">%d taxa added</item>
     </plurals>
+    <string name="home_input_taxa_count_empty">No taxon added</string>
     <string name="home_snackbar_input_deleted">Input deleted</string>
     <string name="home_snackbar_input_undo">Undo</string>
 

@@ -59,14 +59,12 @@ class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<I
                     item.date
                 )
             )
-
-            if (item.getInputTaxa().isNotEmpty()) {
-                text2.text = itemView.resources.getQuantityString(
+            text2.text = if (item.getInputTaxa().isNotEmpty())
+                itemView.resources.getQuantityString(
                     R.plurals.home_input_taxa_count,
                     item.getInputTaxa().size,
                     item.getInputTaxa().size
-                )
-            }
+                ) else itemView.context.getString(R.string.home_input_taxa_count_empty)
         }
     }
 }
