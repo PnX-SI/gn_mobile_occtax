@@ -40,7 +40,9 @@ Installer l'application **_Sync-mobile_**.
 Le fichier de configuration `settings_sync.json` de l'application peut être directement copié dans le répertoire
 `Android/data/fr.geonature.sync` sur le stockage interne du terminal mobile ou récupéré automatiquement lors de la
 première synchronisation avec le serveur GeoNature configuré
-(cf. [Installation et configuration centralisées](#installation-et-configuration-centralisées)).
+(cf. [Installation et configuration centralisées](#installation-et-configuration-centralisées)). 
+Dans tous les cas, l'installation et la configuration centralisée doivent être mis en place pour que la synchronisation
+des données fonctionne.
 
 - Détail des paramètres du fichier de configuration : https://github.com/PnX-SI/gn_mobile_core/tree/master/sync
 - Exemple de fichier de configuration : https://github.com/PnX-SI/gn_mobile_core/blob/master/sync/src/test/resources/fixtures/settings_sync.json
@@ -230,7 +232,7 @@ Concernant les fonds cartographiques, il faut donc suivre les règles suivantes 
 
 ### Installation et configuration centralisées
 
-Il est aussi possible de gérer les fichiers de configuration, l'installation et la mise à jour des applications au
+Il est nécessaire de gérer les fichiers de configuration, l'installation et la mise à jour des applications au
 niveau du serveur GeoNature. Voir [#8](https://github.com/PnX-SI/gn_mobile_core/issues/8).
 
 L'application **_Sync-mobile_** se chargera alors de récupérer sur le serveur GeoNature les dernières versions des
