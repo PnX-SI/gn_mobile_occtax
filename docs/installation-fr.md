@@ -255,7 +255,9 @@ Dans tous les cas, le fichier de configuration sur le serveur doit être nommé 
 Renseigner ensuite la table `gn_commons.t_mobile_apps`.
 
 Pour trouver la valeur à renseigner dans le champs `version_code`, voir les fichiers https://github.com/PnX-SI/gn_mobile_core/blob/master/sync/version.properties
-et https://github.com/PnX-SI/gn_mobile_occtax/blob/master/occtax/version.properties
+et https://github.com/PnX-SI/gn_mobile_occtax/blob/master/occtax/version.properties.
+
+Ou avec l'outil ``aapt`` (``apt-get install aapt`` pour l'installer), exécutez la commande ``aapt dump badging applicationfile.apk  | grep -Po "(?<=\sversion(Code|Name)=')([0-9.]+)"``.
 
 Exemple de contenu de la table `gn_commons.t_mobile_apps` :
 
