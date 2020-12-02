@@ -5,7 +5,7 @@
 **Occtax-mobile** fonctionne avec Android et interagit avec un serveur GeoNature (2.4.0 minimum) et TaxHub (1.7.0 minimum).
 
 Si vous souhaitez customiser l'application (nom, couleurs, icône), vous devez générer l'APK à partir des fichiers source
-comme détaillé dans la documentation (https://github.com/PnX-SI/gn_mobile_core/tree/master/docs).
+comme détaillé dans la [documentation de développement](https://github.com/PnX-SI/gn_mobile_core/tree/master/docs).
 
 Sinon vous pouvez utiliser les APK fournies dans les fichiers (assets) de chaque release (aux couleurs de certains parcs nationaux
 ou la version générique verte et rouge).
@@ -15,7 +15,7 @@ synchronisation des données.
 Cela permet d'envisager le développement d'autres applications mobiles connectées à GeoNature en factorisant la
 synchronisation des données dans une seule application dédiée à cela.
 
-**_Sync-mobile_** permet de récupérer des données (observateurs, JDD, liste de taxons, etc.) en appelant les routes d'une
+**_Sync-mobile_** permet de récupérer des données (observateurs, JDD, liste de taxons, nomenclatures, etc.) en appelant les routes d'une
 instance GeoNature (obligatoirement sécurisée en HTTPS) après authentification de l'utilisateur pour lui appliquer ses droits.
 Toutes ces données sont stockées dans une base de données locale au format SQLite dans le terminal mobile pour disposer
 des données localement et ainsi pouvoir fonctionner hors-ligne.
@@ -342,4 +342,4 @@ adb logcat | findstr fr.geonature
 
 # Utilisation
 
-Voir https://geonature.fr/documents/0.25-occtax-mobile.pdf (à mettre à jour et migrer en fichier .md à part)
+Documentation d'utilisation : https://github.com/PnX-SI/gn_mobile_occtax/blob/master/docs/utilisation-fr.md
