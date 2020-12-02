@@ -4,7 +4,10 @@ GeoNature Android mobile application for Occtax module.
 
 Based on Sync-mobile (https://github.com/PnX-SI/gn_mobile_core) to synchronize data and Maps-mobile (https://github.com/PnX-SI/gn_mobile_maps) as map module.
 
-Installation documentation (French) : https://github.com/PnX-SI/gn_mobile_occtax/blob/master/docs/installation-fr.md
+Documentation : 
+
+- Installation (French) : https://github.com/PnX-SI/gn_mobile_occtax/blob/master/docs/installation-fr.md
+- Utilisation (French) : https://github.com/PnX-SI/gn_mobile_occtax/blob/master/docs/utilisation-fr.md
 
 ## Launcher icons
 
