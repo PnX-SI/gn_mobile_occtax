@@ -54,11 +54,11 @@ Si une couche vectorielle de zonage a été définie et intégrée dans l'appare
 
 Il est possible de filtrer pour n'afficher que les taxons jamais observés, ou déjà observés.
 
-Il est possible de rechercher dans la liste des taxons (en français ou en latinà, ou de filtrer par rang taxonomique.
+Il est possible de rechercher dans la liste des taxons (en français ou en latin), ou de filtrer par rang taxonomique.
 
 <img src="https://geonature.fr/docs/img/occtax-mobile/OM-06.jpg"/>
 
-On renseigne ensuite les nomenclatures. Les valeurs par défaut définies dans la base de données sont renseignées par défaut. Chaque nomenclature peut être modifiée.
+On renseigne ensuite les nomenclatures. Les valeurs par défaut définies dans la base de données sont renseignées par défaut. Chaque nomenclature peut être modifiée. Les nomenclatures proposées dépendent du règne ou du groupe du taxon selectionné dans l'étape précédente.
 
 <img src="https://geonature.fr/docs/img/occtax-mobile/OM-07.jpg"/>
 
@@ -74,14 +74,16 @@ Il est possible de renseigner un ou plusieurs dénombrements pour chaque taxon o
 
 Chaque dénombrement peut être modifié ou supprimé (en cliquant longuement sur l'un d'eux dans la liste des dénombrements).
 
-## Dénombrement
+## Récapitulatif et synchronisation
 
-La dernière étape est un récapitulatif des taxons du relevés, où il est aussi possible de mettre un commentaire général sur le relevé.
+La dernière étape est un récapitulatif des taxons du relevé, où il est aussi possible de mettre un commentaire général sur le relevé.
 
 <img src="https://geonature.fr/docs/img/occtax-mobile/OM-09.jpg"/>
 
 Il est alors possible d’ajouter un autre taxon au relevé, ou bien de terminer le relevé.
 
-Si l’on termine le relevé, on revient à la page d’accueil de l'application qui liste les relevés en cours et l'état de synchronisation des données.
+Il est possible de supprimer un taxon du relevé en cliquant longuement dessus.
 
-Elle permet aussi de lancer une synchronisation des données en lançant l'application Sync-mobile.
+Si l’on termine le relevé, on revient à la page d’accueil de l'application qui liste les relevés en cours. Il est possible de modifier un relevé en cours en cliquant dessus, ou bien de le supprimer en cliquant longuement dessus.
+
+Cette page d'accueil indique aussi l'état de synchronisation des données et permet de lancer une synchronisation des données en lançant l'application Sync-mobile.
