@@ -8,7 +8,7 @@ import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 
 /**
- * Default RecyclerView Adapter used by [HomeFragment].
+ * Default RecyclerView Adapter used by [HomeActivity].
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */

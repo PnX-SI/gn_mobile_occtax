@@ -7,9 +7,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
 import fr.geonature.maps.settings.MapSettings
-import fr.geonature.maps.util.SettingsUtils.showCompass
-import fr.geonature.maps.util.SettingsUtils.showScale
-import fr.geonature.maps.util.SettingsUtils.showZoom
+import fr.geonature.maps.util.MapSettingsPreferencesUtils.showCompass
+import fr.geonature.maps.util.MapSettingsPreferencesUtils.showScale
+import fr.geonature.maps.util.MapSettingsPreferencesUtils.showZoom
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputViewModel
