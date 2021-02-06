@@ -139,8 +139,11 @@ Pour l'affichage et l'utilisation des unités géographiques permettant d'affich
 la date de dernière observation dans l'unité, il est nécessaire de charger une couche vectorielle des polygones des
 unités géographiques en respectant quelques règles.
 
+Le code du type de zonage utilisé doit être renseigné dans le paramètre `code_area_type` de gn_mobile_core. Ce même code 
+doit aussi être renseigné dans le paramètre `occtaxmobile_area_type`de la table `gn_commons.t_parameters`de GeoNature.
+
 Par défaut, si aucune couche vectorielle n'est configurée, l'application va simplement charger la base des taxons sans
-les données additionnelles venant des unités géographiques.
+les informations additionnelles venant des unités géographiques.
 
 - Exemple de fichier WKT : https://github.com/PnX-SI/gn_mobile_maps/blob/develop/maps/src/test/resources/fixtures/features.wkt
 - Exemple de configuration : https://github.com/PnX-SI/gn_mobile_maps/blob/develop/maps/src/test/resources/fixtures/map_settings.json
