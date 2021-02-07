@@ -7,6 +7,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import fr.geonature.occtax.BuildConfig
 import fr.geonature.occtax.R
+import fr.geonature.occtax.settings.AppSettings
 import java.text.DateFormat
 import java.util.Date
 
@@ -25,11 +26,13 @@ class PreferencesActivity : AppCompatActivity(),
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        val appSettings: AppSettings? = intent.getParcelableExtra(EXTRA_APP_SETTINGS)
+
         // Display the fragment as the main content.
         supportFragmentManager.beginTransaction()
             .replace(
                 android.R.id.content,
-                PreferencesFragment.newInstance()
+                PreferencesFragment.newInstance(appSettings)
             )
             .commit()
     }
@@ -56,8 +59,18 @@ class PreferencesActivity : AppCompatActivity(),
 
     companion object {
 
-        fun newIntent(context: Context): Intent {
-            return Intent(context, PreferencesActivity::class.java)
+        private const val EXTRA_APP_SETTINGS = "extra_app_settings"
+
+        fun newIntent(context: Context, appSettings: AppSettings? = null): Intent {
+            return Intent(
+                context,
+                PreferencesActivity::class.java
+            ).apply {
+                putExtra(
+                    EXTRA_APP_SETTINGS,
+                    appSettings
+                )
+            }
         }
     }
 }

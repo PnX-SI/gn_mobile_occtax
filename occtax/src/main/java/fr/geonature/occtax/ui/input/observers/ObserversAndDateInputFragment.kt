@@ -12,6 +12,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.loader.app.LoaderManager
@@ -50,6 +52,9 @@ import java.util.Locale
 class ObserversAndDateInputFragment : Fragment(),
     IValidateFragment,
     IInputFragment {
+
+    private lateinit var observersResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var datasetResultLauncher: ActivityResultLauncher<Intent>
 
     private var input: Input? = null
     private val selectedInputObservers: MutableList<InputObserver> = mutableListOf()
@@ -145,6 +150,9 @@ class ObserversAndDateInputFragment : Fragment(),
                     }
 
                     updateSelectedObserversActionView(selectedInputObservers)
+
+                    LoaderManager.getInstance(this@ObserversAndDateInputFragment)
+                        .destroyLoader(LOADER_OBSERVERS_IDS)
                 }
                 LOADER_DATASET_ID -> {
                     if (data.count == 0) {
@@ -158,6 +166,9 @@ class ObserversAndDateInputFragment : Fragment(),
                     }
 
                     updateSelectedDatasetActionView(selectedDataset)
+
+                    LoaderManager.getInstance(this@ObserversAndDateInputFragment)
+                        .destroyLoader(LOADER_DATASET_ID)
                 }
                 LOADER_DEFAULT_NOMENCLATURE_VALUES -> {
                     data.moveToFirst()
@@ -187,6 +198,9 @@ class ObserversAndDateInputFragment : Fragment(),
 
                         data.moveToNext()
                     }
+
+                    LoaderManager.getInstance(this@ObserversAndDateInputFragment)
+                        .destroyLoader(LOADER_DEFAULT_NOMENCLATURE_VALUES)
 
                     (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
 
@@ -232,6 +246,31 @@ class ObserversAndDateInputFragment : Fragment(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        observersResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if ((it.resultCode != Activity.RESULT_OK) || (it.data == null)) {
+                    return@registerForActivityResult
+                }
+
+                updateSelectedObservers(
+                    it.data?.getParcelableArrayListExtra(
+                        InputObserverListActivity.EXTRA_SELECTED_INPUT_OBSERVERS
+                    ) ?: ArrayList()
+                )
+            }
+        datasetResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if ((it.resultCode != Activity.RESULT_OK) || (it.data == null)) {
+                    return@registerForActivityResult
+                }
+
+                updateSelectedDataset(
+                    it.data?.getParcelableExtra(
+                        DatasetListActivity.EXTRA_SELECTED_DATASET
+                    )
+                )
+            }
+
         val supportFragmentManager = activity?.supportFragmentManager ?: return
 
         val dialogFragment =
@@ -257,13 +296,12 @@ class ObserversAndDateInputFragment : Fragment(),
             override fun onAction() {
                 val context = context ?: return
 
-                startActivityForResult(
+                observersResultLauncher.launch(
                     InputObserverListActivity.newIntent(
                         context,
                         ListView.CHOICE_MODE_MULTIPLE,
                         selectedInputObservers
-                    ),
-                    LOADER_OBSERVERS_IDS
+                    )
                 )
             }
         })
@@ -274,12 +312,11 @@ class ObserversAndDateInputFragment : Fragment(),
             override fun onAction() {
                 val context = context ?: return
 
-                startActivityForResult(
+                datasetResultLauncher.launch(
                     DatasetListActivity.newIntent(
                         context,
                         selectedDataset
-                    ),
-                    LOADER_DATASET_ID
+                    )
                 )
             }
         })
@@ -298,54 +335,6 @@ class ObserversAndDateInputFragment : Fragment(),
         })
 
         return view
-    }
-
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?
-    ) {
-        if ((resultCode != Activity.RESULT_OK) || (data == null)) {
-            return
-        }
-
-        when (requestCode) {
-            LOADER_OBSERVERS_IDS -> {
-                selectedInputObservers.clear()
-                selectedInputObservers.addAll(
-                    data.getParcelableArrayListExtra(
-                        InputObserverListActivity.EXTRA_SELECTED_INPUT_OBSERVERS
-                    ) ?: ArrayList()
-                )
-
-                input?.also {
-                    it.clearAllInputObservers()
-
-                    if (selectedInputObservers.isEmpty()) {
-                        val context = context ?: return
-                        getDefaultObserverId(context).also { defaultObserverId ->
-                            if (defaultObserverId != null) it.setPrimaryInputObserverId(
-                                defaultObserverId
-                            )
-                        }
-                    }
-
-                    it.setAllInputObservers(selectedInputObservers)
-                }
-
-                updateSelectedObserversActionView(selectedInputObservers)
-            }
-            LOADER_DATASET_ID -> {
-                selectedDataset =
-                    data.getParcelableExtra(DatasetListActivity.EXTRA_SELECTED_DATASET)
-
-                input?.also {
-                    it.datasetId = selectedDataset?.id
-                }
-
-                updateSelectedDatasetActionView(selectedDataset)
-            }
-        }
     }
 
     override fun getResourceTitle(): Int {
@@ -373,7 +362,7 @@ class ObserversAndDateInputFragment : Fragment(),
 
         if (selectedInputObserverIds.isNotEmpty()) {
             LoaderManager.getInstance(this)
-                .restartLoader(
+                .initLoader(
                     LOADER_OBSERVERS_IDS,
                     bundleOf(
                         kotlin.Pair(
@@ -391,7 +380,7 @@ class ObserversAndDateInputFragment : Fragment(),
 
         if (selectedDatasetId != null) {
             LoaderManager.getInstance(this)
-                .restartLoader(
+                .initLoader(
                     LOADER_DATASET_ID,
                     bundleOf(
                         kotlin.Pair(
@@ -437,6 +426,44 @@ class ObserversAndDateInputFragment : Fragment(),
 
     override fun setInput(input: AbstractInput) {
         this.input = input as Input
+    }
+
+    private fun updateSelectedObservers(selectedInputObservers: List<InputObserver>) {
+        this.selectedInputObservers.clear()
+        this.selectedInputObservers.addAll(
+            selectedInputObservers
+        )
+
+        input?.also {
+            it.clearAllInputObservers()
+
+            if (selectedInputObservers.isEmpty()) {
+                val context = context ?: return
+                getDefaultObserverId(context).also { defaultObserverId ->
+                    if (defaultObserverId != null) it.setPrimaryInputObserverId(
+                        defaultObserverId
+                    )
+                }
+            }
+
+            it.setAllInputObservers(selectedInputObservers)
+        }
+
+        (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+
+        updateSelectedObserversActionView(selectedInputObservers)
+    }
+
+    private fun updateSelectedDataset(selectedDataset: Dataset?) {
+        this.selectedDataset = selectedDataset
+
+        input?.also {
+            it.datasetId = selectedDataset?.id
+        }
+
+        (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+
+        updateSelectedDatasetActionView(selectedDataset)
     }
 
     private fun updateSelectedObserversActionView(selectedInputObservers: List<InputObserver>) {

@@ -10,12 +10,15 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.TextView
 import android.widget.Toast
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.input.AbstractInput
@@ -27,7 +30,6 @@ import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.occtax.ui.shared.dialog.CommentDialogFragment
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
-import kotlinx.android.synthetic.main.fragment_recycler_view_fab.*
 
 /**
  * Summary of all edited taxa.
@@ -40,6 +42,10 @@ class InputTaxaSummaryFragment : Fragment(),
 
     private var input: Input? = null
     private var adapter: InputTaxaSummaryRecyclerViewAdapter? = null
+    private var contentView: CoordinatorLayout? = null
+    private var recyclerView: RecyclerView? = null
+    private var emptyTextView: TextView? = null
+    private var fab: FloatingActionButton? = null
 
     private val onCommentDialogFragmentListener =
         object : CommentDialogFragment.OnCommentDialogFragmentListener {
@@ -83,9 +89,13 @@ class InputTaxaSummaryFragment : Fragment(),
         // we have a menu item to show in action bar
         setHasOptionsMenu(true)
 
-        empty.text = getString(R.string.summary_no_data)
+        contentView = view.findViewById(android.R.id.content)
+        recyclerView = view.findViewById(android.R.id.list)
 
-        fab.setOnClickListener {
+        emptyTextView = view.findViewById(android.R.id.empty)
+        emptyTextView?.text = getString(R.string.summary_no_data)
+
+        fab?.setOnClickListener {
             ((activity as AbstractPagerFragmentActivity?))?.also {
                 input?.clearCurrentSelectedInputTaxon()
                 it.goToPreviousPage()
@@ -116,79 +126,81 @@ class InputTaxaSummaryFragment : Fragment(),
                     )?.vibrate(100)
                 }
 
-                Snackbar.make(
-                    content,
-                    R.string.summary_snackbar_input_taxon_deleted,
-                    Snackbar.LENGTH_LONG
-                )
-                    .setAction(
-                        R.string.summary_snackbar_input_taxon_undo
-                    ) {
-                        adapter?.add(
-                            item,
-                            position
-                        )
-                        input?.addInputTaxon(item)
-                    }
-                    .addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
-                        override fun onDismissed(
-                            transientBottomBar: Snackbar?,
-                            event: Int
+                contentView?.also {
+                    Snackbar.make(
+                        it,
+                        R.string.summary_snackbar_input_taxon_deleted,
+                        Snackbar.LENGTH_LONG
+                    )
+                        .setAction(
+                            R.string.summary_snackbar_input_taxon_undo
                         ) {
-                            super.onDismissed(
-                                transientBottomBar,
-                                event
+                            adapter?.add(
+                                item,
+                                position
                             )
-
-                            (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
-
-                            // check if this step is still valid and apply automatic redirection if any
-                            if (!this@InputTaxaSummaryFragment.validate()) {
-                                val context = context ?: return
-
-                                Toast.makeText(
-                                    context,
-                                    R.string.summary_toast_no_input_taxon,
-                                    Toast.LENGTH_LONG
+                            input?.addInputTaxon(item)
+                        }
+                        .addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                            override fun onDismissed(
+                                transientBottomBar: Snackbar?,
+                                event: Int
+                            ) {
+                                super.onDismissed(
+                                    transientBottomBar,
+                                    event
                                 )
-                                    .show()
 
-                                ((activity as AbstractPagerFragmentActivity?))?.also {
-                                    it.goToPreviousPage()
-                                    it.goToNextPage()
+                                (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+
+                                // check if this step is still valid and apply automatic redirection if any
+                                if (!this@InputTaxaSummaryFragment.validate()) {
+                                    val context = context ?: return
+
+                                    Toast.makeText(
+                                        context,
+                                        R.string.summary_toast_no_input_taxon,
+                                        Toast.LENGTH_LONG
+                                    )
+                                        .show()
+
+                                    ((activity as AbstractPagerFragmentActivity?))?.also { activity ->
+                                        activity.goToPreviousPage()
+                                        activity.goToNextPage()
+                                    }
                                 }
                             }
-                        }
-                    })
-                    .show()
+                        })
+                        .show()
+                }
             }
 
             override fun showEmptyTextView(show: Boolean) {
-                if (empty.visibility == View.VISIBLE == show) {
+                if (emptyTextView?.visibility == View.VISIBLE == show) {
                     return
                 }
 
                 if (show) {
-                    empty.startAnimation(
+                    emptyTextView?.startAnimation(
                         AnimationUtils.loadAnimation(
                             context,
                             android.R.anim.fade_in
                         )
                     )
-                    empty.visibility = View.VISIBLE
+                    emptyTextView?.visibility = View.VISIBLE
                 } else {
-                    empty.startAnimation(
+                    emptyTextView?.startAnimation(
                         AnimationUtils.loadAnimation(
                             context,
                             android.R.anim.fade_out
                         )
                     )
-                    empty.visibility = View.GONE
+                    emptyTextView?.visibility = View.GONE
                 }
             }
         })
 
-        with(list as RecyclerView) {
+        with(recyclerView as RecyclerView) {
             layoutManager = LinearLayoutManager(context)
             adapter = this@InputTaxaSummaryFragment.adapter
 

@@ -275,7 +275,7 @@ open class ListItemActionView : ConstraintLayout {
     private inner class EditListItemViewRecyclerViewAdapter :
         RecyclerView.Adapter<EditListItemViewRecyclerViewAdapter.ViewHolder>() {
 
-        internal val items: MutableList<Pair<String, String?>> = ArrayList()
+        val items: MutableList<Pair<String, String?>> = ArrayList()
 
         override fun onCreateViewHolder(
             parent: ViewGroup,
@@ -302,7 +302,7 @@ open class ListItemActionView : ConstraintLayout {
             notifyDataSetChanged()
         }
 
-        internal inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
+        inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
             LayoutInflater.from(parent.context)
                 .inflate(
                     R.layout.list_item_2,

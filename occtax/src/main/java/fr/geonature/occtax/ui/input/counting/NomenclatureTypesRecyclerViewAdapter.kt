@@ -103,11 +103,11 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             // add default mnemonic filters
             availableNomenclatureTypes.addAll(mnemonicFilter.filter {
                 it.second != NomenclatureTypeViewType.NOMENCLATURE_TYPE &&
-                (defaultPropertySettings.isEmpty() || defaultPropertySettings.any { p -> p.key == it.first })
+                    (defaultPropertySettings.isEmpty() || defaultPropertySettings.any { p -> p.key == it.first })
             })
         }
 
-        availableNomenclatureTypes.sortWith(Comparator { o1, o2 ->
+        availableNomenclatureTypes.sortWith { o1, o2 ->
             val i1 = mnemonicFilter.indexOfFirst { it.first == o1.first }
             val i2 = mnemonicFilter.indexOfFirst { it.first == o2.first }
 
@@ -116,7 +116,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
                 i2 == -1 -> -1
                 else -> i1 - i2
             }
-        })
+        }
 
         setNomenclatureTypes(availableNomenclatureTypes)
     }

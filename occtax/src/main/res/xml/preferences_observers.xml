@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/preference_category_observers">
+        <PreferenceScreen
+            android:key="@string/preference_category_observers_default_key"
+            android:title="@string/preference_category_observers_default" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -8,12 +8,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.data.Taxonomy
 import fr.geonature.commons.input.AbstractInput
@@ -26,7 +31,6 @@ import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
-import kotlinx.android.synthetic.main.fragment_recycler_view_fab.*
 
 /**
  * [Fragment] to let the user to add additional counting information for the given [Input].
@@ -37,8 +41,27 @@ class CountingFragment : Fragment(),
     IValidateFragment,
     IInputFragment {
 
+    private lateinit var editCountingResultLauncher: ActivityResultLauncher<Intent>
+
     private var input: Input? = null
     private var adapter: CountingRecyclerViewAdapter? = null
+    private var contentView: CoordinatorLayout? = null
+    private var recyclerView: RecyclerView? = null
+    private var emptyTextView: TextView? = null
+    private var fab: FloatingActionButton? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        editCountingResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if ((it.resultCode != Activity.RESULT_OK) || (it.data == null)) {
+                    return@registerForActivityResult
+                }
+
+                updateCountingMetadata(it.data?.getParcelableExtra(EditCountingMetadataActivity.EXTRA_COUNTING_METADATA))
+            }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,47 +84,21 @@ class CountingFragment : Fragment(),
             savedInstanceState
         )
 
-        empty.text = getString(R.string.counting_no_data)
+        contentView = view.findViewById(android.R.id.content)
+        recyclerView = view.findViewById(android.R.id.list)
 
-        fab.setOnClickListener {
-            val context = context ?: return@setOnClickListener
+        emptyTextView = view.findViewById(android.R.id.empty)
+        emptyTextView?.text = getString(R.string.counting_no_data)
 
-            startActivityForResult(
-                EditCountingMetadataActivity.newIntent(
-                    context,
-                    input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
-                        ?: Taxonomy(
-                            Taxonomy.ANY,
-                            Taxonomy.ANY
-                        ),
-                    null,
-                    *(arguments?.getParcelableArray(ARG_PROPERTIES)
-                        ?.map { it as PropertySettings }
-                        ?.toTypedArray() ?: emptyArray())
-                ),
-                0
-            )
+        fab = view.findViewById(R.id.fab)
+        fab?.setOnClickListener {
+            launchEditCountingMetadataActivity()
         }
 
         adapter = CountingRecyclerViewAdapter(object :
             AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<CountingMetadata> {
             override fun onClick(item: CountingMetadata) {
-                val context = context ?: return
-                startActivityForResult(
-                    EditCountingMetadataActivity.newIntent(
-                        context,
-                        input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
-                            ?: Taxonomy(
-                                Taxonomy.ANY,
-                                Taxonomy.ANY
-                            ),
-                        item,
-                        *(arguments?.getParcelableArray(ARG_PROPERTIES)
-                            ?.map { it as PropertySettings }
-                            ?.toTypedArray() ?: emptyArray())
-                    ),
-                    0
-                )
+                launchEditCountingMetadataActivity(item)
             }
 
             override fun onLongClicked(
@@ -120,51 +117,53 @@ class CountingFragment : Fragment(),
                     )?.vibrate(100)
                 }
 
-                Snackbar.make(
-                    content,
-                    R.string.counting_snackbar_counting_deleted,
-                    Snackbar.LENGTH_LONG
-                )
-                    .setAction(
-                        R.string.counting_snackbar_counting_undo
-                    ) {
-                        adapter?.add(
-                            item,
-                            position
-                        )
-                        (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.addCountingMetadata(
-                            item
-                        )
-                    }
-                    .show()
+                contentView?.also {
+                    Snackbar.make(
+                        it,
+                        R.string.counting_snackbar_counting_deleted,
+                        Snackbar.LENGTH_LONG
+                    )
+                        .setAction(
+                            R.string.counting_snackbar_counting_undo
+                        ) {
+                            adapter?.add(
+                                item,
+                                position
+                            )
+                            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.addCountingMetadata(
+                                item
+                            )
+                        }
+                        .show()
+                }
             }
 
             override fun showEmptyTextView(show: Boolean) {
-                if (empty.visibility == View.VISIBLE == show) {
+                if (emptyTextView?.visibility == View.VISIBLE == show) {
                     return
                 }
 
                 if (show) {
-                    empty.startAnimation(
+                    emptyTextView?.startAnimation(
                         AnimationUtils.loadAnimation(
                             context,
                             android.R.anim.fade_in
                         )
                     )
-                    empty.visibility = View.VISIBLE
+                    emptyTextView?.visibility = View.VISIBLE
                 } else {
-                    empty.startAnimation(
+                    emptyTextView?.startAnimation(
                         AnimationUtils.loadAnimation(
                             context,
                             android.R.anim.fade_out
                         )
                     )
-                    empty.visibility = View.GONE
+                    emptyTextView?.visibility = View.GONE
                 }
             }
         })
 
-        with(list as RecyclerView) {
+        with(recyclerView as RecyclerView) {
             layoutManager = LinearLayoutManager(context)
             adapter = this@CountingFragment.adapter
 
@@ -173,51 +172,6 @@ class CountingFragment : Fragment(),
                 (layoutManager as LinearLayoutManager).orientation
             )
             addItemDecoration(dividerItemDecoration)
-        }
-    }
-
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?
-    ) {
-        if ((resultCode == Activity.RESULT_OK) && (data != null)) {
-            val countingMetadata =
-                data.getParcelableExtra<CountingMetadata>(EditCountingMetadataActivity.EXTRA_COUNTING_METADATA)
-
-            if (countingMetadata == null) {
-                Toast.makeText(
-                    context,
-                    R.string.counting_toast_empty,
-                    Toast.LENGTH_LONG
-                )
-                    .show()
-
-                return
-            }
-
-            if (countingMetadata.isEmpty()) {
-                (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.deleteCountingMetadata(
-                    countingMetadata.index
-                )
-                Toast.makeText(
-                    context,
-                    R.string.counting_toast_empty,
-                    Toast.LENGTH_LONG
-                )
-                    .show()
-
-                return
-            }
-
-            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.addCountingMetadata(
-                countingMetadata
-            )
-
-            val counting = (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()
-                ?: emptyList()
-
-            adapter?.setItems(counting)
         }
     }
 
@@ -249,23 +203,65 @@ class CountingFragment : Fragment(),
         adapter?.setItems(counting)
 
         if (counting.isEmpty()) {
-            val context = context ?: return
-            startActivityForResult(
-                EditCountingMetadataActivity.newIntent(
-                    context,
-                    input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
-                        ?: Taxonomy(
-                            Taxonomy.ANY,
-                            Taxonomy.ANY
-                        )
-                ),
-                0
-            )
+            launchEditCountingMetadataActivity()
         }
     }
 
     override fun setInput(input: AbstractInput) {
         this.input = input as Input
+    }
+
+    private fun launchEditCountingMetadataActivity(countingMetadata: CountingMetadata? = null) {
+        val context = context ?: return
+
+        editCountingResultLauncher.launch(EditCountingMetadataActivity.newIntent(
+            context,
+            input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
+                ?: Taxonomy(
+                    Taxonomy.ANY,
+                    Taxonomy.ANY
+                ),
+            countingMetadata,
+            *(arguments?.getParcelableArray(ARG_PROPERTIES)
+                ?.map { it as PropertySettings }
+                ?.toTypedArray() ?: emptyArray())
+        ))
+    }
+
+    private fun updateCountingMetadata(countingMetadata: CountingMetadata?) {
+        if (countingMetadata == null) {
+            Toast.makeText(
+                context,
+                R.string.counting_toast_empty,
+                Toast.LENGTH_LONG
+            )
+                .show()
+
+            return
+        }
+
+        if (countingMetadata.isEmpty()) {
+            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.deleteCountingMetadata(
+                countingMetadata.index
+            )
+            Toast.makeText(
+                context,
+                R.string.counting_toast_empty,
+                Toast.LENGTH_LONG
+            )
+                .show()
+
+            return
+        }
+
+        (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.addCountingMetadata(
+            countingMetadata
+        )
+
+        val counting = (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()
+            ?: emptyList()
+
+        adapter?.setItems(counting)
     }
 
     companion object {
