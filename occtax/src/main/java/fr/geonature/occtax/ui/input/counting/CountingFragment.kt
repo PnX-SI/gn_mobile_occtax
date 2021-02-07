@@ -8,14 +8,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.data.Taxonomy
 import fr.geonature.commons.input.AbstractInput
@@ -28,7 +31,6 @@ import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
-import kotlinx.android.synthetic.main.fragment_recycler_view_fab.*
 
 /**
  * [Fragment] to let the user to add additional counting information for the given [Input].
@@ -43,6 +45,10 @@ class CountingFragment : Fragment(),
 
     private var input: Input? = null
     private var adapter: CountingRecyclerViewAdapter? = null
+    private var contentView: CoordinatorLayout? = null
+    private var recyclerView: RecyclerView? = null
+    private var emptyTextView: TextView? = null
+    private var fab: FloatingActionButton? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,9 +84,14 @@ class CountingFragment : Fragment(),
             savedInstanceState
         )
 
-        empty.text = getString(R.string.counting_no_data)
+        contentView = view.findViewById(android.R.id.content)
+        recyclerView = view.findViewById(android.R.id.list)
 
-        fab.setOnClickListener {
+        emptyTextView = view.findViewById(android.R.id.empty)
+        emptyTextView?.text = getString(R.string.counting_no_data)
+
+        fab = view.findViewById(R.id.fab)
+        fab?.setOnClickListener {
             launchEditCountingMetadataActivity()
         }
 
@@ -106,51 +117,53 @@ class CountingFragment : Fragment(),
                     )?.vibrate(100)
                 }
 
-                Snackbar.make(
-                    content,
-                    R.string.counting_snackbar_counting_deleted,
-                    Snackbar.LENGTH_LONG
-                )
-                    .setAction(
-                        R.string.counting_snackbar_counting_undo
-                    ) {
-                        adapter?.add(
-                            item,
-                            position
-                        )
-                        (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.addCountingMetadata(
-                            item
-                        )
-                    }
-                    .show()
+                contentView?.also {
+                    Snackbar.make(
+                        it,
+                        R.string.counting_snackbar_counting_deleted,
+                        Snackbar.LENGTH_LONG
+                    )
+                        .setAction(
+                            R.string.counting_snackbar_counting_undo
+                        ) {
+                            adapter?.add(
+                                item,
+                                position
+                            )
+                            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.addCountingMetadata(
+                                item
+                            )
+                        }
+                        .show()
+                }
             }
 
             override fun showEmptyTextView(show: Boolean) {
-                if (empty.visibility == View.VISIBLE == show) {
+                if (emptyTextView?.visibility == View.VISIBLE == show) {
                     return
                 }
 
                 if (show) {
-                    empty.startAnimation(
+                    emptyTextView?.startAnimation(
                         AnimationUtils.loadAnimation(
                             context,
                             android.R.anim.fade_in
                         )
                     )
-                    empty.visibility = View.VISIBLE
+                    emptyTextView?.visibility = View.VISIBLE
                 } else {
-                    empty.startAnimation(
+                    emptyTextView?.startAnimation(
                         AnimationUtils.loadAnimation(
                             context,
                             android.R.anim.fade_out
                         )
                     )
-                    empty.visibility = View.GONE
+                    emptyTextView?.visibility = View.GONE
                 }
             }
         })
 
-        with(list as RecyclerView) {
+        with(recyclerView as RecyclerView) {
             layoutManager = LinearLayoutManager(context)
             adapter = this@CountingFragment.adapter
 

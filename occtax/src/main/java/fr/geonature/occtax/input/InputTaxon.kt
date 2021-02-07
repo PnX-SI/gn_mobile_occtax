@@ -85,7 +85,7 @@ class InputTaxon : AbstractInputTaxon {
         if (countingMetadata.isEmpty()) return
 
         val index = if (countingMetadata.index > 0) countingMetadata.index
-        else this.counting.keys.max()?.plus(1) ?: 1
+        else this.counting.keys.maxOrNull()?.plus(1) ?: 1
 
         counting[index] = countingMetadata.apply { this.index = index }
     }
