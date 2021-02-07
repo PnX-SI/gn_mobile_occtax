@@ -158,7 +158,7 @@ class EditCountingMetadataFragment : Fragment(),
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val recyclerView = inflater.inflate(
             R.layout.recycler_view,
             container,

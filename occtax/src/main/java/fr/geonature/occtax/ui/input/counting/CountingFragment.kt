@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -37,8 +39,23 @@ class CountingFragment : Fragment(),
     IValidateFragment,
     IInputFragment {
 
+    private lateinit var editCountingResultLauncher: ActivityResultLauncher<Intent>
+
     private var input: Input? = null
     private var adapter: CountingRecyclerViewAdapter? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        editCountingResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if ((it.resultCode != Activity.RESULT_OK) || (it.data == null)) {
+                    return@registerForActivityResult
+                }
+
+                updateCountingMetadata(it.data?.getParcelableExtra(EditCountingMetadataActivity.EXTRA_COUNTING_METADATA))
+            }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,44 +81,13 @@ class CountingFragment : Fragment(),
         empty.text = getString(R.string.counting_no_data)
 
         fab.setOnClickListener {
-            val context = context ?: return@setOnClickListener
-
-            startActivityForResult(
-                EditCountingMetadataActivity.newIntent(
-                    context,
-                    input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
-                        ?: Taxonomy(
-                            Taxonomy.ANY,
-                            Taxonomy.ANY
-                        ),
-                    null,
-                    *(arguments?.getParcelableArray(ARG_PROPERTIES)
-                        ?.map { it as PropertySettings }
-                        ?.toTypedArray() ?: emptyArray())
-                ),
-                0
-            )
+            launchEditCountingMetadataActivity()
         }
 
         adapter = CountingRecyclerViewAdapter(object :
             AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<CountingMetadata> {
             override fun onClick(item: CountingMetadata) {
-                val context = context ?: return
-                startActivityForResult(
-                    EditCountingMetadataActivity.newIntent(
-                        context,
-                        input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
-                            ?: Taxonomy(
-                                Taxonomy.ANY,
-                                Taxonomy.ANY
-                            ),
-                        item,
-                        *(arguments?.getParcelableArray(ARG_PROPERTIES)
-                            ?.map { it as PropertySettings }
-                            ?.toTypedArray() ?: emptyArray())
-                    ),
-                    0
-                )
+                launchEditCountingMetadataActivity(item)
             }
 
             override fun onLongClicked(
@@ -176,51 +162,6 @@ class CountingFragment : Fragment(),
         }
     }
 
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?
-    ) {
-        if ((resultCode == Activity.RESULT_OK) && (data != null)) {
-            val countingMetadata =
-                data.getParcelableExtra<CountingMetadata>(EditCountingMetadataActivity.EXTRA_COUNTING_METADATA)
-
-            if (countingMetadata == null) {
-                Toast.makeText(
-                    context,
-                    R.string.counting_toast_empty,
-                    Toast.LENGTH_LONG
-                )
-                    .show()
-
-                return
-            }
-
-            if (countingMetadata.isEmpty()) {
-                (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.deleteCountingMetadata(
-                    countingMetadata.index
-                )
-                Toast.makeText(
-                    context,
-                    R.string.counting_toast_empty,
-                    Toast.LENGTH_LONG
-                )
-                    .show()
-
-                return
-            }
-
-            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.addCountingMetadata(
-                countingMetadata
-            )
-
-            val counting = (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()
-                ?: emptyList()
-
-            adapter?.setItems(counting)
-        }
-    }
-
     override fun getResourceTitle(): Int {
         return R.string.pager_fragment_counting_title
     }
@@ -249,23 +190,65 @@ class CountingFragment : Fragment(),
         adapter?.setItems(counting)
 
         if (counting.isEmpty()) {
-            val context = context ?: return
-            startActivityForResult(
-                EditCountingMetadataActivity.newIntent(
-                    context,
-                    input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
-                        ?: Taxonomy(
-                            Taxonomy.ANY,
-                            Taxonomy.ANY
-                        )
-                ),
-                0
-            )
+            launchEditCountingMetadataActivity()
         }
     }
 
     override fun setInput(input: AbstractInput) {
         this.input = input as Input
+    }
+
+    private fun launchEditCountingMetadataActivity(countingMetadata: CountingMetadata? = null) {
+        val context = context ?: return
+
+        editCountingResultLauncher.launch(EditCountingMetadataActivity.newIntent(
+            context,
+            input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
+                ?: Taxonomy(
+                    Taxonomy.ANY,
+                    Taxonomy.ANY
+                ),
+            countingMetadata,
+            *(arguments?.getParcelableArray(ARG_PROPERTIES)
+                ?.map { it as PropertySettings }
+                ?.toTypedArray() ?: emptyArray())
+        ))
+    }
+
+    private fun updateCountingMetadata(countingMetadata: CountingMetadata?) {
+        if (countingMetadata == null) {
+            Toast.makeText(
+                context,
+                R.string.counting_toast_empty,
+                Toast.LENGTH_LONG
+            )
+                .show()
+
+            return
+        }
+
+        if (countingMetadata.isEmpty()) {
+            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.deleteCountingMetadata(
+                countingMetadata.index
+            )
+            Toast.makeText(
+                context,
+                R.string.counting_toast_empty,
+                Toast.LENGTH_LONG
+            )
+                .show()
+
+            return
+        }
+
+        (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.addCountingMetadata(
+            countingMetadata
+        )
+
+        val counting = (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()
+            ?: emptyList()
+
+        adapter?.setItems(counting)
     }
 
     companion object {
