@@ -26,6 +26,64 @@ connexion internet (wifi ou 4G).
 **_Sync-mobile_** permet aussi de récupérer automatiquement les configurations et les dernières versions des applications
 mobiles directement sur le serveur GeoNature avec lequel elle se synchronise.
 
+## Pré-requis
+
+- Disposer de GeoNature et de TaxHub dans les versions compatibles avec les versions d'**_Occtax-mobile_** et **_Sync-mobile_**
+que vous souhaitez installer
+- Que vos instances de GeoNature et TaxHub soient accessibles en HTTPS
+
+### Installation et configuration centralisées
+
+Il est nécessaire de gérer les fichiers de configuration, l'installation et la mise à jour des applications au
+niveau du serveur GeoNature. Voir [#8](https://github.com/PnX-SI/gn_mobile_core/issues/8).
+
+L'application **_Sync-mobile_** se chargera alors de récupérer sur le serveur GeoNature les dernières versions des
+fichiers de configuration des applications ainsi que les dernière APK des applications.
+
+Pour cela, chargez les APK souhaitées des applications **_Sync-mobile_** et **_Occtax-mobile_** ainsi que leurs fichiers
+de configuration respectifs nommés `settings.json` dans le dossier `/home/myuser/geonature/backend/static/mobile` du
+serveur GeoNature.
+
+Il faut créer un dossier par application, car les fichiers de configuration de chaque application ont le même nom (`settings.json`), 
+exemple pour **_Sync-mobile_** :
+
+![image](https://user-images.githubusercontent.com/4418840/82023083-fdc01300-968d-11ea-9a74-dfe9e17727b4.png)
+
+Exemple pour **_Occtax-mobile_** :
+
+![image](https://user-images.githubusercontent.com/4418840/82023217-36f88300-968e-11ea-9865-76148108b302.png)
+
+Dans tous les cas, le fichier de configuration sur le serveur doit être nommé `settings.json`.
+
+Renseigner ensuite la table `gn_commons.t_mobile_apps`.
+
+Pour trouver la valeur à renseigner dans le champs `version_code`, voir les fichiers 
+https://github.com/PnX-SI/gn_mobile_core/blob/master/sync/version.properties et 
+https://github.com/PnX-SI/gn_mobile_occtax/blob/master/occtax/version.properties.
+
+Ou avec l'outil ``aapt`` (``apt-get install aapt`` pour l'installer), exécutez la commande ``aapt dump badging applicationfile.apk  | grep -Po "(?<=\sversion(Code|Name)=')([0-9.]+)"``.
+
+Exemple de contenu de la table `gn_commons.t_mobile_apps` :
+
+```
+1;"OCCTAX";"static/mobile/occtax/occtax-0.3.0-pne-debug.apk";"";"fr.geonature.occtax";"1660"
+2;"SYNC";"static/mobile/sync/sync-0.2.8-pne-debug.apk";"";"fr.geonature.sync";"2280"
+```
+
+Le résultat peut être testé en interrogeant la route `<URL_GEONATURE>/api/gn_commons/t_mobile_apps` qui est celle utilisée
+par l'application **_Sync-mobile_** pour mettre à jour les applications et leur configuration.
+
+Installez ensuite uniquement l'application **_Sync-mobile_** sur le terminal mobile, lancez-la et déclarez l'URL de
+GeoNature et de TaxHub dans sa configuration.
+
+L'application de synchronisation se chargera de récupérer le fichier de configuration pour chaque application installée.
+
+Elle proposera aussi d'installer les applications mobiles disponibles et de récupérer leur fichier de configuration.
+
+Si vous faites évoluer la configuration et/ou les versions des applications mobiles sur le serveur GeoNature et dans la
+table `gn_commons.t_mobile_apps`, alors ils seront mis à jour sur le terminal mobile au prochain lancement de
+l'application **_Sync-mobile_**.
+
 ## Installer et configurer les applications
 
 Téléchargez les APKs dans les fichiers (assets) associés à la version souhaitée.
@@ -41,8 +99,10 @@ Le fichier de configuration `settings_sync.json` de l'application peut être dir
 `Android/data/fr.geonature.sync` sur le stockage interne du terminal mobile ou récupéré automatiquement lors de la
 première synchronisation avec le serveur GeoNature configuré
 (cf. [Installation et configuration centralisées](#installation-et-configuration-centralisées)). 
+
 Dans tous les cas, l'installation et la configuration centralisée doivent être mis en place pour que la synchronisation
-des données fonctionne.
+des données fonctionne. Le fichier de configuration sur le serveur écrasera celui sur le terminal à chaque lancement de 
+l'application **_Sync-mobile_**.
 
 - Détail des paramètres du fichier de configuration : https://github.com/PnX-SI/gn_mobile_core/tree/master/sync
 - Exemple de fichier de configuration : https://github.com/PnX-SI/gn_mobile_core/blob/master/sync/src/test/resources/fixtures/settings_sync.json
@@ -89,7 +149,9 @@ Le paramètre `taxa_list_id` permet de renseigner l'`id_liste` des taxons saisis
 Installer l'application **_Occtax-mobile_** manuellement via son APK ou automatiquement via l'application **_Sync-mobile_**.
 
 Si l'installation se fait manuellement, il faut copier son fichier de configuration `settings_occtax.json` dans le
-répertoire `Android/data/fr.geonature.occtax` sur le stockage interne du terminal mobile.
+répertoire `Android/data/fr.geonature.occtax` sur le stockage interne du terminal mobile. 
+Le fichier de configuration sur le serveur écrasera celui sur le terminal à chaque lancement de 
+l'application **_Sync-mobile_**.
 
 - Détail des paramètres du fichier de configuration : https://github.com/PnX-SI/gn_mobile_occtax#settings
 - Exemple de fichier de configuration : https://github.com/PnX-SI/gn_mobile_occtax/blob/master/occtax/src/test/resources/fixtures/settings_occtax.json
@@ -232,56 +294,6 @@ Concernant les fonds cartographiques, il faut donc suivre les règles suivantes 
     }
   }
   ```
-
-### Installation et configuration centralisées
-
-Il est nécessaire de gérer les fichiers de configuration, l'installation et la mise à jour des applications au
-niveau du serveur GeoNature. Voir [#8](https://github.com/PnX-SI/gn_mobile_core/issues/8).
-
-L'application **_Sync-mobile_** se chargera alors de récupérer sur le serveur GeoNature les dernières versions des
-fichiers de configuration des applications ainsi que les dernière APK des applications.
-
-Pour cela, chargez les APK souhaitées des applications **_Sync-mobile_** et **_Occtax-mobile_** ainsi que leurs fichiers
-de configuration respectifs nommés `settings.json` dans le dossier `/home/myuser/geonature/backend/static/mobile` du
-serveur GeoNature.
-
-Il faut créer un dossier par application, exemple pour **_Sync-mobile_** :
-
-![image](https://user-images.githubusercontent.com/4418840/82023083-fdc01300-968d-11ea-9a74-dfe9e17727b4.png)
-
-Exemple pour **_Occtax-mobile_** :
-
-![image](https://user-images.githubusercontent.com/4418840/82023217-36f88300-968e-11ea-9865-76148108b302.png)
-
-Dans tous les cas, le fichier de configuration sur le serveur doit être nommé `settings.json`.
-
-Renseigner ensuite la table `gn_commons.t_mobile_apps`.
-
-Pour trouver la valeur à renseigner dans le champs `version_code`, voir les fichiers https://github.com/PnX-SI/gn_mobile_core/blob/master/sync/version.properties
-et https://github.com/PnX-SI/gn_mobile_occtax/blob/master/occtax/version.properties.
-
-Ou avec l'outil ``aapt`` (``apt-get install aapt`` pour l'installer), exécutez la commande ``aapt dump badging applicationfile.apk  | grep -Po "(?<=\sversion(Code|Name)=')([0-9.]+)"``.
-
-Exemple de contenu de la table `gn_commons.t_mobile_apps` :
-
-```
-1;"OCCTAX";"static/mobile/occtax/occtax-0.3.0-pne-debug.apk";"''";"fr.geonature.occtax";"1660"
-2;"SYNC";"static/mobile/sync/sync-0.2.8-pne-debug.apk";"";"fr.geonature.sync";"2280"
-```
-
-Le résultat peut être testé en interrogeant la route `<URL_GEONATURE>/api/gn_commons/t_mobile_apps` qui est celle utilisée
-par l'application **_Sync-mobile_** pour mettre à jour les applications et leur configuration.
-
-Installez ensuite uniquement l'application **_Sync-mobile_** sur le terminal mobile, lancez-la et déclarez l'URL de
-GeoNature et de TaxHub dans sa configuration.
-
-L'application de synchronisation se chargera de récupérer le fichier de configuration pour chaque application installée.
-
-Elle proposera aussi d'installer les applications mobiles disponibles et de récupérer leur fichier de configuration.
-
-Si vous faites évoluer la configuration et/ou les versions des applications mobiles sur le serveur GeoNature et dans la
-table `gn_commons.t_mobile_apps`, alors ils seront mis à jour sur le terminal mobile au prochain lancement de
-l'application **_Sync-mobile_**.
 
 ## Démonstration
 
