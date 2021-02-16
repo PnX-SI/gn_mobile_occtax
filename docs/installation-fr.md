@@ -29,10 +29,10 @@ mobiles directement sur le serveur GeoNature avec lequel elle se synchronise.
 ## Pré-requis
 
 - Disposer de GeoNature et de TaxHub dans les versions compatibles avec les versions d'**_Occtax-mobile_** et **_Sync-mobile_**
-que vous souhaitez installer
-- Que vos instances de GeoNature et TaxHub soient accessibles en HTTPS
+  que vous souhaitez installer
+- Vos instances de GeoNature et TaxHub doivent être accessibles en HTTPS
 
-![Architecture](images/occtax-mobile-architecture.jpg)
+![Architecture](/images/occtax-mobile-architecture.jpg)
 
 ### Installation et configuration centralisées
 
@@ -43,10 +43,42 @@ L'application **_Sync-mobile_** se chargera alors de récupérer sur le serveur 
 fichiers de configuration des applications ainsi que les dernière APK des applications.
 
 Pour cela, chargez les APK souhaitées des applications **_Sync-mobile_** et **_Occtax-mobile_** ainsi que leurs fichiers
-de configuration respectifs nommés `settings.json` dans le dossier `/home/myuser/geonature/backend/static/mobile` du
+de configuration respectifs nommés `settings.json` dans le dossier `/home/``whoami``/geonature/backend/static/mobile` du
 serveur GeoNature.
 
-Il faut créer un dossier par application, car les fichiers de configuration de chaque application ont le même nom (`settings.json`), 
+Au préalable, Il faut créer un dossier par application, car les fichiers de configuration de chaque application ont le même nom (`settings.json`), 
+
+Dans les commandes ci-dessous, remplacez `X.Y.Z` par le numéro (tag) de la version (release) utilisée.
+
+- **_Sync-mobile_** : https://github.com/PnX-SI/gn_mobile_core/releases
+- **_Occtax-mobile_** : https://github.com/PnX-SI/gn_mobile_occtax/releases
+
+Sur votre serveur GeoNature, créer les sous-répertoires des applications mobiles **_Sync-mobile_** et **_Occtax-mobile_**
+
+```sh
+cd
+cd /home/``whoami``/geonature/backend/static/mobile
+mkdir occtax sync
+```
+
+​	Télécharger la version de **_Sync-mobile_** souhaitée et l'exemple de fichier de configuration  ``settings.json`` :
+
+```sh
+cd sync
+wget https://github.com/PnX-SI/gn_mobile_core/releases/download/X.Y.Z/sync-X.Y.Z-generic-release.apk
+wget https://raw.githubusercontent.com/PnX-SI/gn_mobile_core/X.Y.Z/sync/src/test/resources/fixtures/settings_sync.json
+mv settings_sync.json settings.json
+```
+
+​	Télécharger la version de **_Occtax-mobile_** souhaitée et l'exemple de fichier de configuration  ``settings.json`` :
+
+```sh
+cd ../occtax
+wget https://github.com/PnX-SI/gn_mobile_occtax/releases/download/X.Y.Z/occtax-X.Y.Z-generic-release.apk
+wget https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/X.Y.Z/occtax/src/test/resources/fixtures/settings_occtax.json
+mv settings_occtax.json settings.json
+```
+
 exemple pour **_Sync-mobile_** :
 
 ![image](https://user-images.githubusercontent.com/4418840/82023083-fdc01300-968d-11ea-9a74-dfe9e17727b4.png)
@@ -57,9 +89,10 @@ Exemple pour **_Occtax-mobile_** :
 
 Dans tous les cas, le fichier de configuration sur le serveur doit être nommé `settings.json`.
 
-Renseigner ensuite la table `gn_commons.t_mobile_apps`.
+Renseigner ensuite la table `gn_commons.t_mobile_apps` de la base de données.
 
-Pour trouver la valeur à renseigner dans le champs `version_code`, voir les fichiers 
+Pour trouver la valeur à renseigner dans le champs `version_code`, reportez-vous aux fichiers suivants en sélectionnant le tag de version où la branche que vous utilisez :
+
 https://github.com/PnX-SI/gn_mobile_core/blob/master/sync/version.properties et 
 https://github.com/PnX-SI/gn_mobile_occtax/blob/master/occtax/version.properties.
 
@@ -75,8 +108,11 @@ Exemple de contenu de la table `gn_commons.t_mobile_apps` :
 Le résultat peut être testé en interrogeant la route `<URL_GEONATURE>/api/gn_commons/t_mobile_apps` qui est celle utilisée
 par l'application **_Sync-mobile_** pour mettre à jour les applications et leur configuration.
 
-Installez ensuite uniquement l'application **_Sync-mobile_** sur le terminal mobile, lancez-la et déclarez l'URL de
-GeoNature et de TaxHub dans sa configuration.
+Installez ensuite uniquement l'application **_Sync-mobile_** sur le terminal mobile.
+
+Récupérer le fichier APK de la version souhaitée dans la fichiers de la release (assets)
+
+Lancez l'application **_Sync-mobile_** et déclarez l'URL de GeoNature et de TaxHub dans sa configuration (paramètres).
 
 L'application de synchronisation se chargera de récupérer le fichier de configuration pour chaque application installée.
 
@@ -88,21 +124,13 @@ l'application **_Sync-mobile_**.
 
 ## Installer et configurer les applications
 
-Téléchargez les APKs dans les fichiers (assets) associés à la version souhaitée.
-
-- **_Sync-mobile_** : https://github.com/PnX-SI/gn_mobile_core/releases
-- **_Occtax-mobile_** : https://github.com/PnX-SI/gn_mobile_occtax/releases
-
 ### Sync-mobile
-
-Installer l'application **_Sync-mobile_**.
 
 Le fichier de configuration `settings_sync.json` de l'application peut être directement copié dans le répertoire
 `Android/data/fr.geonature.sync` sur le stockage interne du terminal mobile ou récupéré automatiquement lors de la
-première synchronisation avec le serveur GeoNature configuré
-(cf. [Installation et configuration centralisées](#installation-et-configuration-centralisées)). 
+première synchronisation avec le serveur GeoNature configuré (cf. [Installation et configuration centralisées](#installation-et-configuration-centralisées)). 
 
-Dans tous les cas, l'installation et la configuration centralisée doivent être mis en place pour que la synchronisation
+Dans tous les cas, l'installation et la configuration centralisée devront être mis en place pour que la synchronisation
 des données fonctionne. Le fichier de configuration sur le serveur écrasera celui sur le terminal à chaque lancement de 
 l'application **_Sync-mobile_**.
 
@@ -120,7 +148,7 @@ Exemples des routes paginées :
   vingtième résultat des couleurs des taxons pour les zonages de type Mailles de 10km)
 
 Ainsi la valeur du paramètre `page_size` multipliée par la valeur du paramètre `page_max_retry` doit être au moins égale
-au nombre total de résultats renvoyé par ces routes.
+au nombre total de résultats renvoyés par ces routes.
 
 Le comportement de l'application de synchronisation consiste à appeler au maximum n fois (où n = `page_max_retry`) la
 route paginée tant que celle-ci retourne un tableau de valeurs non vides et que ce tableau a la même taille que
@@ -148,7 +176,10 @@ Le paramètre `taxa_list_id` permet de renseigner l'`id_liste` des taxons saisis
 
 ### Occtax-mobile
 
-Installer l'application **_Occtax-mobile_** manuellement via son APK ou automatiquement via l'application **_Sync-mobile_**.
+Préférez l'installation de l'application **_Occtax-mobile_** automatiquement via l'application **_Sync-mobile_** avecl la mise en place de [l'Installation et la configuration centralisées.](#installation-et-configuration-centralisées)
+
+Vous pouvez également installer **_Occtax-mobile_** manuellement via son APK depuis les fichiers (assets) de la release souhaitée, mais l'installation et la configuration centralisées devront être mises en place pour que la synchronisation
+des données fonctionne.
 
 Si l'installation se fait manuellement, il faut copier son fichier de configuration `settings_occtax.json` dans le
 répertoire `Android/data/fr.geonature.occtax` sur le stockage interne du terminal mobile. 
@@ -177,8 +208,7 @@ Cette partie permet de définir l'affichage des outils cartographiques, le centr
 mais aussi les fonds et couches cartographiques de l'application.
 
 Le module **Maps** s'appuie sur la bibliothèque [osmdroid](https://github.com/osmdroid/osmdroid) et gère notamment les
-sources locales (https://github.com/osmdroid/osmdroid/wiki/Offline-Map-Tiles) pouvant être généré via l'outil
-[MOBAC](https://mobac.sourceforge.io) ou [Maperitive](http://maperitive.net).
+sources locales (https://github.com/osmdroid/osmdroid/wiki/Offline-Map-Tiles) pouvant être généré via les outils [QGIS](https://docs.qgis.org/3.10/fr/docs/user_manual/processing_algs/qgis/rastertools.html#generate-xyz-tiles-mbtiles) (Traitements > générer des tuiles XYZ), [MOBAC](https://mobac.sourceforge.io) ou [Maperitive](http://maperitive.net).
 
 Charger un fond de carte (MBTiles, les autres formats doivent aussi fonctionner) sur le terminal mobile et renseigner
 son chemin dans le paramètre `base_path`.
@@ -189,22 +219,23 @@ de la carte externe SD.
 Il n'est cependant pas obligatoire de préciser le chemin pour résoudre le chargement des fonds de carte.
 L'application va privilégier la carte SD externe (si présente) et à défaut la mémoire interne.
 Le paramètre `base_path` peut prendre un chemin absolu (pour une résolution rapide), un chemin relatif (selon le point
-de montage, par exemple `Android/data`) ou être omis. Dans ce cas, la résolution sera plus lente car elle impliquera un
+de montage, par exemple `Android/data`) ou être omis. Dans ce dernier cas, la résolution sera plus lente car elle impliquera un
 scan complet des stockages du terminal mobile.
 
-Il est possible de charger différents fonds cartographiques (Scan et ortho par exemple) mais aussi d'afficher des
+Il est possible de charger différents fonds cartographiques (Scan et Ortho par exemple) mais aussi d'afficher des
 couches vectorielles.
 
 On peut ajouter autant de couches vectorielles et pour chacune on peut appliquer des styles différents.
 Vous pouvez vous référer au [README](https://github.com/PnX-SI/gn_mobile_maps/blob/develop/maps/README.md) du module
 **Maps** pour le paramétrage.
 
-Pour l'affichage et l'utilisation des unités géographiques permettant d'afficher les taxons de couleur différente selon
-la date de dernière observation dans l'unité, il est nécessaire de charger une couche vectorielle des polygones des
-unités géographiques en respectant quelques règles.
+Il est possible d'utiliser et d'afficher une couche vectorielle de polygones d'unités géographiques (mailles, habitats, zonages etc.). Cela permet d'afficher une couleur différente aux taxons de la liste selon la date de dernière observation dans l'unité où le relevé a été localisé (via synchronisation des données de la synthèse de GeoNature). Il est également possible de filtrer la liste des taxons selon ce critère.
 
-Le code du type de zonage utilisé doit être renseigné dans le paramètre `code_area_type` de gn_mobile_core. Ce même code 
-doit aussi être renseigné dans le paramètre `occtaxmobile_area_type`de la table `gn_commons.t_parameters`de GeoNature.
+Pour cela, il est nécessaire de charger une couche vectorielle de polygones des unités géographiques en respectant quelques règles.
+
+La "couche" d'unités géographiques doit être issue des entités qui peuplent la table  ``ref_geo.l_areas``.
+
+Le code du type de zonage utilisé doit être renseigné dans le paramètre `code_area_type` du fichier ``settings.json`` de gn_mobile_core. Ce même code doit aussi être renseigné dans le paramètre `occtaxmobile_area_type`de la table `gn_commons.t_parameters`de la base de données de GeoNature.
 
 Par défaut, si aucune couche vectorielle n'est configurée, l'application va simplement charger la base des taxons sans
 les informations additionnelles venant des unités géographiques.
@@ -217,41 +248,21 @@ Il est important que l'ID de chaque zone corresponde à ce que remonte GeoNature
 L'attribut `area_id` des données de la route `/geonature/api/synthese/color_taxon` correspond à l'identifiant
 présent dans la couche vectorielle.
 
-Par exemple, si la source vectorielle est du WKT :
+A NOTER : Pour que les couleurs de taxons soient synchronisées sur l'ensemble des unités géographiques choisies, il est nécessaire d'adapter la pagination et le nombre de résultats renvoyés par les routes en tenant compte du nombre d'entités présentes dans la vue ``gn_synthese.v_color_taxon_area``. Pour ce faire, modifiez le fichier ``settings.json`` de l'application de l'application **_Sync-mobile_**.
 
-```
-110,POINT (-1.5487664937973022 47.21628889447996)
-108,POINT (-1.5407788753509521 47.241763083159455)
-```
-
-Les couches vectorielles peuvent être au format `json`, `geojson` ou `wkt`.
-
-Concernant l'exemple au format WKT, il est au format CSV et le module **Maps** doit suivre le schéma suivant :
-
-```
-id,wkt
-```
-
-par ligne et sans entête.
-
-Par exemple :
-
-```
-108,POINT (-1.5407788753509521 47.241763083159455)
-```
-
-Concernant le fichier au format WKT, il ne faut pas mettre entre guillemets la géométrie. Exemple :
-
-```
-660993,MULTIPOLYGON (((6.73181863107186 45.7539143085928,6.74466771917198 45.7534881584565,6.74405801858532 45.7444934010459,6.73121101630907 45.7449194816323,6.73181863107186 45.7539143085928)))
-```
-
-Concernant les fonds cartographiques, il faut donc suivre les règles suivantes :
+Les couches vectorielles peuvent être au format `json`, `geojson` ou `wkt`:
 
 **wkt**:
 
-- fichier texte, où chaque ligne comporte la description d'une géométrie au format WKT
-- chaque ligne doit commencer par un identifiant, ce qui donne ceci :
+- Fichier texte au format CSV où chaque ligne comporte la description d'une géométrie au format WKT
+
+- La géométrie doit être encodée dans le SCR ``WGS84:EPSG4326``
+
+- Le type de géométrie doit être ``POLYGON`` (et non ``MULTIPOLYGON``)
+
+- L'extension du fichier doit être `.wkt` et le fichier ne doit pas contenir d'en-tête
+
+- Chaque ligne doit commencer par un identifiant puis, la géométrie ce qui donne ceci :
 
   ```
   <id>,<geometry>
@@ -265,10 +276,20 @@ Concernant les fonds cartographiques, il faut donc suivre les règles suivantes 
   108,POINT (-1.5407788753509521 47.241763083159455)
   ```
 
+- dans le fichier au format WKT (chaîne de caractères), la géométrie ne doit pas être en guillemets (quotes). Exemple :
+
+  ```
+  660993,POLYGON (((6.73181863107186 45.7539143085928,6.74466771917198 45.7534881584565,6.74405801858532 45.7444934010459,6.73121101630907 45.7449194816323,6.73181863107186 45.7539143085928)))
+  ```
+
+
 **json, geojson**
 
-- fichier texte au format json contenant un objet de type `FeatureCollection` ou un tableau d'objets de type `Feature`
-- chaque objet de type `Feature` doit comporter un identifiant (attribut `id`), en tant qu'attribut de cet objet ou en
+- Fichier texte au format JSON contenant un objet de type `FeatureCollection` ou un tableau d'objets de type `Feature`
+
+- La géométrie doit être encodée dans le SCR ``WGS84:EPSG4326``
+
+- Chaque objet de type `Feature` doit comporter un identifiant (attribut `id`), en tant qu'attribut de cet objet ou en
   tant que propriété de cet objet. Par exemple :
 
   ```json
