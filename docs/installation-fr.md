@@ -32,6 +32,8 @@ mobiles directement sur le serveur GeoNature avec lequel elle se synchronise.
 que vous souhaitez installer
 - Que vos instances de GeoNature et TaxHub soient accessibles en HTTPS
 
+![Architecture](images/occtax-mobile-architecture.jpg)
+
 ### Installation et configuration centralisées
 
 Il est nécessaire de gérer les fichiers de configuration, l'installation et la mise à jour des applications au
