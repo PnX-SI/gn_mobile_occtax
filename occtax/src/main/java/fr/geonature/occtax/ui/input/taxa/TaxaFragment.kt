@@ -363,7 +363,7 @@ class TaxaFragment : Fragment(),
                         *getSelectedFilters().toTypedArray()
                     )
                 )
-                
+
                 true
             }
             else -> super.onOptionsItemSelected(item)

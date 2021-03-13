@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.MergeAdapter
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.data.Taxonomy
 import fr.geonature.commons.ui.adapter.IStickyRecyclerViewAdapter
@@ -49,7 +49,7 @@ class FilterRecyclerViewAdapter(val listener: FilterRecyclerViewAdapterListener<
                 listener.onSelectedFilters(*selectedFilters.toTypedArray())
             }
         })
-    private val mergeAdapter = MergeAdapter(
+    private val concatAdapter = ConcatAdapter(
         filterTitleAreaObservationRecyclerViewAdapter,
         filterAreaObservationRecyclerViewAdapter,
         filterTitleTaxonomyRecyclerViewAdapter,
@@ -58,8 +58,8 @@ class FilterRecyclerViewAdapter(val listener: FilterRecyclerViewAdapterListener<
     private val selectedFilters: MutableList<Filter<*>> = mutableListOf()
 
     init {
-        setHasStableIds(mergeAdapter.hasStableIds())
-        mergeAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+        setHasStableIds(concatAdapter.hasStableIds())
+        concatAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onChanged() {
                 this@FilterRecyclerViewAdapter.notifyDataSetChanged()
             }
@@ -103,23 +103,23 @@ class FilterRecyclerViewAdapter(val listener: FilterRecyclerViewAdapterListener<
     }
 
     override fun onFailedToRecycleView(holder: RecyclerView.ViewHolder): Boolean {
-        return mergeAdapter.onFailedToRecycleView(holder)
+        return concatAdapter.onFailedToRecycleView(holder)
     }
 
     override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
-        mergeAdapter.onViewAttachedToWindow(holder)
+        concatAdapter.onViewAttachedToWindow(holder)
     }
 
     override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
-        mergeAdapter.onViewDetachedFromWindow(holder)
+        concatAdapter.onViewDetachedFromWindow(holder)
     }
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
-        mergeAdapter.onViewRecycled(holder)
+        concatAdapter.onViewRecycled(holder)
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        mergeAdapter.onAttachedToRecyclerView(recyclerView)
+        concatAdapter.onAttachedToRecyclerView(recyclerView)
 
         recyclerView.addItemDecoration(
             StickyHeaderItemDecorator(
@@ -130,7 +130,7 @@ class FilterRecyclerViewAdapter(val listener: FilterRecyclerViewAdapterListener<
     }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        mergeAdapter.onDetachedFromRecyclerView(recyclerView)
+        concatAdapter.onDetachedFromRecyclerView(recyclerView)
 
         for (i in 0 until recyclerView.itemDecorationCount) {
             val decorator = recyclerView.getItemDecorationAt(i)
@@ -142,26 +142,26 @@ class FilterRecyclerViewAdapter(val listener: FilterRecyclerViewAdapterListener<
     }
 
     override fun getItemViewType(position: Int): Int {
-        return mergeAdapter.getItemViewType(position)
+        return concatAdapter.getItemViewType(position)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return mergeAdapter.onCreateViewHolder(
+        return concatAdapter.onCreateViewHolder(
             parent,
             viewType
         )
     }
 
     override fun getItemId(position: Int): Long {
-        return mergeAdapter.getItemId(position)
+        return concatAdapter.getItemId(position)
     }
 
     override fun getItemCount(): Int {
-        return mergeAdapter.itemCount
+        return concatAdapter.itemCount
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        mergeAdapter.onBindViewHolder(
+        concatAdapter.onBindViewHolder(
             holder,
             position
         )
