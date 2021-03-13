@@ -19,7 +19,7 @@ class Input : AbstractInput {
     var selectedFeatureId: String? = null
     var comment: String? = null
     val properties: SortedMap<String, PropertyValue> =
-        TreeMap<String, PropertyValue>(Comparator { o1, o2 ->
+        TreeMap { o1, o2 ->
             val i1 = defaultPropertiesMnemonic.indexOfFirst { it.first == o1 }
             val i2 = defaultPropertiesMnemonic.indexOfFirst { it.first == o2 }
 
@@ -28,7 +28,7 @@ class Input : AbstractInput {
                 i2 == -1 -> -1
                 else -> i1 - i2
             }
-        })
+        }
 
     constructor() : super("occtax")
     constructor(source: Parcel) : super(source) {
