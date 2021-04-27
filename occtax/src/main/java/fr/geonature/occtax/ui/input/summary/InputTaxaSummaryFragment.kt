@@ -91,6 +91,7 @@ class InputTaxaSummaryFragment : Fragment(),
 
         contentView = view.findViewById(android.R.id.content)
         recyclerView = view.findViewById(android.R.id.list)
+        fab = view.findViewById(R.id.fab)
 
         emptyTextView = view.findViewById(android.R.id.empty)
         emptyTextView?.text = getString(R.string.summary_no_data)
