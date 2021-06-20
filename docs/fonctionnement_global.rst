@@ -1,2 +1,2 @@
-Fonctionnement global de la solution de saisie mobile Occtax
-============================================================
+Fonctionnement global d'Occtax-mobile
+=====================================
