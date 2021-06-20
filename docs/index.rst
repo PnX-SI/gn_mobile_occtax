@@ -5,9 +5,9 @@ Bienvenue dans la documentation de Occtax-mobile
    :maxdepth: 2
 
    fonctionnement_global
-   installation coté serveur
-   installation coté terminal
-   configuration centralisée
+   installation_serveur
+   installation_terminal
+   configuration_centralisee
    utilisation
    acces_logs
    CHANGELOG
