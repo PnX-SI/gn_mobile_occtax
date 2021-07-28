@@ -1,6 +1,5 @@
 package fr.geonature.occtax.ui.home
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.database.Cursor
 import android.os.Bundle
@@ -28,8 +27,8 @@ import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.data.AppSync
 import fr.geonature.commons.data.helper.Provider
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
-import fr.geonature.commons.util.PermissionUtils
 import fr.geonature.commons.util.observeOnce
+import fr.geonature.occtax.MainApplication
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputViewModel
@@ -209,7 +208,7 @@ class HomeActivity : AppCompatActivity() {
         }
 
         if (checkAppSync()) {
-            checkPermissions()
+            loadAppSettings()
         }
     }
 
@@ -284,7 +283,7 @@ class HomeActivity : AppCompatActivity() {
     private fun configureInputViewModel(): InputViewModel {
         return ViewModelProvider(
             this,
-            fr.geonature.commons.input.InputViewModel.Factory { InputViewModel(this.application) }).get(
+            fr.geonature.commons.input.InputViewModel.Factory { InputViewModel((application as MainApplication).sl.inputManager) }).get(
             InputViewModel::class.java
         )
     }
@@ -334,26 +333,6 @@ class HomeActivity : AppCompatActivity() {
         appSyncView?.enableActionButton()
 
         return true
-    }
-
-    private fun checkPermissions() {
-        PermissionUtils.requestPermissions(
-            this,
-            listOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-            { result ->
-                if (result.values.all { it }) {
-                    loadAppSettings()
-                } else {
-                    makeSnackbar(getString(R.string.snackbar_permissions_not_granted))?.show()
-                }
-            },
-            { callback ->
-                makeSnackbar(
-                    getString(R.string.snackbar_permission_external_storage_rationale),
-                    BaseTransientBottomBar.LENGTH_INDEFINITE
-                )?.setAction(android.R.string.ok) { callback() }
-                    ?.show()
-            })
     }
 
     private fun makeSnackbar(

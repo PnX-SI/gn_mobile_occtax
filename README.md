@@ -1,23 +1,24 @@
 # Occtax-mobile
 
-GeoNature Android mobile application for Occtax module.
+GeoNature Android mobile application for *Occtax* GeoNature module.
 
-Based on Sync-mobile (https://github.com/PnX-SI/gn_mobile_core) to synchronize data and Maps-mobile (https://github.com/PnX-SI/gn_mobile_maps) as map module.
+Based on [Sync-mobile](https://github.com/PnX-SI/gn_mobile_core) to synchronize data and [Maps-mobile](https://github.com/PnX-SI/gn_mobile_maps) as map module.
 
-Documentation : 
+**Documentation :**
 
-- Installation (French) : https://github.com/PnX-SI/gn_mobile_occtax/blob/master/docs/installation-fr.md
-- Utilisation (French) : https://github.com/PnX-SI/gn_mobile_occtax/blob/master/docs/utilisation-fr.md
+- Installation (in french): https://github.com/PnX-SI/gn_mobile_occtax/blob/master/docs/installation-fr.md
+- User documentation (in french): https://github.com/PnX-SI/gn_mobile_occtax/blob/master/docs/utilisation-fr.md
 
 ## Launcher icons
 
-| Name                                                                 | Flavor    | Launcher icon                                                                                                              |
-| -------------------------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Default                                                              | _generic_ | ![PNX](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/main/res/mipmap-xhdpi/ic_launcher.png) |
-| [Parc National des Cévennes](http://www.cevennes-parcnational.fr)    | _pnc_     | ![PNC](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnc/res/mipmap-xhdpi/ic_launcher.png)  |
-| [Parc National des Écrins](http://www.ecrins-parcnational.fr)        | _pne_     | ![PNE](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pne/res/mipmap-xhdpi/ic_launcher.png)  |
-| [Parc National du Mercantour](http://www.mercantour-parcnational.fr) | _pnm_     | ![PNE](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnm/res/mipmap-xhdpi/ic_launcher.png)  |
-| [Parc National de la Vanoise](http://www.vanoise-parcnational.fr)    | _pnv_     | ![PNE](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnv/res/mipmap-xhdpi/ic_launcher.png)  |
+| Name                                                                 | Flavor    | Launcher icon                                                                                                                                                                                                                                                  |
+| -------------------------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Default                                                              | _generic_ | ![PNX](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/main/res/mipmap-xhdpi/ic_launcher.png) ![PNX_debug](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/debug/res/mipmap-xhdpi/ic_launcher.png)   |
+| [Parc amazonien de Guyane](https://www.parc-amazonien-guyane.fr)     | _pag_     | ![PAG](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pag/res/mipmap-xhdpi/ic_launcher.png) ![PAG_debug](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pagDebug/res/mipmap-xhdpi/ic_launcher.png) |
+| [Parc National des Cévennes](http://www.cevennes-parcnational.fr)    | _pnc_     | ![PNC](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnc/res/mipmap-xhdpi/ic_launcher.png) ![PNC_debug](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pncDebug/res/mipmap-xhdpi/ic_launcher.png) |
+| [Parc National des Écrins](http://www.ecrins-parcnational.fr)        | _pne_     | ![PNE](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pne/res/mipmap-xhdpi/ic_launcher.png) ![PNE_debug](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pneDebug/res/mipmap-xhdpi/ic_launcher.png) |
+| [Parc National du Mercantour](http://www.mercantour-parcnational.fr) | _pnm_     | ![PNM](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnm/res/mipmap-xhdpi/ic_launcher.png) ![PNM_debug](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnmDebug/res/mipmap-xhdpi/ic_launcher.png) |
+| [Parc National de la Vanoise](http://www.vanoise-parcnational.fr)    | _pnv_     | ![PNV](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnv/res/mipmap-xhdpi/ic_launcher.png) ![PNV_debug](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/pnvDebug/res/mipmap-xhdpi/ic_launcher.png) |
 
 ## Settings
 
@@ -67,17 +68,17 @@ All these settings may not be defined and the default values will then be used i
 
 **Information settings**
 
-| Nomenclature     | Label                            | Displayed by default | Editable (visible) |
-| ---------------- | -------------------------------- | -------------------- | ------------------ |
-| METH_OBS         | Observation methods              | `true`               | `true`             |
-| ETA_BIO          | Biological state                 | `true`               | `true`             |
-| METH_DETERMIN    | Determination method             | `false`              | `true`             |
-| DETERMINER       | Determiner                       | `false`              | `true`             |
-| STATUT_BIO       | Biological status                | `false`              | `true`             |
-| OCC_COMPORTEMENT | Behaviour                        | `false`              | `true`             |
-| NATURALITE       | Level of naturalness             | `false`              | `true`             |
-| PREUVE_EXIST     | Proof of existence               | `false`              | `true`             |
-| COMMENT          | Comment                          | `false`              | `true`             |
+| Nomenclature     | Label                | Displayed by default | Editable (visible) |
+| ---------------- | -------------------- | -------------------- | ------------------ |
+| METH_OBS         | Observation methods  | `true`               | `true`             |
+| ETA_BIO          | Biological state     | `true`               | `true`             |
+| METH_DETERMIN    | Determination method | `false`              | `true`             |
+| DETERMINER       | Determiner           | `false`              | `true`             |
+| STATUT_BIO       | Biological status    | `false`              | `true`             |
+| OCC_COMPORTEMENT | Behaviour            | `false`              | `true`             |
+| NATURALITE       | Level of naturalness | `false`              | `true`             |
+| PREUVE_EXIST     | Proof of existence   | `false`              | `true`             |
+| COMMENT          | Comment              | `false`              | `true`             |
 
 **Counting settings**
 
@@ -112,7 +113,7 @@ You can override these default settings by adding a property for each nomenclatu
         "visible": true,
         "default": false
       },
-       {
+      {
         "key": "OCC_COMPORTEMENT",
         "visible": true,
         "default": false
