@@ -297,7 +297,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
 
         fun getNomenclatureTypeLabel(mnemonic: String): String {
             val resourceId = contentView.resources.getIdentifier(
-                "nomenclature_${mnemonic.toLowerCase(Locale.getDefault())}",
+                "nomenclature_${mnemonic.lowercase(Locale.getDefault())}",
                 "string",
                 contentView.context.packageName
             )
@@ -450,7 +450,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
                 R.string.counting_min_max_title
             } else {
                 contentView.resources.getIdentifier(
-                    "counting_${property.code.toLowerCase(Locale.ROOT)}_title",
+                    "counting_${property.code.lowercase(Locale.ROOT)}_title",
                     "string",
                     contentView.context.packageName
                 ).takeIf { it > 0 } ?: R.string.counting_min_max_title

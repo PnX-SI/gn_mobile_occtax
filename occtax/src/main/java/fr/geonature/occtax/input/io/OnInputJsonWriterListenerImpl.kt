@@ -335,7 +335,7 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
     ) {
         if (propertyValue.isEmpty()) return
 
-        writer.name(name.toLowerCase(Locale.ROOT))
+        writer.name(name.lowercase(Locale.ROOT))
             .beginObject()
 
         if (!TextUtils.isEmpty(propertyValue.label)) {

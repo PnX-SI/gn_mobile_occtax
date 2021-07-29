@@ -502,7 +502,7 @@ class TaxaFragment : Fragment(),
                     text = areaObservationToAdd.short
 
                     setChipBackgroundColorResource(context.resources.getIdentifier(
-                        "area_observation_${areaObservationToAdd.type.name.toLowerCase(Locale.ROOT)}",
+                        "area_observation_${areaObservationToAdd.type.name.lowercase(Locale.ROOT)}",
                         "color",
                         context.packageName
                     ).takeIf { it > 0 } ?: R.color.accent)

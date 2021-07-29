@@ -445,7 +445,7 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
         reader.endObject()
 
         val propertyValue = PropertyValue(
-            code.toUpperCase(Locale.ROOT),
+            code.uppercase(Locale.ROOT),
             label,
             value
         )
