@@ -2,7 +2,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="CommonsBaseTheme">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
 
         <!-- main theme colors -->
         <item name="colorPrimary">@color/primary</item>

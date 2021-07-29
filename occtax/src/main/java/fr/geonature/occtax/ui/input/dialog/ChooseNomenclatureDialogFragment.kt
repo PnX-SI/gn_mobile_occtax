@@ -164,7 +164,7 @@ class ChooseNomenclatureDialogFragment : DialogFragment() {
     private fun getNomenclatureTypeLabel(mnemonic: String): String? {
         val context = context ?: return null
         val resourceId = resources.getIdentifier(
-            "nomenclature_${mnemonic.toLowerCase(Locale.getDefault())}",
+            "nomenclature_${mnemonic.lowercase(Locale.getDefault())}",
             "string",
             context.packageName
         )

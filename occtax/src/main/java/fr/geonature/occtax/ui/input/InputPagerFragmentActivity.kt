@@ -6,10 +6,12 @@ import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
+import fr.geonature.commons.input.AbstractInput
 import fr.geonature.maps.settings.MapSettings
 import fr.geonature.maps.util.MapSettingsPreferencesUtils.showCompass
 import fr.geonature.maps.util.MapSettingsPreferencesUtils.showScale
 import fr.geonature.maps.util.MapSettingsPreferencesUtils.showZoom
+import fr.geonature.occtax.MainApplication
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputViewModel
@@ -41,10 +43,7 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        inputViewModel = ViewModelProvider(this,
-            fr.geonature.commons.input.InputViewModel.Factory { InputViewModel(this.application) }).get(
-            InputViewModel::class.java
-        )
+        inputViewModel = configureInputViewModel()
 
         appSettings = intent.getParcelableExtra(EXTRA_APP_SETTINGS)!!
         input = intent.getParcelableExtra(EXTRA_INPUT) ?: Input()
@@ -67,7 +66,9 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
     override fun onPause() {
         super.onPause()
 
-        inputViewModel.saveInput(input)
+        if (input.status == AbstractInput.Status.DRAFT) {
+            inputViewModel.saveInput(input)
+        }
     }
 
     override val pagerFragments: Map<Int, IValidateFragment>
@@ -103,9 +104,9 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
         }
 
     override fun performFinishAction() {
-        inputViewModel.exportInput(input)
-
-        finish()
+        inputViewModel.exportInput(input) {
+            finish()
+        }
     }
 
     override fun onPageSelected(position: Int) {
@@ -119,6 +120,14 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
             validateCurrentPage()
             inputViewModel.saveInput(input)
         }
+    }
+
+    private fun configureInputViewModel(): InputViewModel {
+        return ViewModelProvider(
+            this,
+            fr.geonature.commons.input.InputViewModel.Factory { InputViewModel((application as MainApplication).sl.inputManager) }).get(
+            InputViewModel::class.java
+        )
     }
 
     private fun getMapSettings(): MapSettings {

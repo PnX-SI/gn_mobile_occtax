@@ -476,7 +476,7 @@ class ObserversAndDateInputFragment : Fragment(),
         )
         selectedInputObserversActionView?.setItems(selectedInputObservers.map { inputObserver ->
             Pair.create(
-                inputObserver.lastname?.toUpperCase(Locale.getDefault()) ?: "",
+                inputObserver.lastname?.uppercase(Locale.getDefault()) ?: "",
                 inputObserver.firstname
             )
         })
