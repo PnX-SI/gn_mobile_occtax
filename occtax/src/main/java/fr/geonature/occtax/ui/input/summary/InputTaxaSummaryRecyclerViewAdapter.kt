@@ -129,7 +129,7 @@ class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapte
 
         private fun getNomenclatureTypeLabel(mnemonic: String): String {
             val resourceId = itemView.resources.getIdentifier(
-                "nomenclature_${mnemonic.toLowerCase(Locale.getDefault())}",
+                "nomenclature_${mnemonic.lowercase(Locale.getDefault())}",
                 "string",
                 itemView.context.packageName
             )

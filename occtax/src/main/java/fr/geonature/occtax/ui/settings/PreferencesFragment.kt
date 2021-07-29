@@ -298,7 +298,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             )
 
             defaultObserverPreference.summary =
-                defaultObserver.lastname?.toUpperCase(Locale.getDefault()) + if (defaultObserver.lastname == null) "" else " " + defaultObserver.firstname
+                defaultObserver.lastname?.uppercase(Locale.getDefault()) + if (defaultObserver.lastname == null) "" else " " + defaultObserver.firstname
         }
 
         editor.apply()

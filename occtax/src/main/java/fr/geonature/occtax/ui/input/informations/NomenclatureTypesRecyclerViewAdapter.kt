@@ -289,7 +289,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
 
         fun getNomenclatureTypeLabel(mnemonic: String): String {
             val resourceId = itemView.resources.getIdentifier(
-                "nomenclature_${mnemonic.toLowerCase(Locale.getDefault())}",
+                "nomenclature_${mnemonic.lowercase(Locale.getDefault())}",
                 "string",
                 itemView.context.packageName
             )
@@ -418,7 +418,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
 
         private fun getEditTextHint(mnemonic: String): String {
             val resourceId = contentView.resources.getIdentifier(
-                "information_${mnemonic.toLowerCase(Locale.getDefault())}_hint",
+                "information_${mnemonic.lowercase(Locale.getDefault())}_hint",
                 "string",
                 contentView.context.packageName
             )
