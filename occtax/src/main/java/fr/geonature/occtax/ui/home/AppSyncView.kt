@@ -5,7 +5,7 @@ import android.text.format.DateFormat
 import android.util.AttributeSet
 import android.util.Pair
 import android.view.View
-import fr.geonature.commons.data.AppSync
+import fr.geonature.commons.data.entity.AppSync
 import fr.geonature.occtax.R
 import fr.geonature.occtax.ui.shared.view.ListItemActionView
 import java.text.NumberFormat
@@ -13,7 +13,7 @@ import java.text.NumberFormat
 /**
  * Custom [View] about [AppSync].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class AppSyncView : ListItemActionView {
 

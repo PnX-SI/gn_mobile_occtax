@@ -1,19 +1,19 @@
 package fr.geonature.occtax.input
 
 import android.os.Parcel
-import fr.geonature.commons.data.Taxon
-import fr.geonature.commons.data.Taxonomy
+import fr.geonature.commons.data.entity.Taxon
+import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.util.toDate
-import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import java.util.Date
 
 /**
  * Unit tests about [Input].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 @RunWith(RobolectricTestRunner::class)
 class InputTest {

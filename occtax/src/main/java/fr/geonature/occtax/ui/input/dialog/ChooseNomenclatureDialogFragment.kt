@@ -13,9 +13,9 @@ import androidx.loader.content.Loader
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import fr.geonature.commons.data.Nomenclature
-import fr.geonature.commons.data.NomenclatureType
-import fr.geonature.commons.data.Taxonomy
+import fr.geonature.commons.data.entity.Nomenclature
+import fr.geonature.commons.data.entity.NomenclatureType
+import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.data.helper.Provider.buildUri
 import fr.geonature.occtax.R
 import java.util.Locale
@@ -23,7 +23,7 @@ import java.util.Locale
 /**
  * [DialogFragment] to let the user to choose a nomenclature value for a given [NomenclatureType].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class ChooseNomenclatureDialogFragment : DialogFragment() {
 

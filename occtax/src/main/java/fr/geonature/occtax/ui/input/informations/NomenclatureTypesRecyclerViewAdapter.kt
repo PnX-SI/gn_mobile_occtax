@@ -14,7 +14,7 @@ import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import fr.geonature.commons.data.NomenclatureType
+import fr.geonature.commons.data.entity.NomenclatureType
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.InputTaxon
@@ -26,7 +26,7 @@ import java.util.Locale
 /**
  * Default RecyclerView Adapter used by [InformationFragment].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureTypesRecyclerViewAdapterListener) :
     RecyclerView.Adapter<NomenclatureTypesRecyclerViewAdapter.AbstractViewHolder>() {
@@ -43,13 +43,9 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
     private val properties = mutableListOf<PropertyValue>()
     private var showAllNomenclatureTypes = false
 
-    private val onClickListener: View.OnClickListener
-
-    init {
-        onClickListener = View.OnClickListener { v ->
-            val selectedProperty = v.tag as PropertyValue
-            listener.onAction(selectedProperty.code)
-        }
+    private val onClickListener: View.OnClickListener = View.OnClickListener { v ->
+        val selectedProperty = v.tag as PropertyValue
+        listener.onAction(selectedProperty.code)
     }
 
     override fun onCreateViewHolder(

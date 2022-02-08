@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
@@ -24,7 +25,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import fr.geonature.commons.data.AppSync
+import dagger.hilt.android.AndroidEntryPoint
+import fr.geonature.commons.data.entity.AppSync
 import fr.geonature.commons.data.helper.Provider
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.commons.util.observeOnce
@@ -42,11 +44,12 @@ import fr.geonature.occtax.util.IntentUtils.syncActivity
 /**
  * Home screen Activity.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
+@AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
 
-    private lateinit var appSettingsViewModel: AppSettingsViewModel
+    private val appSettingsViewModel: AppSettingsViewModel by viewModels()
     private lateinit var inputViewModel: InputViewModel
 
     private var homeContent: CoordinatorLayout? = null
@@ -120,7 +123,6 @@ class HomeActivity : AppCompatActivity() {
         inputEmptyTextView = findViewById(R.id.inputEmptyTextView)
         fab = findViewById(R.id.fab)
 
-        appSettingsViewModel = configureAppSettingsViewModel()
         inputViewModel = configureInputViewModel()
 
         appSyncView?.setListener(object : ListItemActionView.OnListItemActionViewListener {
@@ -271,21 +273,12 @@ class HomeActivity : AppCompatActivity() {
         )
     }
 
-    private fun configureAppSettingsViewModel(): AppSettingsViewModel {
-        return ViewModelProvider(
-            this,
-            fr.geonature.commons.settings.AppSettingsViewModel.Factory {
-                AppSettingsViewModel(application)
-            }
-        ).get(AppSettingsViewModel::class.java)
-    }
-
     private fun configureInputViewModel(): InputViewModel {
         return ViewModelProvider(
             this,
-            fr.geonature.commons.input.InputViewModel.Factory { InputViewModel((application as MainApplication).sl.inputManager) }).get(
-            InputViewModel::class.java
-        )
+            fr.geonature.commons.input.InputViewModel.Factory {
+                InputViewModel((application as MainApplication).sl.inputManager)
+            })[InputViewModel::class.java]
     }
 
     private fun loadAppSettings() {
@@ -314,11 +307,10 @@ class HomeActivity : AppCompatActivity() {
 
     private fun loadInputs() {
         inputViewModel.readInputs().observe(
-            this,
-            {
-                adapter.setItems(it)
-            }
-        )
+            this
+        ) {
+            adapter.setItems(it)
+        }
     }
 
     private fun checkAppSync(): Boolean {

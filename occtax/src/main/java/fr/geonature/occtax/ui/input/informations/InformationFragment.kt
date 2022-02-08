@@ -12,10 +12,10 @@ import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import fr.geonature.commons.data.DefaultNomenclatureWithType
-import fr.geonature.commons.data.Nomenclature
-import fr.geonature.commons.data.NomenclatureType
-import fr.geonature.commons.data.Taxonomy
+import fr.geonature.commons.data.entity.DefaultNomenclatureWithType
+import fr.geonature.commons.data.entity.Nomenclature
+import fr.geonature.commons.data.entity.NomenclatureType
+import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.data.helper.Provider.buildUri
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.occtax.R
@@ -30,7 +30,7 @@ import fr.geonature.viewpager.ui.IValidateFragment
 /**
  * [Fragment] to let the user to add additional information for the given [Input].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class InformationFragment : Fragment(),
     IValidateFragment,

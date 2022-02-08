@@ -1,15 +1,17 @@
 package fr.geonature.occtax.settings
 
-import android.app.Application
+import dagger.hilt.android.lifecycle.HiltViewModel
+import fr.geonature.commons.settings.IAppSettingsManager
+import javax.inject.Inject
 import fr.geonature.commons.settings.AppSettingsViewModel as BaseAppSettingsViewModel
-import fr.geonature.occtax.settings.io.OnAppSettingsJsonReaderListenerImpl
 
 /**
  * [AppSettings] view model.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
-class AppSettingsViewModel(application: Application) : BaseAppSettingsViewModel<AppSettings>(
-    application,
-    OnAppSettingsJsonReaderListenerImpl()
-)
+@HiltViewModel
+class AppSettingsViewModel @Inject constructor(appSettingsManager: IAppSettingsManager<AppSettings>) :
+    BaseAppSettingsViewModel<AppSettings>(
+        appSettingsManager
+    )

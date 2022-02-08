@@ -8,7 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import fr.geonature.commons.data.Taxonomy
+import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.settings.PropertySettings
@@ -18,7 +18,7 @@ import fr.geonature.occtax.settings.PropertySettings
  *
  * @see EditCountingMetadataFragment
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class EditCountingMetadataActivity : AppCompatActivity(),
     EditCountingMetadataFragment.OnEditCountingMetadataFragmentListener {

@@ -17,8 +17,8 @@ import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.locationtech.jts.geom.Point
 import org.osmdroid.util.GeoPoint
@@ -27,7 +27,7 @@ import org.osmdroid.views.MapView
 /**
  * Simple [Fragment] embedding a [MapView] instance to edit a single POI on the map.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class InputMapFragment : MapFragment(),
     IValidateFragment,
@@ -95,7 +95,7 @@ class InputMapFragment : MapFragment(),
 
         (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
 
-        GlobalScope.launch(Main) {
+        CoroutineScope(Main).launch {
             getOverlays { overlay -> overlay is FeatureCollectionOverlay }
                 .asSequence()
                 .map { it as FeatureCollectionOverlay }
@@ -104,7 +104,7 @@ class InputMapFragment : MapFragment(),
     }
 
     private fun selectPOI(poi: GeoPoint) {
-        GlobalScope.launch(Main) {
+        CoroutineScope(Main).launch {
             val context = context ?: return@launch
 
             input?.geometry = toPoint(poi)

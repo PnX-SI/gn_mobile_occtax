@@ -4,7 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.ListView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,8 +16,8 @@ import androidx.loader.content.Loader
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
-import fr.geonature.commons.data.Dataset
-import fr.geonature.commons.data.InputObserver
+import fr.geonature.commons.data.entity.Dataset
+import fr.geonature.commons.data.entity.InputObserver
 import fr.geonature.commons.data.helper.Provider.buildUri
 import fr.geonature.maps.settings.MapSettings
 import fr.geonature.maps.util.MapSettingsPreferencesUtils
@@ -30,7 +32,7 @@ import java.util.Locale
 /**
  * Global settings.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class PreferencesFragment : PreferenceFragmentCompat() {
 
@@ -130,6 +132,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         setDefaultPreferences(arguments?.getParcelable(ARG_APP_SETTINGS))
         loadDefaultDataset()
         loadDefaultObserver()
+        configurePermissions()
 
         (preferenceScreen.findPreference(getString(R.string.preference_category_about_app_version_key)) as Preference?)?.also {
             it.summary = listener?.getAppVersion()
@@ -143,6 +146,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         addPreferencesFromResource(R.xml.preferences_dataset)
         addPreferencesFromResource(R.xml.preferences_observers)
         addPreferencesFromResource(R.xml.map_preferences)
+        addPreferencesFromResource(R.xml.preferences_permissions)
         addPreferencesFromResource(R.xml.preferences_about)
     }
 
@@ -246,7 +250,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             true
         }
 
-        val editor = PreferenceManager.getDefaultSharedPreferences(context)
+        val editor = PreferenceManager.getDefaultSharedPreferences(defaultDatasetPreference.context)
             .edit()
 
         if (defaultDataset == null) {
@@ -284,7 +288,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             true
         }
 
-        val editor = PreferenceManager.getDefaultSharedPreferences(context)
+        val editor = PreferenceManager.getDefaultSharedPreferences(defaultObserverPreference.context)
             .edit()
 
         if (defaultObserver == null) {
@@ -302,6 +306,27 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         }
 
         editor.apply()
+    }
+
+    private fun configurePermissions() {
+        preferenceScreen
+            .findPreference<Preference>(getString(R.string.preference_category_permissions_configure_key))
+            ?.apply {
+                onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                    startActivity(
+                        Intent(
+                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.fromParts(
+                                "package",
+                                it.context.packageName,
+                                null
+                            )
+                        )
+                    )
+
+                    true
+                }
+            }
     }
 
     /**

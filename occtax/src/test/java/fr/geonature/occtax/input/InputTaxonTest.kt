@@ -1,9 +1,9 @@
 package fr.geonature.occtax.input
 
 import android.os.Parcel
-import fr.geonature.commons.data.Nomenclature
-import fr.geonature.commons.data.Taxon
-import fr.geonature.commons.data.Taxonomy
+import fr.geonature.commons.data.entity.Nomenclature
+import fr.geonature.commons.data.entity.Taxon
+import fr.geonature.commons.data.entity.Taxonomy
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -16,7 +16,7 @@ import org.robolectric.RobolectricTestRunner
 /**
  * Unit tests about [InputTaxon].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 @RunWith(RobolectricTestRunner::class)
 class InputTaxonTest {

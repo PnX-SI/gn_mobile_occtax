@@ -7,6 +7,8 @@
     <string name="preference_category_observers">Observateurs</string>
     <string name="preference_category_observers_default">Observateur par défaut</string>
     <string name="preference_category_observers_default_not_set">Non défini</string>
+    <string name="preference_category_permissions">Permissions</string>
+    <string name="preference_category_permissions_configure">Gérer les permissions</string>
     <string name="preference_category_about">A propos</string>
     <string name="preference_category_about_app_version">Version de l\'application</string>
 

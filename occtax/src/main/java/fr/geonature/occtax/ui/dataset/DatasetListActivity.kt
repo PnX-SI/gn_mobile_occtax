@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import fr.geonature.commons.data.Dataset
+import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.occtax.R
 
 /**
@@ -13,7 +13,7 @@ import fr.geonature.occtax.R
  *
  * @see DatasetListFragment
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class DatasetListActivity : AppCompatActivity(),
     DatasetListFragment.OnDatasetListFragmentListener {

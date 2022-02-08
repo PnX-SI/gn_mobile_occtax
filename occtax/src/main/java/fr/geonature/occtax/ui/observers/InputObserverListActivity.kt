@@ -6,7 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
-import fr.geonature.commons.data.InputObserver
+import fr.geonature.commons.data.entity.InputObserver
 import fr.geonature.occtax.R
 
 /**
@@ -14,7 +14,7 @@ import fr.geonature.occtax.R
  *
  * @see InputObserverListFragment
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class InputObserverListActivity : AppCompatActivity(),
     InputObserverListFragment.OnInputObserverListFragmentListener {
