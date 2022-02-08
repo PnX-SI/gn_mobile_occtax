@@ -19,11 +19,11 @@ import androidx.fragment.app.Fragment
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
-import fr.geonature.commons.data.Dataset
-import fr.geonature.commons.data.DefaultNomenclature
-import fr.geonature.commons.data.DefaultNomenclatureWithType
-import fr.geonature.commons.data.InputObserver
-import fr.geonature.commons.data.NomenclatureType
+import fr.geonature.commons.data.entity.Dataset
+import fr.geonature.commons.data.entity.DefaultNomenclature
+import fr.geonature.commons.data.entity.DefaultNomenclatureWithType
+import fr.geonature.commons.data.entity.InputObserver
+import fr.geonature.commons.data.entity.NomenclatureType
 import fr.geonature.commons.data.helper.Provider.buildUri
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.occtax.R
@@ -47,7 +47,7 @@ import java.util.Locale
 /**
  * Selected observer and current date as first {@code Fragment} used by [InputPagerFragmentActivity].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class ObserversAndDateInputFragment : Fragment(),
     IValidateFragment,

@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
-import fr.geonature.commons.data.Taxonomy
+import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.ui.adapter.IStickyRecyclerViewAdapter
 import fr.geonature.commons.ui.adapter.StickyHeaderItemDecorator
 import fr.geonature.occtax.R
@@ -16,7 +16,7 @@ import fr.geonature.occtax.R
  * Default RecyclerView Adapter used by [TaxaFilterFragment], combining
  * [FilterAreaObservationRecyclerViewAdapter] and [FilterTaxonomyRecyclerViewAdapter].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  *
  * @see FilterAreaObservationRecyclerViewAdapter
  * @see FilterTaxonomyRecyclerViewAdapter

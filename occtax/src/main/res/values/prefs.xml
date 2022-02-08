@@ -9,6 +9,9 @@
     <string name="preference_category_observers_default_key" translatable="false">observer_default</string>
     <string name="preference_category_observers_default">Default observer</string>
     <string name="preference_category_observers_default_not_set">Not defined</string>
+    <string name="preference_category_permissions">Permissions</string>
+    <string name="preference_category_permissions_configure">Manage permissions</string>
+    <string name="preference_category_permissions_configure_key" translatable="false">permissions</string>
     <string name="preference_category_about">About</string>
     <string name="preference_category_about_app_version_key" translatable="false">app_version</string>
     <string name="preference_category_about_app_version">App version</string>

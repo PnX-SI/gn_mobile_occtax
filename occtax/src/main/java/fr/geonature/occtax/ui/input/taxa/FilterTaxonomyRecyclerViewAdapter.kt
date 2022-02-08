@@ -3,14 +3,14 @@ package fr.geonature.occtax.ui.input.taxa
 import android.view.View
 import android.widget.CheckBox
 import android.widget.TextView
-import fr.geonature.commons.data.Taxonomy
+import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
 
 /**
  * Default RecyclerView Adapter for [FilterTaxonomy].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class FilterTaxonomyRecyclerViewAdapter(val listener: FilterRecyclerViewAdapterListener<FilterTaxonomy>) :
     AbstractListItemRecyclerViewAdapter<FilterTaxonomy>() {

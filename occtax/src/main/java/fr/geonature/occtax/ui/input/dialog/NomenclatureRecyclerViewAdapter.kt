@@ -6,25 +6,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import fr.geonature.commons.data.Nomenclature
-import fr.geonature.commons.data.NomenclatureWithTaxonomy
+import fr.geonature.commons.data.entity.Nomenclature
+import fr.geonature.commons.data.entity.NomenclatureWithTaxonomy
 import fr.geonature.occtax.R
 
 /**
  * Default RecyclerView Adapter used by [ChooseNomenclatureDialogFragment].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
-class NomenclatureRecyclerViewAdapter(private val listener: OnNomenclatureRecyclerViewAdapterListener) : RecyclerView.Adapter<NomenclatureRecyclerViewAdapter.ViewHolder>() {
+class NomenclatureRecyclerViewAdapter(private val listener: OnNomenclatureRecyclerViewAdapterListener) :
+    RecyclerView.Adapter<NomenclatureRecyclerViewAdapter.ViewHolder>() {
 
     private var cursor: Cursor? = null
-    private val onClickListener: View.OnClickListener
-
-    init {
-        onClickListener = View.OnClickListener { v ->
-            val nomenclature = v.tag as Nomenclature
-            listener.onSelectedNomenclature(nomenclature)
-        }
+    private val onClickListener: View.OnClickListener = View.OnClickListener { v ->
+        val nomenclature = v.tag as Nomenclature
+        listener.onSelectedNomenclature(nomenclature)
     }
 
     override fun onCreateViewHolder(
@@ -50,9 +47,13 @@ class NomenclatureRecyclerViewAdapter(private val listener: OnNomenclatureRecycl
         notifyDataSetChanged()
     }
 
-    inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_2,
-                                                                                                                    parent,
-                                                                                                                    false)) {
+    inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
+        LayoutInflater.from(parent.context).inflate(
+            R.layout.list_item_2,
+            parent,
+            false
+        )
+    ) {
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
 
         fun bind(position: Int) {

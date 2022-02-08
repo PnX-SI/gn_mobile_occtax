@@ -2,6 +2,7 @@ package fr.geonature.occtax
 
 import android.app.Application
 import android.util.Log
+import dagger.hilt.android.HiltAndroidApp
 import fr.geonature.mountpoint.util.MountPointUtils
 import fr.geonature.occtax.di.ServiceLocator
 
@@ -10,6 +11,7 @@ import fr.geonature.occtax.di.ServiceLocator
  *
  * @author S. Grimault
  */
+@HiltAndroidApp
 class MainApplication : Application() {
 
     override fun onCreate() {

@@ -1,13 +1,19 @@
 package fr.geonature.occtax.ui.input
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.maps.settings.MapSettings
+import fr.geonature.maps.ui.MapFragment
+import fr.geonature.maps.util.CheckPermissionLifecycleObserver
+import fr.geonature.maps.util.ManageExternalStoragePermissionLifecycleObserver
 import fr.geonature.maps.util.MapSettingsPreferencesUtils.showCompass
 import fr.geonature.maps.util.MapSettingsPreferencesUtils.showScale
 import fr.geonature.maps.util.MapSettingsPreferencesUtils.showZoom
@@ -25,23 +31,47 @@ import fr.geonature.occtax.ui.input.taxa.TaxaFragment
 import fr.geonature.viewpager.ui.AbstractNavigationHistoryPagerFragmentActivity
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 /**
  * [ViewPager] implementation as [AbstractPagerFragmentActivity] with navigation history support.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
-class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivity() {
+class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivity(),
+    MapFragment.OnMapFragmentPermissionsListener {
 
     private lateinit var inputViewModel: InputViewModel
     private lateinit var appSettings: AppSettings
     private lateinit var input: Input
 
+    private var manageExternalStoragePermissionLifecycleObserver: ManageExternalStoragePermissionLifecycleObserver? =
+        null
+    private var readExternalStoragePermissionLifecycleObserver: CheckPermissionLifecycleObserver? =
+        null
+    private var locationPermissionLifecycleObserver: CheckPermissionLifecycleObserver? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            manageExternalStoragePermissionLifecycleObserver =
+                ManageExternalStoragePermissionLifecycleObserver(this)
+        } else {
+            readExternalStoragePermissionLifecycleObserver = CheckPermissionLifecycleObserver(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+        }
+
+        locationPermissionLifecycleObserver = CheckPermissionLifecycleObserver(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
 
         inputViewModel = configureInputViewModel()
 
@@ -58,7 +88,7 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
             "loading input: ${input.id}"
         )
 
-        GlobalScope.launch(Dispatchers.Main) {
+        CoroutineScope(Dispatchers.Main).launch {
             pagerManager.load(input.id)
         }
     }
@@ -121,6 +151,29 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
             inputViewModel.saveInput(input)
         }
     }
+
+    override suspend fun onStoragePermissionsGranted() =
+        suspendCancellableCoroutine<Boolean> { continuation ->
+            lifecycleScope.launch {
+                continuation.resume(
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        manageExternalStoragePermissionLifecycleObserver?.invoke()
+                    } else {
+                        readExternalStoragePermissionLifecycleObserver?.invoke(this@InputPagerFragmentActivity)
+                    } ?: false
+                )
+            }
+        }
+
+    override suspend fun onLocationPermissionGranted() =
+        suspendCancellableCoroutine<Boolean> { continuation ->
+            lifecycleScope.launch {
+                continuation.resume(
+                    locationPermissionLifecycleObserver?.invoke(this@InputPagerFragmentActivity)
+                        ?: false
+                )
+            }
+        }
 
     private fun configureInputViewModel(): InputViewModel {
         return ViewModelProvider(

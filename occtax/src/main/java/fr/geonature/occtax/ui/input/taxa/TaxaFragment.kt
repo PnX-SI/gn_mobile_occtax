@@ -27,10 +27,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import fr.geonature.commons.data.AbstractTaxon
-import fr.geonature.commons.data.Taxon
-import fr.geonature.commons.data.TaxonWithArea
-import fr.geonature.commons.data.Taxonomy
+import fr.geonature.commons.data.entity.AbstractTaxon
+import fr.geonature.commons.data.entity.Taxon
+import fr.geonature.commons.data.entity.TaxonWithArea
+import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.data.helper.Provider.buildUri
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.commons.util.ThemeUtils
@@ -46,7 +46,7 @@ import java.util.Locale
 /**
  * [Fragment] to let the user to choose a [Taxon] from the list.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class TaxaFragment : Fragment(),
     IValidateFragment,

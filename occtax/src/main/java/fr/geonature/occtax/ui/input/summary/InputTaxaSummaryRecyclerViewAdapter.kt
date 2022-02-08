@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.core.text.HtmlCompat
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import fr.geonature.commons.data.Taxonomy
+import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.input.AbstractInputTaxon
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
@@ -18,7 +18,7 @@ import java.util.Locale
 /**
  * Default RecyclerView Adapter used by [InputTaxaSummaryFragment].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<AbstractInputTaxon>) :
     AbstractListItemRecyclerViewAdapter<AbstractInputTaxon>(listener) {

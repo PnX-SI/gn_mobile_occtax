@@ -13,7 +13,7 @@ import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import fr.geonature.commons.data.NomenclatureType
+import fr.geonature.commons.data.entity.NomenclatureType
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
@@ -25,7 +25,7 @@ import java.util.Locale
 /**
  * Default RecyclerView Adapter used by [EditCountingMetadataFragment].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureTypesRecyclerViewAdapterListener) :
     RecyclerView.Adapter<NomenclatureTypesRecyclerViewAdapter.AbstractCardViewHolder>() {

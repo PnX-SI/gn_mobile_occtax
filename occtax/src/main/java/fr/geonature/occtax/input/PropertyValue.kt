@@ -2,14 +2,14 @@ package fr.geonature.occtax.input
 
 import android.os.Parcel
 import android.os.Parcelable
-import fr.geonature.commons.data.Nomenclature
+import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.input.AbstractInputTaxon
 import java.io.Serializable
 
 /**
  * Property value for [AbstractInputTaxon]
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 data class PropertyValue(
     val code: String,

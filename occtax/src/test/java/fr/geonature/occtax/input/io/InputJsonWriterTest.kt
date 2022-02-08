@@ -1,7 +1,7 @@
 package fr.geonature.occtax.input.io
 
-import fr.geonature.commons.data.Taxon
-import fr.geonature.commons.data.Taxonomy
+import fr.geonature.commons.data.entity.Taxon
+import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.input.io.InputJsonWriter
 import fr.geonature.commons.util.toDate
 import fr.geonature.occtax.FixtureHelper.getFixture
@@ -20,7 +20,7 @@ import java.util.Date
 /**
  * Unit tests about [InputJsonWriter].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 @RunWith(RobolectricTestRunner::class)
 class InputJsonWriterTest {

@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import fr.geonature.commons.data.Taxonomy
+import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
@@ -35,7 +35,7 @@ import fr.geonature.viewpager.ui.IValidateFragment
 /**
  * [Fragment] to let the user to add additional counting information for the given [Input].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class CountingFragment : Fragment(),
     IValidateFragment,

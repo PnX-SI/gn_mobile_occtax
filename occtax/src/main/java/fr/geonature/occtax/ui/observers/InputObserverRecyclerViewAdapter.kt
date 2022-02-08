@@ -9,7 +9,7 @@ import android.widget.ListView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.l4digital.fastscroll.FastScroller
-import fr.geonature.commons.data.InputObserver
+import fr.geonature.commons.data.entity.InputObserver
 import java.util.Locale
 
 /**
@@ -17,7 +17,7 @@ import java.util.Locale
  *
  * @see InputObserverListFragment
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecyclerViewAdapterListener) :
     RecyclerView.Adapter<InputObserverRecyclerViewAdapter.ViewHolder>(),

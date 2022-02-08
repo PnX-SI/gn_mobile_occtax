@@ -11,9 +11,9 @@ import android.widget.TextView
 import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.l4digital.fastscroll.FastScroller
-import fr.geonature.commons.data.AbstractTaxon
-import fr.geonature.commons.data.Taxon
-import fr.geonature.commons.data.TaxonWithArea
+import fr.geonature.commons.data.entity.AbstractTaxon
+import fr.geonature.commons.data.entity.Taxon
+import fr.geonature.commons.data.entity.TaxonWithArea
 import fr.geonature.occtax.R
 import java.text.NumberFormat
 
@@ -22,7 +22,7 @@ import java.text.NumberFormat
  *
  * @see TaxaFragment
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterListener) :
     RecyclerView.Adapter<TaxaRecyclerViewAdapter.ViewHolder>(),

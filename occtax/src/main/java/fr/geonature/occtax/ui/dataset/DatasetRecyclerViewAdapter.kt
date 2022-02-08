@@ -9,7 +9,7 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.l4digital.fastscroll.FastScroller
-import fr.geonature.commons.data.Dataset
+import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.occtax.R
 
 /**
@@ -17,7 +17,7 @@ import fr.geonature.occtax.R
  *
  * @see DatasetListFragment
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class DatasetRecyclerViewAdapter(private val listener: OnDatasetRecyclerViewAdapterListener) :
     RecyclerView.Adapter<DatasetRecyclerViewAdapter.ViewHolder>(),

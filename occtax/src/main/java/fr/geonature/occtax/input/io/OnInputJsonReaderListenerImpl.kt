@@ -3,8 +3,8 @@ package fr.geonature.occtax.input.io
 import android.text.TextUtils
 import android.util.JsonReader
 import android.util.JsonToken
-import fr.geonature.commons.data.Taxon
-import fr.geonature.commons.data.Taxonomy
+import fr.geonature.commons.data.entity.Taxon
+import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.input.io.InputJsonReader
 import fr.geonature.commons.util.toDate
 import fr.geonature.maps.jts.geojson.io.GeoJsonReader
@@ -19,7 +19,7 @@ import java.util.Locale
 /**
  * Default implementation of [InputJsonReader.OnInputJsonReaderListener].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<Input> {
 

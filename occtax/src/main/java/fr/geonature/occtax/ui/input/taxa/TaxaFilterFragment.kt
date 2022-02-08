@@ -15,7 +15,7 @@ import androidx.loader.content.Loader
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import fr.geonature.commons.data.Taxonomy
+import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.data.helper.Provider
 import fr.geonature.occtax.R
 import fr.geonature.occtax.settings.AppSettings
@@ -23,7 +23,7 @@ import fr.geonature.occtax.settings.AppSettings
 /**
  * [Fragment] to let the user to apply filters on taxa list.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class TaxaFilterFragment : Fragment() {
 

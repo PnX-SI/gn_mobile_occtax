@@ -2,7 +2,7 @@ package fr.geonature.occtax.input
 
 import android.os.Parcel
 import android.os.Parcelable
-import fr.geonature.commons.data.AbstractTaxon
+import fr.geonature.commons.data.entity.AbstractTaxon
 import fr.geonature.commons.input.AbstractInputTaxon
 import java.util.SortedMap
 import java.util.TreeMap
@@ -10,12 +10,12 @@ import java.util.TreeMap
 /**
  * Describes an input taxon.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class InputTaxon : AbstractInputTaxon {
 
     val properties: SortedMap<String, PropertyValue> =
-        TreeMap<String, PropertyValue> { o1, o2 ->
+        TreeMap { o1, o2 ->
             val i1 = defaultPropertiesMnemonic.indexOfFirst { it.first == o1 }
             val i2 = defaultPropertiesMnemonic.indexOfFirst { it.first == o2 }
 
@@ -25,7 +25,7 @@ class InputTaxon : AbstractInputTaxon {
                 else -> i1 - i2
             }
         }
-    private val counting: SortedMap<Int, CountingMetadata> = TreeMap<Int, CountingMetadata>()
+    private val counting: SortedMap<Int, CountingMetadata> = TreeMap()
 
     constructor(taxon: AbstractTaxon) : super(taxon)
     constructor(source: Parcel) : super(source) {
