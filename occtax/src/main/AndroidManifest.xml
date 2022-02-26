@@ -2,10 +2,10 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="fr.geonature.occtax"
-    android:sharedUserId="@string/sharedUserId">
+    package="fr.geonature.occtax">
 
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:name=".MainApplication"
@@ -28,6 +28,11 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="fr.geonature.datasync.ui.login.LoginActivity"
+            android:label="@string/activity_login_title"
+            android:theme="@style/AppTheme.Login"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".ui.settings.PreferencesActivity"
             android:label="@string/activity_preferences_title" />
         <activity
@@ -46,6 +51,30 @@
             android:name=".ui.input.taxa.TaxaFilterActivity"
             android:label="@string/activity_taxa_filter_title" />
         <activity android:name=".ui.input.counting.EditCountingMetadataActivity" />
+
+        <!--+
+           | remove the default initializer
+           +-->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            tools:node="remove" />
+
+        <provider
+            android:name="fr.geonature.commons.data.MainContentProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="true"
+            android:readPermission="@string/permission_read"
+            android:writePermission="@string/permission_write" />
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.file.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider_paths" />
+        </provider>
 
     </application>
 

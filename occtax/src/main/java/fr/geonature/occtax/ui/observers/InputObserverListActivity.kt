@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
+import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.entity.InputObserver
 import fr.geonature.occtax.R
 
@@ -16,6 +17,7 @@ import fr.geonature.occtax.R
  *
  * @author S. Grimault
  */
+@AndroidEntryPoint
 class InputObserverListActivity : AppCompatActivity(),
     InputObserverListFragment.OnInputObserverListFragmentListener {
 

@@ -5,36 +5,50 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.Settings
 import android.widget.ListView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
+import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
+import androidx.preference.PreferenceScreen
+import dagger.hilt.android.AndroidEntryPoint
+import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.entity.InputObserver
-import fr.geonature.commons.data.helper.Provider.buildUri
+import fr.geonature.commons.data.helper.ProviderHelper.buildUri
+import fr.geonature.datasync.api.IGeoNatureAPIClient
 import fr.geonature.maps.settings.MapSettings
 import fr.geonature.maps.util.MapSettingsPreferencesUtils
+import fr.geonature.mountpoint.util.MountPointUtils
 import fr.geonature.occtax.R
-import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.ui.dataset.DatasetListActivity
 import fr.geonature.occtax.ui.observers.InputObserverListActivity
 import fr.geonature.occtax.util.SettingsUtils.getDefaultDatasetId
 import fr.geonature.occtax.util.SettingsUtils.getDefaultObserverId
 import java.util.Locale
+import javax.inject.Inject
 
 /**
  * Global settings.
  *
  * @author S. Grimault
  */
+@AndroidEntryPoint
 class PreferencesFragment : PreferenceFragmentCompat() {
+
+    @ContentProviderAuthority
+    @Inject
+    lateinit var authority: String
 
     private lateinit var datasetResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var observerResultLauncher: ActivityResultLauncher<Intent>
@@ -51,6 +65,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 LOADER_DATASET -> CursorLoader(
                     requireContext(),
                     buildUri(
+                        authority,
                         Dataset.TABLE_NAME,
                         "occtax",
                         args!!.getLong(KEY_SELECTED_DATASET).toString()
@@ -63,6 +78,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 LOADER_OBSERVER -> CursorLoader(
                     requireContext(),
                     buildUri(
+                        authority,
                         InputObserver.TABLE_NAME,
                         args!!.getLong(KEY_SELECTED_OBSERVER).toString()
                     ),
@@ -129,10 +145,20 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 updateDefaultObserverPreference(if (selectedInputObservers.isNotEmpty()) selectedInputObservers[0] else null)
             }
 
-        setDefaultPreferences(arguments?.getParcelable(ARG_APP_SETTINGS))
         loadDefaultDataset()
         loadDefaultObserver()
         configurePermissions()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            configureNotifications()
+        }
+
+        setServerUrlsPreferences(
+            preferenceScreen,
+            arguments?.getParcelable(ARG_SERVER_URLS)
+        )
+        setMapSettingsPreferences(arguments?.getParcelable(ARG_MAP_SETTINGS))
+        setMountPointsPreferences(preferenceScreen)
 
         (preferenceScreen.findPreference(getString(R.string.preference_category_about_app_version_key)) as Preference?)?.also {
             it.summary = listener?.getAppVersion()
@@ -143,10 +169,17 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         savedInstanceState: Bundle?,
         rootKey: String?
     ) {
+        addPreferencesFromResource(R.xml.preferences_servers)
         addPreferencesFromResource(R.xml.preferences_dataset)
         addPreferencesFromResource(R.xml.preferences_observers)
         addPreferencesFromResource(R.xml.map_preferences)
         addPreferencesFromResource(R.xml.preferences_permissions)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            addPreferencesFromResource(R.xml.preferences_notifications)
+        }
+
+        addPreferencesFromResource(R.xml.preferences_storage)
         addPreferencesFromResource(R.xml.preferences_about)
     }
 
@@ -164,16 +197,6 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         super.onDetach()
 
         listener = null
-    }
-
-    private fun setDefaultPreferences(appSettings: AppSettings?) {
-        val context = context ?: return
-
-        MapSettingsPreferencesUtils.setDefaultPreferences(
-            context,
-            MapSettings.Builder.newInstance().from(appSettings?.mapSettings).build(),
-            preferenceScreen
-        )
     }
 
     private fun loadDefaultDataset() {
@@ -232,6 +255,65 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             )
     }
 
+    private fun setServerUrlsPreferences(
+        preferenceScreen: PreferenceScreen,
+        serverUrls: IGeoNatureAPIClient.ServerUrls?
+    ) {
+        val context = preferenceScreen.context
+
+        val onPreferenceChangeListener =
+            Preference.OnPreferenceChangeListener { preference, newValue ->
+                preference.summary = newValue.toString()
+                true
+            }
+
+        preferenceScreen
+            .findPreference<EditTextPreference?>(context.getString(R.string.preference_category_server_geonature_url_key))
+            ?.apply {
+                setOnBindEditTextListener { it.setSingleLine() }
+                summary = serverUrls?.geoNatureBaseUrl
+                setOnPreferenceChangeListener(onPreferenceChangeListener)
+            }
+        preferenceScreen
+            .findPreference<EditTextPreference?>(context.getString(R.string.preference_category_server_taxhub_url_key))
+            ?.apply {
+                setOnBindEditTextListener { it.setSingleLine() }
+                summary = serverUrls?.taxHubBaseUrl
+                setOnPreferenceChangeListener(onPreferenceChangeListener)
+            }
+    }
+
+    private fun setMapSettingsPreferences(mapSettings: MapSettings?) {
+        val context = context ?: return
+
+        MapSettingsPreferencesUtils.setDefaultPreferences(
+            context,
+            MapSettings.Builder.newInstance().from(mapSettings).build(),
+            preferenceScreen
+        )
+    }
+
+    private fun setMountPointsPreferences(preferenceScreen: PreferenceScreen) {
+        val context = preferenceScreen.context
+
+        preferenceScreen.findPreference<Preference?>(context.getString(R.string.preference_category_storage_internal_key))?.summary =
+            MountPointUtils.getInternalStorage(preferenceScreen.context).mountPath.absolutePath
+        MountPointUtils
+            .getExternalStorage(
+                preferenceScreen.context,
+                Environment.MEDIA_MOUNTED,
+                Environment.MEDIA_MOUNTED_READ_ONLY
+            )
+            ?.also { mountPoint ->
+                preferenceScreen
+                    .findPreference<Preference?>(context.getString(R.string.preference_category_storage_external_key))
+                    ?.also {
+                        it.summary = mountPoint.mountPath.absolutePath
+                        it.isEnabled = true
+                    }
+            }
+    }
+
     private fun updateDefaultDatasetPreference(defaultDataset: Dataset? = null) {
         val defaultDatasetPreference: Preference =
             preferenceScreen.findPreference(getString(R.string.preference_category_dataset_default_key))
@@ -288,8 +370,9 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             true
         }
 
-        val editor = PreferenceManager.getDefaultSharedPreferences(defaultObserverPreference.context)
-            .edit()
+        val editor =
+            PreferenceManager.getDefaultSharedPreferences(defaultObserverPreference.context)
+                .edit()
 
         if (defaultObserver == null) {
             editor.remove(getString(R.string.preference_category_observers_default_key))
@@ -329,6 +412,23 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun configureNotifications() {
+        preferenceScreen
+            .findPreference<Preference>(getString(R.string.preference_category_notifications_configure_key))
+            ?.apply {
+                onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                    startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                        putExtra(
+                            Settings.EXTRA_APP_PACKAGE,
+                            context.packageName
+                        )
+                    })
+                    true
+                }
+            }
+    }
+
     /**
      * Callback used by [PreferencesFragment].
      */
@@ -338,7 +438,9 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
     companion object {
 
-        private const val ARG_APP_SETTINGS = "arg_app_settings"
+        private const val ARG_SERVER_URLS = "server_urls"
+        private const val ARG_MAP_SETTINGS = "arg_map_settings"
+
         private const val LOADER_DATASET = 1
         private const val LOADER_OBSERVER = 2
         private const val KEY_SELECTED_DATASET = "selected_dataset"
@@ -350,13 +452,18 @@ class PreferencesFragment : PreferenceFragmentCompat() {
          * @return A new instance of [PreferencesFragment]
          */
         @JvmStatic
-        fun newInstance(appSettings: AppSettings? = null) = PreferencesFragment().apply {
-            arguments = Bundle().apply {
-                putParcelable(
-                    ARG_APP_SETTINGS,
-                    appSettings
-                )
+        fun newInstance(serverUrls: IGeoNatureAPIClient.ServerUrls?, mapSettings: MapSettings?) =
+            PreferencesFragment().apply {
+                arguments = Bundle().apply {
+                    putParcelable(
+                        ARG_SERVER_URLS,
+                        serverUrls
+                    )
+                    putParcelable(
+                        ARG_MAP_SETTINGS,
+                        mapSettings
+                    )
+                }
             }
-        }
     }
 }

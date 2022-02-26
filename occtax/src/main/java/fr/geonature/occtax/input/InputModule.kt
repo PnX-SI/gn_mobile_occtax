@@ -1,4 +1,4 @@
-package fr.geonature.occtax.settings
+package fr.geonature.occtax.input
 
 import android.content.Context
 import dagger.Module
@@ -7,30 +7,32 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import fr.geonature.commons.data.ContentProviderAuthority
-import fr.geonature.commons.settings.AppSettingsManagerImpl
-import fr.geonature.commons.settings.IAppSettingsManager
-import fr.geonature.occtax.settings.io.OnAppSettingsJsonReaderListenerImpl
+import fr.geonature.commons.input.IInputManager
+import fr.geonature.commons.input.InputManagerImpl
+import fr.geonature.occtax.input.io.OnInputJsonReaderListenerImpl
+import fr.geonature.occtax.input.io.OnInputJsonWriterListenerImpl
 import javax.inject.Singleton
 
 /**
- * Application settings module.
+ * Input module.
  *
  * @author S. Grimault
  */
-@Module
 @InstallIn(SingletonComponent::class)
-object AppSettingsModule {
+@Module
+object InputModule {
 
     @Singleton
     @Provides
-    fun provideAppSettingsManager(
+    fun provideInputManager(
         @ApplicationContext appContext: Context,
         @ContentProviderAuthority authority: String
-    ): IAppSettingsManager<AppSettings> {
-        return AppSettingsManagerImpl(
+    ): IInputManager<Input> {
+        return InputManagerImpl(
             appContext,
             authority,
-            OnAppSettingsJsonReaderListenerImpl()
+            OnInputJsonReaderListenerImpl(),
+            OnInputJsonWriterListenerImpl()
         )
     }
 }

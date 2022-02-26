@@ -1,11 +1,15 @@
 package fr.geonature.occtax.input
 
+import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.geonature.commons.input.IInputManager
+import javax.inject.Inject
 import fr.geonature.commons.input.InputViewModel as BaseInputModel
 
 /**
  * [Input] view model.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
-class InputViewModel(inputManager: IInputManager<Input>) : BaseInputModel<Input>(inputManager)
+@HiltViewModel
+class InputViewModel @Inject constructor(inputManager: IInputManager<Input>) :
+    BaseInputModel<Input>(inputManager)

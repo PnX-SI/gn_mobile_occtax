@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.database.Cursor
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -27,11 +26,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import dagger.hilt.android.AndroidEntryPoint
+import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.entity.AbstractTaxon
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.TaxonWithArea
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.commons.data.helper.Provider.buildUri
+import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.commons.util.ThemeUtils
 import fr.geonature.occtax.R
@@ -41,16 +42,23 @@ import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
+import org.tinylog.Logger
 import java.util.Locale
+import javax.inject.Inject
 
 /**
  * [Fragment] to let the user to choose a [Taxon] from the list.
  *
  * @author S. Grimault
  */
+@AndroidEntryPoint
 class TaxaFragment : Fragment(),
     IValidateFragment,
     IInputFragment {
+
+    @ContentProviderAuthority
+    @Inject
+    lateinit var authority: String
 
     private lateinit var savedState: Bundle
     private lateinit var taxaFilterResultLauncher: ActivityResultLauncher<Intent>
@@ -78,10 +86,7 @@ class TaxaFragment : Fragment(),
                         null
                     )
 
-                    Log.d(
-                        TAG,
-                        "load taxa with selected feature ID: $selectedFeatureId"
-                    )
+                    Logger.debug { "load taxa with selected feature ID: $selectedFeatureId" }
 
                     val taxonFilter =
                         TaxonWithArea.Filter()
@@ -114,6 +119,7 @@ class TaxaFragment : Fragment(),
                     CursorLoader(
                         requireContext(),
                         buildUri(
+                            authority,
                             Taxon.TABLE_NAME,
                             if (selectedFeatureId.isNullOrBlank()) "" else "area/$selectedFeatureId"
                         ),
@@ -132,6 +138,7 @@ class TaxaFragment : Fragment(),
                     CursorLoader(
                         requireContext(),
                         buildUri(
+                            authority,
                             Taxon.TABLE_NAME,
                             args?.getLong(KEY_SELECTED_TAXON_ID).toString(),
                             if (selectedFeatureId == null) "" else "area/$selectedFeatureId"
@@ -152,10 +159,7 @@ class TaxaFragment : Fragment(),
         ) {
 
             if (data == null) {
-                Log.w(
-                    TAG,
-                    "Failed to load data from '${(loader as CursorLoader).uri}'"
-                )
+                Logger.warn { "failed to load data from '${(loader as CursorLoader).uri}'" }
 
                 return
             }
@@ -613,8 +617,6 @@ class TaxaFragment : Fragment(),
     }
 
     companion object {
-
-        private val TAG = TaxaFragment::class.java.name
 
         private const val ARG_AREA_OBSERVATION_DURATION = "arg_area_observation_duration"
         private const val LOADER_TAXA = 1

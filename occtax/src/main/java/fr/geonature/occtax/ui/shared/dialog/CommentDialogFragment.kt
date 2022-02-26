@@ -15,7 +15,9 @@ import fr.geonature.commons.util.KeyboardUtils.showSoftKeyboard
 import fr.geonature.occtax.R
 
 /**
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * Custom [Dialog] used to add comment.
+ *
+ * @author S. Grimault
  */
 class CommentDialogFragment : DialogFragment() {
 
@@ -75,10 +77,7 @@ class CommentDialogFragment : DialogFragment() {
             showSoftKeyboard(editText)
         }
 
-        return AlertDialog.Builder(
-            context,
-            R.style.DialogStyle
-        )
+        return AlertDialog.Builder(context)
             .setTitle(if (TextUtils.isEmpty(comment)) R.string.alert_dialog_add_comment_title else R.string.alert_dialog_edit_comment_title)
             .setView(view)
             .setPositiveButton(R.string.alert_dialog_ok) { _, _ ->
@@ -141,7 +140,7 @@ class CommentDialogFragment : DialogFragment() {
     /**
      * The callback used by [CommentDialogFragment].
      *
-     * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+     * @author S. Grimault
      */
     interface OnCommentDialogFragmentListener {
 

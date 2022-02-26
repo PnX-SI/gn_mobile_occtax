@@ -2,19 +2,21 @@ package fr.geonature.occtax.settings.io
 
 import android.util.JsonReader
 import android.util.JsonToken
-import android.util.Log
 import fr.geonature.commons.settings.io.AppSettingsJsonReader
+import fr.geonature.datasync.settings.DataSyncSettings
+import fr.geonature.datasync.settings.io.DataSyncSettingsJsonReader
 import fr.geonature.maps.settings.MapSettings
 import fr.geonature.maps.settings.io.MapSettingsReader
 import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.settings.NomenclatureSettings
 import fr.geonature.occtax.settings.PropertySettings
+import org.tinylog.Logger
 import java.io.IOException
 
 /**
  * Default implementation of [AppSettingsJsonReader.OnAppSettingsJsonReaderListener].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class OnAppSettingsJsonReaderListenerImpl :
     AppSettingsJsonReader.OnAppSettingsJsonReaderListener<AppSettings> {
@@ -30,10 +32,21 @@ class OnAppSettingsJsonReaderListenerImpl :
     ) {
         when (keyName) {
             "area_observation_duration" -> appSettings.areaObservationDuration = reader.nextInt()
+            "sync" -> appSettings.dataSyncSettings = readDataSyncSettings(reader)
             "map" -> appSettings.mapSettings = readMapSettings(reader)
             "nomenclature" -> appSettings.nomenclatureSettings = readNomenclatureSettings(reader)
             else -> reader.skipValue()
         }
+    }
+
+    private fun readDataSyncSettings(reader: JsonReader): DataSyncSettings? {
+        if (reader.peek() != JsonToken.BEGIN_OBJECT) {
+            reader.skipValue()
+
+            return null
+        }
+
+        return DataSyncSettingsJsonReader().read(reader)
     }
 
     private fun readMapSettings(reader: JsonReader): MapSettings? {
@@ -90,10 +103,7 @@ class OnAppSettingsJsonReaderListenerImpl :
                     propertySettingsList.add(it)
                 }
             } catch (ioe: IOException) {
-                Log.w(
-                    TAG,
-                    ioe
-                )
+                Logger.error(ioe)
             }
         }
 
@@ -143,10 +153,5 @@ class OnAppSettingsJsonReaderListenerImpl :
                 null
             }
         }
-    }
-
-    companion object {
-
-        private val TAG = OnAppSettingsJsonReaderListenerImpl::class.java.name
     }
 }

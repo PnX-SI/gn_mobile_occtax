@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.occtax.R
 
@@ -15,6 +16,7 @@ import fr.geonature.occtax.R
  *
  * @author S. Grimault
  */
+@AndroidEntryPoint
 class DatasetListActivity : AppCompatActivity(),
     DatasetListFragment.OnDatasetListFragmentListener {
 

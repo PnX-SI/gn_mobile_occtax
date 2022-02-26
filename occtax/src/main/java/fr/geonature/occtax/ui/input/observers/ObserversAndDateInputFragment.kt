@@ -5,7 +5,6 @@ import android.content.Intent
 import android.database.Cursor
 import android.os.Bundle
 import android.text.format.DateFormat
-import android.util.Log
 import android.util.Pair
 import android.view.LayoutInflater
 import android.view.View
@@ -19,12 +18,17 @@ import androidx.fragment.app.Fragment
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointBackward
+import com.google.android.material.datepicker.MaterialDatePicker
+import dagger.hilt.android.AndroidEntryPoint
+import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.entity.DefaultNomenclature
 import fr.geonature.commons.data.entity.DefaultNomenclatureWithType
 import fr.geonature.commons.data.entity.InputObserver
 import fr.geonature.commons.data.entity.NomenclatureType
-import fr.geonature.commons.data.helper.Provider.buildUri
+import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
@@ -34,24 +38,29 @@ import fr.geonature.occtax.ui.dataset.DatasetListActivity
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
 import fr.geonature.occtax.ui.observers.InputObserverListActivity
-import fr.geonature.occtax.ui.shared.dialog.DatePickerDialogFragment
 import fr.geonature.occtax.ui.shared.view.ListItemActionView
 import fr.geonature.occtax.util.SettingsUtils.getDefaultDatasetId
 import fr.geonature.occtax.util.SettingsUtils.getDefaultObserverId
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
-import java.util.Calendar
+import org.tinylog.kotlin.Logger
 import java.util.Date
 import java.util.Locale
+import javax.inject.Inject
 
 /**
  * Selected observer and current date as first {@code Fragment} used by [InputPagerFragmentActivity].
  *
  * @author S. Grimault
  */
+@AndroidEntryPoint
 class ObserversAndDateInputFragment : Fragment(),
     IValidateFragment,
     IInputFragment {
+
+    @ContentProviderAuthority
+    @Inject
+    lateinit var authority: String
 
     private lateinit var observersResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var datasetResultLauncher: ActivityResultLauncher<Intent>
@@ -74,6 +83,7 @@ class ObserversAndDateInputFragment : Fragment(),
                 LOADER_OBSERVERS_IDS -> CursorLoader(
                     requireContext(),
                     buildUri(
+                        authority,
                         InputObserver.TABLE_NAME,
                         args?.getLongArray(KEY_SELECTED_INPUT_OBSERVER_IDS)?.joinToString(",")
                             ?: ""
@@ -86,6 +96,7 @@ class ObserversAndDateInputFragment : Fragment(),
                 LOADER_DATASET_ID -> CursorLoader(
                     requireContext(),
                     buildUri(
+                        authority,
                         Dataset.TABLE_NAME,
                         args?.getString(Dataset.COLUMN_MODULE) ?: "",
                         args?.getLong(
@@ -101,6 +112,7 @@ class ObserversAndDateInputFragment : Fragment(),
                 LOADER_DEFAULT_NOMENCLATURE_VALUES -> CursorLoader(
                     requireContext(),
                     buildUri(
+                        authority,
                         NomenclatureType.TABLE_NAME,
                         args?.getString(Dataset.COLUMN_MODULE) ?: "",
                         "default"
@@ -120,10 +132,7 @@ class ObserversAndDateInputFragment : Fragment(),
         ) {
 
             if (data == null) {
-                Log.w(
-                    TAG,
-                    "Failed to load data from '${(loader as CursorLoader).uri}'"
-                )
+                Logger.warn { "failed to load data from '${(loader as CursorLoader).uri}'" }
 
                 return
             }
@@ -226,23 +235,6 @@ class ObserversAndDateInputFragment : Fragment(),
         }
     }
 
-    private val onCalendarSetListener = object : DatePickerDialogFragment.OnCalendarSetListener {
-        override fun onCalendarSet(calendar: Calendar) {
-            input?.date = calendar.time
-            inputDateActionView?.setItems(
-                listOf(
-                    Pair.create(
-                        DateFormat.format(
-                            getString(R.string.observers_and_date_date_format),
-                            calendar.time
-                        ).toString(),
-                        ""
-                    )
-                )
-            )
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -270,12 +262,6 @@ class ObserversAndDateInputFragment : Fragment(),
                     )
                 )
             }
-
-        val supportFragmentManager = activity?.supportFragmentManager ?: return
-
-        val dialogFragment =
-            supportFragmentManager.findFragmentByTag(DATE_PICKER_DIALOG_FRAGMENT) as DatePickerDialogFragment?
-        dialogFragment?.setOnCalendarSetListener(onCalendarSetListener)
     }
 
     override fun onCreateView(
@@ -325,9 +311,28 @@ class ObserversAndDateInputFragment : Fragment(),
         inputDateActionView?.setListener(object : ListItemActionView.OnListItemActionViewListener {
             override fun onAction() {
                 val supportFragmentManager = activity?.supportFragmentManager ?: return
-                val datePickerDialogFragment = DatePickerDialogFragment()
-                datePickerDialogFragment.setOnCalendarSetListener(onCalendarSetListener)
-                datePickerDialogFragment.show(
+
+                val datePicker =
+                    MaterialDatePicker.Builder.datePicker().setSelection(input?.date?.time)
+                        .setCalendarConstraints(
+                            CalendarConstraints.Builder()
+                                .setValidator(DateValidatorPointBackward.now()).build()
+                        ).build()
+                datePicker.addOnPositiveButtonClickListener {
+                    input?.date = Date(it)
+                    inputDateActionView?.setItems(
+                        listOf(
+                            Pair.create(
+                                DateFormat.format(
+                                    getString(R.string.observers_and_date_date_format),
+                                    Date(it)
+                                ).toString(),
+                                ""
+                            )
+                        )
+                    )
+                }
+                datePicker.show(
                     supportFragmentManager,
                     DATE_PICKER_DIALOG_FRAGMENT
                 )
@@ -520,7 +525,6 @@ class ObserversAndDateInputFragment : Fragment(),
 
     companion object {
 
-        private val TAG = ObserversAndDateInputFragment::class.java.name
         private const val DATE_PICKER_DIALOG_FRAGMENT = "date_picker_dialog_fragment"
         private const val LOADER_OBSERVERS_IDS = 1
         private const val LOADER_DATASET_ID = 2

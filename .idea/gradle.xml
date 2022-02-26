@@ -12,6 +12,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/commons" />
+            <option value="$PROJECT_DIR$/datasync" />
             <option value="$PROJECT_DIR$/maps" />
             <option value="$PROJECT_DIR$/mountpoint" />
             <option value="$PROJECT_DIR$/occtax" />

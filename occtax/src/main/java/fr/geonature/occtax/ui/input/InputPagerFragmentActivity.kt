@@ -5,10 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
+import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.maps.settings.MapSettings
 import fr.geonature.maps.ui.MapFragment
@@ -17,7 +17,6 @@ import fr.geonature.maps.util.ManageExternalStoragePermissionLifecycleObserver
 import fr.geonature.maps.util.MapSettingsPreferencesUtils.showCompass
 import fr.geonature.maps.util.MapSettingsPreferencesUtils.showScale
 import fr.geonature.maps.util.MapSettingsPreferencesUtils.showZoom
-import fr.geonature.occtax.MainApplication
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputViewModel
@@ -35,6 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import org.tinylog.kotlin.Logger
 import kotlin.coroutines.resume
 
 /**
@@ -42,10 +42,12 @@ import kotlin.coroutines.resume
  *
  * @author S. Grimault
  */
+@AndroidEntryPoint
 class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivity(),
     MapFragment.OnMapFragmentPermissionsListener {
 
-    private lateinit var inputViewModel: InputViewModel
+    private val inputViewModel: InputViewModel by viewModels()
+
     private lateinit var appSettings: AppSettings
     private lateinit var input: Input
 
@@ -73,8 +75,6 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
             Manifest.permission.ACCESS_FINE_LOCATION
         )
 
-        inputViewModel = configureInputViewModel()
-
         appSettings = intent.getParcelableExtra(EXTRA_APP_SETTINGS)!!
         input = intent.getParcelableExtra(EXTRA_INPUT) ?: Input()
         val lastAddedInputTaxon = input.getLastAddedInputTaxon()
@@ -83,10 +83,7 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
             input.setCurrentSelectedInputTaxonId(lastAddedInputTaxon.taxon.id)
         }
 
-        Log.i(
-            TAG,
-            "loading input: ${input.id}"
-        )
+        Logger.info { "loading input: ${input.id}" }
 
         CoroutineScope(Dispatchers.Main).launch {
             pagerManager.load(input.id)
@@ -175,14 +172,6 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
             }
         }
 
-    private fun configureInputViewModel(): InputViewModel {
-        return ViewModelProvider(
-            this,
-            fr.geonature.commons.input.InputViewModel.Factory { InputViewModel((application as MainApplication).sl.inputManager) }).get(
-            InputViewModel::class.java
-        )
-    }
-
     private fun getMapSettings(): MapSettings {
         return MapSettings.Builder.newInstance()
             .from(appSettings.mapSettings!!)
@@ -193,8 +182,6 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
     }
 
     companion object {
-
-        private val TAG = InputPagerFragmentActivity::class.java.name
 
         private const val EXTRA_APP_SETTINGS = "extra_app_settings"
         private const val EXTRA_INPUT = "extra_input"
