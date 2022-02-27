@@ -28,6 +28,7 @@
     <string name="home_input_created_at">Relevé du %s</string>
     <plurals name="home_input_taxa_count">
         <item quantity="one">%d taxon ajouté</item>
+        <item quantity="other">%d taxons ajoutés</item>
         <item quantity="many">%d taxons ajoutés</item>
     </plurals>
     <string name="home_input_taxa_count_empty">Aucun taxon ajouté</string>
@@ -47,6 +48,7 @@
     <string name="action_edit">Modifier</string>
     <plurals name="action_title_item_count_selected">
         <item quantity="one">%d sélectionné</item>
+        <item quantity="other">%d sélectionnés</item>
         <item quantity="many">%d sélectionnés</item>
     </plurals>
     <string name="action_save">Sauvegarder</string>
@@ -93,6 +95,7 @@
     <string name="observers_and_date_selected_observers">Observateurs</string>
     <plurals name="observers_and_date_selected_observers">
         <item quantity="one">%d observateur</item>
+        <item quantity="other">%d observateurs</item>
         <item quantity="many">%d observateurs</item>
     </plurals>
     <string name="observers_and_date_selected_observers_no_data">Aucun observateur sélectionné.\nAjouter en un via le bouton "Ajouter".</string>
@@ -102,6 +105,7 @@
 
     <plurals name="taxa_found">
         <item quantity="one">%d taxon trouvé</item>
+        <item quantity="other">%d taxons trouvés</item>
         <item quantity="many">%d taxons trouvés</item>
     </plurals>
 
@@ -118,14 +122,17 @@
 
     <plurals name="duration_year">
         <item quantity="one" tools:ignore="ImpliedQuantity">d\'un an</item>
+        <item quantity="other">de %d ans</item>
         <item quantity="many">de %d ans</item>
     </plurals>
     <plurals name="duration_month">
         <item quantity="one" tools:ignore="ImpliedQuantity">d\'un mois</item>
+        <item quantity="other">de %d mois</item>
         <item quantity="many">de %d mois</item>
     </plurals>
     <plurals name="duration_days">
         <item quantity="one" tools:ignore="ImpliedQuantity">d\'un jour</item>
+        <item quantity="other">de %d jours</item>
         <item quantity="many">de %d jours</item>
     </plurals>
 
@@ -149,6 +156,7 @@
     <string name="summary_taxon_information"><![CDATA[<b>%1$s :</b>]]> <![CDATA[<i>%2$s</i>]]></string>
     <plurals name="summary_taxon_counting">
         <item quantity="one">%d dénombrement</item>
+        <item quantity="other">%d dénombrements</item>
         <item quantity="many">%d dénombrements</item>
     </plurals>
     <string name="summary_taxon_counting_zero">aucun dénombrement</string>
