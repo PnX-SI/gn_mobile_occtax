@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.menu.MenuBuilder
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -208,12 +209,13 @@ class HomeActivity : AppCompatActivity() {
             }
 
             override fun showEmptyTextView(show: Boolean) {
+                if (show) fab?.extend() else fab?.shrink()
+                
                 if (inputEmptyTextView?.visibility == View.VISIBLE == show) {
                     return
                 }
 
                 if (show) {
-                    fab?.extend()
                     inputEmptyTextView?.startAnimation(
                         AnimationUtils.loadAnimation(
                             this@HomeActivity,
@@ -222,7 +224,6 @@ class HomeActivity : AppCompatActivity() {
                     )
                     inputEmptyTextView?.visibility = View.VISIBLE
                 } else {
-                    fab?.shrink()
                     inputEmptyTextView?.startAnimation(
                         AnimationUtils.loadAnimation(
                             this@HomeActivity,
@@ -289,6 +290,10 @@ class HomeActivity : AppCompatActivity() {
             R.menu.login,
             menu
         )
+
+        if (menu is MenuBuilder) {
+            menu.setOptionalIconsVisible(true)
+        }
 
         return true
     }

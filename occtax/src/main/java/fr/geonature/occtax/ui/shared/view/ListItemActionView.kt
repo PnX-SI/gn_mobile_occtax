@@ -117,7 +117,7 @@ open class ListItemActionView : ConstraintLayout {
         )
 
         if (listPreferredItemHeight > 0) {
-            recyclerView.layoutParams.height = visibleItems * listPreferredItemHeight.toInt()
+            recyclerView.layoutParams.height = visibleItems * (listPreferredItemHeight.toInt() + visibleItems)
         }
 
         typedArray.recycle()
@@ -146,7 +146,6 @@ open class ListItemActionView : ConstraintLayout {
 
         titleTextView = findViewById(android.R.id.title)
         recyclerView = findViewById(android.R.id.list)
-        recyclerView.setHasFixedSize(true)
         actionButton = findViewById(android.R.id.button1)
         actionButton.setOnClickListener { listener?.onAction() }
         emptyTextView = findViewById(android.R.id.empty)
@@ -170,13 +169,14 @@ open class ListItemActionView : ConstraintLayout {
         with(recyclerView) {
             layoutManager = LinearLayoutManager(context)
             adapter = this@ListItemActionView.adapter
+            setHasFixedSize(true)
+            addItemDecoration(
+                DividerItemDecoration(
+                    recyclerView.context,
+                    (layoutManager as LinearLayoutManager).orientation
+                )
+            )
         }
-
-        val dividerItemDecoration = DividerItemDecoration(
-            recyclerView.context,
-            (recyclerView.layoutManager as LinearLayoutManager).orientation
-        )
-        recyclerView.addItemDecoration(dividerItemDecoration)
 
         // load attributes
         val ta = context.obtainStyledAttributes(
