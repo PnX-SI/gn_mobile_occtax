@@ -1,0 +1,101 @@
+@startuml
+
+!theme bluegray
+
+skinparam componentStyle uml2
+skinparam backgroundColor transparent
+
+title **Architecture**
+
+frame "<&globe> GeoNature" as frame_gn {
+    database "Database" as db
+
+    component "<&cog> GeoNature" as comp_gn
+    component "<&cog> TaxHub" as comp_th
+
+    file "<&file> occtax.apk" as apk
+    note right: APK to download
+    file "<&document> settings.json" as json
+    note right: global applications\nsettings
+
+    apk -[hidden]- json
+
+    db <--> comp_gn
+    db <--> comp_th
+}
+
+interface "API" as i_api_gn
+interface "API" as i_api_th
+
+comp_gn -- i_api_gn
+comp_th -- i_api_th
+
+cloud "<&globe> Internet" as internet
+
+i_api_gn <..[#green]..> internet
+note left on link
+    * ""POST -> /api/auth/login""
+    * ""POST -> /api///{module}///releve""
+    * ""GET  -> /api/meta/datasets?fields=modules""
+    * ""GET  -> /api/users/menu///{id}//""
+    * ""GET  -> /api/synthese/color_taxon""
+    * ""GET  -> /api/nomenclatures/nomenclatures/taxonomy""
+    * ""GET  -> /api/gn_commons/t_mobile_apps""
+end note
+
+i_api_th <..[#green]..> internet
+note left on link
+    * ""GET -> /api/taxref/regnewithgroupe2""
+    * ""GET -> /api/taxref/allnamebylist///{id}//""
+end note
+
+frame "<&globe> Maps tiles providers" as tiles_providers {
+    component "<&layers> OpenStreetMap" as tp_osm
+    component "<&layers> OpenTopoMap" as tp_otm
+    component "<&layers> Some tiles provider" as tp_other
+
+    tp_osm -[hidden]- tp_otm
+    tp_otm -[hidden]- tp_other
+}
+
+tiles_providers -[hidden]left- frame_gn
+tiles_providers <.[#blue].> internet
+
+frame "<&phone> Android device" as device {
+    frame "Occtax-mobile" as frame_occtax {
+        component "<&puzzle-piece> commons" as gn_commons
+        component "<&puzzle-piece> datasync" as gn_datasync
+        component "<&puzzle-piece> maps" as gn_maps
+
+        internet <.[#green].> gn_datasync
+        internet .[#blue].> gn_maps
+    }
+
+    folder "<&hard-drive> local storage" as local_storage {
+        rectangle sd [
+            <&folder> Android
+            |_ <&folder> data
+              |_ <&folder> fr.geonature.occtax
+                |_ <&folder> databases
+                  |_ <&file> data.db
+                |_ <&folder> files
+                |_ <&folder> logs
+                |_ <&document> settings_occtax.json
+        ]
+    }
+    
+    note as note_local_storage
+        * ""databases/data.db"": local database
+        * ""files/"": inputs to synchronize folder
+        * ""logs/"": logs folder
+        * ""settings_occtax.json"": local settings
+    end note
+
+    note_local_storage . local_storage
+
+    frame_occtax .down.> sd
+}
+
+internet -[hidden]- device
+
+@enduml
