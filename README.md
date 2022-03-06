@@ -7,8 +7,8 @@ Based on [datasync module](https://github.com/PnX-SI/gn_mobile_core) to synchron
 
 ## Documentation
 
-- [Installation (in french)](https://github.com/PnX-SI/gn_mobile_occtax/blob/feature/v2/docs/installation-fr.adoc)
-- [User documentation (in french)](https://github.com/PnX-SI/gn_mobile_occtax/blob/master/docs/utilisation-fr.md)
+- [Installation (in french)](./docs/installation-fr.adoc)
+- [User documentation (in french)](./docs/utilisation-fr.md)
 
 ## Launcher icons
 
