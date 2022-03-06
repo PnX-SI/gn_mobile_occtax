@@ -1,0 +1,21 @@
+= Input workflow
+:authors: Sebastien Grimault
+:source-highlighter: pygments
+:pygments-style: github
+:icons: font
+:imagesdir: images/
+:sectnums:
+:toc:
+:toclevels: 4
+:gitplant: http://www.plantuml.com/plantuml/proxy?cache=no&fmt=svg&src=https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/feature/v2/docs/uml/
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+This document describe the input worflow within *_Occtax-mobile_* app.
+
+image::{gitplant}/input_workflow.puml[Input workflow]
