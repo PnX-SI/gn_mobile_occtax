@@ -326,4 +326,4 @@ adb logcat | findstr fr.geonature
 
 == Utilisation
 
-link:utilisation-fr.md[Documentation d'utilisation]
+link:utilisation-fr.adoc[Documentation d'utilisation]
