@@ -1,0 +1,323 @@
+= Installation
+:authors: Camille Monchicourt; Sebastien Grimault
+:source-highlighter: pygments
+:pygments-style: github
+:icons: font
+:sectnums:
+:toclevels: 4
+:toc:
+:toc-title: Sommaire
+:gitplant: http://www.plantuml.com/plantuml/proxy?cache=no&fmt=svg&src=https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/feature/v2/docs/uml/
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+== Introduction
+
+L'application *_Occtax-mobile_* est une application Android et interagit avec un serveur https://github.com/PnX-SI/GeoNature[GeoNature] (2.4.0 minimum) et https://github.com/PnX-SI/TaxHub[TaxHub] (1.7.0 minimum).
+
+Si vous souhaitez personnaliser l'application (nom, couleurs, icône), vous devez générer l'APK à partir des fichiers source comme détaillé dans la https://github.com/PnX-SI/gn_mobile_core/tree/master/docs[documentation de développement].
+
+Sinon vous pouvez utiliser les APKs fournies dans les fichiers (assets) de chaque release (aux couleurs de certains parcs nationaux ou la version générique verte et rouge).
+
+L'application __Occtax-mobile__ embarque le module https://github.com/PnX-SI/gn_mobile_core/tree/develop/datasync[__datasync__] qui gère notamment les données de GeoNature (observateurs, jeux de données, taxons, nomenclature, etc.) en faisant appel aux APIs de GeoNature.
+Toutes ces données sont stockées dans la base de données locale au format SQLite de l'application afin d'en disposer à tout moment et ainsi permettre un fonctionnement hors-ligne.
+Ce module permet aussi d'envoyer les données saisies sur le terminal mobile une fois que celui-ci dispose d'une connexion internet (wifi ou 4G).
+Ce module gère aussi la mise à jour automatique du fichier de configuration (à chaque démarrage de l'application), détecte et propose à l'utilisateur la mise à jour de l'application.
+
+== Pré-requis
+
+* Disposer de GeoNature et de TaxHub dans les versions compatibles avec la version d'*_Occtax-mobile_* que vous souhaitez installer.
+* Vos instances de GeoNature et TaxHub doivent être accessibles en HTTPS.
+
+image::{gitplant}/arch.puml[Architecture]
+
+[#installation-et-configuration-centralisees]
+=== Installation et configuration centralisées
+
+Il est nécessaire de gérer les fichiers de configuration, l'installation et la mise à jour des applications au niveau du serveur GeoNature.
+Voir https://github.com/PnX-SI/gn_mobile_core/issues/8[#8].
+
+L'application *_Occtax-mobile_* se chargera alors de récupérer automatiquement sur le serveur GeoNature la dernière version du fichier de configuration des applications et détectera les éventuelles mises à jour disponibles pour l'application.
+
+Pour cela, chargez l'APK de l'application *_Occtax-mobile_* ainsi que son fichier de configuration dans le fichier `settings.json` dans le dossier `/home/``whoami``/geonature/backend/static/mobile` du serveur GeoNature.
+
+Au préalable, Il faut créer un dossier par application, car les fichiers de configuration de chaque application ont le même nom (`settings.json`),
+
+Dans les commandes ci-dessous, remplacez `x.y.y` par le numéro (tag) de la version (release) utilisée.
+
+* *_Occtax-mobile_* : https://github.com/PnX-SI/gn_mobile_occtax/releases
+
+Sur votre serveur GeoNature, créer le sous-répertoire de l'application mobile *_Occtax-mobile_*.
+
+[source,shell]
+----
+cd /home/``whoami``/geonature/backend/static/mobile
+mkdir occtax
+----
+
+​Télécharger la version de *_Occtax-mobile_* souhaitée :
+
+[source,shell]
+----
+cd ../occtax
+wget https://github.com/PnX-SI/gn_mobile_occtax/releases/download/x.y.z/occtax-y.y.z-generic-release.apk
+----
+
+Créer le fichier de settings `settings.json` en suivant https://github.com/PnX-SI/gn_mobile_occtax#settings[la documentation] en fonction de la configuration de votre serveur GeoNature.
+
+Renseigner ensuite la table `gn_commons.t_mobile_apps` de la base de données.
+
+Pour trouver la valeur à renseigner dans le champs `version_code`, reportez-vous aux fichiers suivants en sélectionnant le tag de version où la branche que vous utilisez :
+
+https://github.com/PnX-SI/gn_mobile_occtax/blob/master/occtax/version.properties
+
+Ou avec l'outil `aapt` (`apt-get install aapt` pour l'installer), exécutez la commande `aapt dump badging applicationfile.apk | grep -Po "(?&lt;=\sversion(Code|Name)'=&#39;')([0-9.]+)"`.
+
+Exemple de contenu de la table `gn_commons.t_mobile_apps` :
+
+[source,csv]
+----
+1;"OCCTAX";"static/mobile/occtax/occtax-2.0.0-pne-debug.apk";"";"fr.geonature.occtax";"2555"
+----
+
+Le résultat peut être testé en interrogeant directement la route `&lt;URL_GEONATURE&gt;/api/gn_commons/t_mobile_apps` qui est celle utilisée par l'application *_Occtax-mobile_* pour faire les mises à jour.
+
+Installez ensuite l'application *_Occtax-mobile_* sur le terminal mobile.
+
+Récupérer le fichier APK de la version souhaitée dans la fichiers de la release (assets)
+
+Lancez l'application *_Occtax-mobile_* et déclarez l'URL de GeoNature et de TaxHub dans sa configuration (paramètres).
+
+Le module de synchronisation se chargera de récupérer le fichier de configuration puis de lancer automatiquement une première synchronisation des données de GeoNature après authentification.
+
+Si vous faites évoluer la configuration et/ou la version de l'application mobile sur le serveur GeoNature et dans la table `gn_commons.t_mobile_apps`, alors ils seront mis à jour sur le terminal mobile au prochain lancement de l'application *_Occtax-mobile_*.
+
+== Installation et configuration de l'application
+
+Le fichier de configuration `settings_occtax.json` de l'application peut être directement copié dans le répertoire `Android/data/fr.geonature.occtax` sur le stockage interne du terminal mobile ou récupéré automatiquement lors de la première synchronisation avec le serveur GeoNature configuré (cf. <<installation-et-configuration-centralisees,Installation et configuration centralisées>>).
+
+Dans tous les cas, l'installation et la configuration centralisée devront être mis en place pour que la synchronisation des données fonctionne.
+Le fichier de configuration sur le serveur écrasera celui sur le terminal à chaque lancement de l'application *_Occtax-mobile_*.
+
+* Détail des paramètres du fichier de configuration : https://github.com/PnX-SI/gn_mobile_occtax#settings
+
+Les paramètres `page_size` et `page_max_retry` permettent de paginer les appels aux routes renvoyant de nombreux résultats et ainsi les récupérer par lots (voir https://github.com/PnX-SI/gn_mobile_occtax/issues/37[#37]).
+
+Exemples des routes paginées :
+
+* `&lt;URL_TAXHUB&gt;/api/taxref/allnamebylist/100?limit=100&amp;offset=200` (pour renvoyer les noms des 100 taxons à partir du 200ième résultat des taxons de la liste 100)
+* `&lt;URL_GEONATURE&gt;/api/synthese/color_taxon?code_area_type=M10&amp;limit=10&amp;offset=20` (pour renvoyer 10 résultats à partir du vingtième résultat des couleurs des taxons pour les zonages de type Mailles de 10km)
+
+Ainsi la valeur du paramètre `page_size` multipliée par la valeur du paramètre `page_max_retry` doit être au moins égale au nombre total de résultats renvoyés par ces routes.
+
+Le comportement de la synchronisation consiste à appeler au maximum n fois (où n = `page_max_retry`) la route paginée tant que celle-ci retourne un tableau de valeurs non vides et que ce tableau a la même taille que `page_size`.
+
+Les conditions d'arrêt de l'interrogation de ces routes sont :
+
+* Nombre d'appels = `page_max_retry`
+* Tableau de valeurs vide
+* Taille du tableau de valeurs < `page_size`
+* Erreur 404
+
+Le paramètre `code_area_type` correspond au type de zonage de votre référentiel géographique de GeoNature (champs `type_code` de la table `ref_geo.bib_areas_types`) utilisé pour les unités géographiques.
+Voir https://github.com/PnX-SI/gn_mobile_core/issues/15[#15].
+
+Le paramètre `uh_application_id` permet de renseigner l'`id_application` de GeoNature dans sa table `utilisateurs.t_applications` pour l'authentification des utilisateurs et leurs droits.
+
+Le paramètre `observers_list_id` permet de renseigner l`id_liste` des observateurs d'Occtax dans la table `utilisateurs.t_listes`.
+
+Le paramètre `taxa_list_id` permet de renseigner l'`id_liste` des taxons saisissables dans Occtax dans la table `taxonomie.bib_listes`.
+
+Le paramètre `area_observation_duration` est lié aux couleurs des taxons dans chaque unités géographiques en fonction de la date de dernière observation du taxon dans l'unité géographique.
+
+Il correspond à la durée en jours définie dans la vue `gn_synthese.v_color_taxon_area` permettant d'ajuster à quelle fréquence un taxon change de couleur selon sa date de dernière observation dans l'unité géographique (plus d'un mois, plus d'un an, plus de 5 ans, etc.).
+
+Voir https://github.com/PnX-SI/GeoNature/issues/617[#617] et https://github.com/PnX-SI/gn_mobile_occtax/issues/50[#50] pour plus de détails.
+
+Pour la configuration de la partie cartographique (attribut `map` du fichier `settings_occtax.json`), se référer au https://github.com/PnX-SI/gn_mobile_maps/blob/develop/maps/README.md[README] du module *Maps*.
+
+Cette partie permet de définir l'affichage des outils cartographiques, le centrage l'étendue et les niveaux de zoom, mais aussi les fonds et couches cartographiques de l'application.
+
+Le module *Maps* s'appuie sur la bibliothèque https://github.com/osmdroid/osmdroid[osmdroid] et gère notamment les sources locales (https://github.com/osmdroid/osmdroid/wiki/Offline-Map-Tiles) pouvant être généré via les outils https://docs.qgis.org/3.10/fr/docs/user_manual/processing_algs/qgis/rastertools.html#generate-xyz-tiles-mbtiles[QGIS] (Traitements &gt; générer des tuiles XYZ), https://mobac.sourceforge.io[MOBAC] ou http://maperitive.net[Maperitive].
+
+Charger un fond de carte (`MBTiles`, les autres formats doivent aussi fonctionner) sur le terminal mobile et renseigner son chemin dans le paramètre `base_path`.
+
+La page _Paramètres_ de l'application *_Occtax-mobile_* indique les chemins absolus de la carte interne et éventuellement de la carte SD externe.
+
+Il n'est cependant pas obligatoire de préciser le chemin pour résoudre le chargement des fonds de carte.
+L'application va privilégier la carte SD externe (si présente) et à défaut la mémoire interne.
+Le paramètre `base_path` peut prendre un chemin absolu (pour une résolution rapide), un chemin relatif (selon le point de montage, par exemple `Android/data`) ou être omis.
+Dans ce dernier cas, la résolution sera plus lente car elle impliquera un scan complet des stockages du terminal mobile.
+
+NOTE: Sur Android 11 et supérieur, l'application *_Occtax-mobile_* nécessitera d'avoir les permissions pour gérer l'espace de stockage ceci afin de pouvoir déterminer automatiquement l'emplacement des fonds de carte sur le terminal.
+
+Il est possible de charger différents fonds cartographiques (Scan et Ortho par exemple) mais aussi d'afficher des couches vectorielles.
+
+On peut ajouter autant de couches vectorielles et pour chacune on peut appliquer des styles différents.
+Vous pouvez vous référer au https://github.com/PnX-SI/gn_mobile_maps/blob/develop/maps/README.md[README] du module *Maps* pour le paramétrage.
+
+Il est possible d'utiliser et d'afficher une couche vectorielle de polygones d'unités géographiques (mailles, habitats, zonages etc.).
+Cela permet d'afficher une couleur différente aux taxons de la liste selon la date de dernière observation dans l'unité où le relevé a été localisé (via synchronisation des données de la synthèse de GeoNature).
+Il est également possible de filtrer la liste des taxons selon ce critère.
+
+Pour cela, il est nécessaire de charger une couche vectorielle de polygones des unités géographiques en respectant quelques règles.
+
+La "couche" d'unités géographiques doit être issue des entités qui peuplent la table `ref_geo.l_areas`.
+
+Le code du type de zonage utilisé doit être renseigné dans le paramètre `code_area_type` du fichier `settings.json` de gn_mobile_core.
+Ce même code doit aussi être renseigné dans le paramètre `occtaxmobile_area_type`de la table `gn_commons.t_parameters`de la base de données de GeoNature.
+
+Par défaut, si aucune couche vectorielle n'est configurée, l'application va simplement charger la base des taxons sans les informations additionnelles venant des unités géographiques.
+
+* Exemple de fichier WKT : https://github.com/PnX-SI/gn_mobile_maps/blob/develop/maps/src/test/resources/fixtures/features.wkt
+* Exemple de configuration : https://github.com/PnX-SI/gn_mobile_maps/blob/develop/maps/src/test/resources/fixtures/map_settings.json
+
+Il est important que l'ID de chaque zone corresponde à ce que remonte GeoNature pour faire la correspondance.
+
+L'attribut `area_id` des données de la route `/geonature/api/synthese/color_taxon` correspond à l'identifiant présent dans la couche vectorielle.
+
+WARNING: Pour que les couleurs de taxons soient synchronisées sur l'ensemble des unités géographiques choisies, il est nécessaire d'adapter la pagination et le nombre de résultats renvoyés par les routes en tenant compte du nombre d'entités présentes dans la vue `gn_synthese.v_color_taxon_area`.
+Pour ce faire, modifiez le fichier `settings.json` de l'application de l'application *_Occtax-mobile_* directement coté GeoNature.
+L'application se chargera de le mettre à jour localement lors de son prochain redémarrage.
+
+Les couches vectorielles peuvent être au format `json`, `geojson` ou `wkt`:
+
+*WKT*:
+
+* Fichier texte au format CSV où chaque ligne comporte la description d'une géométrie au format WKT
+* La géométrie doit être encodée dans le SCR `WGS84:EPSG4326`
+* Le type de géométrie doit être `POLYGON` (et non `MULTIPOLYGON`)
+* L'extension du fichier doit être `.wkt` et le fichier ne doit pas contenir d'en-tête
+
+* Chaque ligne doit commencer par un identifiant puis, la géométrie ce qui donne ceci :
+ `
+  <id>,<geometry>;
+  ...
+`. Par exemple :
+
+[source,wkt]
+----
+110,POINT (-1.5487664937973022 47.21628889447996)
+108,POINT (-1.5407788753509521 47.241763083159455)
+----
+
+* dans le fichier au format WKT (chaîne de caractères), la géométrie ne doit pas être en guillemets (quotes). Exemple :
+
+[source,wkt]
+----
+660993,POLYGON (((6.73181863107186 45.7539143085928,6.74466771917198 45.7534881584565,6.74405801858532 45.7444934010459,6.73121101630907 45.7449194816323,6.73181863107186 45.7539143085928)))
+----
+
+*json, geojson*
+
+* Fichier texte au format JSON contenant un objet de type `FeatureCollection` ou un tableau d'objets de type `Feature`
+* La géométrie doit être encodée dans le SCR `WGS84:EPSG4326`
+* Chaque objet de type `Feature` doit comporter un identifiant (attribut `id`), en tant qu'attribut de cet objet ou en tant que propriété de cet objet. Par exemple :
+
+[source,json]
+----
+{
+  "id": 1234, <1>
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -1.5545135,
+      47.2256258
+    ]
+  },
+  "properties": {
+    "name": "Ile de Versailles"
+  }
+}
+----
+<1> identifiant de la géométrie
+
+[source,json]
+----
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -1.5545135,
+      47.2256258
+    ]
+  },
+  "properties": {
+    "id": 1234, <1>
+    "name": "Ile de Versailles"
+  }
+}
+----
+<1> identifiant de la géométrie
+
+== Serveur de démonstration
+
+Il est possible de tester l'application mobile en la connectant sur le https://demo.geonature.fr[serveur de démonstration].
+
+Pour cela, télécharger l'application *_Occtax-mobile_* et installez-la sur un terminal mobile.
+Renseignez dans ses paramètres l'URL du serveur de démo de GeoNature et TaxHub :
+
+* URL de GeoNature : https://demo.geonature.fr/geonature
+* URL de TaxHub : https://demo.geonature.fr/taxhub
+
+Authentifiez-vous avec l'utilisateur de démo (_admin_ / _admin_).
+L'application se chargera de télécharger le fichier de configuration puis lancera automatiquement une première synchronisation des données.
+
+Vous pouvez aussi utiliser les fichiers d'exemple de fond de carte et d'unités géographiques (mailles 10x10km), disponibles dans le dossier https://geonature.fr/data/maps/.
+À placer dans un répertoire `DCIM/maps` du stockage interne.
+
+== Logs
+
+Pour obtenir des logs de l'application mobile, on peut soit utiliser l'utilitaire `adb` (https://developer.android.com/studio/command-line/adb[Android Debug Bridge], il est intégré au kit de développement d'https://developer.android.com/studio#downloads[Android Studio] mais peut aussi être installé à part) ou les récupérer directement dans le répertoire des logs de l'application.
+
+=== adb
+
+*Sous Linux :*
+
+[source,sh]
+----
+sudo apt-get install android-tools-adb
+----
+
+Sous Windows, vous pouvez installer le petit logiciel Minimal ADB and Fastboot (https://forum.xda-developers.com/showthread.php?t=2317790).
+
+Pour en savoir plus : https://www.frandroid.com/android/rom-custom-2/403222_comment-telecharger-les-outils-adb-et-fastboot-sur-windows-macos-et-linux
+
+Activer le _Débogage USB_ dans les options développeur de votre terminal mobile et connectez-le en USB à votre PC.
+
+Sous Linux, dans le terminal ou sous Windows dans le terminal de Minimal ADB, lancer la commande permettant les appareils mobiles connectés :
+
+[source,shell]
+----
+adb devices
+----
+
+Cette commande doit lister votre appareil mobile si celui-ci est bien détecté.
+Il peut être nécessaire d'autoriser la connexion sur l'appareil mobile.
+
+Pour obtenir les logs liés à l'application *_Occtax-mobile_*, exécutez la commande :
+
+*Sous Linux :*
+
+[source,shell]
+----
+adb logcat | grep fr.geonature
+----
+
+*Sous Windows :*
+
+[source,shell]
+----
+adb logcat | findstr fr.geonature
+----
+
+== Utilisation
+
+Documentation d'utilisation : https://github.com/PnX-SI/gn_mobile_occtax/blob/master/docs/utilisation-fr.md
