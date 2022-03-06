@@ -40,7 +40,7 @@ image::{gitplant}/arch.puml[Architecture]
 === Installation et configuration centralisées
 
 Il est nécessaire de gérer les fichiers de configuration, l'installation et la mise à jour des applications au niveau du serveur GeoNature.
-Voir https://github.com/PnX-SI/gn_mobile_core/issues/8[#8].
+Voir https://github.com/PnX-SI/gn_mobile_core/issues/8[PnX-SI/gn_mobile_core#8].
 
 L'application *_Occtax-mobile_* se chargera alors de récupérer automatiquement sur le serveur GeoNature la dernière version du fichier de configuration des applications et détectera les éventuelles mises à jour disponibles pour l'application.
 
@@ -125,7 +125,7 @@ Les conditions d'arrêt de l'interrogation de ces routes sont :
 * Erreur 404
 
 Le paramètre `code_area_type` correspond au type de zonage de votre référentiel géographique de GeoNature (champs `type_code` de la table `ref_geo.bib_areas_types`) utilisé pour les unités géographiques.
-Voir https://github.com/PnX-SI/gn_mobile_core/issues/15[#15].
+Voir https://github.com/PnX-SI/gn_mobile_core/issues/15[PnX-SI/gn_mobile_core#15].
 
 Le paramètre `uh_application_id` permet de renseigner l'`id_application` de GeoNature dans sa table `utilisateurs.t_applications` pour l'authentification des utilisateurs et leurs droits.
 
@@ -137,7 +137,7 @@ Le paramètre `area_observation_duration` est lié aux couleurs des taxons dans 
 
 Il correspond à la durée en jours définie dans la vue `gn_synthese.v_color_taxon_area` permettant d'ajuster à quelle fréquence un taxon change de couleur selon sa date de dernière observation dans l'unité géographique (plus d'un mois, plus d'un an, plus de 5 ans, etc.).
 
-Voir https://github.com/PnX-SI/GeoNature/issues/617[#617] et https://github.com/PnX-SI/gn_mobile_occtax/issues/50[#50] pour plus de détails.
+Voir https://github.com/PnX-SI/GeoNature/issues/617[PnX-SI/GeoNature#617] et https://github.com/PnX-SI/gn_mobile_occtax/issues/50[#50] pour plus de détails.
 
 Pour la configuration de la partie cartographique (attribut `map` du fichier `settings_occtax.json`), se référer au https://github.com/PnX-SI/gn_mobile_maps/blob/develop/maps/README.md[README] du module *Maps*.
 
@@ -154,7 +154,7 @@ L'application va privilégier la carte SD externe (si présente) et à défaut l
 Le paramètre `base_path` peut prendre un chemin absolu (pour une résolution rapide), un chemin relatif (selon le point de montage, par exemple `Android/data`) ou être omis.
 Dans ce dernier cas, la résolution sera plus lente car elle impliquera un scan complet des stockages du terminal mobile.
 
-NOTE: Sur Android 11 et supérieur, l'application *_Occtax-mobile_* nécessitera d'avoir les permissions pour gérer l'espace de stockage ceci afin de pouvoir déterminer automatiquement l'emplacement des fonds de carte sur le terminal.
+NOTE: Sur Android 11 et supérieur, l'application *_Occtax-mobile_* nécessitera d'avoir les permissions pour gérer l'espace de stockage ceci afin de pouvoir déterminer automatiquement l'emplacement des fonds de carte sur le terminal (cf. https://github.com/PnX-SI/gn_mobile_maps/issues/7[PnX-SI/gn_mobile_maps#7]).
 
 Il est possible de charger différents fonds cartographiques (Scan et Ortho par exemple) mais aussi d'afficher des couches vectorielles.
 
@@ -320,4 +320,4 @@ adb logcat | findstr fr.geonature
 
 == Utilisation
 
-Documentation d'utilisation : https://github.com/PnX-SI/gn_mobile_occtax/blob/master/docs/utilisation-fr.md
+link:utilisation-fr.md[Documentation d'utilisation]
