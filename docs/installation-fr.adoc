@@ -3,9 +3,10 @@
 :source-highlighter: pygments
 :pygments-style: github
 :icons: font
+:imagesdir: images/
 :sectnums:
-:toclevels: 4
 :toc:
+:toclevels: 4
 :toc-title: Sommaire
 :gitplant: http://www.plantuml.com/plantuml/proxy?cache=no&fmt=svg&src=https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/feature/v2/docs/uml/
 ifdef::env-github[]
@@ -154,7 +155,12 @@ L'application va privilégier la carte SD externe (si présente) et à défaut l
 Le paramètre `base_path` peut prendre un chemin absolu (pour une résolution rapide), un chemin relatif (selon le point de montage, par exemple `Android/data`) ou être omis.
 Dans ce dernier cas, la résolution sera plus lente car elle impliquera un scan complet des stockages du terminal mobile.
 
-NOTE: Sur Android 11 et supérieur, l'application *_Occtax-mobile_* nécessitera d'avoir les permissions pour gérer l'espace de stockage ceci afin de pouvoir déterminer automatiquement l'emplacement des fonds de carte sur le terminal (cf. https://github.com/PnX-SI/gn_mobile_maps/issues/7[PnX-SI/gn_mobile_maps#7]).
+[NOTE]
+====
+Sur Android 11 et supérieur, l'application *_Occtax-mobile_* nécessitera d'avoir les permissions pour gérer l'espace de stockage ceci afin de pouvoir déterminer automatiquement l'emplacement des fonds de carte sur le terminal (cf. https://github.com/PnX-SI/gn_mobile_maps/issues/7[PnX-SI/gn_mobile_maps#7]).
+
+image::manage_external_storage.png[title=Demande d'accès à tous les fichiers,width=256]
+====
 
 Il est possible de charger différents fonds cartographiques (Scan et Ortho par exemple) mais aussi d'afficher des couches vectorielles.
 
