@@ -100,27 +100,24 @@ Si vous faites évoluer la configuration et/ou la version de l'application mobil
 
 == Installation et configuration de l'application
 
-Le fichier de configuration `settings_occtax.json` de l'application peut être directement copié dans le répertoire `Android/data/fr.geonature.occtax` sur le stockage interne du terminal mobile ou récupéré automatiquement lors de la première synchronisation avec le serveur GeoNature configuré (cf. <<installation-et-configuration-centralisees,Installation et configuration centralisées>>).
+Le fichier de configuration `settings.json` de l'application peut être directement copié dans le répertoire `Android/data/fr.geonature.occtax` sur le stockage interne du terminal mobile ou récupéré automatiquement lors de la première synchronisation avec le serveur GeoNature configuré (cf. <<installation-et-configuration-centralisees,Installation et configuration centralisées>>).
 
 Dans tous les cas, l'installation et la configuration centralisée devront être mis en place pour que la synchronisation des données fonctionne.
 Le fichier de configuration sur le serveur écrasera celui sur le terminal à chaque lancement de l'application *_Occtax-mobile_*.
 
 * Détail des paramètres du fichier de configuration : https://github.com/PnX-SI/gn_mobile_occtax#settings
 
-Les paramètres `page_size` et `page_max_retry` permettent de paginer les appels aux routes renvoyant de nombreux résultats et ainsi les récupérer par lots (voir https://github.com/PnX-SI/gn_mobile_occtax/issues/37[#37]).
+Le paramètre `page_size` permettent de paginer les appels aux routes renvoyant de nombreux résultats et ainsi les récupérer par lots (voir https://github.com/PnX-SI/gn_mobile_occtax/issues/37[#37]).
 
 Exemples des routes paginées :
 
 * `&lt;URL_TAXHUB&gt;/api/taxref/allnamebylist/100?limit=100&amp;offset=200` (pour renvoyer les noms des 100 taxons à partir du 200ième résultat des taxons de la liste 100)
 * `&lt;URL_GEONATURE&gt;/api/synthese/color_taxon?code_area_type=M10&amp;limit=10&amp;offset=20` (pour renvoyer 10 résultats à partir du vingtième résultat des couleurs des taxons pour les zonages de type Mailles de 10km)
 
-Ainsi la valeur du paramètre `page_size` multipliée par la valeur du paramètre `page_max_retry` doit être au moins égale au nombre total de résultats renvoyés par ces routes.
-
-Le comportement de la synchronisation consiste à appeler au maximum n fois (où n = `page_max_retry`) la route paginée tant que celle-ci retourne un tableau de valeurs non vides et que ce tableau a la même taille que `page_size`.
+Le comportement de la synchronisation consiste à appeler au maximum n fois la route paginée tant que celle-ci retourne un tableau de valeurs non vides et que ce tableau a la même taille que `page_size`.
 
 Les conditions d'arrêt de l'interrogation de ces routes sont :
 
-* Nombre d'appels = `page_max_retry`
 * Tableau de valeurs vide
 * Taille du tableau de valeurs < `page_size`
 * Erreur 404
@@ -128,7 +125,7 @@ Les conditions d'arrêt de l'interrogation de ces routes sont :
 Le paramètre `code_area_type` correspond au type de zonage de votre référentiel géographique de GeoNature (champs `type_code` de la table `ref_geo.bib_areas_types`) utilisé pour les unités géographiques.
 Voir https://github.com/PnX-SI/gn_mobile_core/issues/15[PnX-SI/gn_mobile_core#15].
 
-Le paramètre `uh_application_id` permet de renseigner l'`id_application` de GeoNature dans sa table `utilisateurs.t_applications` pour l'authentification des utilisateurs et leurs droits.
+Le paramètre `uh_application_id` permet de renseigner l'`id_application` de GeoNature dans la table `utilisateurs.t_applications` pour l'authentification des utilisateurs et leurs droits.
 
 Le paramètre `observers_list_id` permet de renseigner l`id_liste` des observateurs d'Occtax dans la table `utilisateurs.t_listes`.
 
@@ -140,7 +137,7 @@ Il correspond à la durée en jours définie dans la vue `gn_synthese.v_color_ta
 
 Voir https://github.com/PnX-SI/GeoNature/issues/617[PnX-SI/GeoNature#617] et https://github.com/PnX-SI/gn_mobile_occtax/issues/50[#50] pour plus de détails.
 
-Pour la configuration de la partie cartographique (attribut `map` du fichier `settings_occtax.json`), se référer au https://github.com/PnX-SI/gn_mobile_maps/blob/develop/maps/README.md[README] du module *Maps*.
+Pour la configuration de la partie cartographique (attribut `map` du fichier `settings.json`), se référer au https://github.com/PnX-SI/gn_mobile_maps/blob/develop/maps/README.md[README] du module *Maps*.
 
 Cette partie permet de définir l'affichage des outils cartographiques, le centrage l'étendue et les niveaux de zoom, mais aussi les fonds et couches cartographiques de l'application.
 
@@ -157,7 +154,7 @@ Dans ce dernier cas, la résolution sera plus lente car elle impliquera un scan 
 
 [NOTE]
 ====
-Sur Android 11 et supérieur, l'application *_Occtax-mobile_* nécessitera d'avoir les permissions pour gérer l'espace de stockage ceci afin de pouvoir déterminer automatiquement l'emplacement des fonds de carte sur le terminal (cf. https://github.com/PnX-SI/gn_mobile_maps/issues/7[PnX-SI/gn_mobile_maps#7]).
+Sur Android 11 et supérieur, l'application *_Occtax-mobile_* nécessitera d'avoir les permissions pour gérer l'espace de stockage, ceci afin de pouvoir déterminer automatiquement l'emplacement des fonds de carte sur le terminal (cf. https://github.com/PnX-SI/gn_mobile_maps/issues/7[PnX-SI/gn_mobile_maps#7]).
 
 image::manage_external_storage.png[title=Demande d'accès à tous les fichiers,width=256]
 ====
