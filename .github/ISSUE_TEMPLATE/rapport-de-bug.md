@@ -2,7 +2,7 @@
 name: Rapport de bug
 about: Un rapport de bug pour nous aider à le corriger.
 title: ''
-labels: :bug: bug
+labels: bug
 assignees: ''
 
 ---
