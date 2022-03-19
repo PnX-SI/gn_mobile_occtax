@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0 (unreleased)
+## [2.0.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.0.0) (2022-03-19, pre-release)
 
 ### 🚀 Nouveautés
 
@@ -11,6 +11,8 @@
 ### 🐛 Corrections
 
 ### ⚠️ Notes de version
+
+* Code de version : 2560
 
 *Coté serveur pour les administrateurs :*
 
