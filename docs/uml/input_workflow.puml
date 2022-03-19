@@ -1,0 +1,178 @@
+@startuml
+
+!theme bluegray
+
+skinparam componentStyle uml2
+skinparam backgroundColor transparent
+
+title **Input workflow**
+
+participant "input" as occtax_input << module >>
+participant "data" as sync << provider >>
+
+activate occtax_input
+
+occtax_input -> occtax_input : initialize input
+note left
+  **input:**
+  {
+    "id": <generated_id>,
+    "module": "occtax",
+    ...
+  }
+end note
+
+group Step 1: Observers & date
+  occtax_input -> sync ++ : **query** : ""/observers""
+  sync -> occtax_input -- : ""[InputObserver]""
+  occtax_input -> occtax_input : set logged in observer
+  occtax_input -> occtax_input : set selected observers
+  occtax_input -> occtax_input : set input date
+
+  alt Save input
+    occtax_input -> occtax_input : save input
+    occtax_input -> occtax_input : redirect to home page
+  end
+
+end
+
+group Step 2: Location
+  occtax_input -> occtax_input : set taxon location
+
+  alt Save input
+    occtax_input -> occtax_input : save input
+    occtax_input -> occtax_input : redirect to home page
+  end
+
+end
+
+group Step 3: Taxon
+  occtax_input -> sync ++ : **query** : ""/taxa""
+  sync -> occtax_input -- : ""[Taxon]""
+  occtax_input -> occtax_input : set selected taxon
+
+  alt Save input
+    occtax_input -> occtax_input : save input
+    occtax_input -> occtax_input : redirect to home page
+  end
+
+end
+
+group Step 4: Informations
+
+  occtax_input -> occtax_input : read properties settings
+  note left
+  [
+    {
+      "key": "STATUT_BIO",
+      "visible": true,
+      "default": false
+    },
+    ...
+  ]
+  end note
+
+  occtax_input -> sync ++ : **query** : ""/nomenclature_types""
+  sync -> occtax_input -- : ""[NomenclatureType]""
+
+  occtax_input -> sync ++ : **query** : ""/nomenclature_types/occtax/default""
+  sync -> occtax_input -- : ""[DefaultNomenclatureWithType]""
+
+  group Step 4.1: Observation
+    occtax_input -> occtax_input : set observation method
+  end
+
+  group Step 4.2: Biological state
+    occtax_input -> occtax_input : set biological state
+  end
+
+  group Step 4.3: Determination
+    occtax_input -> occtax_input : set determination method
+  end
+
+  group Step 4.4: Naturalness
+    occtax_input -> occtax_input : set naturalness
+  end
+
+  ...
+
+  alt Save input
+    occtax_input -> occtax_input : save input
+    occtax_input -> occtax_input : redirect to home page
+  end
+
+end
+
+group Step 5: Counting
+
+  alt Add counting step if no one was defined
+    occtax_input -> occtax_input : add counting step
+  end
+
+  loop Add counting step
+
+    occtax_input -> occtax_input : add counting step
+
+    occtax_input -> occtax_input : read properties settings
+    note left
+    [
+      "STADE_VIE",
+      "SEXE",
+      "OBJ_DENBR",
+      "TYP_DENBR",
+      MIN,
+      MAX
+    ]
+    end note
+
+    occtax_input -> sync ++ : **query** : ""/nomenclature_types""
+    sync -> occtax_input -- : ""[NomenclatureType]""
+
+    occtax_input -> sync ++ : **query** : ""/nomenclature_types/occtax/default""
+    sync -> occtax_input -- : ""[DefaultNomenclatureWithType]""
+
+    group 5.1: Life status
+      occtax_input -> occtax_input : set life status
+    end
+
+    group 5.2: Sex
+      occtax_input -> occtax_input : set life status
+    end
+
+    ...
+
+  end
+
+  alt Save input
+    occtax_input -> occtax_input : save input
+    occtax_input -> occtax_input : redirect to home page
+  end
+
+end
+
+group Step 6: Report
+
+  alt Add taxon
+    occtax_input -> occtax_input : redirect to **Step 3**
+  end
+
+  alt Edit taxon
+    occtax_input -> occtax_input : edit selected taxon
+  end
+
+  alt Save input
+    occtax_input -> occtax_input : save input
+    occtax_input -> occtax_input : redirect to home page
+  end
+
+  alt Export input
+    occtax_input -> occtax_input : save input to //input_occtax_<id>.json//
+    occtax_input -> occtax_input : delete saved input
+    occtax_input -> occtax_input : redirect to home page
+  end
+
+end
+
+deactivate occtax_input
+
+@enduml

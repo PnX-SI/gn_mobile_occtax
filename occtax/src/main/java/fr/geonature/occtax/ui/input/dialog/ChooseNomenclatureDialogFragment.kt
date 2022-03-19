@@ -3,7 +3,6 @@ package fr.geonature.occtax.ui.input.dialog
 import android.app.Dialog
 import android.database.Cursor
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
@@ -13,19 +12,28 @@ import androidx.loader.content.Loader
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
+import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.NomenclatureType
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.commons.data.helper.Provider.buildUri
+import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.occtax.R
+import org.tinylog.kotlin.Logger
 import java.util.Locale
+import javax.inject.Inject
 
 /**
  * [DialogFragment] to let the user to choose a nomenclature value for a given [NomenclatureType].
  *
  * @author S. Grimault
  */
+@AndroidEntryPoint
 class ChooseNomenclatureDialogFragment : DialogFragment() {
+
+    @ContentProviderAuthority
+    @Inject
+    lateinit var authority: String
 
     private var listener: OnChooseNomenclatureDialogFragmentListener? = null
     private var adapter: NomenclatureRecyclerViewAdapter? = null
@@ -50,6 +58,7 @@ class ChooseNomenclatureDialogFragment : DialogFragment() {
                     CursorLoader(
                         requireContext(),
                         buildUri(
+                            authority,
                             NomenclatureType.TABLE_NAME,
                             nomenclatureType,
                             "items",
@@ -71,10 +80,7 @@ class ChooseNomenclatureDialogFragment : DialogFragment() {
             data: Cursor?
         ) {
             if (data == null) {
-                Log.w(
-                    TAG,
-                    "Failed to load data from '${(loader as CursorLoader).uri}'"
-                )
+                Logger.warn { "failed to load data from '${(loader as CursorLoader).uri}'" }
 
                 return
             }
@@ -190,7 +196,6 @@ class ChooseNomenclatureDialogFragment : DialogFragment() {
     }
 
     companion object {
-        private val TAG = ChooseNomenclatureDialogFragment::class.java.name
 
         const val ARG_NOMENCLATURE_TYPE = "arg_nomenclature_type"
         const val ARG_TAXONOMY = "arg_taxonomy"

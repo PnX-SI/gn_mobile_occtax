@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.occtax.settings.AppSettings
 
 /**
@@ -13,8 +14,9 @@ import fr.geonature.occtax.settings.AppSettings
  *
  * @see TaxaFilterFragment
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
+@AndroidEntryPoint
 class TaxaFilterActivity : AppCompatActivity(), TaxaFilterFragment.OnTaxaFilterFragmentListener {
 
     private val selectedFilters: MutableList<Filter<*>> = mutableListOf()

@@ -12,6 +12,14 @@
     <string name="preference_category_permissions">Permissions</string>
     <string name="preference_category_permissions_configure">Manage permissions</string>
     <string name="preference_category_permissions_configure_key" translatable="false">permissions</string>
+    <string name="preference_category_notifications">Notifications</string>
+    <string name="preference_category_notifications_configure">Manage notifications</string>
+    <string name="preference_category_notifications_configure_key" translatable="false">notifications_configure</string>
+    <string name="preference_category_storage">Storage</string>
+    <string name="preference_category_storage_internal">Internal storage</string>
+    <string name="preference_category_storage_internal_key" translatable="false">storage_internal</string>
+    <string name="preference_category_storage_external">External storage</string>
+    <string name="preference_category_storage_external_key" translatable="false">storage_external</string>
     <string name="preference_category_about">About</string>
     <string name="preference_category_about_app_version_key" translatable="false">app_version</string>
     <string name="preference_category_about_app_version">App version</string>

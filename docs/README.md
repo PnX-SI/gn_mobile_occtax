@@ -1,5 +1,9 @@
 ## Install required dependencies
 
+```bash
+sudo apt install -y ruby ruby-dev graphviz
+```
+
 You have to install [bundler](https://bundler.io) first if needed:
 
 ```bash

@@ -11,6 +11,11 @@
     <color name="grey_200">#eeeeee</color>
     <color name="grey_300">#e0e0e0</color>
 
+    <color name="datasync_status_ok">#689F38</color>
+    <color name="datasync_status_ko">#D32F2F</color>
+    <color name="datasync_status_pending">#FFA000</color>
+    <color name="datasync_status_unknown">#CCC</color>
+
     <color name="area_observation_more_than_duration">#f00</color>
     <color name="area_observation_less_than_duration">#808080</color>
     <color name="area_observation_none">#fff</color>

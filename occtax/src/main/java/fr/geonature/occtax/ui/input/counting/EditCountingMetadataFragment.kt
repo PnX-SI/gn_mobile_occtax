@@ -3,7 +3,6 @@ package fr.geonature.occtax.ui.input.counting
 import android.content.Context
 import android.database.Cursor
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,13 +13,15 @@ import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
+import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.entity.DefaultNomenclature
 import fr.geonature.commons.data.entity.DefaultNomenclatureWithType
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.NomenclatureType
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.commons.data.helper.Provider.buildUri
+import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
@@ -28,14 +29,21 @@ import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.PropertyValue
 import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.input.dialog.ChooseNomenclatureDialogFragment
+import org.tinylog.kotlin.Logger
+import javax.inject.Inject
 
 /**
  * [Fragment] to let the user to edit additional counting information for the given [Input].
  *
  * @author S. Grimault
  */
+@AndroidEntryPoint
 class EditCountingMetadataFragment : Fragment(),
     ChooseNomenclatureDialogFragment.OnChooseNomenclatureDialogFragmentListener {
+
+    @ContentProviderAuthority
+    @Inject
+    lateinit var authority: String
 
     private var listener: OnEditCountingMetadataFragmentListener? = null
     private var adapter: NomenclatureTypesRecyclerViewAdapter? = null
@@ -50,7 +58,10 @@ class EditCountingMetadataFragment : Fragment(),
             return when (id) {
                 LOADER_NOMENCLATURE_TYPES -> CursorLoader(
                     requireContext(),
-                    buildUri(NomenclatureType.TABLE_NAME),
+                    buildUri(
+                        authority,
+                        NomenclatureType.TABLE_NAME
+                    ),
                     null,
                     null,
                     null,
@@ -59,6 +70,7 @@ class EditCountingMetadataFragment : Fragment(),
                 LOADER_DEFAULT_NOMENCLATURE_VALUES -> CursorLoader(
                     requireContext(),
                     buildUri(
+                        authority,
                         NomenclatureType.TABLE_NAME,
                         args?.getString(Dataset.COLUMN_MODULE) ?: "",
                         "default"
@@ -77,10 +89,7 @@ class EditCountingMetadataFragment : Fragment(),
             data: Cursor?
         ) {
             if (data == null) {
-                Log.w(
-                    TAG,
-                    "Failed to load data from '${(loader as CursorLoader).uri}'"
-                )
+                Logger.warn { "failed to load data from '${(loader as CursorLoader).uri}'" }
 
                 return
             }
@@ -261,7 +270,6 @@ class EditCountingMetadataFragment : Fragment(),
     }
 
     companion object {
-        private val TAG = EditCountingMetadataFragment::class.java.name
 
         const val ARG_TAXONOMY = "arg_taxonomy"
         const val ARG_COUNTING_METADATA = "arg_counting_metadata"

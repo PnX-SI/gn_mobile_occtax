@@ -3,21 +3,24 @@ package fr.geonature.occtax.settings
 import android.os.Parcel
 import android.os.Parcelable
 import fr.geonature.commons.settings.IAppSettings
+import fr.geonature.datasync.settings.DataSyncSettings
 import fr.geonature.maps.settings.MapSettings
 
 /**
  * Global internal settings.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 data class AppSettings(
     var areaObservationDuration: Int = DEFAULT_AREA_OBSERVATION_DURATION,
+    var dataSyncSettings: DataSyncSettings? = null,
     var mapSettings: MapSettings? = null,
     var nomenclatureSettings: NomenclatureSettings? = null
 ) : IAppSettings {
 
     private constructor(source: Parcel) : this(
         source.readInt(),
+        source.readParcelable(DataSyncSettings::class.java.classLoader) as DataSyncSettings?,
         source.readParcelable(MapSettings::class.java.classLoader) as MapSettings?,
         source.readParcelable(NomenclatureSettings::class.java.classLoader) as NomenclatureSettings?
     )
@@ -32,6 +35,10 @@ data class AppSettings(
     ) {
         dest?.also {
             it.writeInt(areaObservationDuration)
+            it.writeParcelable(
+                dataSyncSettings,
+                0
+            )
             it.writeParcelable(
                 mapSettings,
                 0
@@ -48,6 +55,7 @@ data class AppSettings(
         if (other !is AppSettings) return false
 
         if (areaObservationDuration != other.areaObservationDuration) return false
+        if (dataSyncSettings != other.dataSyncSettings) return false
         if (mapSettings != other.mapSettings) return false
         if (nomenclatureSettings != other.nomenclatureSettings) return false
 
@@ -56,8 +64,9 @@ data class AppSettings(
 
     override fun hashCode(): Int {
         var result = areaObservationDuration
-        result = 31 * result + (mapSettings?.hashCode() ?: 0)
-        result = 31 * result + (nomenclatureSettings?.hashCode() ?: 0)
+        result = 31 * result + (dataSyncSettings.hashCode())
+        result = 31 * result + (mapSettings.hashCode())
+        result = 31 * result + (nomenclatureSettings.hashCode())
 
         return result
     }

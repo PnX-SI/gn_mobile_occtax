@@ -1,13 +1,16 @@
 # Occtax-mobile
 
-GeoNature Android mobile application for *Occtax* GeoNature module.
+GeoNature Android mobile application for _Occtax_ GeoNature module.
 
-Based on [Sync-mobile](https://github.com/PnX-SI/gn_mobile_core) to synchronize data and [Maps-mobile](https://github.com/PnX-SI/gn_mobile_maps) as map module.
+Based on [datasync module](https://github.com/PnX-SI/gn_mobile_core) to synchronize data and
+[maps module](https://github.com/PnX-SI/gn_mobile_maps) to show maps data.
 
-**Documentation :**
+## Documentation
 
-- Installation (in french): https://github.com/PnX-SI/gn_mobile_occtax/blob/master/docs/installation-fr.md
-- User documentation (in french): https://github.com/PnX-SI/gn_mobile_occtax/blob/master/docs/utilisation-fr.md
+- [Installation (in french)](./docs/installation-fr.adoc)
+- [User documentation (in french)](./docs/utilisation-fr.adoc)
+- [Data synchronization workflow](https://github.com/PnX-SI/gn_mobile_core/blob/develop/docs/data_sync.adoc)
+- [Input workflow](./docs/input_workflow.adoc)
 
 ## Launcher icons
 
@@ -27,6 +30,15 @@ Example:
 ```json
 {
   "area_observation_duration": 365,
+  "sync": {
+    "geonature_url": "https://demo.geonature/geonature",
+    "taxhub_url": "https://demo.geonature/taxhub",
+    "uh_application_id": 3,
+    "observers_list_id": 1,
+    "taxa_list_id": 100,
+    "code_area_type": "M1",
+    "page_size": 10000
+  },
   "map": {
     "show_scale": true,
     "show_compass": true,
@@ -51,13 +63,14 @@ Example:
 
 ### Parameters description
 
-| Parameter                   | UI      | Description                                                                    | Default value |
-| --------------------------- | ------- | ------------------------------------------------------------------------------ | ------------- |
-| `area_observation_duration` | &#9744; | Area observation duration period (in days)                                     | 365           |
-| `map`                       | &#9744; | Maps settings (cf. https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps) |               |
-| `nomenclature`              | &#9744; | Nomenclature settings                                                          |               |
-| `nomenclature/information`  | &#9744; | Information settings (as array)                                                |               |
-| `nomenclature/counting`     | &#9744; | Counting settings (as array)                                                   |               |
+| Parameter                   | UI      | Description                                                                                        | Default value |
+| --------------------------- | ------- | -------------------------------------------------------------------------------------------------- | ------------- |
+| `area_observation_duration` | &#9744; | Area observation duration period (in days)                                                         | 365           |
+| `sync`                      | &#9744; | Data synchronization settings (cf. https://github.com/PnX-SI/gn_mobile_core/tree/develop/datasync) |               |
+| `map`                       | &#9744; | Maps settings (cf. https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps)                     |               |
+| `nomenclature`              | &#9744; | Nomenclature settings                                                                              |               |
+| `nomenclature/information`  | &#9744; | Information settings (as array)                                                                    |               |
+| `nomenclature/counting`     | &#9744; | Counting settings (as array)                                                                       |               |
 
 #### Nomenclature settings
 
@@ -195,6 +208,7 @@ Do **NOT** modify directly any git sub modules (e.g. `commons`, `mountpoint`, `v
 Any changes should be made from each underlying git repository:
 
 - `commons`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
+- `datasync`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
 - `mountpoint`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
 - `viewpager`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
 - `maps`: [gn_mobile_maps](https://github.com/PnX-SI/gn_mobile_maps) git repository

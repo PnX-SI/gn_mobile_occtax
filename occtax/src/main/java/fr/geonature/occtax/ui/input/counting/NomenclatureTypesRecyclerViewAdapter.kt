@@ -34,13 +34,9 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
     private val availableNomenclatureTypes = mutableListOf<Pair<String, NomenclatureTypeViewType>>()
     private val properties = mutableListOf<PropertyValue>()
 
-    private val onClickListener: View.OnClickListener
-
-    init {
-        onClickListener = View.OnClickListener { v ->
-            val selectedProperty = v.tag as PropertyValue
-            listener.onAction(selectedProperty.code)
-        }
+    private val onClickListener: View.OnClickListener = View.OnClickListener { v ->
+        val selectedProperty = v.tag as PropertyValue
+        listener.onAction(selectedProperty.code)
     }
 
     override fun onCreateViewHolder(
