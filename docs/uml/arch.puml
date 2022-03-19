@@ -75,7 +75,7 @@ frame "<&phone> Android device" as device {
         rectangle sd [
             <&folder> Android
             |_ <&folder> data
-              |_ <&folder> fr.geonature.occtax
+              |_ <&folder> fr.geonature.occtax2
                 |_ <&folder> databases
                   |_ <&file> data.db
                 |_ <&folder> files

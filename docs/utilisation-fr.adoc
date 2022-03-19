@@ -28,9 +28,9 @@ Au premier lancement, l'application *_Occtax-mobile_* va demander de configurer 
 
 [cols="1a,1a,1a",grid=none]
 |===
-|image::occtax_settings.png[width=128]
-|image::occtax_login.png[width=128]
-|image::occtax_sync.png[width=128]
+|image::occtax_settings.png[width=256]
+|image::occtax_login.png[width=256]
+|image::occtax_sync.png[width=256]
 |===
 
 Elle est paramétrée en lien avec une instance de GeoNature, ainsi qu'un `id_application` dans UsersHub pour vérifier si l'utilisateur a le droit d'accéder à GeoNature.
@@ -45,7 +45,7 @@ D'autres paramètres sous forme de fichier de configuration permettent de défin
 
 * le chemin de stockage des fonds de carte au format mbtiles, 
 * les éventuelles couches vectorielles permettant de définir les couleurs de chaque taxon en fonction de la localisation du relevé, ainsi que leur style d'affichage
-* le centrage, la bbox et les niveaux de zoom de la carte
+* le centrage, la _bbox_ et les niveaux de zoom de la carte
 * le niveau de zoom minimal à partir duquel il est possible de localiser le relevé
 
 == Relevé
@@ -58,9 +58,9 @@ La première étape consiste à éventuellement modifier les valeurs par défaut
 
 [cols="1a,1a,1a",grid=none]
 |===
-|image::occtax_input_step1.png[float="left",width=128]
-|image::occtax_input_step1_observers.png[float="left",width=128]
-|image::occtax_input_step1_dataset.png[float="left",width=128]
+|image::occtax_input_step1.png[float="left",width=256]
+|image::occtax_input_step1_observers.png[float="left",width=256]
+|image::occtax_input_step1_dataset.png[float="left",width=256]
 |===
 
 === Étape 2 : Pointage
@@ -69,17 +69,17 @@ L'étape suivante consiste à localiser le relevé sur la carte sous forme d'un 
 
 [cols="1a,1a,1a",grid=none]
 |===
-|image::occtax_input_maps_layers.png[float="left",width=128]
-|image::occtax_input_maps_position.png[float="left",width=128]
-|image::occtax_input_maps_poi.png[float="left",width=128]
+|image::occtax_input_maps_layers.png[float="left",width=256]
+|image::occtax_input_maps_position.png[float="left",width=256]
+|image::occtax_input_maps_poi.png[float="left",width=256]
 |===
 
 Il est aussi possible de déplacer la localisation du relevé en faisant un "toucher long" dessus. Un menu contextuel apparaît alors qui permet notamment la suppression du marqueur.
 
 [cols="1a,1a",grid=none]
 |===
-|image::occtax_input_maps_poi_edit.png[float="left",width=128]
-|image::occtax_input_maps_poi_deleted.png[float="left",width=128]
+|image::occtax_input_maps_poi_edit.png[float="left",width=256]
+|image::occtax_input_maps_poi_deleted.png[float="left",width=256]
 |===
 
 [NOTE]
@@ -95,8 +95,8 @@ L'étape 3 est le choix du taxon observé.
 
 [cols="1a,1a",grid=none]
 |===
-|image::occtax_input_taxa_list.png[float="left",width=128]
-|image::occtax_input_taxa_selection.png[float="left",width=128]
+|image::occtax_input_taxa_list.png[float="left",width=256]
+|image::occtax_input_taxa_selection.png[float="left",width=256]
 |===
 
 Si une couche vectorielle de zonage a été définie et intégrée dans l'appareil, alors une couleur indique les taxons qui ont été déjà vus dans la zone du relevé (et depuis quand en rouge ou gris), ainsi que le nombre de fois où ils ont été observés dans la zone et la date de dernière observation.
@@ -107,9 +107,9 @@ Il est possible de rechercher dans la liste des taxons (en français ou en latin
 
 [cols="1a,1a,1a",grid=none]
 |===
-|image::occtax_input_taxa_filter.png[float="left",width=128]
-|image::occtax_input_taxa_list_filters.png[float="left",width=128]
-|image::occtax_input_taxa_filter_search.png[float="left",width=128]
+|image::occtax_input_taxa_filter.png[float="left",width=256]
+|image::occtax_input_taxa_list_filters.png[float="left",width=256]
+|image::occtax_input_taxa_filter_search.png[float="left",width=256]
 |===
 
 === Étape 4 : Informations
@@ -118,8 +118,8 @@ On renseigne ensuite les nomenclatures. Les valeurs par défaut définies dans l
 
 [cols="1a,1a",grid=none]
 |===
-|image::occtax_input_step4.png[float="left",width=128]
-|image::occtax_input_step4_meth_obs_choice.png[float="left",width=128]
+|image::occtax_input_step4.png[float="left",width=256]
+|image::occtax_input_step4_meth_obs_choice.png[float="left",width=256]
 |===
 
 Il est aussi possible d'afficher et de modifier les nomenclatures avancées.
@@ -130,8 +130,8 @@ L'étape suivante concerne le dénombrement. Aucun dénombrement n'est renseign�
 
 [cols="1a,1a",grid=none]
 |===
-|image::occtax_input_counting_edit.png[float="left",width=128]
-|image::occtax_input_counting_list.png[float="left",width=128]
+|image::occtax_input_counting_edit.png[float="left",width=256]
+|image::occtax_input_counting_list.png[float="left",width=256]
 |===
 
 Il est possible de renseigner un ou plusieurs dénombrements pour chaque taxon observé.
@@ -140,8 +140,8 @@ Chaque dénombrement peut être modifié ou supprimé (en faisant un "toucher lo
 
 [cols="1a,1a",grid=none]
 |===
-|image::occtax_input_counting_deleted.png[float="left",width=128]
-|image::occtax_input_counting_list_empty.png[float="left",width=128]
+|image::occtax_input_counting_deleted.png[float="left",width=256]
+|image::occtax_input_counting_list_empty.png[float="left",width=256]
 |===
 
 === Étape 6 : Bilan de la saisie
@@ -150,8 +150,8 @@ La dernière étape est un récapitulatif des taxons du relevé, où il est auss
 
 [cols="1a,1a",grid=none]
 |===
-|image::occtax_input_step6.png[float="left",width=128]
-|image::occtax_input_step6_comment.png[float="left",width=128]
+|image::occtax_input_step6.png[float="left",width=256]
+|image::occtax_input_step6_comment.png[float="left",width=256]
 |===
 
 Il est alors possible d'ajouter un autre taxon au relevé via le bouton "+", ou bien de terminer le relevé.

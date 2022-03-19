@@ -45,7 +45,7 @@ Voir https://github.com/PnX-SI/gn_mobile_core/issues/8[PnX-SI/gn_mobile_core#8].
 
 L'application *_Occtax-mobile_* se chargera alors de récupérer automatiquement sur le serveur GeoNature la dernière version du fichier de configuration des applications et détectera les éventuelles mises à jour disponibles pour l'application.
 
-Pour cela, chargez l'APK de l'application *_Occtax-mobile_* ainsi que son fichier de configuration dans le fichier `settings.json` dans le dossier `/home/``whoami``/geonature/backend/static/mobile` du serveur GeoNature.
+Pour cela, chargez l'APK de l'application *_Occtax-mobile_* ainsi que son fichier de configuration dans le fichier `settings.json` dans le dossier `$HOME/geonature/backend/static/mobile` du serveur GeoNature.
 
 Au préalable, Il faut créer un dossier par application, car les fichiers de configuration de chaque application ont le même nom (`settings.json`),
 
@@ -57,7 +57,7 @@ Sur votre serveur GeoNature, créer le sous-répertoire de l'application mobile 
 
 [source,shell]
 ----
-cd /home/``whoami``/geonature/backend/static/mobile
+cd $HOME/geonature/backend/static/mobile
 mkdir occtax
 ----
 
@@ -83,7 +83,7 @@ Exemple de contenu de la table `gn_commons.t_mobile_apps` :
 
 [source,csv]
 ----
-1;"OCCTAX";"static/mobile/occtax/occtax-2.0.0-pne-debug.apk";"";"fr.geonature.occtax";"2555"
+1;"OCCTAX";"static/mobile/occtax/occtax-2.0.0-pne-debug.apk";"";"fr.geonature.occtax2";"2555"
 ----
 
 Le résultat peut être testé en interrogeant directement la route `&lt;URL_GEONATURE&gt;/api/gn_commons/t_mobile_apps` qui est celle utilisée par l'application *_Occtax-mobile_* pour faire les mises à jour.
@@ -100,7 +100,7 @@ Si vous faites évoluer la configuration et/ou la version de l'application mobil
 
 == Installation et configuration de l'application
 
-Le fichier de configuration `settings.json` de l'application peut être directement copié dans le répertoire `Android/data/fr.geonature.occtax` sur le stockage interne du terminal mobile ou récupéré automatiquement lors de la première synchronisation avec le serveur GeoNature configuré (cf. <<installation-et-configuration-centralisees,Installation et configuration centralisées>>).
+Le fichier de configuration `settings.json` de l'application peut être directement copié dans le répertoire `Android/data/fr.geonature.occtax2` sur le stockage interne du terminal mobile ou récupéré automatiquement lors de la première synchronisation avec le serveur GeoNature configuré (cf. <<installation-et-configuration-centralisees,Installation et configuration centralisées>>).
 
 Dans tous les cas, l'installation et la configuration centralisée devront être mis en place pour que la synchronisation des données fonctionne.
 Le fichier de configuration sur le serveur écrasera celui sur le terminal à chaque lancement de l'application *_Occtax-mobile_*.
@@ -170,10 +170,10 @@ Il est également possible de filtrer la liste des taxons selon ce critère.
 
 Pour cela, il est nécessaire de charger une couche vectorielle de polygones des unités géographiques en respectant quelques règles.
 
-La "couche" d'unités géographiques doit être issue des entités qui peuplent la table `ref_geo.l_areas`.
+La couche d'unités géographiques doit être issue des entités qui peuplent la table `ref_geo.l_areas`.
 
 Le code du type de zonage utilisé doit être renseigné dans le paramètre `code_area_type` du fichier `settings.json` de gn_mobile_core.
-Ce même code doit aussi être renseigné dans le paramètre `occtaxmobile_area_type`de la table `gn_commons.t_parameters`de la base de données de GeoNature.
+Ce même code doit aussi être renseigné dans le paramètre `occtaxmobile_area_type` de la table `gn_commons.t_parameters` de la base de données de GeoNature.
 
 Par défaut, si aucune couche vectorielle n'est configurée, l'application va simplement charger la base des taxons sans les informations additionnelles venant des unités géographiques.
 
@@ -193,16 +193,19 @@ Les couches vectorielles peuvent être au format `json`, `geojson` ou `wkt`:
 *WKT*:
 
 * Fichier texte au format CSV où chaque ligne comporte la description d'une géométrie au format WKT
-* La géométrie doit être encodée dans le SCR `WGS84:EPSG4326`
+* La géométrie doit être encodée dans le https://fr.wikipedia.org/wiki/Syst%C3%A8me_de_coordonn%C3%A9es_(cartographie)[SCR] `WGS84:EPSG4326`
 * Le type de géométrie doit être `POLYGON` (et non `MULTIPOLYGON`)
 * L'extension du fichier doit être `.wkt` et le fichier ne doit pas contenir d'en-tête
 
 * Chaque ligne doit commencer par un identifiant puis, la géométrie ce qui donne ceci :
- `
++
+``
   <id>,<geometry>;
   ...
-`. Par exemple :
-
+``
++
+Par exemple :
++
 [source,wkt]
 ----
 110,POINT (-1.5487664937973022 47.21628889447996)
@@ -210,7 +213,7 @@ Les couches vectorielles peuvent être au format `json`, `geojson` ou `wkt`:
 ----
 
 * dans le fichier au format WKT (chaîne de caractères), la géométrie ne doit pas être en guillemets (quotes). Exemple :
-
++
 [source,wkt]
 ----
 660993,POLYGON (((6.73181863107186 45.7539143085928,6.74466771917198 45.7534881584565,6.74405801858532 45.7444934010459,6.73121101630907 45.7449194816323,6.73181863107186 45.7539143085928)))
@@ -221,7 +224,7 @@ Les couches vectorielles peuvent être au format `json`, `geojson` ou `wkt`:
 * Fichier texte au format JSON contenant un objet de type `FeatureCollection` ou un tableau d'objets de type `Feature`
 * La géométrie doit être encodée dans le SCR `WGS84:EPSG4326`
 * Chaque objet de type `Feature` doit comporter un identifiant (attribut `id`), en tant qu'attribut de cet objet ou en tant que propriété de cet objet. Par exemple :
-
++
 [source,json]
 ----
 {
@@ -240,7 +243,7 @@ Les couches vectorielles peuvent être au format `json`, `geojson` ou `wkt`:
 }
 ----
 <1> identifiant de la géométrie
-
++
 [source,json]
 ----
 {

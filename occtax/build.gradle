@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "fr.geonature.occtax"
+        applicationId "fr.geonature.occtax2"
         minSdkVersion 21
         targetSdkVersion 31
         versionCode updateVersionCode(project.name)
