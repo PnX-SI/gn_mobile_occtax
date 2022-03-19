@@ -4,7 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import dagger.hilt.android.AndroidEntryPoint
+import fr.geonature.commons.fp.getOrElse
+import fr.geonature.datasync.api.IGeoNatureAPIClient
+import fr.geonature.datasync.settings.DataSyncSettingsViewModel
 import fr.geonature.occtax.BuildConfig
 import fr.geonature.occtax.R
 import fr.geonature.occtax.settings.AppSettings
@@ -16,10 +21,15 @@ import java.util.Date
  *
  * @see PreferencesFragment
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
+@AndroidEntryPoint
 class PreferencesActivity : AppCompatActivity(),
     PreferencesFragment.OnPreferencesFragmentListener {
+
+    private val dataSyncSettingsViewModel: DataSyncSettingsViewModel by viewModels()
+
+    private var serverUrls: IGeoNatureAPIClient.ServerUrls? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,13 +38,40 @@ class PreferencesActivity : AppCompatActivity(),
 
         val appSettings: AppSettings? = intent.getParcelableExtra(EXTRA_APP_SETTINGS)
 
+        serverUrls = dataSyncSettingsViewModel
+            .getServerBaseUrls()
+            .getOrElse(null)
+
         // Display the fragment as the main content.
         supportFragmentManager.beginTransaction()
             .replace(
                 android.R.id.content,
-                PreferencesFragment.newInstance(appSettings)
+                PreferencesFragment.newInstance(
+                    serverUrls,
+                    appSettings?.mapSettings
+                )
             )
             .commit()
+    }
+
+    override fun finish() {
+        val currentServerUrls = dataSyncSettingsViewModel
+            .getServerBaseUrls()
+            .getOrElse(null)
+
+        if (currentServerUrls != null) {
+            dataSyncSettingsViewModel.setServerBaseUrls(
+                geoNatureServerUrl = currentServerUrls.geoNatureBaseUrl,
+                taxHubServerUrl = currentServerUrls.taxHubBaseUrl
+            )
+        }
+
+        setResult(
+            if (serverUrls != currentServerUrls) RESULT_OK
+            else RESULT_CANCELED
+        )
+
+        super.finish()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
@@ -20,6 +21,7 @@ import fr.geonature.occtax.settings.PropertySettings
  *
  * @author S. Grimault
  */
+@AndroidEntryPoint
 class EditCountingMetadataActivity : AppCompatActivity(),
     EditCountingMetadataFragment.OnEditCountingMetadataFragmentListener {
 

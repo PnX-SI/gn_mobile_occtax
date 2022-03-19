@@ -2,7 +2,6 @@ package fr.geonature.occtax.ui.input.informations
 
 import android.database.Cursor
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,11 +11,13 @@ import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
+import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.entity.DefaultNomenclatureWithType
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.NomenclatureType
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.commons.data.helper.Provider.buildUri
+import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
@@ -26,16 +27,23 @@ import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.occtax.ui.input.dialog.ChooseNomenclatureDialogFragment
 import fr.geonature.viewpager.ui.IValidateFragment
+import org.tinylog.kotlin.Logger
+import javax.inject.Inject
 
 /**
  * [Fragment] to let the user to add additional information for the given [Input].
  *
  * @author S. Grimault
  */
+@AndroidEntryPoint
 class InformationFragment : Fragment(),
     IValidateFragment,
     IInputFragment,
     ChooseNomenclatureDialogFragment.OnChooseNomenclatureDialogFragmentListener {
+
+    @ContentProviderAuthority
+    @Inject
+    lateinit var authority: String
 
     private var input: Input? = null
     private var adapter: NomenclatureTypesRecyclerViewAdapter? = null
@@ -49,7 +57,10 @@ class InformationFragment : Fragment(),
             return when (id) {
                 LOADER_NOMENCLATURE_TYPES -> CursorLoader(
                     requireContext(),
-                    buildUri(NomenclatureType.TABLE_NAME),
+                    buildUri(
+                        authority,
+                        NomenclatureType.TABLE_NAME
+                    ),
                     null,
                     null,
                     null,
@@ -58,6 +69,7 @@ class InformationFragment : Fragment(),
                 LOADER_DEFAULT_NOMENCLATURE_VALUES -> CursorLoader(
                     requireContext(),
                     buildUri(
+                        authority,
                         NomenclatureType.TABLE_NAME,
                         "occtax",
                         "default"
@@ -76,10 +88,7 @@ class InformationFragment : Fragment(),
             data: Cursor?
         ) {
             if (data == null) {
-                Log.w(
-                    TAG,
-                    "Failed to load data from '${(loader as CursorLoader).uri}'"
-                )
+                Logger.warn { "failed to load data from '${(loader as CursorLoader).uri}'" }
 
                 return
             }
@@ -283,7 +292,6 @@ class InformationFragment : Fragment(),
     }
 
     companion object {
-        private val TAG = InformationFragment::class.java.name
 
         private const val ARG_PROPERTIES = "arg_properties"
         private const val LOADER_NOMENCLATURE_TYPES = 1

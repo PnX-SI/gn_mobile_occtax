@@ -3,7 +3,6 @@ package fr.geonature.occtax.ui.input.taxa
 import android.content.Context
 import android.database.Cursor
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,17 +14,26 @@ import androidx.loader.content.Loader
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
+import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.commons.data.helper.Provider
+import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.occtax.R
 import fr.geonature.occtax.settings.AppSettings
+import org.tinylog.kotlin.Logger
+import javax.inject.Inject
 
 /**
  * [Fragment] to let the user to apply filters on taxa list.
  *
  * @author S. Grimault
  */
+@AndroidEntryPoint
 class TaxaFilterFragment : Fragment() {
+
+    @ContentProviderAuthority
+    @Inject
+    lateinit var authority: String
 
     private var listener: OnTaxaFilterFragmentListener? = null
     private var adapter: FilterRecyclerViewAdapter? = null
@@ -39,7 +47,10 @@ class TaxaFilterFragment : Fragment() {
             return when (id) {
                 LOADER_TAXONOMY -> CursorLoader(
                     requireContext(),
-                    Provider.buildUri(Taxonomy.TABLE_NAME),
+                    buildUri(
+                        authority,
+                        Taxonomy.TABLE_NAME
+                    ),
                     null,
                     null,
                     null,
@@ -54,10 +65,7 @@ class TaxaFilterFragment : Fragment() {
             data: Cursor?
         ) {
             if (data == null) {
-                Log.w(
-                    TAG,
-                    "Failed to load data from '${(loader as CursorLoader).uri}'"
-                )
+                Logger.warn { "failed to load data from '${(loader as CursorLoader).uri}'" }
 
                 return
             }
@@ -253,8 +261,6 @@ class TaxaFilterFragment : Fragment() {
     }
 
     companion object {
-
-        private val TAG = TaxaFilterFragment::class.java.name
 
         private const val ARG_WITH_AREA_OBSERVATION = "arg_with_area_observation"
         private const val ARG_AREA_OBSERVATION_DURATION = "arg_area_observation_duration"

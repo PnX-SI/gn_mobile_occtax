@@ -3,9 +3,7 @@ package fr.geonature.occtax.ui.shared.view
 import android.content.Context
 import android.util.AttributeSet
 import android.util.Pair
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.AnimationUtils.loadAnimation
 import android.widget.Button
 import android.widget.TextView
@@ -14,13 +12,13 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
-import java.util.ArrayList
 
 /**
  * Generic [View] about selected list items.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 open class ListItemActionView : ConstraintLayout {
 
@@ -77,15 +75,12 @@ open class ListItemActionView : ConstraintLayout {
     }
 
     fun setTitle(@StringRes titleResourceId: Int) {
-        if (titleResourceId == 0) {
-            return
-        }
-
-        titleTextView.setText(titleResourceId)
+        setTitle(if (titleResourceId == 0) null else context.getString(titleResourceId))
     }
 
-    fun setTitle(title: String) {
+    fun setTitle(title: String?) {
         titleTextView.text = title
+        titleTextView.visibility = if (title.isNullOrBlank()) GONE else VISIBLE
     }
 
     fun setEmptyText(@StringRes emptyTextResourceId: Int) {
@@ -122,14 +117,21 @@ open class ListItemActionView : ConstraintLayout {
         )
 
         if (listPreferredItemHeight > 0) {
-            recyclerView.layoutParams.height = visibleItems * listPreferredItemHeight.toInt()
+            recyclerView.layoutParams.height = visibleItems * (listPreferredItemHeight.toInt() + visibleItems)
         }
 
         typedArray.recycle()
     }
 
-    fun setItems(collection: Collection<Pair<String, String?>>) {
+    fun setItems(collection: List<Pair<String, String?>>) {
         adapter.setItems(collection)
+    }
+
+    fun set(item: Pair<String, String?>, index: Int) {
+        adapter.set(
+            item,
+            index
+        )
     }
 
     private fun init(
@@ -144,44 +146,37 @@ open class ListItemActionView : ConstraintLayout {
 
         titleTextView = findViewById(android.R.id.title)
         recyclerView = findViewById(android.R.id.list)
-        recyclerView.setHasFixedSize(true)
         actionButton = findViewById(android.R.id.button1)
         actionButton.setOnClickListener { listener?.onAction() }
         emptyTextView = findViewById(android.R.id.empty)
 
-        adapter = EditListItemViewRecyclerViewAdapter()
-        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onChanged() {
-                super.onChanged()
-
-                actionButton.setText(if (adapter.itemCount == 0) actionEmptyText else actionText)
-                showEmptyTextView(adapter.itemCount == 0)
+        adapter = EditListItemViewRecyclerViewAdapter(object :
+            AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<Pair<String, String?>> {
+            override fun onClick(item: Pair<String, String?>) {
+                // nothing to do...
             }
 
-            override fun onItemRangeInserted(
-                positionStart: Int,
-                itemCount: Int
-            ) {
-                super.onItemRangeInserted(
-                    positionStart,
-                    itemCount
-                )
+            override fun onLongClicked(position: Int, item: Pair<String, String?>) {
+                // nothing to do...
+            }
 
-                actionButton.setText(actionText)
-                showEmptyTextView(false)
+            override fun showEmptyTextView(show: Boolean) {
+                actionButton.setText(if (show) actionEmptyText else actionText)
+                this@ListItemActionView.showEmptyTextView(show)
             }
         })
 
         with(recyclerView) {
             layoutManager = LinearLayoutManager(context)
             adapter = this@ListItemActionView.adapter
+            setHasFixedSize(true)
+            addItemDecoration(
+                DividerItemDecoration(
+                    recyclerView.context,
+                    (layoutManager as LinearLayoutManager).orientation
+                )
+            )
         }
-
-        val dividerItemDecoration = DividerItemDecoration(
-            recyclerView.context,
-            (recyclerView.layoutManager as LinearLayoutManager).orientation
-        )
-        recyclerView.addItemDecoration(dividerItemDecoration)
 
         // load attributes
         val ta = context.obtainStyledAttributes(
@@ -191,30 +186,30 @@ open class ListItemActionView : ConstraintLayout {
             0
         )
 
+        ta.getString(R.styleable.ListItemActionView_title)?.also {
+            setTitle(it)
+        }
         setTitle(
             ta.getResourceId(
                 R.styleable.ListItemActionView_title,
                 0
             )
         )
+
         setEmptyText(
             ta.getResourceId(
                 R.styleable.ListItemActionView_no_data,
                 R.string.no_data
             )
         )
+
         enableActionButton(
             ta.getBoolean(
                 R.styleable.ListItemActionView_action_enabled,
                 true
             )
         )
-        setActionText(
-            ta.getResourceId(
-                R.styleable.ListItemActionView_action,
-                0
-            )
-        )
+
         setActionText(
             ta.getResourceId(
                 R.styleable.ListItemActionView_action,
@@ -227,6 +222,8 @@ open class ListItemActionView : ConstraintLayout {
                 0
             )
         )
+        actionButton.setText(if (adapter.itemCount == 0) actionEmptyText else actionText)
+
         setVisibleItems(
             ta.getInteger(
                 R.styleable.ListItemActionView_visible_items,
@@ -272,61 +269,51 @@ open class ListItemActionView : ConstraintLayout {
         fun onAction()
     }
 
-    private inner class EditListItemViewRecyclerViewAdapter :
-        RecyclerView.Adapter<EditListItemViewRecyclerViewAdapter.ViewHolder>() {
+    /**
+     * Default RecyclerView Adapter used by [ListItemActionView].
+     *
+     * @see ListItemActionView
+     */
+    private inner class EditListItemViewRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<Pair<String, String?>>) :
+        AbstractListItemRecyclerViewAdapter<Pair<String, String?>>(listener) {
 
-        val items: MutableList<Pair<String, String?>> = ArrayList()
-
-        override fun onCreateViewHolder(
-            parent: ViewGroup,
-            viewType: Int
-        ): ViewHolder {
-            return ViewHolder(parent)
+        override fun getViewHolder(view: View, viewType: Int): AbstractViewHolder {
+            return ViewHolder(view)
         }
 
-        override fun onBindViewHolder(
-            holder: ViewHolder,
-            position: Int
-        ) {
-            holder.bind(items[position])
+        override fun getLayoutResourceId(position: Int, item: Pair<String, String?>): Int {
+            return R.layout.list_item_2
         }
 
-        override fun getItemCount(): Int {
-            return items.size
+        override fun areItemsTheSame(
+            oldItems: List<Pair<String, String?>>,
+            newItems: List<Pair<String, String?>>,
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
+            return oldItems[oldItemPosition].first == newItems[newItemPosition].first &&
+                oldItems[oldItemPosition].second == newItems[newItemPosition].second
         }
 
-        fun setItems(collection: Collection<Pair<String, String?>>) {
-            items.clear()
-            items.addAll(collection)
-
-            notifyDataSetChanged()
+        override fun areContentsTheSame(
+            oldItems: List<Pair<String, String?>>,
+            newItems: List<Pair<String, String?>>,
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
+            return oldItems[oldItemPosition].first == newItems[newItemPosition].first &&
+                oldItems[oldItemPosition].second == newItems[newItemPosition].second
         }
 
-        inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
-            LayoutInflater.from(parent.context)
-                .inflate(
-                    R.layout.list_item_2,
-                    parent,
-                    false
-                )
-        ) {
+        inner class ViewHolder(itemView: View) :
+            AbstractListItemRecyclerViewAdapter<Pair<String, String?>>.AbstractViewHolder(itemView) {
 
             private val textView1: TextView = itemView.findViewById(android.R.id.text1)
             private val textView2: TextView = itemView.findViewById(android.R.id.text2)
 
-            fun bind(pair: Pair<String, String?>) {
-                bind(
-                    pair.first,
-                    pair.second
-                )
-            }
-
-            fun bind(
-                label: String,
-                description: String?
-            ) {
-                textView1.text = label
-                textView2.text = description.orEmpty()
+            override fun onBind(item: Pair<String, String?>) {
+                textView1.text = item.first
+                textView2.text = item.second.orEmpty()
             }
         }
     }

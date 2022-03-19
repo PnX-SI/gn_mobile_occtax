@@ -5,6 +5,7 @@ buildscript {
     ext.androidx_hilt_version = '1.0.0'
     ext.hilt_version = '2.40.5'
     ext.retrofit_version = '2.9.0'
+    ext.tinylog_version = '2.4.1'
 
     repositories {
         google()
@@ -15,7 +16,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.1'
+        classpath 'com.android.tools.build:gradle:7.1.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
         classpath "org.jlleitschuh.gradle:ktlint-gradle:9.4.1"

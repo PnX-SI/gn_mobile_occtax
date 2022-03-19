@@ -30,8 +30,7 @@
                 android:layout_height="wrap_content"
                 app:action="@string/sync_action_synchronize"
                 app:action_enabled="false"
-                app:title="@string/sync_device_status"
-                app:visible_items="2" />
+                app:title="@string/sync_device_status" />
 
         </androidx.cardview.widget.CardView>
 
@@ -70,19 +69,18 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/padding_default"
         android:layout_marginBottom="@dimen/padding_default"
-        android:backgroundTint="@color/accent"
         android:clickable="true"
         android:focusable="true"
+        android:text="@string/action_new_input"
         android:visibility="visible"
         app:elevation="@dimen/fab_elevation"
-        app:srcCompat="@drawable/ic_add"
-        app:tint="@android:color/white" />
+        app:icon="@drawable/ic_add" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

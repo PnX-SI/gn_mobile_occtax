@@ -1,33 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <!-- Base application theme -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
 
         <!-- main theme colors -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
 
+        <item name="colorSecondary">?attr/colorAccent</item>
+        <item name="colorOnSecondary">@android:color/white</item>
+
         <item name="underlinePageIndicatorStyle">@style/UnderlinePageIndicator</item>
+
+        <item name="materialThemeOverlay">@style/ButtonThemeOverlay</item>
 
     </style>
 
-    <style name="AppTheme.NoActionBar">
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="AppTheme.Login" parent="AppTheme">
 
-    <style name="DialogStyle" parent="Theme.AppCompat.Light.Dialog">
-        <item name="colorAccent">@color/accent</item>
+        <item name="android:windowBackground">@drawable/background_login</item>
+
+        <item name="android:actionBarStyle">@style/ActionBar.Login</item>
+        <item name="actionBarStyle">@style/ActionBar.Login</item>
+
+        <item name="materialButtonStyle">@style/Button.Login</item>
+
+        <item name="textInputStyle">@style/TextInputLayout.Login</item>
+        <item name="android:editTextColor">?android:textColorPrimaryInverse</item>
+        <item name="editTextColor">?android:textColorPrimaryInverse</item>
+
+        <item name="android:colorControlNormal">?attr/colorAccent</item>
+        <item name="android:colorControlActivated">?attr/colorAccent</item>
+        <item name="android:colorControlHighlight">?attr/colorAccent</item>
+
+    </style>
+
+    <style name="ActionBar.Login" parent="Widget.AppCompat.ActionBar.Solid">
+        <item name="android:background">?attr/colorPrimaryDark</item>
+        <item name="background">?attr/colorPrimaryDark</item>
+    </style>
+
+    <style name="Button.Login" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:colorButtonNormal">?attr/colorAccent</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Medium.Inverse</item>
+        <item name="textAllCaps">true</item>
+    </style>
+
+    <style name="TextInputLayout.Login" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">?android:textColorPrimaryInverse</item>
+        <item name="android:textColorHint">?android:textColorPrimaryInverse</item>
+        <item name="hintTextColor">?android:textColorPrimaryInverse</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="materialThemeOverlay">@style/AppTheme.PopupOverlay</item>
+    </style>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
     </style>
 
     <style name="UnderlinePageIndicator">
-        <item name="selectedColor">@color/accent</item>
+        <item name="selectedColor">?attr/colorAccent</item>
+    </style>
+
+    <style name="ButtonThemeOverlay">
+        <item name="colorPrimary">?attr/colorAccent</item>
     </style>
 
 </resources>

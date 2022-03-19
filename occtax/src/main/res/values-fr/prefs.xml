@@ -9,6 +9,11 @@
     <string name="preference_category_observers_default_not_set">Non défini</string>
     <string name="preference_category_permissions">Permissions</string>
     <string name="preference_category_permissions_configure">Gérer les permissions</string>
+    <string name="preference_category_notifications">Notifications</string>
+    <string name="preference_category_notifications_configure">Configurer les notifications</string>
+    <string name="preference_category_storage">Mémoire</string>
+    <string name="preference_category_storage_internal">Mémoire interne</string>
+    <string name="preference_category_storage_external">Mémoire externe</string>
     <string name="preference_category_about">A propos</string>
     <string name="preference_category_about_app_version">Version de l\'application</string>
 

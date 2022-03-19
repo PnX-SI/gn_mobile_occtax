@@ -18,17 +18,25 @@ import androidx.loader.content.Loader
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
+import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.entity.Dataset
-import fr.geonature.commons.data.helper.Provider.buildUri
+import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.occtax.R
 import fr.geonature.occtax.R.layout.fast_scroll_recycler_view
+import javax.inject.Inject
 
 /**
  * [Fragment] to let the user to choose a [Dataset] from the list.
  *
  * @author S. Grimault
  */
+@AndroidEntryPoint
 class DatasetListFragment : Fragment() {
+
+    @ContentProviderAuthority
+    @Inject
+    lateinit var authority: String
 
     private var listener: OnDatasetListFragmentListener? = null
     private var adapter: DatasetRecyclerViewAdapter? = null
@@ -43,6 +51,7 @@ class DatasetListFragment : Fragment() {
                 LOADER_DATASET -> CursorLoader(
                     requireContext(),
                     buildUri(
+                        authority,
                         Dataset.TABLE_NAME,
                         args?.getString(Dataset.COLUMN_MODULE) ?: "",
                         "active"
