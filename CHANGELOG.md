@@ -6,6 +6,7 @@
 
 * Fusion des applications **Sync-mobile** et **Occtax-mobile** en une seule application, en intégrant le module de synchronisation des données _datasync_ dans **Occtax-mobile** (#94)
 * Mise en place d'un système de logs dans l'application pour en faciliter la récupération (#112)
+* Suppression des variantes par défaut (#103), seule la version générique par défaut sera proposée
 * Révision de la documentation et intégration de diagrammes dans celle-ci
 
 ### 🐛 Corrections
