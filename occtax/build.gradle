@@ -53,11 +53,6 @@ android {
     flavorDimensions "version"
     productFlavors {
         generic {}
-        pag {}
-        pnc {}
-        pne {}
-        pnm {}
-        pnv {}
     }
 
     testOptions {
