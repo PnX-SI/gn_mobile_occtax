@@ -9,8 +9,6 @@
 * Suppression des variantes par défaut (#103), seule la version générique par défaut sera proposée
 * Révision de la documentation et intégration de diagrammes dans celle-ci
 
-### 🐛 Corrections
-
 ### ⚠️ Notes de version
 
 * Code de version : 2560
