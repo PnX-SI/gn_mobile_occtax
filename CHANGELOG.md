@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.0.0) (2022-03-19, pre-release)
+## [2.0.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.0.0) (2022-03-20, release)
 
 ### 🚀 Nouveautés
 
@@ -19,8 +19,8 @@
 Les versions 1 et 2 d'Occtax-mobile peuvent cohabiter temporairement, et vous permettre d'avoir une flotte de mobile "mixte" utilisant les deux versions :
 
 * Déposer le fichier APK de la nouvelle version d'Occtax-mobile sur le serveur GeoNature
-* Compléter le fichier de configuration d'Occtax-mobile suite à l'intégration du module de synchronisation, en ajoutant la partie ``sync`` (voir https://github.com/PnX-SI/gn_mobile_occtax/tree/feature/v2#settings). Cette nouvelle partie sera ignorée par les mobiles utilisant encore la version 1 d'Occtax-mobile
-* Compléter la table ``gn_commons.t_mobile_apps`` en ajoutant une nouvelle ligne pour la version d'Occtax-mobile. Vous pouvez (temporairement) conserver les lignes liées à la version 1, et conserver des mobiles en version 1 et en version 2 connectées à votre instance GeoNature. 
+* Compléter le fichier de configuration d'Occtax-mobile suite à l'intégration du module de synchronisation, en ajoutant la partie `sync` (voir https://github.com/PnX-SI/gn_mobile_occtax/tree/develop#settings). Cette nouvelle partie sera ignorée par les mobiles utilisant encore la version 1 d'Occtax-mobile
+* Compléter la table `gn_commons.t_mobile_apps` en ajoutant une nouvelle ligne pour la version d'Occtax-mobile. Vous pouvez (temporairement) conserver les lignes liées à la version 1, et conserver des mobiles en version 1 et en version 2 connectées à votre instance GeoNature. 
 * Prévoyez de supprimer les lignes liées à Occtax-mobile v1 et Sync-mobile v1 dès que l'ensemble des mobiles connectés à votre GeoNature seront mis à jour avec Occtax-mobile v2
 
 *Coté terminal pour les utilisateurs :* 
