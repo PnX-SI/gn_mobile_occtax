@@ -7,6 +7,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import fr.geonature.commons.data.ContentProviderAuthority
+import fr.geonature.commons.data.GeoNatureModuleName
 import javax.inject.Singleton
 
 /**
@@ -14,8 +15,8 @@ import javax.inject.Singleton
  *
  * @author S. Grimault
  */
-@InstallIn(SingletonComponent::class)
 @Module
+@InstallIn(SingletonComponent::class)
 object DatabaseModule {
 
     @Singleton
@@ -23,5 +24,12 @@ object DatabaseModule {
     @ContentProviderAuthority
     fun provideContentProviderAuthority(@ApplicationContext appContext: Context): String {
         return "${appContext.packageName}.provider"
+    }
+
+    @Singleton
+    @Provides
+    @GeoNatureModuleName
+    fun provideGeoNatureModuleName(): String {
+        return "occtax"
     }
 }

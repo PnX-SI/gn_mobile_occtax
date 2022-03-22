@@ -23,6 +23,7 @@ import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.ContentProviderAuthority
+import fr.geonature.commons.data.GeoNatureModuleName
 import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.entity.DefaultNomenclature
 import fr.geonature.commons.data.entity.DefaultNomenclatureWithType
@@ -61,6 +62,10 @@ class ObserversAndDateInputFragment : Fragment(),
     @ContentProviderAuthority
     @Inject
     lateinit var authority: String
+
+    @GeoNatureModuleName
+    @Inject
+    lateinit var moduleName: String
 
     private lateinit var observersResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var datasetResultLauncher: ActivityResultLauncher<Intent>
@@ -390,7 +395,7 @@ class ObserversAndDateInputFragment : Fragment(),
                     bundleOf(
                         kotlin.Pair(
                             Dataset.COLUMN_MODULE,
-                            context?.packageName
+                            moduleName
                         ),
                         kotlin.Pair(
                             Dataset.COLUMN_ID,
@@ -409,7 +414,7 @@ class ObserversAndDateInputFragment : Fragment(),
                 bundleOf(
                     kotlin.Pair(
                         DefaultNomenclature.COLUMN_MODULE,
-                        context?.packageName
+                       moduleName
                     )
                 ),
                 loaderCallbacks

@@ -300,9 +300,6 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         menu?.run {
-            findItem(R.id.menu_settings)?.also {
-                it.isEnabled = appSettings != null
-            }
             findItem(R.id.menu_login)?.also {
                 it.isEnabled = appSettings != null
                 it.isVisible = !isLoggedIn

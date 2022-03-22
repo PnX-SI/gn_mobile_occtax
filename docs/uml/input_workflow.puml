@@ -166,7 +166,7 @@ group Step 6: Report
   end
 
   alt Export input
-    occtax_input -> occtax_input : save input to //input_occtax_<id>.json//
+    occtax_input -> occtax_input : save input to //input_<id>.json//
     occtax_input -> occtax_input : delete saved input
     occtax_input -> occtax_input : redirect to home page
   end
