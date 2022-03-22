@@ -9,6 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.settings.AppSettingsManagerImpl
 import fr.geonature.commons.settings.IAppSettingsManager
+import fr.geonature.datasync.settings.AppSettingsFilename
 import fr.geonature.occtax.settings.io.OnAppSettingsJsonReaderListenerImpl
 import javax.inject.Singleton
 
@@ -25,11 +26,13 @@ object AppSettingsModule {
     @Provides
     fun provideAppSettingsManager(
         @ApplicationContext appContext: Context,
-        @ContentProviderAuthority authority: String
+        @ContentProviderAuthority authority: String,
+        @AppSettingsFilename appSettingsFilename: String
     ): IAppSettingsManager<AppSettings> {
         return AppSettingsManagerImpl(
             appContext,
             authority,
+            appSettingsFilename,
             OnAppSettingsJsonReaderListenerImpl()
         )
     }

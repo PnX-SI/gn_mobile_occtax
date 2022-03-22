@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.ContentProviderAuthority
+import fr.geonature.commons.data.GeoNatureModuleName
 import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.occtax.R
@@ -37,6 +38,10 @@ class DatasetListFragment : Fragment() {
     @ContentProviderAuthority
     @Inject
     lateinit var authority: String
+
+    @GeoNatureModuleName
+    @Inject
+    lateinit var moduleName: String
 
     private var listener: OnDatasetListFragmentListener? = null
     private var adapter: DatasetRecyclerViewAdapter? = null
@@ -156,7 +161,7 @@ class DatasetListFragment : Fragment() {
                     bundleOf(
                         Pair(
                             Dataset.COLUMN_MODULE,
-                            context?.packageName
+                            moduleName
                         )
                     ),
                     loaderCallbacks

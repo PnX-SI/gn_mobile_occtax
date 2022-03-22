@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.ContentProviderAuthority
+import fr.geonature.commons.data.GeoNatureModuleName
 import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.entity.DefaultNomenclature
 import fr.geonature.commons.data.entity.DefaultNomenclatureWithType
@@ -44,6 +45,10 @@ class EditCountingMetadataFragment : Fragment(),
     @ContentProviderAuthority
     @Inject
     lateinit var authority: String
+
+    @GeoNatureModuleName
+    @Inject
+    lateinit var moduleName: String
 
     private var listener: OnEditCountingMetadataFragmentListener? = null
     private var adapter: NomenclatureTypesRecyclerViewAdapter? = null
@@ -255,7 +260,7 @@ class EditCountingMetadataFragment : Fragment(),
                 bundleOf(
                     Pair(
                         DefaultNomenclature.COLUMN_MODULE,
-                        context?.packageName
+                        moduleName
                     )
                 ),
                 loaderCallbacks
