@@ -6,9 +6,8 @@
 
 * Fusion des applications **Sync-mobile** et **Occtax-mobile** en une seule application, en intégrant le module de synchronisation des données _datasync_ dans **Occtax-mobile** (#94)
 * Mise en place d'un système de logs dans l'application pour en faciliter la récupération (#112)
+* Suppression des variantes par défaut (#103), seule la version générique par défaut sera proposée
 * Révision de la documentation et intégration de diagrammes dans celle-ci
-
-### 🐛 Corrections
 
 ### ⚠️ Notes de version
 
@@ -20,7 +19,7 @@ Les versions 1 et 2 d'Occtax-mobile peuvent cohabiter temporairement, et vous pe
 
 * Déposer le fichier APK de la nouvelle version d'Occtax-mobile sur le serveur GeoNature
 * Compléter le fichier de configuration d'Occtax-mobile suite à l'intégration du module de synchronisation, en ajoutant la partie `sync` (voir https://github.com/PnX-SI/gn_mobile_occtax/tree/develop#settings). Cette nouvelle partie sera ignorée par les mobiles utilisant encore la version 1 d'Occtax-mobile
-* Compléter la table `gn_commons.t_mobile_apps` en ajoutant une nouvelle ligne pour la version d'Occtax-mobile. Vous pouvez (temporairement) conserver les lignes liées à la version 1, et conserver des mobiles en version 1 et en version 2 connectées à votre instance GeoNature. 
+* Compléter la table `gn_commons.t_mobile_apps` en ajoutant une nouvelle ligne pour la version 2 d'Occtax-mobile (`fr.geonature.occtax2`). Vous pouvez (temporairement) conserver les lignes liées à la version 1, et conserver des mobiles en version 1 et en version 2 connectées à votre instance GeoNature. 
 * Prévoyez de supprimer les lignes liées à Occtax-mobile v1 et Sync-mobile v1 dès que l'ensemble des mobiles connectés à votre GeoNature seront mis à jour avec Occtax-mobile v2
 
 *Coté terminal pour les utilisateurs :* 
