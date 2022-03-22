@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.0.0) (2022-03-20, release)
+## [2.0.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.0.0) (2022-03-22, release)
 
 ### 🚀 Nouveautés
 
@@ -8,10 +8,11 @@
 * Mise en place d'un système de logs dans l'application pour en faciliter la récupération (#112)
 * Suppression des variantes par défaut (#103), seule la version générique par défaut sera proposée
 * Révision de la documentation et intégration de diagrammes dans celle-ci
+* Dissocier le nom du module _occtax_ de GeoNature du nom de package de l'application (#129)
 
 ### ⚠️ Notes de version
 
-* Code de version : 2560
+* Code de version : 2570
 
 *Coté serveur pour les administrateurs :*
 
