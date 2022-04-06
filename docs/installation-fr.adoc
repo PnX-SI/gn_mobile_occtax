@@ -125,7 +125,7 @@ Les conditions d'arrêt de l'interrogation de ces routes sont :
 Le paramètre `code_area_type` correspond au type de zonage de votre référentiel géographique de GeoNature (champs `type_code` de la table `ref_geo.bib_areas_types`) utilisé pour les unités géographiques.
 Voir https://github.com/PnX-SI/gn_mobile_core/issues/15[PnX-SI/gn_mobile_core#15].
 
-Le paramètre `uh_application_id` permet de renseigner l'`id_application` de GeoNature dans la table `utilisateurs.t_applications` pour l'authentification des utilisateurs et leurs droits.
+Le paramètre `gn_application_id` permet de renseigner l'`id_application` de GeoNature dans la table `utilisateurs.t_applications` pour l'authentification des utilisateurs et leurs droits.
 
 Le paramètre `observers_list_id` permet de renseigner l`id_liste` des observateurs d'Occtax dans la table `utilisateurs.t_listes`.
 
