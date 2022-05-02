@@ -37,13 +37,24 @@ import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.entity.AppSync
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
+import fr.geonature.commons.error.Failure
+import fr.geonature.commons.lifecycle.observe
+import fr.geonature.commons.lifecycle.observeOnce
+import fr.geonature.commons.lifecycle.observeUntil
+import fr.geonature.commons.lifecycle.onFailure
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
-import fr.geonature.commons.util.observeOnce
-import fr.geonature.commons.util.observeUntil
+import fr.geonature.commons.util.ThemeUtils.getErrorColor
 import fr.geonature.datasync.api.IGeoNatureAPIClient
 import fr.geonature.datasync.auth.AuthLoginViewModel
+import fr.geonature.datasync.features.settings.presentation.ConfigureServerSettingsActivity
+import fr.geonature.datasync.features.settings.presentation.ConfigureServerSettingsViewModel
+import fr.geonature.datasync.features.settings.presentation.UpdateSettingsViewModel
+import fr.geonature.datasync.packageinfo.PackageInfo
 import fr.geonature.datasync.packageinfo.PackageInfoViewModel
-import fr.geonature.datasync.settings.DataSyncSettings
+import fr.geonature.datasync.packageinfo.error.PackageInfoNotFoundFailure
+import fr.geonature.datasync.packageinfo.error.PackageInfoNotFoundFromRemoteFailure
+import fr.geonature.datasync.settings.error.DataSyncSettingsJsonParseFailure
+import fr.geonature.datasync.settings.error.DataSyncSettingsNotFoundFailure
 import fr.geonature.datasync.sync.DataSyncViewModel
 import fr.geonature.datasync.sync.ServerStatus
 import fr.geonature.datasync.ui.login.LoginActivity
@@ -72,6 +83,8 @@ class HomeActivity : AppCompatActivity() {
     private val appSettingsViewModel: AppSettingsViewModel by viewModels()
     private val packageInfoViewModel: PackageInfoViewModel by viewModels()
     private val dataSyncViewModel: DataSyncViewModel by viewModels()
+    private val configureServerSettingsViewModel: ConfigureServerSettingsViewModel by viewModels()
+    private val updateSettingsViewModel: UpdateSettingsViewModel by viewModels()
     private val inputViewModel: InputViewModel by viewModels()
 
     @Inject
@@ -157,6 +170,8 @@ class HomeActivity : AppCompatActivity() {
         configureAuthLoginViewModel()
         configurePackageInfoViewModel()
         configureDataSyncViewModel()
+        configureConfigureServerSettingsViewModel()
+        configureUpdateSettingsViewModel()
 
         appSyncView?.setListener(object : AppSyncView.OnAppSyncViewListener {
             override fun onAction() {
@@ -166,6 +181,7 @@ class HomeActivity : AppCompatActivity() {
                         HomeActivity::class.java,
                         MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                     )
+                    packageInfoViewModel.getAllApplications()
                     packageInfoViewModel.synchronizeInstalledApplications()
                 }
             }
@@ -210,7 +226,7 @@ class HomeActivity : AppCompatActivity() {
 
             override fun showEmptyTextView(show: Boolean) {
                 if (show) fab?.extend() else fab?.shrink()
-                
+
                 if (inputEmptyTextView?.visibility == View.VISIBLE == show) {
                     return
                 }
@@ -252,21 +268,20 @@ class HomeActivity : AppCompatActivity() {
                     RESULT_OK -> {
                         val dataSyncSettings = appSettings?.dataSyncSettings
 
-                        if (dataSyncSettings == null) {
-                            packageInfoViewModel.getAllApplications()
+                        if (dataSyncSettings == null || geoNatureAPIClient.getBaseUrls().geoNatureBaseUrl != dataSyncSettings.geoNatureServerUrl) {
+                            configureServerSettingsViewModel.loadAppSettings(geoNatureAPIClient.getBaseUrls().geoNatureBaseUrl)
                         } else {
                             dataSyncViewModel.startSync(
                                 dataSyncSettings,
                                 HomeActivity::class.java,
                                 MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                             )
-                            packageInfoViewModel.synchronizeInstalledApplications()
                         }
                     }
                 }
             }
 
-        loadAppSettings()
+        updateSettingsViewModel.updateAppSettings()
     }
 
     override fun onResume() {
@@ -316,7 +331,7 @@ class HomeActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_settings -> {
-                startActivity(
+                startSyncResultLauncher.launch(
                     PreferencesActivity.newIntent(
                         this,
                         appSettings
@@ -382,20 +397,8 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun configurePackageInfoViewModel() {
-        packageInfoViewModel.also { vm ->
-            vm.updateAvailable.observeOnce(this@HomeActivity) { appPackage ->
-                appPackage?.run { confirmBeforeUpgrade(this.packageName) }
-            }
-
-            vm.appSettingsUpdated.observeOnce(this@HomeActivity) {
-                Logger.info { "reloading settings after update..." }
-
-                loadAppSettings()
-            }
-
-            vm.packageInfos.observe(
-                this@HomeActivity
-            ) {
+        with(packageInfoViewModel) {
+            observe(packageInfos) {
                 it.find { packageInfo -> packageInfo.packageName == BuildConfig.APPLICATION_ID }
                     ?.also { packageInfo ->
                         appSyncView?.setPackageInfo(packageInfo)
@@ -441,6 +444,37 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    private fun configureConfigureServerSettingsViewModel() {
+        with(configureServerSettingsViewModel) {
+            observe(dataSyncSettingLoaded) {
+                dataSyncViewModel.startSync(
+                    it,
+                    HomeActivity::class.java,
+                    MainApplication.CHANNEL_DATA_SYNCHRONIZATION
+                )
+                
+                loadAppSettings()
+            }
+            onFailure(
+                failure,
+                ::handleFailure
+            )
+        }
+    }
+
+    private fun configureUpdateSettingsViewModel() {
+        with(updateSettingsViewModel) {
+            observe(
+                packageInfoUpdated,
+                ::packageInfoUpdated
+            )
+            onFailure(
+                failure,
+                ::handleFailure
+            )
+        }
+    }
+
     private fun loadAppSettings() {
         appSettingsViewModel.loadAppSettings()
             .observeOnce(this) {
@@ -458,10 +492,6 @@ class HomeActivity : AppCompatActivity() {
                             appSettingsViewModel.getAppSettingsFilename()
                         )
                     )?.show()
-
-                    if (!checkGeoNatureSettings()) {
-                        startSyncResultLauncher.launch(PreferencesActivity.newIntent(this))
-                    }
                 } else {
                     Logger.info { "app settings successfully loaded" }
 
@@ -471,20 +501,11 @@ class HomeActivity : AppCompatActivity() {
                     invalidateOptionsMenu()
 
                     it.dataSyncSettings?.also { dataSyncSettings ->
-                        geoNatureAPIClient.setBaseUrls(
-                            geoNatureBaseUrl = dataSyncSettings.geoNatureServerUrl,
-                            taxHubBaseUrl = dataSyncSettings.taxHubServerUrl
-                        )
-
                         dataSyncViewModel.configurePeriodicSync(
                             dataSyncSettings,
                             HomeActivity::class.java,
                             MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                         )
-
-                        packageInfoViewModel.getAllApplications()
-                        packageInfoViewModel.synchronizeInstalledApplications()
-                        startFirstSync(dataSyncSettings)
                     }
 
                     loadInputs()
@@ -497,6 +518,75 @@ class HomeActivity : AppCompatActivity() {
             this
         ) {
             adapter.setItems(it)
+        }
+    }
+
+    private fun packageInfoUpdated(packageInfo: PackageInfo) {
+        if (packageInfo.hasNewVersionAvailable()) {
+            confirmBeforeUpgrade(this.packageName)
+        }
+
+        if (packageInfo.apkUrl != null && packageInfo.apkUrl?.isNotEmpty() == true && packageInfo.settings != null) {
+            Logger.info { "reloading settings after update..." }
+        }
+
+        loadAppSettings()
+    }
+
+    private fun handleFailure(failure: Failure) {
+        fab?.hide()
+        adapter.clear()
+        appSyncView?.enableActionButton(false)
+        invalidateOptionsMenu()
+
+        when (failure) {
+            is Failure.NetworkFailure -> {
+                makeSnackbar(failure.reason)
+                    ?.setBackgroundTint(getErrorColor(this))
+                    ?.show()
+            }
+            is Failure.ServerFailure -> {
+                makeSnackbar(getString(fr.geonature.datasync.R.string.settings_server_error))
+                    ?.setBackgroundTint(getErrorColor(this))
+                    ?.show()
+            }
+            is PackageInfoNotFoundFromRemoteFailure -> {
+                makeSnackbar(getString(fr.geonature.datasync.R.string.settings_server_settings_not_found))
+                    ?.setBackgroundTint(getErrorColor(this))
+                    ?.show()
+            }
+            is DataSyncSettingsNotFoundFailure -> {
+                Logger.warn { "failed to load settings${if (failure.source.isNullOrBlank()) "" else " from source '${failure.source}'"}" }
+
+                val geoNatureBaseUrl = failure.geoNatureBaseUrl
+
+                if (geoNatureBaseUrl.isNullOrBlank()) {
+                    // no configuration found: redirect user to server settings configuration activity
+                    startSyncResultLauncher.launch(ConfigureServerSettingsActivity.newIntent(this))
+                } else {
+                    Logger.info { "try to reload settings from '${geoNatureBaseUrl}'..." }
+
+                    configureServerSettingsViewModel.loadAppSettings(geoNatureBaseUrl)
+                }
+            }
+            is DataSyncSettingsJsonParseFailure -> {
+                makeSnackbar(
+                    getString(
+                        R.string.snackbar_settings_invalid
+                    )
+                )
+                    ?.setBackgroundTint(getErrorColor(this))
+                    ?.show()
+            }
+            is PackageInfoNotFoundFailure -> {
+                // should never occur...
+                Logger.error { "this app '${packageName}' seems to be incompatible..." }
+            }
+            else -> {
+                makeSnackbar(getString(fr.geonature.datasync.R.string.error_settings_undefined))
+                    ?.setBackgroundTint(getErrorColor(this))
+                    ?.show()
+            }
         }
     }
 
@@ -546,16 +636,6 @@ class HomeActivity : AppCompatActivity() {
 
     private fun checkGeoNatureSettings(): Boolean {
         return geoNatureAPIClient.checkSettings()
-    }
-
-    private fun startFirstSync(dataSyncSettings: DataSyncSettings) {
-        if (dataSyncViewModel.lastSynchronizedDate.value?.second == null && dataSyncViewModel.isSyncRunning.value != true) {
-            dataSyncViewModel.startSync(
-                dataSyncSettings,
-                HomeActivity::class.java,
-                MainApplication.CHANNEL_DATA_SYNCHRONIZATION
-            )
-        }
     }
 
     private fun confirmBeforeUpgrade(packageName: String) {

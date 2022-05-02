@@ -72,6 +72,7 @@
 
     <string name="snackbar_app_sync_not_found">"Sync" app is not installed</string>
     <string name="snackbar_settings_not_found">Unable to load settings \'%1$s\'</string>
+    <string name="snackbar_settings_invalid">Invalid app settings</string>
     <string name="snackbar_settings_map_invalid">Invalid map configuration from settings \'%1$s\'</string>
     <string name="snackbar_permissions_not_granted">Permissions were not granted</string>
     <string name="snackbar_permissions_granted">Permissions were been granted</string>

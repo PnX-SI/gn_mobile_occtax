@@ -71,6 +71,7 @@
 
     <string name="snackbar_app_sync_not_found">L\'application "Sync" n\'est pas installée</string>
     <string name="snackbar_settings_not_found">Erreur lors du chargement des paramètres \'%1$s\'</string>
+    <string name="snackbar_settings_invalid">Paramètres invalide</string>
     <string name="snackbar_settings_map_invalid">Mauvaise configuration du module cartographique depuis les paramètres \'%1$s\'</string>
     <string name="snackbar_permissions_not_granted">Les permissions n\'ont pas été accordées</string>
     <string name="snackbar_permissions_granted">Les permissions ont été accordées</string>

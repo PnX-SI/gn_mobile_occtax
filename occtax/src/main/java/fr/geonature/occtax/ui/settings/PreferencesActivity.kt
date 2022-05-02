@@ -7,7 +7,7 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
-import fr.geonature.commons.fp.getOrElse
+import fr.geonature.commons.fp.orNull
 import fr.geonature.datasync.api.IGeoNatureAPIClient
 import fr.geonature.datasync.settings.DataSyncSettingsViewModel
 import fr.geonature.occtax.BuildConfig
@@ -40,7 +40,7 @@ class PreferencesActivity : AppCompatActivity(),
 
         serverUrls = dataSyncSettingsViewModel
             .getServerBaseUrls()
-            .getOrElse(null)
+            .orNull()
 
         // Display the fragment as the main content.
         supportFragmentManager.beginTransaction()
@@ -57,12 +57,14 @@ class PreferencesActivity : AppCompatActivity(),
     override fun finish() {
         val currentServerUrls = dataSyncSettingsViewModel
             .getServerBaseUrls()
-            .getOrElse(null)
+            .orNull()
 
-        if (currentServerUrls != null) {
+        if (currentServerUrls != null && currentServerUrls != serverUrls) {
             dataSyncSettingsViewModel.setServerBaseUrls(
-                geoNatureServerUrl = currentServerUrls.geoNatureBaseUrl,
-                taxHubServerUrl = currentServerUrls.taxHubBaseUrl
+                IGeoNatureAPIClient.ServerUrls(
+                    geoNatureBaseUrl = currentServerUrls.geoNatureBaseUrl,
+                    taxHubBaseUrl = currentServerUrls.taxHubBaseUrl
+                )
             )
         }
 
