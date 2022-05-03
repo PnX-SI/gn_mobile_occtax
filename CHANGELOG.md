@@ -1,10 +1,31 @@
 # Changelog
 
+## [2.1.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.1.0-rc0) (2022-05-03, pre-release)
+
+### 🚀 Nouveautés
+
+* Il n'est plus nécessaire de saisir l'URL de TaxHub en plus de celle de GeoNature. Seule celle de
+  GeoNature est demandé à l'utilisateur, l'application se chargera de récupérer automatiquement
+  les paramètres depuis le serveur GeoNature, notamment l'URL de TaxHub.
+
+### 🐛 Corrections
+
+* https://github.com/PnX-SI/gn_mobile_occtax/issues/147
+* https://github.com/PnX-SI/gn_mobile_occtax/issues/133 (La synchronisation des relevés se fait manuellement par l'utilisateur via le bouton "Synchroniser")
+* https://github.com/PnX-SI/gn_mobile_occtax/issues/130 (cf. [commentaire](https://github.com/PnX-SI/gn_mobile_occtax/issues/130#issuecomment-1109794834))
+* https://github.com/PnX-SI/gn_mobile_occtax/issues/116
+* https://github.com/PnX-SI/gn_mobile_occtax/issues/114
+* Améliorations diverses autour de la synchronisation des paramètres et des données
+
+### ⚠️ Notes de version
+
+* Code de version : 2670
+
 ## [2.0.1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.0.1) (2022-03-30, release)
 
 ### 🐛 Corrections
 
-* #130
+* https://github.com/PnX-SI/gn_mobile_occtax/issues/130
 
 ### ⚠️ Notes de version
 
@@ -46,9 +67,9 @@ A partir de la version 2 d'Occtax-mobile, une seule application est nécessaire 
 
 ### 🐛 Corrections
 
-* Support de Android 11 (#88)
+* Support de Android 11 (https://github.com/PnX-SI/gn_mobile_occtax/issues/88)
 * https://github.com/PnX-SI/gn_mobile_maps/issues/7
-* #109
+* https://github.com/PnX-SI/gn_mobile_occtax/issues/109
 
 ### ⚠️ Notes de version
 
@@ -60,7 +81,7 @@ A partir de la version 2 d'Occtax-mobile, une seule application est nécessaire 
 
 ### 🐛 Corrections
 
-* Support partiel de Android 11 (#88)
+* Support partiel de Android 11 (https://github.com/PnX-SI/gn_mobile_occtax/issues/88)
 
 ### ⚠️ Notes de version
 
