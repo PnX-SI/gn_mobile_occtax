@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.1.0-rc0] (unreleased)
+
+### 🚀 Nouveautés
+
+* Récupération de l'URL de TaxHub directement dans le fichier de configuration (#)
+* à compléter
+
+### 🐛 Corrections
+
+* Nettoyage des sous-modules et fichiers modifiés
+* Suppression des reliquats de l'application Sync
+* Complétion des logs
+* Amélioration de la récupération des taxons
+
+### ⚠️ Notes de version
+
+* Code de version : --
+
 ## [2.0.1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.0.1) (2022-03-30, release)
 
 ### 🐛 Corrections
