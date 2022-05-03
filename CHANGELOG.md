@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.1.0-rc0] (https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.1.0-rc0) (2022-05-03, pre-release)
+
+### 🚀 Nouveautés
+
+* Il n'est plus nécessaire de saisir l'URL de TaxHub en plus de celle de GeoNature. Seule celle de
+  GeoNature est demandé à l'utilisateur, l'application se chargera de récuperer automatiquement
+  les paramètres depuis le serveur GeoNature, notamment l'URL de TaxHub.
+
+### 🐛 Corrections
+
+* #147
+* #133 (La synchronisation des relevés se fait manuellement par l'utilisateur via le bouton "Synchroniser")
+* #130 (cf. https://github.com/PnX-SI/gn_mobile_occtax/issues/130#issuecomment-1109794834)
+* #116
+* #114
+* Améliorations diverses autour de la synchronisation des paramètres et des données
+
+### ⚠️ Notes de version
+
+* Code de version : 2670
+
 ## [2.0.1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.0.1) (2022-03-30, release)
 
 ### 🐛 Corrections
