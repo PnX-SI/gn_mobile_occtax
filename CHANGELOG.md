@@ -10,17 +10,18 @@
 
 ### 🐛 Corrections
 
-* Amélioration et correction du cache et de la synchronisation des paramètres et des données (#130 (comment))
+* Amélioration et correction du cache et de la synchronisation des paramètres et des données (https://github.com/PnX-SI/gn_mobile_occtax/issues/130#issuecomment-1109794834)
 * L'authentification n'est demandée que lors de la synchronisation (#145)
-* Renommage du paramètre uh_application_id et gn_application_id (#116)
+* Renommage du paramètre ``uh_application_id`` en ``gn_application_id`` (#116)
 * Validation des taxons lors de la synchronisation (#147)
 * Nettoyage des sous-modules et fichiers modifiés
 * Suppression des reliquats de l'application Sync
 * Complétion des logs
+
 ### ⚠️ Notes de version
 
 * Code de version : **2670**
-* Le paramètre uh_application_id a été renommé gn_application_id. L'ancien nom du paramètre fonctionne toujours mais est déprécié. Il est donc conseillé de le renommer dans votre fichier settings.json
+* Le paramètre ``uh_application_id`` a été renommé ``gn_application_id``. L'ancien nom du paramètre fonctionne toujours mais est déprécié. Il est donc conseillé de le renommer dans votre fichier ``settings.json``
 
 ## [2.0.1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.0.1) (2022-03-30, release)
 
