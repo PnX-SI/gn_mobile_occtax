@@ -1,5 +1,36 @@
 # Changelog
 
+## [2.1.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.1.0) (2022-05-05, release)
+
+### 🚀 Nouveautés
+
+* L'utilisateur ne doit plus renseigner l'URL de TaxHub en plus de celle de GeoNature. Seule celle
+  de GeoNature est demandée à l'utilisateur, l'application se chargera de récupérer automatiquement
+  les paramètres depuis le serveur GeoNature, notamment l'URL de TaxHub
+  (https://github.com/PnX-SI/gn_mobile_occtax/issues/94).
+* Clarification des boutons d'ajout d'un dénombrement et d'un taxon
+  (https://github.com/PnX-SI/gn_mobile_occtax/issues/114)
+* La synchronisation des relevés n'est plus lancée automatiquement au lancement de l'application.
+  Elle ne se fait que manuellement par l'utilisateur via le bouton "Synchroniser"
+  (https://github.com/PnX-SI/gn_mobile_occtax/issues/133).
+
+### 🐛 Corrections
+
+* Amélioration et correction du cache et de la synchronisation des paramètres et des données
+  (https://github.com/PnX-SI/gn_mobile_occtax/issues/130 ([cf. commentaire](https://github.com/PnX-SI/gn_mobile_occtax/issues/130#issuecomment-1109794834)))
+* L'authentification n'est demandée que lors de la synchronisation (https://github.com/PnX-SI/gn_mobile_occtax/issues/145)
+* Renommage du paramètre `uh_application_id` en `gn_application_id` (https://github.com/PnX-SI/gn_mobile_occtax/issues/116)
+* Validation des taxons lors de la synchronisation (https://github.com/PnX-SI/gn_mobile_occtax/issues/147)
+* Nettoyage des sous-modules et fichiers modifiés
+* Complétion des logs
+
+### ⚠️ Notes de version
+
+* Code de version : 2680
+* Le paramètre `uh_application_id` a été renommé `gn_application_id`. L'ancien nom du paramètre
+  fonctionne toujours mais est déprécié. Il est donc conseillé de le renommer dans le fichier de
+  paramétrage (`settings.json` côté GeoNature).
+
 ## [2.1.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.1.0-rc1) (2022-05-04, pre-release)
 
 ### 🐛 Corrections
