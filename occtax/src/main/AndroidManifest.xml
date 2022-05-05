@@ -14,7 +14,6 @@
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
 
@@ -28,13 +27,18 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="fr.geonature.datasync.features.settings.presentation.ConfigureServerSettingsActivity"
+            android:exported="false"
+            android:label="@string/activity_configure_server_settings_title" />
+        <activity
             android:name="fr.geonature.datasync.ui.login.LoginActivity"
             android:label="@string/activity_login_title"
             android:theme="@style/AppTheme.Login"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.settings.PreferencesActivity"
-            android:label="@string/activity_preferences_title" />
+            android:label="@string/activity_preferences_title"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.dataset.DatasetListActivity"
             android:label="@string/activity_dataset_title"

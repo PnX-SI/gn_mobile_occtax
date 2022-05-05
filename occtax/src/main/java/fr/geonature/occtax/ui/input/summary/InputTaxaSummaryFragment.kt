@@ -18,7 +18,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.input.AbstractInput
@@ -45,7 +45,7 @@ class InputTaxaSummaryFragment : Fragment(),
     private var contentView: CoordinatorLayout? = null
     private var recyclerView: RecyclerView? = null
     private var emptyTextView: TextView? = null
-    private var fab: FloatingActionButton? = null
+    private var fab: ExtendedFloatingActionButton? = null
 
     private val onCommentDialogFragmentListener =
         object : CommentDialogFragment.OnCommentDialogFragmentListener {
@@ -96,11 +96,15 @@ class InputTaxaSummaryFragment : Fragment(),
         emptyTextView = view.findViewById(android.R.id.empty)
         emptyTextView?.text = getString(R.string.summary_no_data)
 
-        fab?.setOnClickListener {
-            ((activity as AbstractPagerFragmentActivity?))?.also {
-                input?.clearCurrentSelectedInputTaxon()
-                it.goToPreviousPage()
-                it.goToNextPage()
+        fab?.apply {
+            setText(R.string.action_add_taxon)
+            extend()
+            setOnClickListener {
+                ((activity as AbstractPagerFragmentActivity?))?.also {
+                    input?.clearCurrentSelectedInputTaxon()
+                    it.goToPreviousPage()
+                    it.goToNextPage()
+                }
             }
         }
 

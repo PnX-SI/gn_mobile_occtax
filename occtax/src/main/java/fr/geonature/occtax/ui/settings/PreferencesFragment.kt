@@ -16,7 +16,6 @@ import androidx.annotation.RequiresApi
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
-import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
@@ -27,6 +26,7 @@ import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.entity.InputObserver
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.datasync.api.IGeoNatureAPIClient
+import fr.geonature.datasync.features.settings.presentation.ConfigureServerSettingsDialogFragment
 import fr.geonature.maps.settings.MapSettings
 import fr.geonature.maps.util.MapSettingsPreferencesUtils
 import fr.geonature.mountpoint.util.MountPointUtils
@@ -147,16 +147,13 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
         loadDefaultDataset()
         loadDefaultObserver()
-        configurePermissions()
+        configurePermissionsPreference()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            configureNotifications()
+            configureNotificationsPreferences()
         }
 
-        setServerUrlsPreferences(
-            preferenceScreen,
-            arguments?.getParcelable(ARG_SERVER_URLS)
-        )
+        setServerUrlsPreferences(arguments?.getParcelable(ARG_SERVER_URLS))
         setMapSettingsPreferences(arguments?.getParcelable(ARG_MAP_SETTINGS))
         setMountPointsPreferences(preferenceScreen)
 
@@ -255,31 +252,62 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             )
     }
 
-    private fun setServerUrlsPreferences(
-        preferenceScreen: PreferenceScreen,
-        serverUrls: IGeoNatureAPIClient.ServerUrls?
-    ) {
-        val context = preferenceScreen.context
+    private fun setServerUrlsPreferences(serverUrls: IGeoNatureAPIClient.ServerUrls?) {
+        val serverSettingsPreference: Preference =
+            preferenceScreen.findPreference(getString(R.string.preference_category_server_geonature_url_key))
+                ?: return
 
-        val onPreferenceChangeListener =
-            Preference.OnPreferenceChangeListener { preference, newValue ->
-                preference.summary = newValue.toString()
-                true
+        val serverUrl =
+            PreferenceManager.getDefaultSharedPreferences(serverSettingsPreference.context)
+                .getString(
+                    getString(R.string.preference_category_server_geonature_url_key),
+                    serverUrls?.geoNatureBaseUrl
+                )
+
+        serverSettingsPreference.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            val supportFragmentManager =
+                activity?.supportFragmentManager ?: return@OnPreferenceClickListener false
+
+            ConfigureServerSettingsDialogFragment.newInstance(serverUrl).apply {
+                setOnConfigureServerSettingsDialogFragmentListener(object :
+                    ConfigureServerSettingsDialogFragment.OnConfigureServerSettingsDialogFragmentListener {
+                    override fun onChanged(url: String) {
+                        PreferenceManager.getDefaultSharedPreferences(serverSettingsPreference.context)
+                            .edit().also {
+                                it.putString(
+                                    getString(R.string.preference_category_server_geonature_url_key),
+                                    url
+                                )
+
+                                serverSettingsPreference.summary = url
+
+                                it.apply()
+                            }
+                    }
+                })
+                show(
+                    supportFragmentManager,
+                    SERVER_SETTINGS_DIALOG_FRAGMENT
+                )
             }
 
-        preferenceScreen
-            .findPreference<EditTextPreference?>(context.getString(R.string.preference_category_server_geonature_url_key))
-            ?.apply {
-                setOnBindEditTextListener { it.setSingleLine() }
-                summary = serverUrls?.geoNatureBaseUrl
-                setOnPreferenceChangeListener(onPreferenceChangeListener)
-            }
-        preferenceScreen
-            .findPreference<EditTextPreference?>(context.getString(R.string.preference_category_server_taxhub_url_key))
-            ?.apply {
-                setOnBindEditTextListener { it.setSingleLine() }
-                summary = serverUrls?.taxHubBaseUrl
-                setOnPreferenceChangeListener(onPreferenceChangeListener)
+            true
+        }
+
+        PreferenceManager.getDefaultSharedPreferences(serverSettingsPreference.context)
+            .edit().also {
+                if (serverUrl.isNullOrBlank()) {
+                    it.remove(getString(R.string.preference_category_server_geonature_url_key))
+                    serverSettingsPreference.setSummary(R.string.preference_category_server_geonature_url_not_set)
+                } else {
+                    it.putString(
+                        getString(R.string.preference_category_server_geonature_url_key),
+                        serverUrl
+                    )
+                    serverSettingsPreference.summary = serverUrl
+                }
+
+                it.apply()
             }
     }
 
@@ -391,7 +419,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         editor.apply()
     }
 
-    private fun configurePermissions() {
+    private fun configurePermissionsPreference() {
         preferenceScreen
             .findPreference<Preference>(getString(R.string.preference_category_permissions_configure_key))
             ?.apply {
@@ -413,7 +441,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun configureNotifications() {
+    private fun configureNotificationsPreferences() {
         preferenceScreen
             .findPreference<Preference>(getString(R.string.preference_category_notifications_configure_key))
             ?.apply {
@@ -445,6 +473,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         private const val LOADER_OBSERVER = 2
         private const val KEY_SELECTED_DATASET = "selected_dataset"
         private const val KEY_SELECTED_OBSERVER = "selected_observer"
+
+        private const val SERVER_SETTINGS_DIALOG_FRAGMENT = "server_settings_dialog_fragment"
 
         /**
          * Use this factory method to create a new instance of [PreferencesFragment].
