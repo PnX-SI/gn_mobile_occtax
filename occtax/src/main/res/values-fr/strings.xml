@@ -43,7 +43,7 @@
     <string name="action_search">Recherche</string>
     <string name="action_filter">Filtres</string>
     <string name="action_new_input">Nouveau relevé</string>
-    <string name="action_new_counting">Nouveau dénombrement</string>
+    <string name="action_new_counting">Ajouter un dénombrement</string>
     <string name="action_add">Ajouter</string>
     <string name="action_add_taxon">Ajouter un taxon</string>
     <string name="action_set">Modifier</string>
