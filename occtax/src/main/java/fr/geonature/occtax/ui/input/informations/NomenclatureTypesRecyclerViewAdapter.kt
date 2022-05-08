@@ -7,13 +7,13 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Button
-import android.widget.EditText
-import android.widget.FrameLayout
-import android.widget.TextView
-import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textfield.TextInputLayout
+import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.NomenclatureType
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
@@ -219,8 +219,12 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         }
 
         if (nomenclatureTypes.isEmpty()) {
+            val numberOfProperties = this.properties.size
             this.properties.clear()
-            notifyDataSetChanged()
+            notifyItemRangeRemoved(
+                0,
+                numberOfProperties
+            )
 
             return
         }
@@ -294,44 +298,37 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         }
     }
 
-    abstract inner class AbstractCardViewHolder(parent: ViewGroup) : AbstractViewHolder(
+    inner class NomenclatureTypeViewHolder(parent: ViewGroup) : AbstractViewHolder(
         LayoutInflater.from(parent.context).inflate(
-            R.layout.card_view,
+            R.layout.view_action_nomenclature_type_select,
             parent,
             false
         )
     ) {
-        internal val contentView: View
+        private var edit: TextInputLayout = itemView.findViewById(android.R.id.edit)
 
         init {
-            contentView = LayoutInflater.from(itemView.context)
-                .inflate(
-                    this.getLayoutResourceId(),
-                    itemView as FrameLayout,
-                    true
+            (edit.editText as? AutoCompleteTextView)?.setAdapter(
+                ArrayAdapter<Nomenclature>(
+                    parent.context,
+                    R.layout.list_item_2
                 )
-        }
-
-        @LayoutRes
-        abstract fun getLayoutResourceId(): Int
-    }
-
-    inner class NomenclatureTypeViewHolder(parent: ViewGroup) : AbstractCardViewHolder(parent) {
-        private var title: TextView = contentView.findViewById(android.R.id.title)
-        private var text1: TextView = contentView.findViewById(android.R.id.text1)
-        private var button1: Button = contentView.findViewById(android.R.id.button1)
-
-        override fun getLayoutResourceId(): Int {
-            return R.layout.view_action_nomenclature_type
+            )
         }
 
         override fun onBind(property: PropertyValue) {
-            title.text = getNomenclatureTypeLabel(property.code)
-            text1.text = property.label
+            with(edit) {
+                hint = getNomenclatureTypeLabel(property.code)
 
-            with(button1) {
-                tag = property
-                setOnClickListener(onClickListener)
+                editText?.apply {
+                    tag = property
+                    setOnClickListener(onClickListener)
+                    text = property.label?.let {
+                        Editable.Factory
+                            .getInstance()
+                            .newEditable(it)
+                    }
+                }
             }
         }
     }
@@ -356,9 +353,14 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         }
     }
 
-    open inner class TextSimpleViewHolder(parent: ViewGroup) : AbstractCardViewHolder(parent) {
-        private var title: TextView = contentView.findViewById(android.R.id.title)
-        internal var edit: EditText = contentView.findViewById(android.R.id.edit)
+    open inner class TextSimpleViewHolder(parent: ViewGroup) : AbstractViewHolder(
+        LayoutInflater.from(parent.context).inflate(
+            R.layout.view_action_edit_text,
+            parent,
+            false
+        )
+    ) {
+        internal var edit: TextInputLayout = itemView.findViewById(android.R.id.edit)
         private val textWatcher = object : TextWatcher {
             override fun beforeTextChanged(
                 s: CharSequence?,
@@ -386,7 +388,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
 
         init {
             with(edit) {
-                addTextChangedListener(textWatcher)
+                editText?.addTextChangedListener(textWatcher)
                 setOnFocusChangeListener { v, hasFocus ->
                     if (!hasFocus) {
                         // workaround to force hide the soft keyboard
@@ -396,35 +398,31 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             }
         }
 
-        override fun getLayoutResourceId(): Int {
-            return R.layout.view_action_edit_text
-        }
-
         override fun onBind(property: PropertyValue) {
-            title.text = getNomenclatureTypeLabel(property.code)
             edit.hint = getEditTextHint(property.code)
 
             if (property.value is String? && !property.value.isNullOrEmpty()) {
-                edit.removeTextChangedListener(textWatcher)
-                edit.text = Editable.Factory.getInstance()
-                    .newEditable(property.value)
-                edit.addTextChangedListener(textWatcher)
+                edit.editText?.removeTextChangedListener(textWatcher)
+                edit.editText?.text =
+                    property.value?.let { Editable.Factory.getInstance().newEditable(it) }
+                edit.editText?.addTextChangedListener(textWatcher)
             }
         }
 
         private fun getEditTextHint(mnemonic: String): String {
-            val resourceId = contentView.resources.getIdentifier(
+            val resourceId = itemView.resources.getIdentifier(
                 "information_${mnemonic.lowercase(Locale.getDefault())}_hint",
                 "string",
-                contentView.context.packageName
+                itemView.context.packageName
             )
-            return if (resourceId == 0) "" else contentView.context.getString(resourceId)
+            return if (resourceId == 0) "" else itemView.context.getString(resourceId)
         }
     }
 
     inner class TextMultipleViewHolder(parent: ViewGroup) : TextSimpleViewHolder(parent) {
         init {
-            edit.apply {
+            edit.isCounterEnabled = true
+            edit.editText?.apply {
                 isSingleLine = false
                 inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 minLines = 2

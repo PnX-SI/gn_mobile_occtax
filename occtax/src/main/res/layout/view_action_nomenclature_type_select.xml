@@ -3,19 +3,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@android:id/edit"
-    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="@dimen/padding_default"
-    tools:hint="Hint">
+    tools:hint="Nomenclature type">
 
-    <com.google.android.material.textfield.TextInputEditText
+    <AutoCompleteTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:imeOptions="actionDone"
-        android:importantForAutofill="no"
-        android:inputType="textNoSuggestions"
-        android:selectAllOnFocus="true"
-        tools:ignore="SpeakableTextPresentCheck,TextContrastCheck" />
+        android:inputType="none"
+        android:labelFor="@android:id/edit"
+        tools:ignore="LabelFor,SpeakableTextPresentCheck,TextContrastCheck" />
 
 </com.google.android.material.textfield.TextInputLayout>

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
@@ -151,6 +152,8 @@ class InformationFragment : Fragment(),
             container,
             false
         )
+        recyclerView.setPadding(resources.getDimensionPixelOffset(R.dimen.padding_default))
+
         // Set the adapter
         adapter = NomenclatureTypesRecyclerViewAdapter(object :
             NomenclatureTypesRecyclerViewAdapter.OnNomenclatureTypesRecyclerViewAdapterListener {
