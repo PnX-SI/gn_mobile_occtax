@@ -41,7 +41,7 @@ import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
 import fr.geonature.occtax.ui.observers.InputObserverListActivity
 import fr.geonature.occtax.ui.shared.view.ListItemActionView
 import fr.geonature.occtax.util.SettingsUtils.getDefaultDatasetId
-import fr.geonature.occtax.util.SettingsUtils.getDefaultObserverId
+import fr.geonature.occtax.util.SettingsUtils.getDefaultObserversId
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
 import org.tinylog.kotlin.Logger
@@ -71,6 +71,7 @@ class ObserversAndDateInputFragment : Fragment(),
     private lateinit var datasetResultLauncher: ActivityResultLauncher<Intent>
 
     private var input: Input? = null
+    private val defaultInputObservers: MutableList<InputObserver> = mutableListOf()
     private val selectedInputObservers: MutableList<InputObserver> = mutableListOf()
     private var selectedDataset: Dataset? = null
 
@@ -135,7 +136,6 @@ class ObserversAndDateInputFragment : Fragment(),
             loader: Loader<Cursor>,
             data: Cursor?
         ) {
-
             if (data == null) {
                 Logger.warn { "failed to load data from '${(loader as CursorLoader).uri}'" }
 
@@ -144,29 +144,34 @@ class ObserversAndDateInputFragment : Fragment(),
 
             when (loader.id) {
                 LOADER_OBSERVERS_IDS -> {
-                    selectedInputObservers.clear()
+                    val inputObserversLoaded = data.let { cursor ->
+                        mutableListOf<InputObserver>().let {
+                            if (cursor.moveToFirst()) {
+                                while (!cursor.isAfterLast) {
+                                    InputObserver.fromCursor(cursor)?.run {
+                                        it.add(this)
+                                    }
 
-                    if (data.count == 0) {
-                        input?.clearAllInputObservers()
-                        (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
-                    }
-
-                    if (data.moveToFirst()) {
-                        while (!data.isAfterLast) {
-                            val selectedInputObserver = InputObserver.fromCursor(data)
-
-                            if (selectedInputObserver != null) {
-                                selectedInputObservers.add(selectedInputObserver)
+                                    cursor.moveToNext()
+                                }
                             }
-
-                            data.moveToNext()
+                            it
                         }
                     }
 
-                    updateSelectedObserversActionView(selectedInputObservers)
+                    val defaultObserversId =
+                        context?.let { getDefaultObserversId(it) } ?: emptyList()
 
-                    LoaderManager.getInstance(this@ObserversAndDateInputFragment)
-                        .destroyLoader(LOADER_OBSERVERS_IDS)
+                    if (defaultInputObservers.isEmpty() && defaultObserversId.isNotEmpty()) {
+                        defaultInputObservers.addAll(inputObserversLoaded.filter { inputObserver -> defaultObserversId.any { it == inputObserver.id } })
+                    }
+
+                    with(selectedInputObservers) {
+                        clear()
+                        addAll(inputObserversLoaded)
+                    }
+
+                    updateSelectedObserversActionView(selectedInputObservers)
                 }
                 LOADER_DATASET_ID -> {
                     if (data.count == 0) {
@@ -180,9 +185,6 @@ class ObserversAndDateInputFragment : Fragment(),
                     }
 
                     updateSelectedDatasetActionView(selectedDataset)
-
-                    LoaderManager.getInstance(this@ObserversAndDateInputFragment)
-                        .destroyLoader(LOADER_DATASET_ID)
                 }
                 LOADER_DEFAULT_NOMENCLATURE_VALUES -> {
                     data.moveToFirst()
@@ -213,9 +215,6 @@ class ObserversAndDateInputFragment : Fragment(),
                         data.moveToNext()
                     }
 
-                    LoaderManager.getInstance(this@ObserversAndDateInputFragment)
-                        .destroyLoader(LOADER_DEFAULT_NOMENCLATURE_VALUES)
-
                     (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
 
                     if (input?.properties?.isNotEmpty() == false) {
@@ -230,6 +229,9 @@ class ObserversAndDateInputFragment : Fragment(),
                     }
                 }
             }
+
+            LoaderManager.getInstance(this@ObserversAndDateInputFragment)
+                .destroyLoader(loader.id)
         }
 
         override fun onLoaderReset(loader: Loader<Cursor>) {
@@ -365,10 +367,11 @@ class ObserversAndDateInputFragment : Fragment(),
     }
 
     override fun refreshView() {
-        setDefaultObserverFromSettings()
         setDefaultDatasetFromSettings()
 
-        val selectedInputObserverIds = input?.getAllInputObserverIds() ?: emptySet()
+        val selectedInputObserverIds =
+            input?.getAllInputObserverIds() ?: context?.let { getDefaultObserversId(it) }
+            ?: emptyList()
 
         if (selectedInputObserverIds.isNotEmpty()) {
             LoaderManager.getInstance(this)
@@ -414,7 +417,7 @@ class ObserversAndDateInputFragment : Fragment(),
                 bundleOf(
                     kotlin.Pair(
                         DefaultNomenclature.COLUMN_MODULE,
-                       moduleName
+                        moduleName
                     )
                 ),
                 loaderCallbacks
@@ -446,17 +449,7 @@ class ObserversAndDateInputFragment : Fragment(),
 
         input?.also {
             it.clearAllInputObservers()
-
-            if (selectedInputObservers.isEmpty()) {
-                val context = context ?: return
-                getDefaultObserverId(context).also { defaultObserverId ->
-                    if (defaultObserverId != null) it.setPrimaryInputObserverId(
-                        defaultObserverId
-                    )
-                }
-            }
-
-            it.setAllInputObservers(selectedInputObservers)
+            it.setAllInputObservers(selectedInputObservers.ifEmpty { this.defaultInputObservers })
         }
 
         (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
@@ -502,19 +495,6 @@ class ObserversAndDateInputFragment : Fragment(),
                 )
             )
         )
-    }
-
-    private fun setDefaultObserverFromSettings() {
-        input?.run {
-            if (this.getAllInputObserverIds().isEmpty()) {
-                val context = context ?: return
-                getDefaultObserverId(context).also { defaultObserverId ->
-                    if (defaultObserverId != null) this.setPrimaryInputObserverId(
-                        defaultObserverId
-                    )
-                }
-            }
-        }
     }
 
     private fun setDefaultDatasetFromSettings() {
