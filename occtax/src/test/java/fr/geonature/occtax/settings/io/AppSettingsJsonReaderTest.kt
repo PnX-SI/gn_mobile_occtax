@@ -43,8 +43,8 @@ class AppSettingsJsonReaderTest {
         assertNotNull(appSettings)
         assertEquals(
             AppSettings(
-                365,
-                MapSettings(
+                areaObservationDuration = 365,
+                mapSettings = MapSettings(
                     arrayListOf(
                         LayerSettings(
                             "Nantes",
@@ -75,7 +75,7 @@ class AppSettingsJsonReaderTest {
                         -1.554470
                     )
                 ),
-                NomenclatureSettings(
+                nomenclatureSettings = NomenclatureSettings(
                     arrayListOf(
                         PropertySettings(
                             "METH_OBS",
