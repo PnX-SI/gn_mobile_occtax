@@ -41,7 +41,6 @@ image::{gitplant}/arch.puml[Architecture]
 === Installation et configuration centralisées
 
 Il est nécessaire de gérer les fichiers de configuration, l'installation et la mise à jour des applications au niveau du serveur GeoNature.
-Voir https://github.com/PnX-SI/gn_mobile_core/issues/8[PnX-SI/gn_mobile_core#8].
 
 L'application *_Occtax-mobile_* se chargera alors de récupérer automatiquement sur le serveur GeoNature la dernière version du fichier de configuration des applications et détectera les éventuelles mises à jour disponibles pour l'application.
 
@@ -107,7 +106,7 @@ Le fichier de configuration sur le serveur écrasera celui sur le terminal à ch
 
 * Détail des paramètres du fichier de configuration : https://github.com/PnX-SI/gn_mobile_occtax#settings
 
-Le paramètre `page_size` permettent de paginer les appels aux routes renvoyant de nombreux résultats et ainsi les récupérer par lots (voir https://github.com/PnX-SI/gn_mobile_occtax/issues/37[#37]).
+Le paramètre `page_size` permet de paginer les appels aux routes renvoyant de nombreux résultats et ainsi les récupérer par lots.
 
 Exemples des routes paginées :
 
@@ -125,11 +124,11 @@ Les conditions d'arrêt de l'interrogation de ces routes sont :
 Le paramètre `code_area_type` correspond au type de zonage de votre référentiel géographique de GeoNature (champs `type_code` de la table `ref_geo.bib_areas_types`) utilisé pour les unités géographiques.
 Voir https://github.com/PnX-SI/gn_mobile_core/issues/15[PnX-SI/gn_mobile_core#15].
 
-Le paramètre `gn_application_id` permet de renseigner l'`id_application` de GeoNature dans la table `utilisateurs.t_applications` pour l'authentification des utilisateurs et leurs droits.
+Le paramètre `gn_application_id` permet de renseigner l' `id_application` de GeoNature dans la table `utilisateurs.t_applications` pour l'authentification des utilisateurs et leurs droits.
 
-Le paramètre `observers_list_id` permet de renseigner l`id_liste` des observateurs d'Occtax dans la table `utilisateurs.t_listes`.
+Le paramètre `observers_list_id` permet de renseigner l' `id_liste` des observateurs d'Occtax dans la table `utilisateurs.t_listes`.
 
-Le paramètre `taxa_list_id` permet de renseigner l'`id_liste` des taxons saisissables dans Occtax dans la table `taxonomie.bib_listes`.
+Le paramètre `taxa_list_id` permet de renseigner l' `id_liste` des taxons saisissables dans Occtax dans la table `taxonomie.bib_listes`.
 
 Le paramètre `area_observation_duration` est lié aux couleurs des taxons dans chaque unités géographiques en fonction de la date de dernière observation du taxon dans l'unité géographique.
 
@@ -268,20 +267,16 @@ Par exemple :
 Il est possible de tester l'application mobile en la connectant sur le https://demo.geonature.fr[serveur de démonstration].
 
 Pour cela, télécharger l'application *_Occtax-mobile_* et installez-la sur un terminal mobile.
-Renseignez dans ses paramètres l'URL du serveur de démo de GeoNature et TaxHub :
-
-* URL de GeoNature : https://demo.geonature.fr/geonature
-* URL de TaxHub : https://demo.geonature.fr/taxhub
+Lancez l'application et renseignez dans ses paramètres l'URL du serveur de démo de GeoNature et TaxHub (https://demo.geonature.fr/geonature).
 
 Authentifiez-vous avec l'utilisateur de démo (_admin_ / _admin_).
 L'application se chargera de télécharger le fichier de configuration puis lancera automatiquement une première synchronisation des données.
 
-Vous pouvez aussi utiliser les fichiers d'exemple de fond de carte et d'unités géographiques (mailles 10x10km), disponibles dans le dossier https://geonature.fr/data/maps/.
-À placer dans un répertoire `DCIM/maps` du stockage interne.
+Vous pouvez aussi utiliser les fichiers d'exemple de fond de carte et d'unités géographiques (mailles 10x10km), disponibles dans le dossier https://geonature.fr/data/maps/ et en les copiant dans le dossier que vous souhaitez sur le stockage interne ou la carte SD du terminal.
 
 == Logs
 
-Pour obtenir des logs de l'application mobile, on peut soit utiliser l'utilitaire `adb` (https://developer.android.com/studio/command-line/adb[Android Debug Bridge], il est intégré au kit de développement d'https://developer.android.com/studio#downloads[Android Studio] mais peut aussi être installé à part) ou les récupérer directement dans le répertoire des logs de l'application.
+Pour obtenir des logs de l'application mobile, on peut soit utiliser l'utilitaire `adb` (https://developer.android.com/studio/command-line/adb[Android Debug Bridge], il est intégré au kit de développement d'https://developer.android.com/studio#downloads[Android Studio] mais peut aussi être installé à part) ou les récupérer directement sur l'appareil mobile, dans le répertoire des logs de l'application.
 
 === adb
 
