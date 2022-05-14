@@ -15,7 +15,7 @@ import java.util.Locale
 /**
  * Default implementation of [InputJsonWriter.OnInputJsonWriterListener].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<Input> {
 
@@ -131,11 +131,19 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         writer: JsonWriter,
         input: Input
     ) {
-        val dateToIsoString = input.date.toIsoDateString()
-        writer.name("date_min")
-            .value(dateToIsoString)
-        writer.name("date_max")
-            .value(dateToIsoString)
+        input.startDate.run {
+            writer.name("date_min")
+                .value(toIsoDateString())
+            if (input.endDate == null) {
+                writer.name("date_max")
+                    .value(toIsoDateString())
+            }
+        }
+
+        input.endDate?.run {
+            writer.name("date_max")
+                .value(toIsoDateString())
+        }
     }
 
     private fun writeInputObserverIds(
@@ -227,7 +235,8 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
             if (it.value.isEmpty()) return@forEach
 
             when (it.key) {
-                "METH_OBS" -> writer.name("id_nomenclature_obs_technique").value(it.value.value as Long)
+                "METH_OBS" -> writer.name("id_nomenclature_obs_technique")
+                    .value(it.value.value as Long)
                 "ETA_BIO" -> writer.name("id_nomenclature_bio_condition")
                     .value(it.value.value as Long)
                 "METH_DETERMIN" -> writer.name("id_nomenclature_determination_method")

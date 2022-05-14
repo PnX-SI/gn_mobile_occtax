@@ -86,8 +86,12 @@ class InputJsonReaderTest {
             input.datasetId
         )
         assertEquals(
-            toDate("2016-10-28"),
-            input.date
+            toDate("2016-10-28T08:15:00Z"),
+            input.startDate
+        )
+        assertEquals(
+            toDate("2016-10-29T09:00:00Z"),
+            input.endDate
         )
         assertEquals(
             1L,
@@ -250,7 +254,7 @@ class InputJsonReaderTest {
         assertNull(input.datasetId)
         assertEquals(
             toDate("2016-10-28"),
-            input.date
+            input.startDate
         )
         assertNull(input.getPrimaryObserverId())
         assertArrayEquals(

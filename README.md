@@ -53,6 +53,10 @@ Example:
         "source": "nantes.mbtiles"
       }
     ]
+  },
+  "input": {
+    "start": "dt",
+    "end": "dt"
   }
 }
 ```
@@ -64,11 +68,36 @@ Example:
 | `area_observation_duration` | &#9744; | Area observation duration period (in days)                                                         | 365           |
 | `sync`                      | &#9744; | Data synchronization settings (cf. https://github.com/PnX-SI/gn_mobile_core/tree/develop/datasync) |               |
 | `map`                       | &#9744; | Maps settings (cf. https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps)                     |               |
+| `input`                     | &#9744; | Input settings                                                                                     |               |
 | `nomenclature`              | &#9744; | Nomenclature settings                                                                              |               |
 | `nomenclature/information`  | &#9744; | Information settings (as array)                                                                    |               |
 | `nomenclature/counting`     | &#9744; | Counting settings (as array)                                                                       |               |
 
-#### Nomenclature settings
+### Input settings
+
+Allows to configure settings related to user input.
+
+**Date settings**
+
+How the user can set the start and end date of the input:
+
+| Parameter | Description                                  | Default value |
+| --------- | -------------------------------------------- | ------------- |
+| `start`   | Configure the start date format of the input | `d`           |
+| `end`     | Configure the end date format of the input   | `null`        |
+
+The expected format describing the start and end date format must following the pattern `d[t]?`
+where:
+
+- `d`: represent the date part (mandatory) without time, let the user to set only the date part of
+  the parameter
+- `t`: represent the time part of the date, let the user to set also the time part of the parameter
+
+If nothing is configured, the default value is `d` for the start date and `null` for the end date
+format, which means the user can set the start date (without time) of the input but not the end date
+which take the start date as default value.
+
+### Nomenclature settings
 
 Allows to define if fields are displayed by default and if they are editable (visible). If a field is not editable (visible),
 it will use the default value set in Occtax database.

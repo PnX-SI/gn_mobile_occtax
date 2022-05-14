@@ -68,7 +68,8 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
 
         while (reader.hasNext()) {
             when (reader.nextName()) {
-                "date_min" -> input.date = toDate(reader.nextString()) ?: Date()
+                "date_min" -> input.startDate = toDate(reader.nextString()) ?: Date()
+                "date_max" -> input.endDate= toDate(reader.nextString())
                 "id_dataset" -> {
                     if (reader.peek() != JsonToken.NULL) {
                         input.datasetId = reader.nextLong()

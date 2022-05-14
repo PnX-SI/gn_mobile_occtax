@@ -28,6 +28,12 @@
       }
     ]
   },
+  "input": {
+    "date": {
+      "start": "dt",
+      "end": "d"
+    }
+  },
   "nomenclature": {
     "information": [
       "METH_OBS",

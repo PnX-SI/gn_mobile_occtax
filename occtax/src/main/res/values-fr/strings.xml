@@ -104,7 +104,10 @@
     <string name="observers_and_date_selected_observers_no_data">Aucun observateur sélectionné.\nAjouter en un via le bouton "Ajouter".</string>
     <string name="observers_and_date_dataset">Jeu de données</string>
     <string name="observers_and_date_date">Date</string>
-    <string name="observers_and_date_date_format">dd MMMM yyyy</string>
+    <string name="observers_and_date_date_start_hint">Date de début</string>
+    <string name="observers_and_date_date_end_hint">Date de fin</string>
+    <string name="observers_and_date_date_format">EEE dd MMM yyyy</string>
+    <string name="observers_and_date_datetime_format">EEE dd MMM yyyy à HH:mm</string>
 
     <plurals name="taxa_found">
         <item quantity="one">%d taxon trouvé</item>

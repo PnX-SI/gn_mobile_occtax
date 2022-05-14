@@ -29,7 +29,7 @@ class InputTest {
                 null,
                 133
             )
-            date = toDate("2016-10-28") ?: Date()
+            startDate = toDate("2016-10-28") ?: Date()
             setPrimaryInputObserverId(1L)
             addInputObserverId(5L)
             addInputObserverId(2L)

@@ -3,11 +3,14 @@ package fr.geonature.occtax.settings.io
 import android.util.JsonReader
 import android.util.JsonToken
 import fr.geonature.commons.settings.io.AppSettingsJsonReader
+import fr.geonature.commons.util.nextStringOrNull
 import fr.geonature.datasync.settings.DataSyncSettings
 import fr.geonature.datasync.settings.io.DataSyncSettingsJsonReader
 import fr.geonature.maps.settings.MapSettings
 import fr.geonature.maps.settings.io.MapSettingsReader
 import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.settings.InputDateSettings
+import fr.geonature.occtax.settings.InputSettings
 import fr.geonature.occtax.settings.NomenclatureSettings
 import fr.geonature.occtax.settings.PropertySettings
 import org.tinylog.Logger
@@ -34,6 +37,7 @@ class OnAppSettingsJsonReaderListenerImpl :
             "area_observation_duration" -> appSettings.areaObservationDuration = reader.nextInt()
             "sync" -> appSettings.dataSyncSettings = readDataSyncSettings(reader)
             "map" -> appSettings.mapSettings = readMapSettings(reader)
+            "input" -> appSettings.inputSettings = readInputSettings(reader)
             "nomenclature" -> appSettings.nomenclatureSettings = readNomenclatureSettings(reader)
             else -> reader.skipValue()
         }
@@ -57,6 +61,87 @@ class OnAppSettingsJsonReaderListenerImpl :
         }
 
         return MapSettingsReader().read(reader)
+    }
+
+    private fun readInputSettings(reader: JsonReader): InputSettings {
+        if (reader.peek() != JsonToken.BEGIN_OBJECT) {
+            reader.skipValue()
+
+            return InputSettings(dateSettings = InputDateSettings.DEFAULT)
+        }
+
+        var inputDateSettings: InputDateSettings? = null
+
+        reader.beginObject()
+
+        while (reader.hasNext()) {
+            when (reader.nextName()) {
+                "date" -> inputDateSettings = readInputDateSettings(reader)
+                else -> reader.skipValue()
+            }
+        }
+
+        reader.endObject()
+
+        return InputSettings(dateSettings = inputDateSettings ?: InputDateSettings.DEFAULT)
+    }
+
+    private fun readInputDateSettings(reader: JsonReader): InputDateSettings? {
+        if (reader.peek() != JsonToken.BEGIN_OBJECT) {
+            reader.skipValue()
+
+            return null
+        }
+
+        var startDateSettings: InputDateSettings.DateSettings? = null
+        var endDateSettings: InputDateSettings.DateSettings? = null
+
+        reader.beginObject()
+
+        while (reader.hasNext()) {
+            when (reader.nextName()) {
+                "start" -> startDateSettings = reader.nextStringOrNull()?.let {
+                    when (it.lowercase()) {
+                        "d" -> InputDateSettings.DateSettings.DATE
+                        "dt" -> InputDateSettings.DateSettings.DATETIME
+                        else -> {
+                            Logger.warn { "invalid value '$it' for property 'input.date.start'" }
+                            null
+                        }
+                    }
+                }
+                "end" -> endDateSettings = reader.nextStringOrNull()?.let {
+                    when (it.lowercase()) {
+                        "d" -> InputDateSettings.DateSettings.DATE
+                        "dt" -> InputDateSettings.DateSettings.DATETIME
+                        else -> {
+                            Logger.warn { "invalid value '$it' for property 'input.date.end'" }
+                            null
+                        }
+                    }
+                }
+                else -> reader.skipValue()
+            }
+        }
+
+        reader.endObject()
+
+        // no settings defined: abort
+        if (startDateSettings == null && endDateSettings == null) {
+            return null
+        }
+
+        // invalid settings: abort
+        if (startDateSettings == null && endDateSettings != null) {
+            return null
+        }
+
+        Logger.info { "input date settings loaded ('start': ${startDateSettings?.name?.lowercase()}, 'end': ${endDateSettings?.name?.lowercase()})" }
+
+        return InputDateSettings(
+            startDateSettings = startDateSettings,
+            endDateSettings = endDateSettings
+        )
     }
 
     private fun readNomenclatureSettings(reader: JsonReader): NomenclatureSettings? {

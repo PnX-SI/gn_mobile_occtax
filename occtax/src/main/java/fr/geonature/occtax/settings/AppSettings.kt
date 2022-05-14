@@ -15,6 +15,7 @@ data class AppSettings(
     var areaObservationDuration: Int = DEFAULT_AREA_OBSERVATION_DURATION,
     var dataSyncSettings: DataSyncSettings? = null,
     var mapSettings: MapSettings? = null,
+    var inputSettings: InputSettings? = null,
     var nomenclatureSettings: NomenclatureSettings? = null
 ) : IAppSettings {
 
@@ -22,6 +23,7 @@ data class AppSettings(
         source.readInt(),
         source.readParcelable(DataSyncSettings::class.java.classLoader) as DataSyncSettings?,
         source.readParcelable(MapSettings::class.java.classLoader) as MapSettings?,
+        source.readParcelable(InputSettings::class.java.classLoader) as InputSettings?,
         source.readParcelable(NomenclatureSettings::class.java.classLoader) as NomenclatureSettings?
     )
 
@@ -44,6 +46,10 @@ data class AppSettings(
                 0
             )
             it.writeParcelable(
+                inputSettings,
+                0
+            )
+            it.writeParcelable(
                 nomenclatureSettings,
                 0
             )
@@ -57,6 +63,7 @@ data class AppSettings(
         if (areaObservationDuration != other.areaObservationDuration) return false
         if (dataSyncSettings != other.dataSyncSettings) return false
         if (mapSettings != other.mapSettings) return false
+        if (inputSettings != other.inputSettings) return false
         if (nomenclatureSettings != other.nomenclatureSettings) return false
 
         return true
@@ -66,6 +73,7 @@ data class AppSettings(
         var result = areaObservationDuration
         result = 31 * result + (dataSyncSettings.hashCode())
         result = 31 * result + (mapSettings.hashCode())
+        result = 31 * result + (inputSettings.hashCode())
         result = 31 * result + (nomenclatureSettings.hashCode())
 
         return result

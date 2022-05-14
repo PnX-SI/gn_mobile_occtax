@@ -4,11 +4,14 @@ import android.app.Activity
 import android.content.Intent
 import android.database.Cursor
 import android.os.Bundle
+import android.text.Editable
 import android.text.format.DateFormat
+import android.text.format.DateFormat.is24HourFormat
 import android.util.Pair
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -20,7 +23,11 @@ import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
+import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
 import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.GeoNatureModuleName
@@ -35,6 +42,7 @@ import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.NomenclatureTypeViewType
 import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.settings.InputDateSettings
 import fr.geonature.occtax.ui.dataset.DatasetListActivity
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
@@ -44,10 +52,16 @@ import fr.geonature.occtax.util.SettingsUtils.getDefaultDatasetId
 import fr.geonature.occtax.util.SettingsUtils.getDefaultObserversId
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.tinylog.kotlin.Logger
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * Selected observer and current date as first {@code Fragment} used by [InputPagerFragmentActivity].
@@ -69,6 +83,7 @@ class ObserversAndDateInputFragment : Fragment(),
 
     private lateinit var observersResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var datasetResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var dateSettings: InputDateSettings
 
     private var input: Input? = null
     private val defaultInputObservers: MutableList<InputObserver> = mutableListOf()
@@ -77,7 +92,8 @@ class ObserversAndDateInputFragment : Fragment(),
 
     private var selectedInputObserversActionView: ListItemActionView? = null
     private var selectedDatasetActionView: ListItemActionView? = null
-    private var inputDateActionView: ListItemActionView? = null
+    private var dateStartTextInputLayout: TextInputLayout? = null
+    private var dateEndTextInputLayout: TextInputLayout? = null
 
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(
@@ -269,6 +285,7 @@ class ObserversAndDateInputFragment : Fragment(),
                     )
                 )
             }
+        dateSettings = arguments?.getParcelable(ARG_DATE_SETTINGS) ?: InputDateSettings.DEFAULT
     }
 
     override fun onCreateView(
@@ -283,68 +300,91 @@ class ObserversAndDateInputFragment : Fragment(),
             false
         )
 
-        selectedInputObserversActionView = view.findViewById(R.id.selected_observers_action_view)
-        selectedInputObserversActionView?.setListener(object :
-            ListItemActionView.OnListItemActionViewListener {
-            override fun onAction() {
-                val context = context ?: return
+        selectedInputObserversActionView =
+            view.findViewById<ListItemActionView?>(R.id.selected_observers_action_view)?.apply {
+                setListener(object : ListItemActionView.OnListItemActionViewListener {
+                    override fun onAction() {
+                        val context = context ?: return
 
-                observersResultLauncher.launch(
-                    InputObserverListActivity.newIntent(
-                        context,
-                        ListView.CHOICE_MODE_MULTIPLE,
-                        selectedInputObservers
-                    )
-                )
-            }
-        })
-
-        selectedDatasetActionView = view.findViewById(R.id.selected_dataset_action_view)
-        selectedDatasetActionView?.setListener(object :
-            ListItemActionView.OnListItemActionViewListener {
-            override fun onAction() {
-                val context = context ?: return
-
-                datasetResultLauncher.launch(
-                    DatasetListActivity.newIntent(
-                        context,
-                        selectedDataset
-                    )
-                )
-            }
-        })
-
-        inputDateActionView = view.findViewById(R.id.input_date_action_view)
-        inputDateActionView?.setListener(object : ListItemActionView.OnListItemActionViewListener {
-            override fun onAction() {
-                val supportFragmentManager = activity?.supportFragmentManager ?: return
-
-                val datePicker =
-                    MaterialDatePicker.Builder.datePicker().setSelection(input?.date?.time)
-                        .setCalendarConstraints(
-                            CalendarConstraints.Builder()
-                                .setValidator(DateValidatorPointBackward.now()).build()
-                        ).build()
-                datePicker.addOnPositiveButtonClickListener {
-                    input?.date = Date(it)
-                    inputDateActionView?.setItems(
-                        listOf(
-                            Pair.create(
-                                DateFormat.format(
-                                    getString(R.string.observers_and_date_date_format),
-                                    Date(it)
-                                ).toString(),
-                                ""
+                        observersResultLauncher.launch(
+                            InputObserverListActivity.newIntent(
+                                context,
+                                ListView.CHOICE_MODE_MULTIPLE,
+                                selectedInputObservers
                             )
                         )
-                    )
-                }
-                datePicker.show(
-                    supportFragmentManager,
-                    DATE_PICKER_DIALOG_FRAGMENT
-                )
+                    }
+                })
             }
-        })
+
+        selectedDatasetActionView =
+            view.findViewById<ListItemActionView?>(R.id.selected_dataset_action_view)?.apply {
+                setListener(object : ListItemActionView.OnListItemActionViewListener {
+                    override fun onAction() {
+                        val context = context ?: return
+
+                        datasetResultLauncher.launch(
+                            DatasetListActivity.newIntent(
+                                context,
+                                selectedDataset
+                            )
+                        )
+                    }
+                })
+            }
+
+        dateStartTextInputLayout = view.findViewById<TextInputLayout?>(R.id.dateStart)?.apply {
+            editText?.setOnClickListener {
+                CoroutineScope(Dispatchers.Main).launch {
+                    val startDate = selectDateTime(
+                        CalendarConstraints
+                            .Builder()
+                            .setValidator(DateValidatorPointBackward.now())
+                            .build(),
+                        dateSettings.startDateSettings == InputDateSettings.DateSettings.DATETIME,
+                        input?.startDate ?: Date()
+                    )
+
+                    input?.startDate = startDate
+                    dateStartTextInputLayout?.editText?.apply {
+                        updateDateEditText(
+                            this,
+                            dateSettings.startDateSettings ?: InputDateSettings.DateSettings.DATE,
+                            startDate
+                        )
+                    }
+                }
+            }
+        }
+
+        dateEndTextInputLayout = view.findViewById<TextInputLayout?>(R.id.dateEnd)?.apply {
+            visibility = if (dateSettings.endDateSettings == null) View.GONE else View.VISIBLE
+            editText?.setOnClickListener {
+                CoroutineScope(Dispatchers.Main).launch {
+                    val endDate = selectDateTime(
+                        CalendarConstraints
+                            .Builder()
+                            .setValidator(
+                                DateValidatorPointForward.from(
+                                    (input?.startDate ?: Date()).time
+                                )
+                            )
+                            .build(),
+                        dateSettings.endDateSettings == InputDateSettings.DateSettings.DATETIME,
+                        input?.endDate ?: input?.startDate ?: Date()
+                    )
+
+                    input?.endDate = endDate
+                    dateEndTextInputLayout?.editText?.apply {
+                        updateDateEditText(
+                            this,
+                            dateSettings.endDateSettings ?: InputDateSettings.DateSettings.DATE,
+                            endDate
+                        )
+                    }
+                }
+            }
+        }
 
         return view
     }
@@ -423,18 +463,20 @@ class ObserversAndDateInputFragment : Fragment(),
                 loaderCallbacks
             )
 
-        inputDateActionView?.setItems(
-            listOf(
-                Pair.create(
-                    DateFormat.format(
-                        getString(R.string.observers_and_date_date_format),
-                        input?.date
-                            ?: Date()
-                    ).toString(),
-                    ""
-                )
+        dateStartTextInputLayout?.editText?.apply {
+            updateDateEditText(
+                this,
+                dateSettings.startDateSettings ?: InputDateSettings.DateSettings.DATE,
+                input?.startDate ?: Date()
             )
-        )
+        }
+        dateEndTextInputLayout?.editText?.apply {
+            updateDateEditText(
+                this,
+                dateSettings.endDateSettings ?: InputDateSettings.DateSettings.DATE,
+                input?.endDate
+            )
+        }
     }
 
     override fun setInput(input: AbstractInput) {
@@ -508,9 +550,132 @@ class ObserversAndDateInputFragment : Fragment(),
         }
     }
 
+    /**
+     * Select a new date from given optional date through date/time pickers.
+     * If no date was given, use the current date.
+     */
+    private suspend fun selectDateTime(
+        bounds: CalendarConstraints,
+        withTime: Boolean = false,
+        from: Date = Date()
+    ): Date =
+        suspendCoroutine { continuation ->
+            val supportFragmentManager =
+                activity?.supportFragmentManager
+
+            if (supportFragmentManager == null) {
+                continuation.resume(from)
+
+                return@suspendCoroutine
+            }
+
+            val context = context
+
+            if (context == null) {
+                continuation.resume(from)
+
+                return@suspendCoroutine
+            }
+
+            with(
+                MaterialDatePicker.Builder
+                    .datePicker()
+                    .setSelection(from.time)
+                    .setCalendarConstraints(bounds)
+                    .build()
+            ) {
+                addOnPositiveButtonClickListener {
+                    val calendar = Calendar.getInstance().apply {
+                        time = Date(it)
+                        set(
+                            Calendar.HOUR_OF_DAY,
+                            Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+                        )
+                        set(
+                            Calendar.MINUTE,
+                            Calendar.getInstance().get(Calendar.MINUTE)
+                        )
+                    }
+
+                    if (!withTime) {
+                        continuation.resume(calendar.time)
+
+                        return@addOnPositiveButtonClickListener
+                    }
+
+                    with(
+                        MaterialTimePicker.Builder()
+                            .setTimeFormat(if (is24HourFormat(context)) TimeFormat.CLOCK_24H else TimeFormat.CLOCK_12H)
+                            .setHour(calendar.get(if (is24HourFormat(context)) Calendar.HOUR_OF_DAY else Calendar.HOUR))
+                            .setMinute(calendar.get(Calendar.MINUTE))
+                            .build()
+                    ) {
+                        addOnPositiveButtonClickListener {
+                            with(calendar.let { calendar ->
+                                calendar.set(
+                                    if (is24HourFormat(context)) Calendar.HOUR_OF_DAY else Calendar.HOUR,
+                                    hour
+                                )
+                                calendar.set(
+                                    Calendar.MINUTE,
+                                    minute
+                                )
+                                calendar.time
+                            }) {
+                                continuation.resume(this)
+                            }
+                        }
+                        addOnNegativeButtonClickListener {
+                            continuation.resume(calendar.time)
+                        }
+                        addOnCancelListener {
+                            continuation.resume(calendar.time)
+                        }
+                        show(
+                            supportFragmentManager,
+                            TIME_PICKER_DIALOG_FRAGMENT
+                        )
+                    }
+                }
+                addOnNegativeButtonClickListener {
+                    continuation.resume(from)
+                }
+                addOnCancelListener {
+                    continuation.resume(from)
+                }
+                show(
+                    supportFragmentManager,
+                    DATE_PICKER_DIALOG_FRAGMENT
+                )
+            }
+        }
+
+    private fun updateDateEditText(
+        editText: EditText,
+        dateSettings: InputDateSettings.DateSettings,
+        date: Date?
+    ) {
+        editText.text = date?.let {
+            Editable.Factory
+                .getInstance()
+                .newEditable(
+                    DateFormat.format(
+                        getString(
+                            if (dateSettings == InputDateSettings.DateSettings.DATETIME) R.string.observers_and_date_datetime_format
+                            else R.string.observers_and_date_date_format
+                        ),
+                        it
+                    ).toString()
+                )
+        }
+    }
+
     companion object {
 
+        private const val ARG_DATE_SETTINGS = "arg_date_settings"
+
         private const val DATE_PICKER_DIALOG_FRAGMENT = "date_picker_dialog_fragment"
+        private const val TIME_PICKER_DIALOG_FRAGMENT = "time_picker_dialog_fragment"
         private const val LOADER_OBSERVERS_IDS = 1
         private const val LOADER_DATASET_ID = 2
         private const val LOADER_DEFAULT_NOMENCLATURE_VALUES = 3
@@ -522,6 +687,13 @@ class ObserversAndDateInputFragment : Fragment(),
          * @return A new instance of [ObserversAndDateInputFragment]
          */
         @JvmStatic
-        fun newInstance() = ObserversAndDateInputFragment()
+        fun newInstance(dateSettings: InputDateSettings) = ObserversAndDateInputFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(
+                    ARG_DATE_SETTINGS,
+                    dateSettings
+                )
+            }
+        }
     }
 }

@@ -5,6 +5,8 @@ import fr.geonature.maps.settings.LayerSettings
 import fr.geonature.maps.settings.MapSettings
 import fr.geonature.occtax.FixtureHelper.getFixture
 import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.settings.InputDateSettings
+import fr.geonature.occtax.settings.InputSettings
 import fr.geonature.occtax.settings.NomenclatureSettings
 import fr.geonature.occtax.settings.PropertySettings
 import org.junit.Assert.assertEquals
@@ -20,11 +22,11 @@ import org.robolectric.RobolectricTestRunner
 /**
  * Unit tests about [AppSettingsJsonReader].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 @RunWith(RobolectricTestRunner::class)
 class AppSettingsJsonReaderTest {
-    lateinit var appSettingsJsonReader: AppSettingsJsonReader<AppSettings>
+    private lateinit var appSettingsJsonReader: AppSettingsJsonReader<AppSettings>
 
     @Before
     fun setUp() {
@@ -32,7 +34,7 @@ class AppSettingsJsonReaderTest {
     }
 
     @Test
-    fun testReadAppSettingsFromJsonString() {
+    fun `should read app settings from valid JSON file`() {
         // given a JSON settings
         val json = getFixture("settings_occtax.json")
 
@@ -73,6 +75,12 @@ class AppSettingsJsonReaderTest {
                     center = GeoPoint(
                         47.225827,
                         -1.554470
+                    )
+                ),
+                inputSettings = InputSettings(
+                    dateSettings = InputDateSettings(
+                        startDateSettings = InputDateSettings.DateSettings.DATETIME,
+                        endDateSettings = InputDateSettings.DateSettings.DATE
                     )
                 ),
                 nomenclatureSettings = NomenclatureSettings(
@@ -137,7 +145,7 @@ class AppSettingsJsonReaderTest {
     }
 
     @Test
-    fun testReadAppSettingsFromInvalidJsonString() {
+    fun `should fail to read app settings from invalid empty JSON`() {
         // when read an invalid JSON as AppSettings
         val appSettings = appSettingsJsonReader.read("")
 
@@ -146,7 +154,7 @@ class AppSettingsJsonReaderTest {
     }
 
     @Test
-    fun testReadAppSettingsFromJsonStringWithNoMapSettings() {
+    fun `should read app settings from JSON with no map settings`() {
         // when read an empty JSON as AppSettings
         val appSettings = appSettingsJsonReader.read("{\"map\":null}")
 
@@ -156,7 +164,44 @@ class AppSettingsJsonReaderTest {
     }
 
     @Test
-    fun testReadAppSettingsFromJsonStringWithNoNomenclatureSettings() {
+    fun `should read app settings from JSON with no input settings`() {
+        // when read an empty JSON as AppSettings
+        val appSettings = appSettingsJsonReader.read("{\"input\":null}")
+
+        // then
+        assertNotNull(appSettings)
+        assertEquals(
+            InputSettings(dateSettings = InputDateSettings.DEFAULT),
+            appSettings?.inputSettings
+        )
+    }
+
+    @Test
+    fun `should read app settings from JSON with input settings and no date settings`() {
+        assertEquals(
+            InputSettings(dateSettings = InputDateSettings.DEFAULT),
+            appSettingsJsonReader.read("{\"input\":{\"date\":null}}")?.inputSettings
+        )
+        assertEquals(
+            InputSettings(dateSettings = InputDateSettings.DEFAULT),
+            appSettingsJsonReader.read("{\"input\":{\"date\":{\"start\":null,\"end\":null}}}")?.inputSettings
+        )
+    }
+
+    @Test
+    fun `should read app settings from JSON with input settings and invalid date settings`() {
+        assertEquals(
+            InputSettings(dateSettings = InputDateSettings.DEFAULT),
+            appSettingsJsonReader.read("{\"input\":{\"date\":{\"start\":null,\"end\":\"dt\"}}}")?.inputSettings
+        )
+        assertEquals(
+            InputSettings(dateSettings = InputDateSettings.DEFAULT),
+            appSettingsJsonReader.read("{\"input\":{\"date\":{\"start\":\"no_such_settings\",\"end\":\"dt\"}}}")?.inputSettings
+        )
+    }
+
+    @Test
+    fun `should read app settings from JSON with no nomenclature settings`() {
         // when read an empty JSON as AppSettings
         val appSettings = appSettingsJsonReader.read("{\"nomenclature\":null}")
 
