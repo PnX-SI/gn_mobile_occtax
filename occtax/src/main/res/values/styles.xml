@@ -58,6 +58,7 @@
         <item name="boxStrokeColor">?android:textColorPrimaryInverse</item>
         <item name="android:textColorHint">?android:textColorPrimaryInverse</item>
         <item name="hintTextColor">?android:textColorPrimaryInverse</item>
+        <item name="endIconTint">?android:textColorPrimaryInverse</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
