@@ -44,10 +44,10 @@
     <string name="action_logout">Sign out</string>
     <string name="action_search">Search</string>
     <string name="action_filter">Apply filters</string>
-    <string name="action_new_input">New input</string>
-    <string name="action_new_counting">Add counting</string>
+    <string name="action_new_input">input</string>
+    <string name="action_new_counting">counting</string>
     <string name="action_add">Add</string>
-    <string name="action_add_taxon">Add taxon</string>
+    <string name="action_add_taxon">taxon</string>
     <string name="action_set">Set</string>
     <string name="action_edit">Edit</string>
     <plurals name="action_title_item_count_selected">
