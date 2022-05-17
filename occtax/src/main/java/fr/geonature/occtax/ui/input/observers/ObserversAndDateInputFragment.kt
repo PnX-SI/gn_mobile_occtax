@@ -182,12 +182,12 @@ class ObserversAndDateInputFragment : Fragment(),
                         defaultInputObservers.addAll(inputObserversLoaded.filter { inputObserver -> defaultObserversId.any { it == inputObserver.id } })
                     }
 
-                    with(selectedInputObservers) {
+                    selectedInputObservers.apply {
                         clear()
                         addAll(inputObserversLoaded)
                     }
 
-                    updateSelectedObserversActionView(selectedInputObservers)
+                    updateSelectedObservers(inputObserversLoaded)
                 }
                 LOADER_DATASET_ID -> {
                     if (data.count == 0) {
@@ -485,18 +485,16 @@ class ObserversAndDateInputFragment : Fragment(),
 
     private fun updateSelectedObservers(selectedInputObservers: List<InputObserver>) {
         this.selectedInputObservers.clear()
-        this.selectedInputObservers.addAll(
-            selectedInputObservers
-        )
+        this.selectedInputObservers.addAll(selectedInputObservers)
 
         input?.also {
             it.clearAllInputObservers()
             it.setAllInputObservers(selectedInputObservers.ifEmpty { this.defaultInputObservers })
         }
 
-        (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
-
         updateSelectedObserversActionView(selectedInputObservers)
+
+        (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
     }
 
     private fun updateSelectedDataset(selectedDataset: Dataset?) {
