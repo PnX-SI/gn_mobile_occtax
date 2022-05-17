@@ -4,7 +4,7 @@ import android.text.TextUtils
 import android.util.JsonWriter
 import fr.geonature.commons.input.AbstractInputTaxon
 import fr.geonature.commons.input.io.InputJsonWriter
-import fr.geonature.commons.util.toIsoDateString
+import fr.geonature.commons.util.format
 import fr.geonature.maps.jts.geojson.io.GeoJsonWriter
 import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
@@ -133,16 +133,19 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
     ) {
         input.startDate.run {
             writer.name("date_min")
-                .value(toIsoDateString())
+                .value(format("yyyy-MM-dd"))
+            writer.name("hour_min").value(format("HH:mm"))
             if (input.endDate == null) {
                 writer.name("date_max")
-                    .value(toIsoDateString())
+                    .value(format("yyyy-MM-dd"))
+                writer.name("hour_max").value(format("HH:mm"))
             }
         }
 
         input.endDate?.run {
             writer.name("date_max")
-                .value(toIsoDateString())
+                .value(format("yyyy-MM-dd"))
+            writer.name("hour_max").value(format("HH:mm"))
         }
     }
 

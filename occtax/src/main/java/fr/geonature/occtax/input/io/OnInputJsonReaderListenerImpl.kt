@@ -6,6 +6,8 @@ import android.util.JsonToken
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.input.io.InputJsonReader
+import fr.geonature.commons.util.get
+import fr.geonature.commons.util.set
 import fr.geonature.commons.util.toDate
 import fr.geonature.maps.jts.geojson.io.GeoJsonReader
 import fr.geonature.occtax.input.CountingMetadata
@@ -13,6 +15,7 @@ import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.input.PropertyValue
 import java.io.Serializable
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -68,8 +71,60 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
 
         while (reader.hasNext()) {
             when (reader.nextName()) {
-                "date_min" -> input.startDate = toDate(reader.nextString()) ?: Date()
-                "date_max" -> input.endDate= toDate(reader.nextString())
+                "date_min" -> toDate(reader.nextString())?.run {
+                    input.startDate = input.startDate.set(
+                        Calendar.YEAR,
+                        get(Calendar.YEAR)
+                    ).set(
+                        Calendar.MONTH,
+                        get(Calendar.MONTH)
+                    ).set(
+                        Calendar.DAY_OF_MONTH,
+                        get(Calendar.DAY_OF_MONTH)
+                    )
+                }
+                "hour_min" -> toDate(reader.nextString())?.run {
+                    input.startDate = input.startDate.set(
+                        Calendar.HOUR_OF_DAY,
+                        get(Calendar.HOUR_OF_DAY)
+                    ).set(
+                        Calendar.MINUTE,
+                        get(Calendar.MINUTE)
+                    ).set(
+                        Calendar.SECOND,
+                        0
+                    ).set(
+                        Calendar.MILLISECOND,
+                        0
+                    )
+                }
+                "date_max" -> toDate(reader.nextString())?.run {
+                    input.endDate = (input.endDate ?: Date()).set(
+                        Calendar.YEAR,
+                        get(Calendar.YEAR)
+                    ).set(
+                        Calendar.MONTH,
+                        get(Calendar.MONTH)
+                    ).set(
+                        Calendar.DAY_OF_MONTH,
+                        get(Calendar.DAY_OF_MONTH)
+                    )
+                }
+                "hour_max" -> toDate(reader.nextString())?.run {
+                    input.endDate = (input.endDate ?: Date()).set(
+                        Calendar.HOUR_OF_DAY,
+                        get(Calendar.HOUR_OF_DAY)
+                    ).set(
+                        Calendar.MINUTE,
+                        get(Calendar.MINUTE)
+                    ).set(
+                        Calendar.SECOND,
+                        0
+                    ).set(
+                        Calendar.MILLISECOND,
+                        0
+                    )
+                }
                 "id_dataset" -> {
                     if (reader.peek() != JsonToken.NULL) {
                         input.datasetId = reader.nextLong()

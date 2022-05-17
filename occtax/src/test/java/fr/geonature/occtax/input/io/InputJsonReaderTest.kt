@@ -35,7 +35,7 @@ class InputJsonReaderTest {
     }
 
     @Test
-    fun testReadInputFromInvalidJsonString() {
+    fun `should read null input from invalid json string`() {
         // when read an invalid JSON as Input
         val input = inputJsonReader.read("")
 
@@ -44,7 +44,7 @@ class InputJsonReaderTest {
     }
 
     @Test
-    fun testReadEmptyInput() {
+    fun `should read empty input`() {
         // given an input file to read
         val json = getFixture("input_empty.json")
 
@@ -64,7 +64,7 @@ class InputJsonReaderTest {
     }
 
     @Test
-    fun testReadInput() {
+    fun `should read input`() {
         // given an input file to read
         val json = getFixture("input_simple.json")
 
@@ -234,7 +234,7 @@ class InputJsonReaderTest {
     }
 
     @Test
-    fun testReadInputWithNoObserverAndNoTaxon() {
+    fun `should read input with no observer and no taxon`() {
         // given an input file to read
         val json = getFixture("input_no_observer_no_taxon.json")
 
