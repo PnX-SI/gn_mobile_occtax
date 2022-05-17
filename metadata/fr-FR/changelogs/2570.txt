@@ -1,0 +1,7 @@
+Ajouts et corrections
+ 
+- Fusion des applications Sync-mobile et Occtax-mobile en une seule application, en intégrant le module de synchronisation des données datasync dans Occtax-mobile
+- Mise en place d'un système de logs dans l'application pour en faciliter la récupération
+- Suppression des variantes par défaut, seule la version générique par défaut sera proposée
+- Révision de la documentation et intégration de diagrammes dans celle-ci
+- Dissocier le nom du module occtax de GeoNature du nom de package de l'application
