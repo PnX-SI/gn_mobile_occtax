@@ -43,11 +43,6 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
     private val properties = mutableListOf<PropertyValue>()
     private var showAllNomenclatureTypes = false
 
-    private val onClickListener: View.OnClickListener = View.OnClickListener { v ->
-        val selectedProperty = v.tag as PropertyValue
-        listener.onAction(selectedProperty.code)
-    }
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -319,10 +314,14 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         override fun onBind(property: PropertyValue) {
             with(edit) {
                 hint = getNomenclatureTypeLabel(property.code)
+                setEndIconOnClickListener {
+                    listener.onAction(property.code)
+                }
 
                 editText?.apply {
-                    tag = property
-                    setOnClickListener(onClickListener)
+                    setOnClickListener {
+                        listener.onAction(property.code)
+                    }
                     text = property.label?.let {
                         Editable.Factory
                             .getInstance()
