@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.2.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc1) (2022-05-18, pre-release)
+
+### 🐛 Corrections
+
+* Rendre "cliquable" l'indicateur de sélection des listes déroulantes (https://github.com/PnX-SI/gn_mobile_occtax/issues/158).
+* Disposition du clavier par rapport aux champs de saisie sur l'écran de login (https://github.com/PnX-SI/gn_mobile_occtax/issues/155).
+* Défilement des libellés des jeux de données (https://github.com/PnX-SI/gn_mobile_occtax/issues/120).
+* Taille des libellés sur les boutons "flottants" (https://github.com/PnX-SI/gn_mobile_occtax/issues/114).
+* Mise à jour de la sélection des observateurs par défaut sur l'écran "Observateurs & Date" (https://github.com/PnX-SI/gn_mobile_occtax/issues/110).
+* Gestion des attributs `hour_min` et `hour_max` lors de l'envoi d'un relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/104).
+
+### ⚠️ Notes de version
+
+* Code de version : 2905
+
 ## [2.2.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc0) (2022-05-16, pre-release)
 
 ### 🚀 Nouveautés
