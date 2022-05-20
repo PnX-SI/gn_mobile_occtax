@@ -255,3 +255,7 @@ A full build can be executed with the following command:
 ```
 ./gradlew clean assembleDebug
 ```
+
+## Financial support
+
+This application have been developped with the financial support of the [Office Français de la Biodiversité](https://www.ofb.gouv.fr/)
