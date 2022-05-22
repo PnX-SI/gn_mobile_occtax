@@ -107,7 +107,7 @@
     <string name="observers_and_date_date_start_hint">Start date</string>
     <string name="observers_and_date_date_end_hint">End date</string>
     <string name="observers_and_date_date_format">EEE dd MMM yyyy</string>
-    <string name="observers_and_date_datetime_format">EEE dd MMM yyyy at HH:mm</string>
+    <string name="observers_and_date_datetime_format">EEE dd MMM yyyy \'at\' HH:mm</string>
 
     <plurals name="taxa_found">
         <item quantity="one">%d taxon found</item>
