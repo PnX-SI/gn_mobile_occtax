@@ -21,7 +21,6 @@ import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputViewModel
 import fr.geonature.occtax.settings.AppSettings
-import fr.geonature.occtax.settings.InputDateSettings
 import fr.geonature.occtax.ui.input.counting.CountingFragment
 import fr.geonature.occtax.ui.input.informations.InformationFragment
 import fr.geonature.occtax.ui.input.map.InputMapFragment
@@ -103,9 +102,7 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
         get() = LinkedHashMap<Int, IValidateFragment>().apply {
             put(
                 R.string.pager_fragment_observers_and_date_input_title,
-                ObserversAndDateInputFragment.newInstance(
-                    appSettings.inputSettings?.dateSettings ?: InputDateSettings.DEFAULT
-                )
+                ObserversAndDateInputFragment.newInstance(appSettings.inputSettings.dateSettings)
             )
             put(
                 R.string.pager_fragment_map_title,
@@ -134,7 +131,10 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
         }
 
     override fun performFinishAction() {
-        inputViewModel.exportInput(input) {
+        inputViewModel.exportInput(
+            input,
+            appSettings
+        ) {
             finish()
         }
     }

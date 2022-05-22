@@ -7,6 +7,7 @@ import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.input.io.InputJsonReader
 import fr.geonature.commons.util.get
+import fr.geonature.commons.util.nextStringOrNull
 import fr.geonature.commons.util.set
 import fr.geonature.commons.util.toDate
 import fr.geonature.maps.jts.geojson.io.GeoJsonReader
@@ -69,10 +70,13 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
     ) {
         reader.beginObject()
 
+        var startDate: Date? = null
+        var endDate: Date? = null
+
         while (reader.hasNext()) {
             when (reader.nextName()) {
                 "date_min" -> toDate(reader.nextString())?.run {
-                    input.startDate = input.startDate.set(
+                    startDate = (startDate ?: this).set(
                         Calendar.YEAR,
                         get(Calendar.YEAR)
                     ).set(
@@ -83,8 +87,8 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
                         get(Calendar.DAY_OF_MONTH)
                     )
                 }
-                "hour_min" -> toDate(reader.nextString())?.run {
-                    input.startDate = input.startDate.set(
+                "hour_min" -> toDate(reader.nextStringOrNull())?.run {
+                    startDate = (startDate ?: this).set(
                         Calendar.HOUR_OF_DAY,
                         get(Calendar.HOUR_OF_DAY)
                     ).set(
@@ -99,7 +103,7 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
                     )
                 }
                 "date_max" -> toDate(reader.nextString())?.run {
-                    input.endDate = (input.endDate ?: Date()).set(
+                    endDate = (endDate ?: this).set(
                         Calendar.YEAR,
                         get(Calendar.YEAR)
                     ).set(
@@ -110,8 +114,8 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
                         get(Calendar.DAY_OF_MONTH)
                     )
                 }
-                "hour_max" -> toDate(reader.nextString())?.run {
-                    input.endDate = (input.endDate ?: Date()).set(
+                "hour_max" -> toDate(reader.nextStringOrNull())?.run {
+                    endDate = (endDate ?: this).set(
                         Calendar.HOUR_OF_DAY,
                         get(Calendar.HOUR_OF_DAY)
                     ).set(
@@ -179,6 +183,9 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
                 else -> reader.skipValue()
             }
         }
+
+        input.startDate = startDate ?: Date()
+        input.endDate = endDate
 
         reader.endObject()
     }

@@ -11,6 +11,7 @@ import fr.geonature.commons.input.IInputManager
 import fr.geonature.commons.input.InputManagerImpl
 import fr.geonature.occtax.input.io.OnInputJsonReaderListenerImpl
 import fr.geonature.occtax.input.io.OnInputJsonWriterListenerImpl
+import fr.geonature.occtax.settings.AppSettings
 import javax.inject.Singleton
 
 /**
@@ -27,7 +28,7 @@ object InputModule {
     fun provideInputManager(
         @ApplicationContext appContext: Context,
         @ContentProviderAuthority authority: String
-    ): IInputManager<Input> {
+    ): IInputManager<Input, AppSettings> {
         return InputManagerImpl(
             appContext,
             authority,

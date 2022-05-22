@@ -5,11 +5,14 @@ import android.util.JsonWriter
 import fr.geonature.commons.input.AbstractInputTaxon
 import fr.geonature.commons.input.io.InputJsonWriter
 import fr.geonature.commons.util.format
+import fr.geonature.commons.util.toIsoDateString
 import fr.geonature.maps.jts.geojson.io.GeoJsonWriter
 import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.settings.InputDateSettings
 import java.util.Locale
 
 /**
@@ -17,13 +20,15 @@ import java.util.Locale
  *
  * @author S. Grimault
  */
-class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<Input> {
+class OnInputJsonWriterListenerImpl :
+    InputJsonWriter.OnInputJsonWriterListener<Input, AppSettings> {
 
     private val geoJsonWriter = GeoJsonWriter()
 
     override fun writeAdditionalInputData(
         writer: JsonWriter,
-        input: Input
+        input: Input,
+        settings: AppSettings?
     ) {
         writeGeometry(
             writer,
@@ -31,7 +36,8 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
         )
         writeProperties(
             writer,
-            input
+            input,
+            settings
         )
     }
 
@@ -55,7 +61,8 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
 
     private fun writeProperties(
         writer: JsonWriter,
-        input: Input
+        input: Input,
+        settings: AppSettings? = null
     ) {
         writer.name("properties")
             .beginObject()
@@ -65,7 +72,8 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
 
         writeDate(
             writer,
-            input
+            input,
+            settings?.inputSettings?.dateSettings
         )
 
         writer.name("id_dataset")
@@ -129,23 +137,35 @@ class OnInputJsonWriterListenerImpl : InputJsonWriter.OnInputJsonWriterListener<
 
     private fun writeDate(
         writer: JsonWriter,
-        input: Input
+        input: Input,
+        dateSettings: InputDateSettings? = null
     ) {
         input.startDate.run {
             writer.name("date_min")
-                .value(format("yyyy-MM-dd"))
-            writer.name("hour_min").value(format("HH:mm"))
+                .value(if (dateSettings == null) toIsoDateString() else format("yyyy-MM-dd"))
+            writer.name("hour_min")
+                .value(
+                    if (dateSettings?.startDateSettings == InputDateSettings.DateSettings.DATETIME) format("HH:mm")
+                    else null
+                )
+
             if (input.endDate == null) {
                 writer.name("date_max")
-                    .value(format("yyyy-MM-dd"))
-                writer.name("hour_max").value(format("HH:mm"))
+                    .value(if (dateSettings == null) toIsoDateString() else format("yyyy-MM-dd"))
+                writer.name("hour_max").value(
+                    if (dateSettings?.startDateSettings == InputDateSettings.DateSettings.DATETIME) format("HH:mm")
+                    else null
+                )
             }
         }
 
         input.endDate?.run {
             writer.name("date_max")
-                .value(format("yyyy-MM-dd"))
-            writer.name("hour_max").value(format("HH:mm"))
+                .value(if (dateSettings == null) toIsoDateString() else format("yyyy-MM-dd"))
+            writer.name("hour_max").value(
+                if (dateSettings?.endDateSettings == InputDateSettings.DateSettings.DATETIME) format("HH:mm")
+                else null
+            )
         }
     }
 

@@ -4,10 +4,10 @@
   "geometry": null,
   "properties": {
     "meta_device_entry": "mobile",
-    "date_min": "2016-10-28",
-    "hour_min": "08:15",
-    "date_max": "2016-10-29",
-    "hour_max": "09:00",
+    "date_min": "2016-10-28T08:15:00Z",
+    "hour_min": null,
+    "date_max": "2016-10-29T09:00:00Z",
+    "hour_max": null,
     "id_dataset": 17,
     "id_digitiser": 1,
     "observers": [

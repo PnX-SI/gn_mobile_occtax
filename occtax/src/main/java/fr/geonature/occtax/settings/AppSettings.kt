@@ -13,17 +13,18 @@ import fr.geonature.maps.settings.MapSettings
  */
 data class AppSettings(
     var areaObservationDuration: Int = DEFAULT_AREA_OBSERVATION_DURATION,
+    var inputSettings: InputSettings = InputSettings(dateSettings = InputDateSettings.DEFAULT),
     var dataSyncSettings: DataSyncSettings? = null,
     var mapSettings: MapSettings? = null,
-    var inputSettings: InputSettings? = null,
     var nomenclatureSettings: NomenclatureSettings? = null
 ) : IAppSettings {
 
     private constructor(source: Parcel) : this(
         source.readInt(),
+        source.readParcelable(InputSettings::class.java.classLoader)
+            ?: InputSettings(dateSettings = InputDateSettings.DEFAULT),
         source.readParcelable(DataSyncSettings::class.java.classLoader) as DataSyncSettings?,
         source.readParcelable(MapSettings::class.java.classLoader) as MapSettings?,
-        source.readParcelable(InputSettings::class.java.classLoader) as InputSettings?,
         source.readParcelable(NomenclatureSettings::class.java.classLoader) as NomenclatureSettings?
     )
 
@@ -38,15 +39,15 @@ data class AppSettings(
         dest?.also {
             it.writeInt(areaObservationDuration)
             it.writeParcelable(
+                inputSettings,
+                0
+            )
+            it.writeParcelable(
                 dataSyncSettings,
                 0
             )
             it.writeParcelable(
                 mapSettings,
-                0
-            )
-            it.writeParcelable(
-                inputSettings,
                 0
             )
             it.writeParcelable(
@@ -61,9 +62,9 @@ data class AppSettings(
         if (other !is AppSettings) return false
 
         if (areaObservationDuration != other.areaObservationDuration) return false
+        if (inputSettings != other.inputSettings) return false
         if (dataSyncSettings != other.dataSyncSettings) return false
         if (mapSettings != other.mapSettings) return false
-        if (inputSettings != other.inputSettings) return false
         if (nomenclatureSettings != other.nomenclatureSettings) return false
 
         return true
@@ -71,9 +72,9 @@ data class AppSettings(
 
     override fun hashCode(): Int {
         var result = areaObservationDuration
+        result = 31 * result + (inputSettings.hashCode())
         result = 31 * result + (dataSyncSettings.hashCode())
         result = 31 * result + (mapSettings.hashCode())
-        result = 31 * result + (inputSettings.hashCode())
         result = 31 * result + (nomenclatureSettings.hashCode())
 
         return result
