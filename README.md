@@ -53,10 +53,6 @@ Example:
         "source": "nantes.mbtiles"
       }
     ]
-  },
-  "input": {
-    "start": "dt",
-    "end": "dt"
   }
 }
 ```
@@ -81,21 +77,19 @@ Allows to configure settings related to user input.
 
 How the user can set the start and end date of the input:
 
-| Parameter | Description                                  | Default value |
-| --------- | -------------------------------------------- | ------------- |
-| `start`   | Configure the start date format of the input | `d`           |
-| `end`     | Configure the end date format of the input   | `null`        |
+| Parameter         | Description                                                                  | Default value |
+| ----------------- | ---------------------------------------------------------------------------- | ------------- |
+| `enable_end_date` | Whether to edit as well the end date of the input                            | `false`       |
+| `enable_hours`    | Whether to edit as well the hour part of the start and end date (if enabled) | `false`       |
 
-The expected format describing the start and end date format must following the pattern `d[t]?`
-where:
+The combination of these parameters gives the following configuration:
 
-- `d`: represent the date part (mandatory) without time, let the user to set only the date part of
-  the parameter
-- `t`: represent the time part of the date, let the user to set also the time part of the parameter
+- `enable_end_date` and `enable_hours` are set to `false`: only the start date without the hour part is editable
+- only `enable_end_date` is set to `true`: the start and end date without the hour part are editable
+- only `enable_hours` is set to `true`: only the start date including the hour part is editable
+- `enable_end_date` and `enable_hours` are set to `true`: the start and end date with the hour part are editable
 
-If nothing is configured, the default value is `d` for the start date and `null` for the end date
-format, which means the user can set the start date (without time) of the input but not the end date
-which take the start date as default value.
+If nothing is configured, only the start date without the hour part is editable.
 
 ### Nomenclature settings
 

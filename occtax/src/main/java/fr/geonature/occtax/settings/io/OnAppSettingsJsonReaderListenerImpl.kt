@@ -3,7 +3,7 @@ package fr.geonature.occtax.settings.io
 import android.util.JsonReader
 import android.util.JsonToken
 import fr.geonature.commons.settings.io.AppSettingsJsonReader
-import fr.geonature.commons.util.nextStringOrNull
+import fr.geonature.commons.util.nextBooleanOrElse
 import fr.geonature.datasync.settings.DataSyncSettings
 import fr.geonature.datasync.settings.io.DataSyncSettingsJsonReader
 import fr.geonature.maps.settings.MapSettings
@@ -35,9 +35,9 @@ class OnAppSettingsJsonReaderListenerImpl :
     ) {
         when (keyName) {
             "area_observation_duration" -> appSettings.areaObservationDuration = reader.nextInt()
+            "input" -> appSettings.inputSettings = readInputSettings(reader)
             "sync" -> appSettings.dataSyncSettings = readDataSyncSettings(reader)
             "map" -> appSettings.mapSettings = readMapSettings(reader)
-            "input" -> appSettings.inputSettings = readInputSettings(reader)
             "nomenclature" -> appSettings.nomenclatureSettings = readNomenclatureSettings(reader)
             else -> reader.skipValue()
         }
@@ -93,55 +93,29 @@ class OnAppSettingsJsonReaderListenerImpl :
             return null
         }
 
-        var startDateSettings: InputDateSettings.DateSettings? = null
-        var endDateSettings: InputDateSettings.DateSettings? = null
+        var withEndDate = false
+        var withHours = false
 
         reader.beginObject()
 
         while (reader.hasNext()) {
             when (reader.nextName()) {
-                "start" -> startDateSettings = reader.nextStringOrNull()?.let {
-                    when (it.lowercase()) {
-                        "d" -> InputDateSettings.DateSettings.DATE
-                        "dt" -> InputDateSettings.DateSettings.DATETIME
-                        else -> {
-                            Logger.warn { "invalid value '$it' for property 'input.date.start'" }
-                            null
-                        }
-                    }
-                }
-                "end" -> endDateSettings = reader.nextStringOrNull()?.let {
-                    when (it.lowercase()) {
-                        "d" -> InputDateSettings.DateSettings.DATE
-                        "dt" -> InputDateSettings.DateSettings.DATETIME
-                        else -> {
-                            Logger.warn { "invalid value '$it' for property 'input.date.end'" }
-                            null
-                        }
-                    }
-                }
+                "enable_end_date" -> withEndDate = reader.nextBooleanOrElse { false }
+                "enable_hours" -> withHours = reader.nextBooleanOrElse { false }
                 else -> reader.skipValue()
             }
         }
 
         reader.endObject()
 
-        // no settings defined: abort
-        if (startDateSettings == null && endDateSettings == null) {
-            return null
-        }
-
-        // invalid settings: abort
-        if (startDateSettings == null && endDateSettings != null) {
-            return null
-        }
-
-        Logger.info { "input date settings loaded ('start': ${startDateSettings?.name?.lowercase()}, 'end': ${endDateSettings?.name?.lowercase()})" }
-
         return InputDateSettings(
-            startDateSettings = startDateSettings,
-            endDateSettings = endDateSettings
-        )
+            startDateSettings = if (withHours) InputDateSettings.DateSettings.DATETIME else InputDateSettings.DateSettings.DATE,
+            endDateSettings = if (withEndDate) InputDateSettings.DateSettings.DATE.let {
+                if (withHours) InputDateSettings.DateSettings.DATETIME else it
+            } else null
+        ).also {
+            Logger.info { "input date settings loaded ('start': ${it.startDateSettings?.name?.lowercase()}, 'end': ${it.endDateSettings?.name?.lowercase()})" }
+        }
     }
 
     private fun readNomenclatureSettings(reader: JsonReader): NomenclatureSettings? {

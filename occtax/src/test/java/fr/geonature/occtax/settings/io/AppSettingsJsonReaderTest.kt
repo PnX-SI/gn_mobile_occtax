@@ -77,12 +77,7 @@ class AppSettingsJsonReaderTest {
                         -1.554470
                     )
                 ),
-                inputSettings = InputSettings(
-                    dateSettings = InputDateSettings(
-                        startDateSettings = InputDateSettings.DateSettings.DATETIME,
-                        endDateSettings = InputDateSettings.DateSettings.DATE
-                    )
-                ),
+                inputSettings = InputSettings(dateSettings = InputDateSettings.DEFAULT),
                 nomenclatureSettings = NomenclatureSettings(
                     arrayListOf(
                         PropertySettings(
@@ -184,7 +179,7 @@ class AppSettingsJsonReaderTest {
         )
         assertEquals(
             InputSettings(dateSettings = InputDateSettings.DEFAULT),
-            appSettingsJsonReader.read("{\"input\":{\"date\":{\"start\":null,\"end\":null}}}")?.inputSettings
+            appSettingsJsonReader.read("{\"input\":{\"date\":{\"enable_end_date\":null,\"enable_hours\":null}}}")?.inputSettings
         )
     }
 
@@ -192,11 +187,62 @@ class AppSettingsJsonReaderTest {
     fun `should read app settings from JSON with input settings and invalid date settings`() {
         assertEquals(
             InputSettings(dateSettings = InputDateSettings.DEFAULT),
-            appSettingsJsonReader.read("{\"input\":{\"date\":{\"start\":null,\"end\":\"dt\"}}}")?.inputSettings
+            appSettingsJsonReader.read("{\"input\":{\"date\":{\"enable_end_date\":\"no_such_settings\",\"enable_hours\":\"no_such_settings\"}}}")?.inputSettings
         )
         assertEquals(
-            InputSettings(dateSettings = InputDateSettings.DEFAULT),
-            appSettingsJsonReader.read("{\"input\":{\"date\":{\"start\":\"no_such_settings\",\"end\":\"dt\"}}}")?.inputSettings
+            InputSettings(
+                dateSettings = InputDateSettings(
+                    startDateSettings = InputDateSettings.DateSettings.DATE,
+                    endDateSettings = InputDateSettings.DateSettings.DATE
+                )
+            ),
+            appSettingsJsonReader.read("{\"input\":{\"date\":{\"enable_end_date\":true,\"enable_hours\":\"no_such_settings\"}}}")?.inputSettings
+        )
+        assertEquals(
+            InputSettings(
+                dateSettings = InputDateSettings(
+                    startDateSettings = InputDateSettings.DateSettings.DATETIME
+                )
+            ),
+            appSettingsJsonReader.read("{\"input\":{\"date\":{\"enable_end_date\":\"no_such_settings\",\"enable_hours\":true}}}")?.inputSettings
+        )
+    }
+
+    @Test
+    fun `should read app settings from JSON with input settings and valid date settings`() {
+        assertEquals(
+            InputSettings(
+                dateSettings = InputDateSettings(
+                    startDateSettings = InputDateSettings.DateSettings.DATE
+                )
+            ),
+            appSettingsJsonReader.read("{\"input\":{\"date\":{\"enable_end_date\":false,\"enable_hours\":false}}}")?.inputSettings
+        )
+        assertEquals(
+            InputSettings(
+                dateSettings = InputDateSettings(
+                    startDateSettings = InputDateSettings.DateSettings.DATETIME
+                )
+            ),
+            appSettingsJsonReader.read("{\"input\":{\"date\":{\"enable_end_date\":false,\"enable_hours\":true}}}")?.inputSettings
+        )
+        assertEquals(
+            InputSettings(
+                dateSettings = InputDateSettings(
+                    startDateSettings = InputDateSettings.DateSettings.DATE,
+                    endDateSettings = InputDateSettings.DateSettings.DATE
+                )
+            ),
+            appSettingsJsonReader.read("{\"input\":{\"date\":{\"enable_end_date\":true,\"enable_hours\":false}}}")?.inputSettings
+        )
+        assertEquals(
+            InputSettings(
+                dateSettings = InputDateSettings(
+                    startDateSettings = InputDateSettings.DateSettings.DATETIME,
+                    endDateSettings = InputDateSettings.DateSettings.DATETIME
+                )
+            ),
+            appSettingsJsonReader.read("{\"input\":{\"date\":{\"enable_end_date\":true,\"enable_hours\":true}}}")?.inputSettings
         )
     }
 
