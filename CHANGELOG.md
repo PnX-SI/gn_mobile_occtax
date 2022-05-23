@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.2.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc2) (2022-05-23, pre-release)
+
+### 🐛 Corrections
+
+* Gestion des attributs `hour_min` et `hour_max` lors de l'envoi d'un relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/104).
+* Configuration de la date et de l'heure du relevé via le fichier de paramétrage (https://github.com/PnX-SI/gn_mobile_occtax/issues/104).
+* Corrections sur la résolution des fonds de carte embarqués sur le terminal, en privilégiant
+  d'abord la carte mémoire externe (si présente) puis l'espace de stockage interne
+  (cf. [README.md](https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps#base-path) du module)
+
+### ⚠️ Notes de version
+
+* Code de version : 2945
+
 ## [2.2.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc1) (2022-05-18, pre-release)
 
 ### 🐛 Corrections
