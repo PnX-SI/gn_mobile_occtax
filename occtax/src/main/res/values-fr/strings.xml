@@ -106,6 +106,10 @@
     <string name="observers_and_date_date">Date</string>
     <string name="observers_and_date_date_start_hint">Date de début</string>
     <string name="observers_and_date_date_end_hint">Date de fin</string>
+    <string name="observers_and_date_error_date_start_not_set">La date de début n\'a pas été définie</string>
+    <string name="observers_and_date_error_date_start_after_now">La date de début ne doit pas se situer dans le futur</string>
+    <string name="observers_and_date_error_date_end_not_set">La date de fin n\'a pas été définie</string>
+    <string name="observers_and_date_error_date_end_before_start_date">La date de fin doit être après celle du début</string>
     <string name="observers_and_date_date_format">EEE dd MMM yyyy</string>
     <string name="observers_and_date_datetime_format">EEE dd MMM yyyy \'à\' HH:mm</string>
 

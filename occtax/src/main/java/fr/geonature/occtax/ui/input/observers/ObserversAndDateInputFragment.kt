@@ -22,6 +22,7 @@ import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.CompositeDateValidator
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -38,6 +39,9 @@ import fr.geonature.commons.data.entity.InputObserver
 import fr.geonature.commons.data.entity.NomenclatureType
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.commons.input.AbstractInput
+import fr.geonature.commons.util.afterTextChanged
+import fr.geonature.commons.util.get
+import fr.geonature.commons.util.set
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.NomenclatureTypeViewType
@@ -334,6 +338,10 @@ class ObserversAndDateInputFragment : Fragment(),
             }
 
         dateStartTextInputLayout = view.findViewById<TextInputLayout?>(R.id.dateStart)?.apply {
+            editText?.afterTextChanged {
+                error = checkStartDateConstraints()
+                dateEndTextInputLayout?.error = checkEndDateConstraints()
+            }
             editText?.setOnClickListener {
                 CoroutineScope(Dispatchers.Main).launch {
                     val startDate = selectDateTime(
@@ -353,20 +361,31 @@ class ObserversAndDateInputFragment : Fragment(),
                             startDate
                         )
                     }
+
+                    (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
                 }
             }
         }
 
         dateEndTextInputLayout = view.findViewById<TextInputLayout?>(R.id.dateEnd)?.apply {
             visibility = if (dateSettings.endDateSettings == null) View.GONE else View.VISIBLE
+            editText?.afterTextChanged {
+                error = checkEndDateConstraints()
+                dateStartTextInputLayout?.error = checkStartDateConstraints()
+            }
             editText?.setOnClickListener {
                 CoroutineScope(Dispatchers.Main).launch {
                     val endDate = selectDateTime(
                         CalendarConstraints
                             .Builder()
                             .setValidator(
-                                DateValidatorPointForward.from(
-                                    (input?.startDate ?: Date()).time
+                                CompositeDateValidator.anyOf(
+                                    listOf(
+                                        DateValidatorPointForward.now(),
+                                        DateValidatorPointForward.from(
+                                            (input?.startDate ?: Date()).time
+                                        )
+                                    )
                                 )
                             )
                             .build(),
@@ -382,6 +401,8 @@ class ObserversAndDateInputFragment : Fragment(),
                             endDate
                         )
                     }
+
+                    (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
                 }
             }
         }
@@ -403,7 +424,11 @@ class ObserversAndDateInputFragment : Fragment(),
 
     override fun validate(): Boolean {
         return this.input?.getAllInputObserverIds()
-            ?.isNotEmpty() ?: false && this.input?.datasetId != null && this.input?.properties?.isNotEmpty() == true
+            ?.isNotEmpty() ?: false &&
+            this.input?.datasetId != null &&
+            this.input?.properties?.isNotEmpty() == true &&
+            checkStartDateConstraints() == null &&
+            checkEndDateConstraints() == null
     }
 
     override fun refreshView() {
@@ -583,20 +608,16 @@ class ObserversAndDateInputFragment : Fragment(),
                     .build()
             ) {
                 addOnPositiveButtonClickListener {
-                    val calendar = Calendar.getInstance().apply {
-                        time = Date(it)
-                        set(
-                            Calendar.HOUR_OF_DAY,
-                            Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-                        )
-                        set(
-                            Calendar.MINUTE,
-                            Calendar.getInstance().get(Calendar.MINUTE)
-                        )
-                    }
+                    val selectedDate = Date(it).set(
+                        Calendar.HOUR_OF_DAY,
+                        from.get(Calendar.HOUR_OF_DAY)
+                    ).set(
+                        Calendar.MINUTE,
+                        from.get(Calendar.MINUTE)
+                    )
 
                     if (!withTime) {
-                        continuation.resume(calendar.time)
+                        continuation.resume(selectedDate)
 
                         return@addOnPositiveButtonClickListener
                     }
@@ -604,30 +625,26 @@ class ObserversAndDateInputFragment : Fragment(),
                     with(
                         MaterialTimePicker.Builder()
                             .setTimeFormat(if (is24HourFormat(context)) TimeFormat.CLOCK_24H else TimeFormat.CLOCK_12H)
-                            .setHour(calendar.get(if (is24HourFormat(context)) Calendar.HOUR_OF_DAY else Calendar.HOUR))
-                            .setMinute(calendar.get(Calendar.MINUTE))
+                            .setHour(selectedDate.get(if (is24HourFormat(context)) Calendar.HOUR_OF_DAY else Calendar.HOUR))
+                            .setMinute(selectedDate.get(Calendar.MINUTE))
                             .build()
                     ) {
                         addOnPositiveButtonClickListener {
-                            with(calendar.let { calendar ->
-                                calendar.set(
+                            continuation.resume(
+                                selectedDate.set(
                                     if (is24HourFormat(context)) Calendar.HOUR_OF_DAY else Calendar.HOUR,
                                     hour
-                                )
-                                calendar.set(
+                                ).set(
                                     Calendar.MINUTE,
                                     minute
                                 )
-                                calendar.time
-                            }) {
-                                continuation.resume(this)
-                            }
+                            )
                         }
                         addOnNegativeButtonClickListener {
-                            continuation.resume(calendar.time)
+                            continuation.resume(selectedDate)
                         }
                         addOnCancelListener {
-                            continuation.resume(calendar.time)
+                            continuation.resume(selectedDate)
                         }
                         show(
                             supportFragmentManager,
@@ -666,6 +683,53 @@ class ObserversAndDateInputFragment : Fragment(),
                     ).toString()
                 )
         }
+    }
+
+    /**
+     * Checks start date constraints from current [AbstractInput].
+     *
+     * @return `null` if all constraints are valid, or an error message
+     */
+    private fun checkStartDateConstraints(): CharSequence? {
+        if (input == null) {
+            return null
+        }
+
+        val startDate = input?.startDate
+            ?: return getString(R.string.observers_and_date_error_date_start_not_set)
+
+        if (startDate.after(Date())) {
+            return getString(R.string.observers_and_date_error_date_start_after_now)
+        }
+
+        return null
+    }
+
+    /**
+     * Checks end date constraints from current [AbstractInput].
+     *
+     * @return `null` if all constraints are valid, or an error message
+     */
+    private fun checkEndDateConstraints(): CharSequence? {
+        if (input == null) {
+            return null
+        }
+
+        val endDate = input?.endDate
+
+        if (dateSettings.endDateSettings == null) {
+            return null
+        }
+
+        if (endDate == null) {
+            return getString(R.string.observers_and_date_error_date_end_not_set)
+        }
+
+        if ((input?.startDate ?: Date()).after(endDate)) {
+            return getString(R.string.observers_and_date_error_date_end_before_start_date)
+        }
+
+        return null
     }
 
     companion object {
