@@ -53,6 +53,12 @@ Example:
         "source": "nantes.mbtiles"
       }
     ]
+  },
+  "input": {
+    "date": {
+      "enable_end_date": true,
+      "enable_hours": true
+    }
   }
 }
 ```
@@ -64,7 +70,8 @@ Example:
 | `area_observation_duration` | &#9744; | Area observation duration period (in days)                                                         | 365           |
 | `sync`                      | &#9744; | Data synchronization settings (cf. https://github.com/PnX-SI/gn_mobile_core/tree/develop/datasync) |               |
 | `map`                       | &#9744; | Maps settings (cf. https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps)                     |               |
-| `input`                     | &#9744; | Input settings                                                                                     |               |
+| `input`                     | &#9744; | Input form settings                                                                                |               |
+| `input/date`                | &#9744; | Date settings                                                                                      |               |
 | `nomenclature`              | &#9744; | Nomenclature settings                                                                              |               |
 | `nomenclature/information`  | &#9744; | Information settings (as array)                                                                    |               |
 | `nomenclature/counting`     | &#9744; | Counting settings (as array)                                                                       |               |
