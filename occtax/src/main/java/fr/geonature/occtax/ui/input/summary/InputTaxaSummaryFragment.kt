@@ -34,7 +34,7 @@ import fr.geonature.viewpager.ui.IValidateFragment
 /**
  * Summary of all edited taxa.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class InputTaxaSummaryFragment : Fragment(),
     IValidateFragment,
@@ -280,6 +280,8 @@ class InputTaxaSummaryFragment : Fragment(),
     }
 
     override fun refreshView() {
+        // FIXME: this is a workaround to refresh adapter's list as getInputTaxa() items are not immutable...
+        if ((adapter?.itemCount ?: 0) > 0) adapter?.clear()
         adapter?.setItems(input?.getInputTaxa() ?: emptyList())
     }
 
