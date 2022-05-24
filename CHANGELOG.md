@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.2.0-rc3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc3) (2022-05-24, pre-release)
+
+### 🐛 Corrections
+
+* Rendre "cliquable" l'indicateur de sélection des listes déroulantes (https://github.com/PnX-SI/gn_mobile_occtax/issues/158).
+* Prise en compte du fuseau horaire sur les champs date lors de l'envoi d'un relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/104).
+* Prise en compte du dénombrement réalisé par taxon dans le récapitulatif.
+
+### ⚠️ Notes de version
+
+* Code de version : 2965
+
 ## [2.2.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc2) (2022-05-23, pre-release)
 
 ### 🐛 Corrections
