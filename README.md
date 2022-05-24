@@ -29,7 +29,7 @@ Example:
   "sync": {
     "geonature_url": "https://demo.geonature/geonature",
     "taxhub_url": "https://demo.geonature/taxhub",
-    "uh_application_id": 3,
+    "gn_application_id": 3,
     "observers_list_id": 1,
     "taxa_list_id": 100,
     "code_area_type": "M1",
@@ -39,18 +39,27 @@ Example:
     "show_scale": true,
     "show_compass": true,
     "max_bounds": [
-      [47.253369, -1.605721],
-      [47.173845, -1.482811]
+      [52.0, -6.0],
+      [41.0, 9.0]
     ],
-    "center": [47.225827, -1.55447],
+    "center": [46.0, 3.0],
     "start_zoom": 10.0,
     "min_zoom": 8.0,
     "max_zoom": 19.0,
     "min_zoom_editing": 12.0,
+    "base_path": "Offline_maps",
     "layers": [
       {
-        "label": "Nantes",
-        "source": "nantes.mbtiles"
+        "source": "plan.mbtiles",
+        "label": "IGN plan"
+      },
+      {
+        "source": "ortho.mbtiles",
+        "label": "IGN ortho"
+      },
+      {
+        "label": "OSM",
+        "source": "https://a.tile.openstreetmap.org"
       }
     ]
   },
