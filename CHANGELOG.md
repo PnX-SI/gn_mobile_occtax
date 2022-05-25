@@ -4,11 +4,11 @@
 
 ### 🚀 Nouveautés
 
-* Ajout de la possibilité de renseigner la date de fin ainsi que l'heure du relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/104)
-* Configuration de la date et de l'heure du relevé via le fichier de paramétrage (https://github.com/PnX-SI/gn_mobile_occtax/issues/104).
+* Ajout de la possibilité de renseigner la date de fin ainsi que les heures du relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/104)
+* Configuration des dates et des heures du relevé via le fichier de paramétrage (https://github.com/PnX-SI/gn_mobile_occtax/issues/104).
   La description du paramétrage est décrite dans le [README.md](https://github.com/PnX-SI/gn_mobile_occtax/tree/master#input-settings).
 * Possibilité de définir plusieurs observateurs par défaut (https://github.com/PnX-SI/gn_mobile_occtax/issues/110).
-* Légère refonte ergonomique des formulaires lors de l'édition d'un relevé.
+* Légère refonte ergonomique des formulaires d'édition.
 
 ### 🐛 Corrections
 
