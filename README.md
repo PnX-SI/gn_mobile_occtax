@@ -65,21 +65,8 @@ Example:
         }
       },
       {
-      "label": "Réserves Naturelles Nationales",
-      "source": "rnn.geojson",
-      "properties": {
-        "style": {
-          "stroke": true,
-          "color": "#00FF00",
-          "weight": 6,
-          "opacity": 0.8,
-          "fill": true,
-          "fillColor": "#000000",
-          "fillOpacity": 0.2
-          },
-        "min_zoom": 8.0,
-        "max_zoom": 24.0
-        }
+      "label": "Mailles 5x5",
+      "source": "mailles.geojson"
       }
     ]
   },
