@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.2.0]() (unreleased)
+## [2.2.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0) (unreleased)
 
 ### 🚀 Nouveautés
 
@@ -22,6 +22,18 @@
 ### ⚠️ Notes de version
 
 * Code de version : xxxx
+
+## [2.2.0-rc5](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc5) (2022-05-26, pre-release)
+
+### 🐛 Corrections
+
+* Ajout des contraintes de validation sur les champs date de début et de fin. La date de fin est
+  automatiquement fixée selon la date de début. Posssibilité de définir la même date de début et de
+  fin (https://github.com/PnX-SI/gn_mobile_occtax/issues/104).
+
+### ⚠️ Notes de version
+
+* Code de version : 3015
 
 ## [2.2.0-rc4](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc4) (2022-05-24, pre-release)
 
