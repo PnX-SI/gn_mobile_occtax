@@ -22,7 +22,6 @@ import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import com.google.android.material.datepicker.CalendarConstraints
-import com.google.android.material.datepicker.CompositeDateValidator
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -391,13 +390,21 @@ class ObserversAndDateInputFragment : Fragment(),
                         CalendarConstraints
                             .Builder()
                             .setValidator(
-                                CompositeDateValidator.anyOf(
-                                    listOf(
-                                        DateValidatorPointForward.now(),
-                                        DateValidatorPointForward.from(
-                                            (input?.startDate ?: Date()).time
-                                        )
-                                    )
+                                DateValidatorPointForward.from(
+                                    (input?.startDate ?: Date())
+                                        .set(
+                                            Calendar.HOUR_OF_DAY,
+                                            0
+                                        ).set(
+                                            Calendar.MINUTE,
+                                            0
+                                        ).set(
+                                            Calendar.SECOND,
+                                            0
+                                        ).set(
+                                            Calendar.MILLISECOND,
+                                            0
+                                        ).time
                                 )
                             )
                             .build(),
