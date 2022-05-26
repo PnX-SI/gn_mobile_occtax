@@ -28,7 +28,7 @@
 ### 🐛 Corrections
 
 * Ajout des contraintes de validation sur les champs date de début et de fin. La date de fin est
-  automatiquement fixée selon la date de début. Posssibilité de définir la même date de début et de
+  automatiquement fixée selon la date de début. Possibilité de définir la même date de début et de
   fin (https://github.com/PnX-SI/gn_mobile_occtax/issues/104).
 
 ### ⚠️ Notes de version
