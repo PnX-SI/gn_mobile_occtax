@@ -354,11 +354,23 @@ class ObserversAndDateInputFragment : Fragment(),
                     )
 
                     input?.startDate = startDate
+
+                    if (dateSettings.endDateSettings == null) {
+                        input?.endDate = startDate
+                    }
+
                     dateStartTextInputLayout?.editText?.apply {
                         updateDateEditText(
                             this,
                             dateSettings.startDateSettings ?: InputDateSettings.DateSettings.DATE,
                             startDate
+                        )
+                    }
+                    dateEndTextInputLayout?.editText?.apply {
+                        updateDateEditText(
+                            this,
+                            dateSettings.endDateSettings ?: InputDateSettings.DateSettings.DATE,
+                            input?.endDate
                         )
                     }
 
@@ -394,6 +406,13 @@ class ObserversAndDateInputFragment : Fragment(),
                     )
 
                     input?.endDate = endDate
+                    dateStartTextInputLayout?.editText?.apply {
+                        updateDateEditText(
+                            this,
+                            dateSettings.startDateSettings ?: InputDateSettings.DateSettings.DATE,
+                            input?.startDate
+                        )
+                    }
                     dateEndTextInputLayout?.editText?.apply {
                         updateDateEditText(
                             this,

@@ -4,6 +4,7 @@ import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.input.io.InputJsonWriter
 import fr.geonature.commons.util.toDate
+import fr.geonature.commons.util.toIsoDateString
 import fr.geonature.commons.util.toMap
 import fr.geonature.occtax.FixtureHelper.getFixture
 import fr.geonature.occtax.input.CountingMetadata
@@ -23,7 +24,6 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Date
 
 /**
  * Unit tests about [InputJsonWriter].
@@ -51,8 +51,8 @@ class InputJsonWriterTest {
                 null,
                 133L
             )
-            startDate = toDate("2016-10-28T08:15:00Z") ?: Date()
-            endDate = toDate("2016-10-29T09:00:00Z")
+            startDate = toDate("2016-10-28T08:15:00Z")!!
+            endDate = toDate("2016-10-29T09:00:00Z")!!
             setPrimaryInputObserverId(1L)
             addInputObserverId(5L)
             addInputObserverId(2L)
@@ -172,7 +172,7 @@ class InputJsonWriterTest {
     fun `should write input with only start date defined`() {
         // given an Input instance to write
         val input = Input().apply {
-            startDate = toDate("2016-10-28T08:15:00Z") ?: Date()
+            startDate = toDate("2016-10-28T08:15:00Z")!!
         }
 
         // when write this Input as JSON
@@ -186,7 +186,7 @@ class InputJsonWriterTest {
         )
         assertNull((json["properties"] as Map<*, *>)["hour_min"])
         assertEquals(
-            "2016-10-28T08:15:00Z",
+            input.endDate.toIsoDateString(),
             (json["properties"] as Map<*, *>)["date_max"]
         )
         assertNull((json["properties"] as Map<*, *>)["hour_max"])
@@ -196,7 +196,7 @@ class InputJsonWriterTest {
     fun `should write input with only start date defined following settings startDateSettings=DATE`() {
         // given an Input instance to write
         val input = Input().apply {
-            startDate = toDate("2016-10-28T08:15:00Z") ?: Date()
+            startDate = toDate("2016-10-28T08:15:00Z")!!
         }
 
         // when write this Input as JSON
@@ -213,14 +213,14 @@ class InputJsonWriterTest {
 
         // then
         assertEquals(
-            DateTimeFormatter.ofPattern("yyy-MM-dd")
+            DateTimeFormatter.ofPattern("yyyy-MM-dd")
                 .withZone(ZoneId.systemDefault())
                 .format(input.startDate.toInstant()),
             (json["properties"] as Map<*, *>)["date_min"]
         )
         assertNull((json["properties"] as Map<*, *>)["hour_min"])
         assertEquals(
-            DateTimeFormatter.ofPattern("yyy-MM-dd")
+            DateTimeFormatter.ofPattern("yyyy-MM-dd")
                 .withZone(ZoneId.systemDefault())
                 .format(input.startDate.toInstant()),
             (json["properties"] as Map<*, *>)["date_max"]
@@ -232,7 +232,7 @@ class InputJsonWriterTest {
     fun `should write input with only start date defined following settings startDateSettings=DATETIME`() {
         // given an Input instance to write
         val input = Input().apply {
-            startDate = toDate("2016-10-28T08:15:00Z") ?: Date()
+            startDate = toDate("2016-10-28T08:15:00Z")!!
         }
 
         // when write this Input as JSON
@@ -249,7 +249,7 @@ class InputJsonWriterTest {
 
         // then
         assertEquals(
-            DateTimeFormatter.ofPattern("yyy-MM-dd")
+            DateTimeFormatter.ofPattern("yyyy-MM-dd")
                 .withZone(ZoneId.systemDefault())
                 .format(input.startDate.toInstant()),
             (json["properties"] as Map<*, *>)["date_min"]
@@ -261,7 +261,7 @@ class InputJsonWriterTest {
             (json["properties"] as Map<*, *>)["hour_min"]
         )
         assertEquals(
-            DateTimeFormatter.ofPattern("yyy-MM-dd")
+            DateTimeFormatter.ofPattern("yyyy-MM-dd")
                 .withZone(ZoneId.systemDefault())
                 .format(input.startDate.toInstant()),
             (json["properties"] as Map<*, *>)["date_max"]
@@ -278,8 +278,8 @@ class InputJsonWriterTest {
     fun `should write input with start and end date defined following settings startDateSettings=DATE, endDateSettings=DATE`() {
         // given an Input instance to write
         val input = Input().apply {
-            startDate = toDate("2016-10-28T08:15:00Z") ?: Date()
-            endDate = toDate("2016-10-29T09:00:00Z")
+            startDate = toDate("2016-10-28T08:15:00Z")!!
+            endDate = toDate("2016-10-29T09:00:00Z")!!
         }
 
         // when write this Input as JSON
@@ -297,16 +297,16 @@ class InputJsonWriterTest {
 
         // then
         assertEquals(
-            DateTimeFormatter.ofPattern("yyy-MM-dd")
+            DateTimeFormatter.ofPattern("yyyy-MM-dd")
                 .withZone(ZoneId.systemDefault())
                 .format(input.startDate.toInstant()),
             (json["properties"] as Map<*, *>)["date_min"]
         )
         assertNull((json["properties"] as Map<*, *>)["hour_min"])
         assertEquals(
-            DateTimeFormatter.ofPattern("yyy-MM-dd")
+            DateTimeFormatter.ofPattern("yyyy-MM-dd")
                 .withZone(ZoneId.systemDefault())
-                .format(input.endDate?.toInstant()),
+                .format(input.endDate.toInstant()),
             (json["properties"] as Map<*, *>)["date_max"]
         )
         assertNull((json["properties"] as Map<*, *>)["hour_max"])
@@ -316,8 +316,8 @@ class InputJsonWriterTest {
     fun `should write input with start and end date defined following settings startDateSettings=DATETIME, endDateSettings=DATETIME`() {
         // given an Input instance to write
         val input = Input().apply {
-            startDate = toDate("2016-10-28T08:15:00Z") ?: Date()
-            endDate = toDate("2016-10-29T09:00:00Z")
+            startDate = toDate("2016-10-28T08:15:00Z")!!
+            endDate = toDate("2016-10-29T09:00:00Z")!!
         }
 
         // when write this Input as JSON
@@ -335,7 +335,7 @@ class InputJsonWriterTest {
 
         // then
         assertEquals(
-            DateTimeFormatter.ofPattern("yyy-MM-dd")
+            DateTimeFormatter.ofPattern("yyyy-MM-dd")
                 .withZone(ZoneId.systemDefault())
                 .format(input.startDate.toInstant()),
             (json["properties"] as Map<*, *>)["date_min"]
@@ -347,15 +347,15 @@ class InputJsonWriterTest {
             (json["properties"] as Map<*, *>)["hour_min"]
         )
         assertEquals(
-            DateTimeFormatter.ofPattern("yyy-MM-dd")
+            DateTimeFormatter.ofPattern("yyyy-MM-dd")
                 .withZone(ZoneId.systemDefault())
-                .format(input.endDate?.toInstant()),
+                .format(input.endDate.toInstant()),
             (json["properties"] as Map<*, *>)["date_max"]
         )
         assertEquals(
             DateTimeFormatter.ofPattern("HH:mm")
                 .withZone(ZoneId.systemDefault())
-                .format(input.endDate?.toInstant()),
+                .format(input.endDate.toInstant()),
             (json["properties"] as Map<*, *>)["hour_max"]
         )
     }

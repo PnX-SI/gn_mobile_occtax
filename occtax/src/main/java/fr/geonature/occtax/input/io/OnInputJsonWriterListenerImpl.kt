@@ -157,35 +157,26 @@ class OnInputJsonWriterListenerImpl :
                     )
                     else null
                 )
-
-            if (input.endDate == null) {
-                writer.name("date_max")
-                    .value(
-                        if (dateSettings == null) toIsoDateString() else format(
-                            "yyyy-MM-dd",
-                            TimeZone.getDefault()
-                        )
-                    )
-                writer.name("hour_max").value(
-                    if (dateSettings?.startDateSettings == InputDateSettings.DateSettings.DATETIME) format(
-                        "HH:mm",
-                        TimeZone.getDefault()
-                    )
-                    else null
-                )
-            }
         }
 
-        input.endDate?.run {
+        input.endDate.run {
             writer.name("date_max")
                 .value(
-                    if (dateSettings == null) toIsoDateString() else format(
+                    if (dateSettings == null) toIsoDateString()
+                    else if (dateSettings.endDateSettings != null) format(
+                        "yyyy-MM-dd",
+                        TimeZone.getDefault()
+                    ) else input.startDate.format(
                         "yyyy-MM-dd",
                         TimeZone.getDefault()
                     )
                 )
             writer.name("hour_max").value(
                 if (dateSettings?.endDateSettings == InputDateSettings.DateSettings.DATETIME) format(
+                    "HH:mm",
+                    TimeZone.getDefault()
+                )
+                else if (dateSettings?.startDateSettings == InputDateSettings.DateSettings.DATETIME) input.startDate.format(
                     "HH:mm",
                     TimeZone.getDefault()
                 )
