@@ -6,9 +6,10 @@
     <string name="preference_category_dataset_default">Default dataset</string>
     <string name="preference_category_dataset_default_not_set">Not defined</string>
     <string name="preference_category_observers">Observers</string>
-    <string name="preference_category_observers_default_key" translatable="false">observer_default</string>
-    <string name="preference_category_observers_default">Default observer</string>
+    <string name="preference_category_observers_default_key" translatable="false">observers_default</string>
+    <string name="preference_category_observers_default">Default observers</string>
     <string name="preference_category_observers_default_not_set">Not defined</string>
+    <string name="preference_category_observers_default_set_multiple">%d observers</string>
     <string name="preference_category_permissions">Permissions</string>
     <string name="preference_category_permissions_configure">Manage permissions</string>
     <string name="preference_category_permissions_configure_key" translatable="false">permissions</string>

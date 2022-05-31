@@ -10,7 +10,7 @@ import fr.geonature.occtax.input.Input
 /**
  * Default RecyclerView Adapter used by [HomeActivity].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<Input>) :
     AbstractListItemRecyclerViewAdapter<Input>(listener) {
@@ -56,7 +56,7 @@ class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<I
                 R.string.home_input_created_at,
                 DateFormat.format(
                     itemView.context.getString(R.string.home_input_date),
-                    item.date
+                    item.startDate
                 )
             )
             text2.text = if (item.getInputTaxa().isNotEmpty())

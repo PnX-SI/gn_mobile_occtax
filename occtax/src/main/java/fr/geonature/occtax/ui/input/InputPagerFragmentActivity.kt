@@ -102,7 +102,7 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
         get() = LinkedHashMap<Int, IValidateFragment>().apply {
             put(
                 R.string.pager_fragment_observers_and_date_input_title,
-                ObserversAndDateInputFragment.newInstance()
+                ObserversAndDateInputFragment.newInstance(appSettings.inputSettings.dateSettings)
             )
             put(
                 R.string.pager_fragment_map_title,
@@ -131,7 +131,10 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
         }
 
     override fun performFinishAction() {
-        inputViewModel.exportInput(input) {
+        inputViewModel.exportInput(
+            input,
+            appSettings
+        ) {
             finish()
         }
     }

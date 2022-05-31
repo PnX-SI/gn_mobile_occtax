@@ -42,10 +42,10 @@
     <string name="action_logout">Se déconnecter</string>
     <string name="action_search">Recherche</string>
     <string name="action_filter">Filtres</string>
-    <string name="action_new_input">Nouveau relevé</string>
-    <string name="action_new_counting">Nouveau dénombrement</string>
+    <string name="action_new_input">relevé</string>
+    <string name="action_new_counting">dénombrement</string>
     <string name="action_add">Ajouter</string>
-    <string name="action_add_taxon">Ajouter un taxon</string>
+    <string name="action_add_taxon">taxon</string>
     <string name="action_set">Modifier</string>
     <string name="action_edit">Modifier</string>
     <plurals name="action_title_item_count_selected">
@@ -62,8 +62,8 @@
     <string name="alert_new_app_version_action_ok">Mettre à jour</string>
     <string name="alert_new_app_version_action_later">Plus tard</string>
     <string name="alert_counting_title_discard">Supprimer ce dénombrement ?</string>
-    <string name="alert_counting_title_discard_changes">Supprimer les changements apportés à ce dénombrement ?</string>
-    <string name="alert_counting_action_discard">Supprimer</string>
+    <string name="alert_counting_title_discard_changes">Abandonner les changements apportés à ce dénombrement ?</string>
+    <string name="alert_counting_action_discard">Abandonner</string>
     <string name="alert_counting_action_keep">Continuer la saisie</string>
     <string name="alert_dialog_add_comment_title">Ajouter un commentaire</string>
     <string name="alert_dialog_edit_comment_title">Editer un commentaire</string>
@@ -104,7 +104,14 @@
     <string name="observers_and_date_selected_observers_no_data">Aucun observateur sélectionné.\nAjouter en un via le bouton "Ajouter".</string>
     <string name="observers_and_date_dataset">Jeu de données</string>
     <string name="observers_and_date_date">Date</string>
-    <string name="observers_and_date_date_format">dd MMMM yyyy</string>
+    <string name="observers_and_date_date_start_hint">Date de début</string>
+    <string name="observers_and_date_date_end_hint">Date de fin</string>
+    <string name="observers_and_date_error_date_start_not_set">La date de début n\'a pas été définie</string>
+    <string name="observers_and_date_error_date_start_after_now">La date de début ne doit pas se situer dans le futur</string>
+    <string name="observers_and_date_error_date_end_not_set">La date de fin n\'a pas été définie</string>
+    <string name="observers_and_date_error_date_end_before_start_date">La date de fin doit être après celle du début</string>
+    <string name="observers_and_date_date_format">EEE dd MMM yyyy</string>
+    <string name="observers_and_date_datetime_format">EEE dd MMM yyyy \'à\' HH:mm</string>
 
     <plurals name="taxa_found">
         <item quantity="one">%d taxon trouvé</item>
@@ -149,9 +156,6 @@
     <string name="counting_snackbar_counting_deleted">Dénombrement supprimé</string>
     <string name="counting_snackbar_counting_undo">Annuler</string>
     <string name="counting_toast_empty">Aucune information à sauvegarder</string>
-    <string name="counting_min_title">Min</string>
-    <string name="counting_max_title">Max</string>
-    <string name="counting_min_max_title">Min &amp; Max</string>
     <string name="counting_min_label">Min</string>
     <string name="counting_max_label">Max</string>
 

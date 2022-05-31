@@ -127,10 +127,7 @@ class MainApplication : Application(), Configuration.Provider {
     }
 
     private class TinylogUncaughtExceptionHandler : Thread.UncaughtExceptionHandler {
-        override fun uncaughtException(
-            thread: Thread?,
-            ex: Throwable?
-        ) {
+        override fun uncaughtException(thread: Thread, ex: Throwable) {
             Logger.error(ex)
             exitProcess(1)
         }

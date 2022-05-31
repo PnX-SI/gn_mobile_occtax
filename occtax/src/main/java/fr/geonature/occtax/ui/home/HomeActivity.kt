@@ -225,8 +225,6 @@ class HomeActivity : AppCompatActivity() {
             }
 
             override fun showEmptyTextView(show: Boolean) {
-                if (show) fab?.extend() else fab?.shrink()
-
                 if (inputEmptyTextView?.visibility == View.VISIBLE == show) {
                     return
                 }

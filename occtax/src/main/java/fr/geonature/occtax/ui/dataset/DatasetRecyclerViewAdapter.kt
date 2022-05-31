@@ -30,6 +30,12 @@ class DatasetRecyclerViewAdapter(private val listener: OnDatasetRecyclerViewAdap
         onClickListener = View.OnClickListener { v ->
             val previousSelectedItemPosition = getItemPosition(selectedDataset)
 
+            val title: TextView = v.findViewById(android.R.id.title)
+            title.isSelected = true
+
+            val text1: TextView = v.findViewById(android.R.id.text1)
+            text1.isSelected = true
+
             val checkbox: CheckBox = v.findViewById(android.R.id.checkbox)
             checkbox.isChecked = !checkbox.isChecked
 
@@ -147,7 +153,9 @@ class DatasetRecyclerViewAdapter(private val listener: OnDatasetRecyclerViewAdap
 
             if (dataset != null) {
                 title.text = dataset.name
+                title.isSelected = selectedDataset?.id == dataset.id
                 text1.text = dataset.description
+                text1.isSelected = selectedDataset?.id == dataset.id
                 text2.text = itemView.context.getString(
                     R.string.dataset_created_at,
                     DateFormat.format(

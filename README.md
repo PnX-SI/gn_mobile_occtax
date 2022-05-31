@@ -29,7 +29,7 @@ Example:
   "sync": {
     "geonature_url": "https://demo.geonature/geonature",
     "taxhub_url": "https://demo.geonature/taxhub",
-    "uh_application_id": 3,
+    "gn_application_id": 3,
     "observers_list_id": 1,
     "taxa_list_id": 100,
     "code_area_type": "M1",
@@ -39,20 +39,42 @@ Example:
     "show_scale": true,
     "show_compass": true,
     "max_bounds": [
-      [47.253369, -1.605721],
-      [47.173845, -1.482811]
+      [52.0, -6.0],
+      [41.0, 9.0]
     ],
-    "center": [47.225827, -1.55447],
+    "center": [46.0, 3.0],
     "start_zoom": 10.0,
     "min_zoom": 8.0,
     "max_zoom": 19.0,
     "min_zoom_editing": 12.0,
+    "base_path": "Offline_maps",
     "layers": [
       {
-        "label": "Nantes",
-        "source": "nantes.mbtiles"
+        "source": "plan.mbtiles",
+        "label": "IGN plan"
+      },
+      {
+        "source": "ortho.mbtiles",
+        "label": "IGN ortho"
+      },
+      {
+      "label": "OpenStreetMap",
+      "source": "https://a.tile.openstreetmap.org/",
+      "properties": {
+        "attribution": "© OSM contributors"
+        }
+      },
+      {
+      "label": "Mailles 5x5",
+      "source": "mailles.geojson"
       }
     ]
+  },
+  "input": {
+    "date": {
+      "enable_end_date": true,
+      "enable_hours": true
+    }
   }
 }
 ```
@@ -64,11 +86,35 @@ Example:
 | `area_observation_duration` | &#9744; | Area observation duration period (in days)                                                         | 365           |
 | `sync`                      | &#9744; | Data synchronization settings (cf. https://github.com/PnX-SI/gn_mobile_core/tree/develop/datasync) |               |
 | `map`                       | &#9744; | Maps settings (cf. https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps)                     |               |
+| `input`                     | &#9744; | Input form settings                                                                                |               |
+| `input/date`                | &#9744; | Date settings                                                                                      |               |
 | `nomenclature`              | &#9744; | Nomenclature settings                                                                              |               |
 | `nomenclature/information`  | &#9744; | Information settings (as array)                                                                    |               |
 | `nomenclature/counting`     | &#9744; | Counting settings (as array)                                                                       |               |
 
-#### Nomenclature settings
+### Input settings
+
+Allows to configure settings related to user input.
+
+**Date settings**
+
+How the user can set the start and end date of the input:
+
+| Parameter         | Description                                                                  | Default value |
+| ----------------- | ---------------------------------------------------------------------------- | ------------- |
+| `enable_end_date` | Whether to edit as well the end date of the input                            | `false`       |
+| `enable_hours`    | Whether to edit as well the hour part of the start and end date (if enabled) | `false`       |
+
+The combination of these parameters gives the following configuration:
+
+- `enable_end_date` and `enable_hours` are set to `false`: only the start date without the hour part is editable
+- only `enable_end_date` is set to `true`: the start and end date without the hour part are editable
+- only `enable_hours` is set to `true`: only the start date including the hour part is editable
+- `enable_end_date` and `enable_hours` are set to `true`: the start and end date with the hour part are editable
+
+If nothing is configured, only the start date without the hour part is editable.
+
+### Nomenclature settings
 
 Allows to define if fields are displayed by default and if they are editable (visible). If a field is not editable (visible),
 it will use the default value set in Occtax database.

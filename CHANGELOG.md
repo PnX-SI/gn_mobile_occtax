@@ -1,5 +1,108 @@
 # Changelog
 
+## [2.2.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0) (2022-05-31, release)
+
+### 🚀 Nouveautés
+
+* Ajout de la possibilité de renseigner la date de fin ainsi que les heures du relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/104)
+* Ajout des contraintes de validation sur les champs date de début et de fin. La date de fin est
+  automatiquement fixée selon la date de début. Possibilité de définir la même date de début et de
+  fin (https://github.com/PnX-SI/gn_mobile_occtax/issues/104).
+* Configuration des dates et des heures du relevé via le fichier de paramétrage (https://github.com/PnX-SI/gn_mobile_occtax/issues/104).
+  La description du paramétrage est décrite dans le [README.md](https://github.com/PnX-SI/gn_mobile_occtax/tree/master#input-settings).
+* Possibilité de définir plusieurs observateurs par défaut (https://github.com/PnX-SI/gn_mobile_occtax/issues/110).
+* Légère refonte ergonomique des formulaires d'édition.
+
+### 🐛 Corrections
+
+* Amélioration de la disposition du clavier par rapport aux champs de saisie sur l'écran de login (https://github.com/PnX-SI/gn_mobile_occtax/issues/155).
+* Défilement des libellés des jeux de données (https://github.com/PnX-SI/gn_mobile_occtax/issues/120).
+* Prise en compte du dénombrement réalisé par taxon dans le récapitulatif.
+* Taille des libellés sur les boutons "flottants" (https://github.com/PnX-SI/gn_mobile_occtax/issues/114).
+* Corrections sur la résolution des fonds de carte embarqués sur le terminal (https://github.com/PnX-SI/gn_mobile_occtax/issues/151), 
+  en privilégiant d'abord la carte mémoire externe (si présente) puis l'espace de stockage interne
+  (cf. [README.md](https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps#base-path) du module)
+
+### ⚠️ Notes de version
+
+* Code de version : 3020
+
+## [2.2.0-rc5](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc5) (2022-05-26, pre-release)
+
+### 🐛 Corrections
+
+* Ajout des contraintes de validation sur les champs date de début et de fin. La date de fin est
+  automatiquement fixée selon la date de début. Possibilité de définir la même date de début et de
+  fin (https://github.com/PnX-SI/gn_mobile_occtax/issues/104).
+
+### ⚠️ Notes de version
+
+* Code de version : 3015
+
+## [2.2.0-rc4](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc4) (2022-05-24, pre-release)
+
+### 🐛 Corrections
+
+* Ajout des contraintes de validation sur les champs date de début et de fin (https://github.com/PnX-SI/gn_mobile_occtax/issues/104).
+
+### ⚠️ Notes de version
+
+* Code de version : 2985
+
+## [2.2.0-rc3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc3) (2022-05-24, pre-release)
+
+### 🐛 Corrections
+
+* Rendre "cliquable" l'indicateur de sélection des listes déroulantes (https://github.com/PnX-SI/gn_mobile_occtax/issues/158).
+* Prise en compte du fuseau horaire sur les champs date lors de l'envoi d'un relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/104).
+* Prise en compte du dénombrement réalisé par taxon dans le récapitulatif.
+
+### ⚠️ Notes de version
+
+* Code de version : 2965
+
+## [2.2.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc2) (2022-05-23, pre-release)
+
+### 🐛 Corrections
+
+* Gestion des attributs `hour_min` et `hour_max` lors de l'envoi d'un relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/104).
+* Configuration de la date et de l'heure du relevé via le fichier de paramétrage (https://github.com/PnX-SI/gn_mobile_occtax/issues/104).
+* Corrections sur la résolution des fonds de carte embarqués sur le terminal, en privilégiant
+  d'abord la carte mémoire externe (si présente) puis l'espace de stockage interne
+  (cf. [README.md](https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps#base-path) du module)
+
+### ⚠️ Notes de version
+
+* Code de version : 2945
+
+## [2.2.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc1) (2022-05-18, pre-release)
+
+### 🐛 Corrections
+
+* Rendre "cliquable" l'indicateur de sélection des listes déroulantes (https://github.com/PnX-SI/gn_mobile_occtax/issues/158).
+* Disposition du clavier par rapport aux champs de saisie sur l'écran de login (https://github.com/PnX-SI/gn_mobile_occtax/issues/155).
+* Défilement des libellés des jeux de données (https://github.com/PnX-SI/gn_mobile_occtax/issues/120).
+* Taille des libellés sur les boutons "flottants" (https://github.com/PnX-SI/gn_mobile_occtax/issues/114).
+* Mise à jour de la sélection des observateurs par défaut sur l'écran "Observateurs & Date" (https://github.com/PnX-SI/gn_mobile_occtax/issues/110).
+* Gestion des attributs `hour_min` et `hour_max` lors de l'envoi d'un relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/104).
+
+### ⚠️ Notes de version
+
+* Code de version : 2905
+
+## [2.2.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc0) (2022-05-16, pre-release)
+
+### 🚀 Nouveautés
+
+* Configuration de la date et de l'heure du relevé via le fichier de paramétrage (https://github.com/PnX-SI/gn_mobile_occtax/issues/104).
+  La description du paramétrage est décrite dans le [README.md](https://github.com/PnX-SI/gn_mobile_occtax/tree/develop#input-settings).
+* Possibilité de définir plusieurs observateurs par défaut (https://github.com/PnX-SI/gn_mobile_occtax/issues/110).
+* Légère refonte ergonomique des formulaires lors de l'édition d'un relevé.
+
+### ⚠️ Notes de version
+
+* Code de version : 2870
+
 ## [2.1.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.1.0) (2022-05-05, release)
 
 ### 🚀 Nouveautés

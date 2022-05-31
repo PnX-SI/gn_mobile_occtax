@@ -34,7 +34,7 @@
             android:name="fr.geonature.datasync.ui.login.LoginActivity"
             android:label="@string/activity_login_title"
             android:theme="@style/AppTheme.Login"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.settings.PreferencesActivity"
             android:label="@string/activity_preferences_title"

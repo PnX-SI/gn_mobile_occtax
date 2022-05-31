@@ -44,10 +44,10 @@
     <string name="action_logout">Sign out</string>
     <string name="action_search">Search</string>
     <string name="action_filter">Apply filters</string>
-    <string name="action_new_input">New input</string>
-    <string name="action_new_counting">New counting</string>
+    <string name="action_new_input">input</string>
+    <string name="action_new_counting">counting</string>
     <string name="action_add">Add</string>
-    <string name="action_add_taxon">Add taxon</string>
+    <string name="action_add_taxon">taxon</string>
     <string name="action_set">Set</string>
     <string name="action_edit">Edit</string>
     <plurals name="action_title_item_count_selected">
@@ -104,7 +104,14 @@
     <string name="observers_and_date_selected_observers_no_data">No selected observer.\nAdd one by tapping the "Add" button.</string>
     <string name="observers_and_date_dataset">Dataset</string>
     <string name="observers_and_date_date">Date</string>
-    <string name="observers_and_date_date_format">MMMM dd, yyyy</string>
+    <string name="observers_and_date_date_start_hint">Start date</string>
+    <string name="observers_and_date_date_end_hint">End date</string>
+    <string name="observers_and_date_error_date_start_not_set">Missing start date</string>
+    <string name="observers_and_date_error_date_start_after_now">Start date should be set before now</string>
+    <string name="observers_and_date_error_date_end_not_set">Missing end date</string>
+    <string name="observers_and_date_error_date_end_before_start_date">End date should be after start date</string>
+    <string name="observers_and_date_date_format">EEE dd MMM yyyy</string>
+    <string name="observers_and_date_datetime_format">EEE dd MMM yyyy \'at\' HH:mm</string>
 
     <plurals name="taxa_found">
         <item quantity="one">%d taxon found</item>
@@ -145,9 +152,6 @@
     <string name="counting_snackbar_counting_deleted">Counting deleted</string>
     <string name="counting_snackbar_counting_undo">Undo</string>
     <string name="counting_toast_empty">Empty counting: Nothing to save</string>
-    <string name="counting_min_title">Min</string>
-    <string name="counting_max_title">Max</string>
-    <string name="counting_min_max_title">Min &amp; Max</string>
     <string name="counting_min_label">Min</string>
     <string name="counting_max_label">Max</string>
 

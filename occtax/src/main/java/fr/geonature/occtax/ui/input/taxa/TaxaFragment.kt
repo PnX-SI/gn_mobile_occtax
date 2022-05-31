@@ -233,6 +233,8 @@ class TaxaFragment : Fragment(),
 
                 input?.addInputTaxon(InputTaxon(taxon))
 
+                Logger.info { "selected taxon (id: ${taxon.id}, name: '${taxon.name}', taxonomy: (kingdom='${taxon.taxonomy.kingdom}', group='${taxon.taxonomy.group}'))" }
+
                 (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
             }
 
@@ -406,6 +408,8 @@ class TaxaFragment : Fragment(),
         val selectedInputTaxon = this.input?.getCurrentSelectedInputTaxon()
 
         if (selectedInputTaxon != null) {
+            Logger.info { "selected taxon (id: ${selectedInputTaxon.taxon.id}, name: '${selectedInputTaxon.taxon.name}', taxonomy: (kingdom='${selectedInputTaxon.taxon.taxonomy.kingdom}', group='${selectedInputTaxon.taxon.taxonomy.group}'))" }
+
             LoaderManager.getInstance(this)
                 .initLoader(
                     LOADER_TAXON,

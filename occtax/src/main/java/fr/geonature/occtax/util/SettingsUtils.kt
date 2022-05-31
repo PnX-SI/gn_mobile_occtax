@@ -29,18 +29,20 @@ object SettingsUtils {
     }
 
     /**
-     * Gets the default input observer ID to use.
+     * Gets the default input observers ID to use.
      *
      * @param context the current context
      *
-     * @return the default input observer ID or `null` if not set
+     * @return the default input observers ID or empty list if not set
      */
-    fun getDefaultObserverId(context: Context): Long? {
+    fun getDefaultObserversId(context: Context): List<Long> {
         return getDefaultSharedPreferences(context)
-            .getLong(
+            .getStringSet(
                 context.getString(R.string.preference_category_observers_default_key),
-                0
+                emptySet()
             )
-            .takeIf { it > 0 }
+            ?.mapNotNull { it.toLongOrNull() }
+            ?.toList()
+            ?: emptyList()
     }
 }

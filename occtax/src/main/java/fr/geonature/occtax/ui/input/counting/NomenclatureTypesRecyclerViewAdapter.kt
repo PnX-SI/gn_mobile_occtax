@@ -6,13 +6,12 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.FrameLayout
-import android.widget.TextView
-import androidx.annotation.LayoutRes
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textfield.TextInputLayout
+import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.NomenclatureType
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
@@ -28,21 +27,16 @@ import java.util.Locale
  * @author S. Grimault
  */
 class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureTypesRecyclerViewAdapterListener) :
-    RecyclerView.Adapter<NomenclatureTypesRecyclerViewAdapter.AbstractCardViewHolder>() {
+    RecyclerView.Adapter<NomenclatureTypesRecyclerViewAdapter.AbstractViewHolder>() {
 
     private val mnemonicFilter = CountingMetadata.defaultMnemonic
     private val availableNomenclatureTypes = mutableListOf<Pair<String, NomenclatureTypeViewType>>()
     private val properties = mutableListOf<PropertyValue>()
 
-    private val onClickListener: View.OnClickListener = View.OnClickListener { v ->
-        val selectedProperty = v.tag as PropertyValue
-        listener.onAction(selectedProperty.code)
-    }
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): AbstractCardViewHolder {
+    ): AbstractViewHolder {
         return when (NomenclatureTypeViewType.values()[viewType]) {
             NomenclatureTypeViewType.MIN_MAX -> MinMaxViewHolder(parent)
             else -> NomenclatureTypeViewHolder(parent)
@@ -55,7 +49,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
     }
 
     override fun onBindViewHolder(
-        holder: AbstractCardViewHolder,
+        holder: AbstractViewHolder,
         position: Int
     ) {
         holder.bind(properties[position])
@@ -208,8 +202,12 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         }
 
         if (nomenclatureTypes.isEmpty()) {
+            val numberOfProperties = this.properties.size
             this.properties.clear()
-            notifyDataSetChanged()
+            notifyItemRangeRemoved(
+                0,
+                numberOfProperties
+            )
 
             return
         }
@@ -256,29 +254,8 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         diffResult.dispatchUpdatesTo(this)
     }
 
-    abstract inner class AbstractCardViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
-        LayoutInflater.from(parent.context).inflate(
-            R.layout.card_view,
-            parent,
-            false
-        )
-    ) {
-        internal val contentView: View
+    abstract inner class AbstractViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private var property: PropertyValue? = null
-
-        init {
-            contentView = LayoutInflater.from(itemView.context)
-                .inflate(
-                    this.getLayoutResourceId(),
-                    itemView as FrameLayout,
-                    true
-                )
-
-            // workaround to force hide the soft keyboard
-            contentView.setOnClickListener {
-                it.clearFocus()
-            }
-        }
 
         fun bind(property: PropertyValue) {
             this.property = property
@@ -286,46 +263,67 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             onBind(property)
         }
 
-        @LayoutRes
-        abstract fun getLayoutResourceId(): Int
-
         abstract fun onBind(property: PropertyValue)
 
         fun getNomenclatureTypeLabel(mnemonic: String): String {
-            val resourceId = contentView.resources.getIdentifier(
+            val resourceId = itemView.resources.getIdentifier(
                 "nomenclature_${mnemonic.lowercase(Locale.getDefault())}",
                 "string",
-                contentView.context.packageName
+                itemView.context.packageName
             )
 
-            return if (resourceId == 0) mnemonic else contentView.context.getString(resourceId)
+            return if (resourceId == 0) mnemonic else itemView.context.getString(resourceId)
         }
     }
 
-    inner class NomenclatureTypeViewHolder(parent: ViewGroup) : AbstractCardViewHolder(parent) {
-        private var title: TextView = contentView.findViewById(android.R.id.title)
-        private var text1: TextView = contentView.findViewById(android.R.id.text1)
-        private var button1: Button = contentView.findViewById(android.R.id.button1)
+    inner class NomenclatureTypeViewHolder(parent: ViewGroup) : AbstractViewHolder(
+        LayoutInflater.from(parent.context).inflate(
+            R.layout.view_action_nomenclature_type_select,
+            parent,
+            false
+        )
+    ) {
+        private var edit: TextInputLayout = itemView.findViewById(android.R.id.edit)
 
-        override fun getLayoutResourceId(): Int {
-            return R.layout.view_action_nomenclature_type
+        init {
+            (edit.editText as? AutoCompleteTextView)?.setAdapter(
+                ArrayAdapter<Nomenclature>(
+                    parent.context,
+                    R.layout.list_item_2
+                )
+            )
         }
 
         override fun onBind(property: PropertyValue) {
-            title.text = getNomenclatureTypeLabel(property.code)
-            text1.text = property.label
+            with(edit) {
+                hint = getNomenclatureTypeLabel(property.code)
+                setEndIconOnClickListener {
+                    listener.onAction(property.code)
+                }
 
-            with(button1) {
-                tag = property
-                setOnClickListener(onClickListener)
+                editText?.apply {
+                    setOnClickListener {
+                        listener.onAction(property.code)
+                    }
+                    text = property.label?.let {
+                        Editable.Factory
+                            .getInstance()
+                            .newEditable(it)
+                    }
+                }
             }
         }
     }
 
-    inner class MinMaxViewHolder(parent: ViewGroup) : AbstractCardViewHolder(parent) {
-        private var title: TextView = contentView.findViewById(android.R.id.title)
-        private var editMin: EditText = contentView.findViewById(R.id.editMin)
-        private var editMax: EditText = contentView.findViewById(R.id.editMax)
+    inner class MinMaxViewHolder(parent: ViewGroup) : AbstractViewHolder(
+        LayoutInflater.from(parent.context).inflate(
+            R.layout.view_action_min_max,
+            parent,
+            false
+        )
+    ) {
+        private var editMin: TextInputLayout = itemView.findViewById(R.id.editMin)
+        private var editMax: TextInputLayout = itemView.findViewById(R.id.editMax)
 
         private val minTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(
@@ -346,12 +344,12 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
 
             override fun afterTextChanged(s: Editable?) {
                 val minValue = s?.toString()?.toIntOrNull() ?: 0
-                val maxValue = editMax.text?.toString()?.toIntOrNull() ?: 0
+                val maxValue = editMax.editText?.text?.toString()?.toIntOrNull() ?: 0
 
                 if (minValue > maxValue) setMaxValue(minValue)
 
                 setMinValue(minValue)
-                editMin.setSelection(minValue.toString().length)
+                editMin.editText?.setSelection(minValue.toString().length)
 
                 listener.onMinMaxValues(
                     minValue,
@@ -378,11 +376,11 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             }
 
             override fun afterTextChanged(s: Editable?) {
-                val minValue = editMin.text?.toString()?.toIntOrNull() ?: 0
+                val minValue = editMin.editText?.text?.toString()?.toIntOrNull() ?: 0
                 val maxValue = s?.toString()?.toIntOrNull() ?: 0
 
                 setMaxValue(maxValue)
-                editMax.setSelection(maxValue.toString().length)
+                editMax.editText?.setSelection(maxValue.toString().length)
 
                 listener.onMinMaxValues(
                     minValue,
@@ -394,7 +392,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
         init {
             with(editMin) {
                 visibility = View.GONE
-                addTextChangedListener(minTextWatcher)
+                editText?.addTextChangedListener(minTextWatcher)
                 setOnFocusChangeListener { v, hasFocus ->
                     if (!hasFocus) {
                         // workaround to force hide the soft keyboard
@@ -405,14 +403,14 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
 
             with(editMax) {
                 visibility = View.GONE
-                addTextChangedListener(maxTextWatcher)
+                editText?.addTextChangedListener(maxTextWatcher)
                 setOnFocusChangeListener { v, hasFocus ->
                     if (!hasFocus) {
                         // workaround to force hide the soft keyboard
                         hideSoftKeyboard(v)
 
-                        val minValue = editMin.text?.toString()?.toIntOrNull() ?: 0
-                        val maxValue = editMax.text?.toString()?.toIntOrNull() ?: 0
+                        val minValue = editMin.editText?.text?.toString()?.toIntOrNull() ?: 0
+                        val maxValue = editMax.editText?.text?.toString()?.toIntOrNull() ?: 0
 
                         if (minValue > maxValue) setMaxValue(minValue)
                     }
@@ -420,13 +418,7 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             }
         }
 
-        override fun getLayoutResourceId(): Int {
-            return R.layout.view_action_min_max
-        }
-
         override fun onBind(property: PropertyValue) {
-            setTitle(property)
-
             editMin.visibility =
                 if (hasMinAndMaxPropertyValues() || property.code == "MIN") View.VISIBLE else View.GONE
             editMax.visibility =
@@ -441,35 +433,23 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             }
         }
 
-        private fun setTitle(property: PropertyValue) {
-            title.setText(if (hasMinAndMaxPropertyValues()) {
-                R.string.counting_min_max_title
-            } else {
-                contentView.resources.getIdentifier(
-                    "counting_${property.code.lowercase(Locale.ROOT)}_title",
-                    "string",
-                    contentView.context.packageName
-                ).takeIf { it > 0 } ?: R.string.counting_min_max_title
-            })
-        }
-
         private fun setMinValue(min: Int = 0) {
             editMin.also {
-                it.removeTextChangedListener(minTextWatcher)
-                it.text = Editable.Factory.getInstance()
+                it.editText?.removeTextChangedListener(minTextWatcher)
+                it.editText?.text = Editable.Factory.getInstance()
                     .newEditable(min.toString())
-                it.addTextChangedListener(minTextWatcher)
+                it.editText?.addTextChangedListener(minTextWatcher)
             }
 
-            if (editMax.text?.toString()?.toIntOrNull() ?: 0 < min) setMaxValue(min)
+            if ((editMax.editText?.text?.toString()?.toIntOrNull() ?: 0) < min) setMaxValue(min)
         }
 
         private fun setMaxValue(max: Int = 0) {
             editMax.also {
-                it.removeTextChangedListener(maxTextWatcher)
-                it.text = Editable.Factory.getInstance()
+                it.editText?.removeTextChangedListener(maxTextWatcher)
+                it.editText?.text = Editable.Factory.getInstance()
                     .newEditable(max.toString())
-                it.addTextChangedListener(maxTextWatcher)
+                it.editText?.addTextChangedListener(maxTextWatcher)
             }
         }
 

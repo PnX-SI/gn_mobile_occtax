@@ -15,6 +15,12 @@ import fr.geonature.occtax.input.PropertyValue
 import java.io.Serializable
 import java.util.Date
 import java.util.Locale
+import kotlin.collections.List
+import kotlin.collections.Map
+import kotlin.collections.forEach
+import kotlin.collections.mutableListOf
+import kotlin.collections.mutableMapOf
+import kotlin.collections.set
 
 /**
  * Default implementation of [InputJsonReader.OnInputJsonReaderListener].
@@ -66,9 +72,12 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
     ) {
         reader.beginObject()
 
+        val now = Date()
+
         while (reader.hasNext()) {
             when (reader.nextName()) {
-                "date_min" -> input.date = toDate(reader.nextString()) ?: Date()
+                "date_min" -> input.startDate = toDate(reader.nextString()) ?: now
+                "date_max" -> input.endDate = toDate(reader.nextString()) ?: now
                 "id_dataset" -> {
                     if (reader.peek() != JsonToken.NULL) {
                         input.datasetId = reader.nextLong()

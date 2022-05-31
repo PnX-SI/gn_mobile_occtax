@@ -35,7 +35,7 @@ class InputJsonReaderTest {
     }
 
     @Test
-    fun testReadInputFromInvalidJsonString() {
+    fun `should read null input from invalid json string`() {
         // when read an invalid JSON as Input
         val input = inputJsonReader.read("")
 
@@ -44,7 +44,7 @@ class InputJsonReaderTest {
     }
 
     @Test
-    fun testReadEmptyInput() {
+    fun `should read empty input`() {
         // given an input file to read
         val json = getFixture("input_empty.json")
 
@@ -64,7 +64,7 @@ class InputJsonReaderTest {
     }
 
     @Test
-    fun testReadInput() {
+    fun `should read input`() {
         // given an input file to read
         val json = getFixture("input_simple.json")
 
@@ -86,8 +86,12 @@ class InputJsonReaderTest {
             input.datasetId
         )
         assertEquals(
-            toDate("2016-10-28"),
-            input.date
+            toDate("2016-10-28T08:15:00Z"),
+            input.startDate
+        )
+        assertEquals(
+            toDate("2016-10-29T09:00:00Z"),
+            input.endDate
         )
         assertEquals(
             1L,
@@ -230,7 +234,7 @@ class InputJsonReaderTest {
     }
 
     @Test
-    fun testReadInputWithNoObserverAndNoTaxon() {
+    fun `should read input with no observer and no taxon`() {
         // given an input file to read
         val json = getFixture("input_no_observer_no_taxon.json")
 
@@ -250,7 +254,7 @@ class InputJsonReaderTest {
         assertNull(input.datasetId)
         assertEquals(
             toDate("2016-10-28"),
-            input.date
+            input.startDate
         )
         assertNull(input.getPrimaryObserverId())
         assertArrayEquals(
