@@ -104,6 +104,7 @@
     <string name="observers_and_date_selected_observers_no_data">Aucun observateur sélectionné.\nAjouter en un via le bouton "Ajouter".</string>
     <string name="observers_and_date_dataset">Jeu de données</string>
     <string name="observers_and_date_date">Date</string>
+    <string name="observers_and_date_date_hint">Date du relevé</string>
     <string name="observers_and_date_date_start_hint">Date de début</string>
     <string name="observers_and_date_date_end_hint">Date de fin</string>
     <string name="observers_and_date_error_date_start_not_set">La date de début n\'a pas été définie</string>

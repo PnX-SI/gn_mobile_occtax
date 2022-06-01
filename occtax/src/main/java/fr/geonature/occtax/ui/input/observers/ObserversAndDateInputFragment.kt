@@ -337,6 +337,10 @@ class ObserversAndDateInputFragment : Fragment(),
             }
 
         dateStartTextInputLayout = view.findViewById<TextInputLayout?>(R.id.dateStart)?.apply {
+            hint = getString(
+                if (dateSettings.endDateSettings == null) R.string.observers_and_date_date_hint
+                else R.string.observers_and_date_date_start_hint
+            )
             editText?.afterTextChanged {
                 error = checkStartDateConstraints()
                 dateEndTextInputLayout?.error = checkEndDateConstraints()
