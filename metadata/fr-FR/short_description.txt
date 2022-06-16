@@ -1,1 +1,1 @@
-Application mobile pour la saisie d'observations de biodiversité dans le module Occtax de GeoNature
+Saisie d'observations de biodiversité dans le module Occtax de GeoNature
