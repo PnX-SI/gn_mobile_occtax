@@ -1,7 +1,0 @@
-Nouveautés
-
-- Ajout de la possibilité de renseigner la date de fin ainsi que les heures du relevé
-- Ajout des contraintes de validation sur les champs date de début et de fin. La date de fin est automatiquement fixée selon la date de début. Possibilité de définir la même date de début et de fin).
-- Configuration des dates et des heures du relevé via le fichier de paramétrage.
-- Possibilité de définir plusieurs observateurs par défaut.
-- Légère refonte ergonomique des formulaires d'édition.
