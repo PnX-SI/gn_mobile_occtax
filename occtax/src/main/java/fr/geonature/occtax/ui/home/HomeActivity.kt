@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.database.Cursor
 import android.os.Bundle
+import android.os.VibrationEffect
 import android.os.Vibrator
 import android.view.Menu
 import android.view.MenuItem
@@ -215,7 +216,12 @@ class HomeActivity : AppCompatActivity() {
                 ContextCompat.getSystemService(
                     this@HomeActivity,
                     Vibrator::class.java
-                )?.vibrate(100)
+                )?.vibrate(
+                    VibrationEffect.createOneShot(
+                        100,
+                        VibrationEffect.DEFAULT_AMPLITUDE
+                    )
+                )
 
                 makeSnackbar(getString(R.string.home_snackbar_input_deleted))
                     ?.setAction(R.string.home_snackbar_input_undo) {
@@ -450,7 +456,7 @@ class HomeActivity : AppCompatActivity() {
                     HomeActivity::class.java,
                     MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                 )
-                
+
                 loadAppSettings()
             }
             onFailure(
