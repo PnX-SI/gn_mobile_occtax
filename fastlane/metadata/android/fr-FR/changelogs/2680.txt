@@ -1,0 +1,6 @@
+Nouveautés
+
+- L'utilisateur ne doit plus renseigner l'URL de TaxHub en plus de celle de GeoNature. Seule celle de GeoNature est demandée à l'utilisateur, l'application se chargera de récupérer automatiquement les paramètres depuis le serveur GeoNature, notamment l'URL de TaxHub
+- Clarification des boutons d'ajout d'un dénombrement et d'un taxon
+- La synchronisation des relevés n'est plus lancée automatiquement au lancement de l'application
+- Elle ne se fait que manuellement par l'utilisateur via le bouton "Synchroniser"
