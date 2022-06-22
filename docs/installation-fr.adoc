@@ -44,9 +44,7 @@ Il est nécessaire de gérer les fichiers de configuration, l'installation et la
 
 L'application *_Occtax-mobile_* se chargera alors de récupérer automatiquement sur le serveur GeoNature la dernière version du fichier de configuration des applications et détectera les éventuelles mises à jour disponibles pour l'application.
 
-Pour cela, chargez l'APK de l'application *_Occtax-mobile_* ainsi que son fichier de configuration dans le fichier `settings.json` dans le dossier `$HOME/geonature/backend/static/mobile` du serveur GeoNature.
-
-Au préalable, Il faut créer un dossier par application, car les fichiers de configuration de chaque application ont le même nom (`settings.json`),
+Pour cela, chargez l'APK de l'application *_Occtax-mobile_* ainsi que son fichier de configuration `settings.json` dans le dossier `$HOME/geonature/backend/static/mobile/occtax` du serveur GeoNature.
 
 Dans les commandes ci-dessous, remplacez `x.y.y` par le numéro (tag) de la version (release) utilisée.
 
@@ -60,7 +58,7 @@ cd $HOME/geonature/backend/static/mobile
 mkdir occtax
 ----
 
-​Télécharger la version de *_Occtax-mobile_* souhaitée :
+​ Télécharger la version de *_Occtax-mobile_* souhaitée :
 
 [source,shell]
 ----
@@ -72,9 +70,9 @@ Créer le fichier de settings `settings.json` en suivant https://github.com/PnX-
 
 Renseigner ensuite la table `gn_commons.t_mobile_apps` de la base de données.
 
-Pour trouver la valeur à renseigner dans le champs `version_code`, reportez-vous aux fichiers suivants en sélectionnant le tag de version où la branche que vous utilisez :
+Pour trouver la valeur à renseigner dans le champs `version_code`, celui-ci est mentionné dans les releases, ou reportez-vous au fichier suivant en sélectionnant le tag de version où la branche que vous utilisez :
 
-https://github.com/PnX-SI/gn_mobile_occtax/blob/master/occtax/version.properties
+https://github.com/PnX-SI/gn_mobile_occtax/blob/master/occtax/build.gradle#L24
 
 Ou avec l'outil `aapt` (`apt-get install aapt` pour l'installer), exécutez la commande `aapt dump badging applicationfile.apk | grep -Po "(?&lt;=\sversion(Code|Name)'=&#39;')([0-9.]+)"`.
 
