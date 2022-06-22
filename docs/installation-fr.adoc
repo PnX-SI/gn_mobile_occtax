@@ -44,7 +44,7 @@ Il est nécessaire de gérer les fichiers de configuration, l'installation et la
 
 L'application *_Occtax-mobile_* se chargera alors de récupérer automatiquement sur le serveur GeoNature la dernière version du fichier de configuration des applications et détectera les éventuelles mises à jour disponibles pour l'application.
 
-Pour cela, chargez l'APK de l'application *_Occtax-mobile_* ainsi que son fichier de configuration dans le fichier `settings.json` dans le dossier `$HOME/geonature/backend/static/mobile/occtax` du serveur GeoNature.
+Pour cela, chargez l'APK de l'application *_Occtax-mobile_* ainsi que son fichier de configuration `settings.json` dans le dossier `$HOME/geonature/backend/static/mobile/occtax` du serveur GeoNature.
 
 Dans les commandes ci-dessous, remplacez `x.y.y` par le numéro (tag) de la version (release) utilisée.
 
