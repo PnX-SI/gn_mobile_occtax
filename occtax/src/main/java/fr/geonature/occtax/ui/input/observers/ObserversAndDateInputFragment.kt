@@ -97,6 +97,7 @@ class ObserversAndDateInputFragment : Fragment(),
     private var selectedDatasetActionView: ListItemActionView? = null
     private var dateStartTextInputLayout: TextInputLayout? = null
     private var dateEndTextInputLayout: TextInputLayout? = null
+    private var commentTextInputLayout: TextInputLayout? = null
 
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(
@@ -437,6 +438,12 @@ class ObserversAndDateInputFragment : Fragment(),
             }
         }
 
+        commentTextInputLayout = view.findViewById<TextInputLayout?>(android.R.id.edit)?.apply {
+            editText?.afterTextChanged {
+                input?.comment = it?.toString()?.ifEmpty { null }?.ifBlank { null }
+            }
+        }
+
         return view
     }
 
@@ -531,6 +538,14 @@ class ObserversAndDateInputFragment : Fragment(),
                 dateSettings.endDateSettings ?: InputDateSettings.DateSettings.DATE,
                 input?.endDate
             )
+        }
+        commentTextInputLayout?.hint =
+            getString(
+                if (input?.comment.isNullOrBlank()) R.string.observers_and_date_comment_add_hint
+                else R.string.observers_and_date_comment_edit_hint
+            )
+        commentTextInputLayout?.editText?.apply {
+            text = input?.comment?.let { Editable.Factory.getInstance().newEditable(it) }
         }
     }
 
