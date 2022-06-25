@@ -66,6 +66,9 @@
     <string name="alert_counting_title_discard_changes">Discard changes to this counting?</string>
     <string name="alert_counting_action_discard">Discard</string>
     <string name="alert_counting_action_keep">Keep editing</string>
+    <string name="alert_dialog_input_delete_title">Delete this input?</string>
+    <string name="alert_dialog_counting_delete_title">Delete this counting?</string>
+    <string name="alert_dialog_taxon_delete_title">Delete this taxon?</string>
     <string name="alert_dialog_add_comment_title">Add a comment</string>
     <string name="alert_dialog_edit_comment_title">Edit a comment</string>
     <string name="alert_dialog_add_comment_hint">Add a comment</string>

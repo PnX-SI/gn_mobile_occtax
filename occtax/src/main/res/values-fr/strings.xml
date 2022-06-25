@@ -65,6 +65,9 @@
     <string name="alert_counting_title_discard_changes">Abandonner les changements apportés à ce dénombrement ?</string>
     <string name="alert_counting_action_discard">Abandonner</string>
     <string name="alert_counting_action_keep">Continuer la saisie</string>
+    <string name="alert_dialog_input_delete_title">Souhaitez vous supprimer ce relevé ?</string>
+    <string name="alert_dialog_counting_delete_title">Souhaitez vous supprimer ce dénombrement ?</string>
+    <string name="alert_dialog_taxon_delete_title">Souhaitez vous supprimer ce taxon ?</string>
     <string name="alert_dialog_add_comment_title">Ajouter un commentaire</string>
     <string name="alert_dialog_edit_comment_title">Éditer le commentaire</string>
     <string name="alert_dialog_add_comment_hint">Ajouter un commentaire</string>

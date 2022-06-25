@@ -211,8 +211,6 @@ class HomeActivity : AppCompatActivity() {
                 position: Int,
                 item: Input
             ) {
-                inputViewModel.deleteInput(item)
-
                 ContextCompat.getSystemService(
                     this@HomeActivity,
                     Vibrator::class.java
@@ -223,11 +221,18 @@ class HomeActivity : AppCompatActivity() {
                     )
                 )
 
-                makeSnackbar(getString(R.string.home_snackbar_input_deleted))
-                    ?.setAction(R.string.home_snackbar_input_undo) {
-                        inputViewModel.restoreDeletedInput()
+                AlertDialog.Builder(this@HomeActivity)
+                    .setTitle(R.string.alert_dialog_input_delete_title)
+                    .setPositiveButton(
+                        R.string.alert_dialog_ok
+                    ) { dialog, _ ->
+                        inputViewModel.deleteInput(item)
+                        dialog.dismiss()
                     }
-                    ?.show()
+                    .setNegativeButton(
+                        R.string.alert_dialog_cancel
+                    ) { dialog, _ -> dialog.dismiss() }
+                    .show()
             }
 
             override fun showEmptyTextView(show: Boolean) {

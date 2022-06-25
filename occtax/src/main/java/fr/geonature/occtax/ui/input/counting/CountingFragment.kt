@@ -3,6 +3,7 @@ package fr.geonature.occtax.ui.input.counting
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.VibrationEffect
 import android.os.Vibrator
 import android.view.LayoutInflater
 import android.view.View
@@ -12,14 +13,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
@@ -45,7 +45,6 @@ class CountingFragment : Fragment(),
 
     private var input: Input? = null
     private var adapter: CountingRecyclerViewAdapter? = null
-    private var contentView: CoordinatorLayout? = null
     private var recyclerView: RecyclerView? = null
     private var emptyTextView: TextView? = null
     private var fab: ExtendedFloatingActionButton? = null
@@ -84,7 +83,6 @@ class CountingFragment : Fragment(),
             savedInstanceState
         )
 
-        contentView = view.findViewById(android.R.id.content)
         recyclerView = view.findViewById(android.R.id.list)
 
         emptyTextView = view.findViewById(android.R.id.empty)
@@ -109,35 +107,31 @@ class CountingFragment : Fragment(),
                 position: Int,
                 item: CountingMetadata
             ) {
-                adapter?.remove(item)
-                (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.deleteCountingMetadata(item.index)
-                (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
-
                 context?.run {
-                    @Suppress("DEPRECATION")
                     getSystemService(
                         this,
                         Vibrator::class.java
-                    )?.vibrate(100)
-                }
-
-                contentView?.also {
-                    Snackbar.make(
-                        it,
-                        R.string.counting_snackbar_counting_deleted,
-                        Snackbar.LENGTH_LONG
+                    )?.vibrate(
+                        VibrationEffect.createOneShot(
+                            100,
+                            VibrationEffect.DEFAULT_AMPLITUDE
+                        )
                     )
-                        .setAction(
-                            R.string.counting_snackbar_counting_undo
-                        ) {
-                            adapter?.add(
-                                item,
-                                position
-                            )
-                            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.addCountingMetadata(
-                                item
-                            )
+
+                    AlertDialog.Builder(this)
+                        .setTitle(R.string.alert_dialog_counting_delete_title)
+                        .setPositiveButton(
+                            R.string.alert_dialog_ok
+                        ) { dialog, _ ->
+                            adapter?.remove(item)
+                            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.deleteCountingMetadata(item.index)
+                            (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+
+                            dialog.dismiss()
                         }
+                        .setNegativeButton(
+                            R.string.alert_dialog_cancel
+                        ) { dialog, _ -> dialog.dismiss() }
                         .show()
                 }
             }
