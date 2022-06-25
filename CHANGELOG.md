@@ -4,7 +4,7 @@
 
 ### 🚀 Nouveautés
 
-* Le commentaire du relevé est présent également à l'étape 1 du relevé, sous le choix de la date (#140).
+* Le commentaire du relevé est présent également à l'étape 1 du relevé, sous le choix de la date (https://github.com/PnX-SI/gn_mobile_occtax/issues/140).
 
 ### 🐛 Corrections
 
