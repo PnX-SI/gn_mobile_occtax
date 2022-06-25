@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.3.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0-rc1) (2022-06-25, pre-release)
+
+### 🚀 Nouveautés
+
+* Le commentaire du relevé est présent également à l'étape 1 du relevé, sous le choix de la date (#140).
+
+### 🐛 Corrections
+
+* Possibilité d'ajouter directement un marqueur via un "toucher long" sur la carte (https://github.com/PnX-SI/gn_mobile_occtax/issues/14).
+
+### ⚠️ Notes de version
+
+* Code de version : 3037
+
 ## [2.3.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0-rc0) (2022-06-21, pre-release)
 
 ### 🚀 Nouveautés
