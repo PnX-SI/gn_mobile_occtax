@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.3.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0-rc2) (2022-06-29, pre-release)
+
+### 🚀 Nouveautés
+
+* Refonte ergonomique des champs de saisie "Min" et "Max" (https://github.com/PnX-SI/gn_mobile_occtax/issues/114).
+
+### 🐛 Corrections
+
+* Possibilité de déplacer directement un marqueur existant via un "toucher long" sur la carte (https://github.com/PnX-SI/gn_mobile_occtax/issues/14).
+* Ajustement d'ordre cosmétique sur le commentaire présenté à l'étape 1 du relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/140).
+
+### ⚠️ Notes de version
+
+* Code de version : 3041
+
 ## [2.3.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0-rc1) (2022-06-25, pre-release)
 
 ### 🚀 Nouveautés
