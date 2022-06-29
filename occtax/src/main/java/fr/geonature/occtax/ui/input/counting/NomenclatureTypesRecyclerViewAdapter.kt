@@ -2,24 +2,26 @@ package fr.geonature.occtax.ui.input.counting
 
 import android.database.Cursor
 import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.NumberPicker
+import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.NomenclatureType
-import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.NomenclatureTypeViewType
 import fr.geonature.occtax.input.PropertyValue
 import fr.geonature.occtax.settings.PropertySettings
+import fr.geonature.occtax.ui.shared.view.setOnValueChangedListener
 import java.util.Locale
+import kotlin.math.ceil
 
 /**
  * Default RecyclerView Adapter used by [EditCountingMetadataFragment].
@@ -322,134 +324,73 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             false
         )
     ) {
-        private var editMin: TextInputLayout = itemView.findViewById(R.id.editMin)
-        private var editMax: TextInputLayout = itemView.findViewById(R.id.editMax)
-
-        private val minTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(
-                s: CharSequence?,
-                start: Int,
-                count: Int,
-                after: Int
-            ) {
-            }
-
-            override fun onTextChanged(
-                s: CharSequence?,
-                start: Int,
-                before: Int,
-                count: Int
-            ) {
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                val minValue = s?.toString()?.toIntOrNull() ?: 0
-                val maxValue = editMax.editText?.text?.toString()?.toIntOrNull() ?: 0
-
-                if (minValue > maxValue) setMaxValue(minValue)
-
-                setMinValue(minValue)
-                editMin.editText?.setSelection(minValue.toString().length)
-
-                listener.onMinMaxValues(
-                    minValue,
-                    if (minValue > maxValue) minValue else maxValue
-                )
-            }
-        }
-
-        private val maxTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(
-                s: CharSequence?,
-                start: Int,
-                count: Int,
-                after: Int
-            ) {
-            }
-
-            override fun onTextChanged(
-                s: CharSequence?,
-                start: Int,
-                before: Int,
-                count: Int
-            ) {
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                val minValue = editMin.editText?.text?.toString()?.toIntOrNull() ?: 0
-                val maxValue = s?.toString()?.toIntOrNull() ?: 0
-
-                setMaxValue(maxValue)
-                editMax.editText?.setSelection(maxValue.toString().length)
-
-                listener.onMinMaxValues(
-                    minValue,
-                    if (minValue > maxValue) minValue else maxValue
-                )
-            }
-        }
+        private val defaultMaxValueOffset = 50
+        private var editMinLabel: TextView = itemView.findViewById(R.id.editMinLabel)
+        private var editMaxLabel: TextView = itemView.findViewById(R.id.editMaxLabel)
+        private var editMinPicker: NumberPicker = itemView.findViewById(R.id.editMinPicker)
+        private var editMaxPicker: NumberPicker = itemView.findViewById(R.id.editMaxPicker)
 
         init {
-            with(editMin) {
-                visibility = View.GONE
-                editText?.addTextChangedListener(minTextWatcher)
-                setOnFocusChangeListener { v, hasFocus ->
-                    if (!hasFocus) {
-                        // workaround to force hide the soft keyboard
-                        hideSoftKeyboard(v)
-                    }
+            with(editMinPicker) {
+                minValue = 0
+                maxValue = defaultMaxValueOffset
+                setOnValueChangedListener(defaultMaxValueOffset) {
+                    editMaxPicker.maxValue = editMinPicker.maxValue
+
+                    if (editMaxPicker.value < it) editMaxPicker.value = it
+
+                    listener.onMinMaxValues(
+                        it,
+                        editMaxPicker.value
+                    )
                 }
             }
 
-            with(editMax) {
-                visibility = View.GONE
-                editText?.addTextChangedListener(maxTextWatcher)
-                setOnFocusChangeListener { v, hasFocus ->
-                    if (!hasFocus) {
-                        // workaround to force hide the soft keyboard
-                        hideSoftKeyboard(v)
+            with(editMaxPicker) {
+                minValue = 0
+                maxValue = defaultMaxValueOffset
+                setOnValueChangedListener(defaultMaxValueOffset) {
+                    editMinPicker.maxValue = editMaxPicker.maxValue
 
-                        val minValue = editMin.editText?.text?.toString()?.toIntOrNull() ?: 0
-                        val maxValue = editMax.editText?.text?.toString()?.toIntOrNull() ?: 0
+                    if (editMinPicker.value > it) editMinPicker.value = it
 
-                        if (minValue > maxValue) setMaxValue(minValue)
-                    }
+                    listener.onMinMaxValues(
+                        editMinPicker.value,
+                        it
+                    )
                 }
             }
         }
 
         override fun onBind(property: PropertyValue) {
-            editMin.visibility =
-                if (hasMinAndMaxPropertyValues() || property.code == "MIN") View.VISIBLE else View.GONE
-            editMax.visibility =
-                if (hasMinAndMaxPropertyValues() || property.code == "MAX") View.VISIBLE else View.GONE
+            with(if (hasMinAndMaxPropertyValues() || property.code == "MIN") View.VISIBLE else View.GONE) {
+                editMinLabel.visibility = this
+                editMinPicker.visibility = this
+            }
+
+            with(if (hasMinAndMaxPropertyValues() || property.code == "MAX") View.VISIBLE else View.GONE) {
+                editMaxLabel.visibility = this
+                editMaxPicker.visibility = this
+            }
 
             (properties.firstOrNull { it.code == "MIN" }?.value as Int?)?.also {
-                setMinValue(it)
+                if (it > editMinPicker.maxValue) {
+                    editMinPicker.maxValue =
+                        (ceil((it.toDouble() / defaultMaxValueOffset)) * defaultMaxValueOffset).toInt()
+                    editMaxPicker.maxValue = editMinPicker.maxValue
+                }
+
+                editMinPicker.value = it
             }
 
             (properties.firstOrNull { it.code == "MAX" }?.value as Int?)?.also {
-                setMaxValue(it)
-            }
-        }
+                if (it > editMaxPicker.maxValue) {
+                    editMaxPicker.maxValue =
+                        (ceil((it.toDouble() / defaultMaxValueOffset)) * defaultMaxValueOffset).toInt()
+                    editMinPicker.maxValue = editMaxPicker.maxValue
+                }
 
-        private fun setMinValue(min: Int = 0) {
-            editMin.also {
-                it.editText?.removeTextChangedListener(minTextWatcher)
-                it.editText?.text = Editable.Factory.getInstance()
-                    .newEditable(min.toString())
-                it.editText?.addTextChangedListener(minTextWatcher)
-            }
-
-            if ((editMax.editText?.text?.toString()?.toIntOrNull() ?: 0) < min) setMaxValue(min)
-        }
-
-        private fun setMaxValue(max: Int = 0) {
-            editMax.also {
-                it.editText?.removeTextChangedListener(maxTextWatcher)
-                it.editText?.text = Editable.Factory.getInstance()
-                    .newEditable(max.toString())
-                it.editText?.addTextChangedListener(maxTextWatcher)
+                editMaxPicker.value = it
             }
         }
 
