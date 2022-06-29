@@ -116,6 +116,7 @@
     <string name="observers_and_date_error_date_end_before_start_date">End date should be after start date</string>
     <string name="observers_and_date_date_format">EEE dd MMM yyyy</string>
     <string name="observers_and_date_datetime_format">EEE dd MMM yyyy \'at\' HH:mm</string>
+    <string name="observers_and_date_comment">Input comment</string>
     <string name="observers_and_date_comment_add_hint">Add a comment</string>
     <string name="observers_and_date_comment_edit_hint">Edit a comment</string>
 

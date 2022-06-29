@@ -116,6 +116,7 @@
     <string name="observers_and_date_error_date_end_before_start_date">La date de fin doit être après celle du début</string>
     <string name="observers_and_date_date_format">EEE dd MMM yyyy</string>
     <string name="observers_and_date_datetime_format">EEE dd MMM yyyy \'à\' HH:mm</string>
+    <string name="observers_and_date_comment">Commentaire du relevé</string>
     <string name="observers_and_date_comment_add_hint">Ajouter un commentaire</string>
     <string name="observers_and_date_comment_edit_hint">Éditer le commentaire</string>
 
