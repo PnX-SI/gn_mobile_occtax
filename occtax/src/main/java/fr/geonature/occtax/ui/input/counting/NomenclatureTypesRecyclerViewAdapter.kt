@@ -35,6 +35,52 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
     private val availableNomenclatureTypes = mutableListOf<Pair<String, NomenclatureTypeViewType>>()
     private val properties = mutableListOf<PropertyValue>()
 
+    init {
+        this.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                super.onChanged()
+
+                listener.showEmptyTextView(itemCount == 0)
+            }
+
+            override fun onItemRangeChanged(
+                positionStart: Int,
+                itemCount: Int
+            ) {
+                super.onItemRangeChanged(
+                    positionStart,
+                    itemCount
+                )
+
+                listener.showEmptyTextView(getItemCount() == 0)
+            }
+
+            override fun onItemRangeInserted(
+                positionStart: Int,
+                itemCount: Int
+            ) {
+                super.onItemRangeInserted(
+                    positionStart,
+                    itemCount
+                )
+
+                listener.showEmptyTextView(false)
+            }
+
+            override fun onItemRangeRemoved(
+                positionStart: Int,
+                itemCount: Int
+            ) {
+                super.onItemRangeRemoved(
+                    positionStart,
+                    itemCount
+                )
+
+                listener.showEmptyTextView(getItemCount() == 0)
+            }
+        })
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -421,5 +467,10 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             min: Int = 0,
             max: Int = 0
         )
+
+        /**
+         * Whether to show an empty text view when data changed.
+         */
+        fun showEmptyTextView(show: Boolean)
     }
 }

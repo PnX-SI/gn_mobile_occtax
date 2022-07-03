@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -38,7 +37,6 @@ class EditCountingMetadataActivity : AppCompatActivity(),
 
         supportActionBar?.run {
             setDisplayHomeAsUpEnabled(true)
-            setHomeAsUpIndicator(R.drawable.ic_close)
         }
 
         countingMetadata = intent.getParcelableExtra(EXTRA_COUNTING_METADATA) ?: CountingMetadata()
@@ -65,24 +63,10 @@ class EditCountingMetadataActivity : AppCompatActivity(),
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(
-            R.menu.save,
-            menu
-        )
-
-        return true
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
                 confirmBeforeQuit()
-                true
-            }
-            R.id.action_save -> {
-                sendResult()
-                finish()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -96,6 +80,12 @@ class EditCountingMetadataActivity : AppCompatActivity(),
     override fun onCountingMetadata(countingMetadata: CountingMetadata) {
         this.countingMetadata = countingMetadata
         this.isDirty = true
+    }
+
+    override fun onSave(countingMetadata: CountingMetadata) {
+        this.countingMetadata = countingMetadata
+        sendResult()
+        finish()
     }
 
     private fun sendResult() {
