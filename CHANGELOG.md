@@ -1,5 +1,30 @@
 # Changelog
 
+## [2.3.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0) (unreleased)
+
+
+### 🚀 Nouveautés
+
+* Possibilité d'ajouter directement un marqueur via un "toucher long" sur la carte (https://github.com/PnX-SI/gn_mobile_occtax/issues/14).
+* La rotation de la carte est bloquée par défaut (https://github.com/PnX-SI/gn_mobile_occtax/issues/139).
+  Son paramétrage reste accessible par configuration (cf. [README.md](https://github.com/PnX-SI/gn_mobile_maps/blob/develop/maps/README.md#parameters-description) du module).
+* Le commentaire du relevé est présent également à l'étape 1 du relevé, sous le choix de la date (https://github.com/PnX-SI/gn_mobile_occtax/issues/140).
+* Refonte ergonomique des champs de saisie "Min" et "Max" (https://github.com/PnX-SI/gn_mobile_occtax/issues/114).
+
+### 🐛 Corrections
+
+* Suppression de la double vérification de la validité du cookie de session et du token de session (https://github.com/PnX-SI/gn_mobile_occtax/issues/163).
+  L'application reste "connectée" par défaut tant qu'elle ne reçoit pas en retour d'appel d'API une
+  erreur 401.
+* Libellé du champ date plus clair quand seule la date de début du relevé est configurée (https://github.com/PnX-SI/gn_mobile_occtax/issues/165).
+* Ajustement d'ordre cosmétique sur le commentaire présenté à l'étape 1 du relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/140).
+
+### ⚠️ Notes de version
+
+* Code de version : xxxx
+* L'application est officiellement compatible avec les terminaux tournant sur Android 8.0 au minimum.
+
+
 ## [2.3.0-rc3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0-rc3) (2022-07-04, pre-release)
 
 ### 🚀 Nouveautés
