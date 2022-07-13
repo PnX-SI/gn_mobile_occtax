@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.3.0-rc4](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0-rc4) (2022-07-13, pre-release)
+
+### 🐛 Corrections
+
+* Légère refonte ergonomique du formulaire sur le dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/114).
+* Le champ de saisie "Max" suit la valeur du champ de saisie "Min" si ces deux valeurs sont identiques.
+
+### ⚠️ Notes de version
+
+* Code de version : 3061
+
 ## [2.3.0-rc3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0-rc3) (2022-07-04, pre-release)
 
 ### 🚀 Nouveautés
