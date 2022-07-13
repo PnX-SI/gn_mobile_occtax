@@ -18,13 +18,19 @@ import kotlin.math.ceil
  * @param offset the offset used to increment the max value
  * @param callback the listener to be notified on change of the current value
  */
-fun NumberPicker.setOnValueChangedListener(offset: Int, callback: (newValue: Int) -> Unit) {
-    setOnValueChangedListener { _, _, newVal ->
+fun NumberPicker.setOnValueChangedListener(
+    offset: Int,
+    callback: (oldValue: Int, newValue: Int) -> Unit
+) {
+    setOnValueChangedListener { _, oldVal, newVal ->
         if (newVal == maxValue) {
             maxValue += offset
         }
 
-        callback.invoke(newVal)
+        callback.invoke(
+            oldVal,
+            newVal
+        )
     }
 
     children.find { it is EditText }?.let { it as EditText }?.also {
@@ -43,7 +49,10 @@ fun NumberPicker.setOnValueChangedListener(offset: Int, callback: (newValue: Int
                 if (intValue > maxValue) maxValue =
                     (ceil((intValue.toDouble() / offset)) * offset).toInt()
                 value = intValue
-                callback.invoke(value)
+                callback.invoke(
+                    value,
+                    value
+                )
             }
         }
     }

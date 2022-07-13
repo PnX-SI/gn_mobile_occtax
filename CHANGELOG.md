@@ -2,7 +2,6 @@
 
 ## [2.3.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0) (unreleased)
 
-
 ### 🚀 Nouveautés
 
 * Possibilité d'ajouter directement un marqueur via un "toucher long" sur la carte (https://github.com/PnX-SI/gn_mobile_occtax/issues/14).
@@ -10,6 +9,7 @@
   Son paramétrage reste accessible par configuration (cf. [README.md](https://github.com/PnX-SI/gn_mobile_maps/blob/develop/maps/README.md#parameters-description) du module).
 * Le commentaire du relevé est présent également à l'étape 1 du relevé, sous le choix de la date (https://github.com/PnX-SI/gn_mobile_occtax/issues/140).
 * Refonte ergonomique des champs de saisie "Min" et "Max" (https://github.com/PnX-SI/gn_mobile_occtax/issues/114).
+* Mise en place de modales de confirmation pour la suppression des éléments saisis (https://github.com/PnX-SI/gn_mobile_occtax/issues/77)
 
 ### 🐛 Corrections
 
@@ -24,6 +24,16 @@
 * Code de version : xxxx
 * L'application est officiellement compatible avec les terminaux tournant sur Android 8.0 au minimum.
 
+## [2.3.0-rc4](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0-rc4) (2022-07-13, pre-release)
+
+### 🐛 Corrections
+
+* Légère refonte ergonomique du formulaire sur le dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/114).
+* Le champ de saisie "Max" suit la valeur du champ de saisie "Min" si ces deux valeurs sont identiques.
+
+### ⚠️ Notes de version
+
+* Code de version : 3061
 
 ## [2.3.0-rc3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0-rc3) (2022-07-04, pre-release)
 
