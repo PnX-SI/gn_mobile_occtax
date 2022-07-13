@@ -380,12 +380,18 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             with(editMinPicker) {
                 minValue = 0
                 maxValue = defaultMaxValueOffset
-                setOnValueChangedListener(defaultMaxValueOffset) {
-                    editMaxPicker.maxValue = editMinPicker.maxValue
-                    editMaxPicker.value = it
+                setOnValueChangedListener(defaultMaxValueOffset) { oldValue, newValue ->
+                    if (editMaxPicker.value < newValue) {
+                        editMaxPicker.maxValue = editMinPicker.maxValue
+                        editMaxPicker.value = newValue
+                    }
+
+                    if (editMaxPicker.value == oldValue) {
+                        editMaxPicker.value = newValue
+                    }
 
                     listener.onMinMaxValues(
-                        it,
+                        newValue,
                         editMaxPicker.value
                     )
                 }
@@ -394,14 +400,14 @@ class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureT
             with(editMaxPicker) {
                 minValue = 0
                 maxValue = defaultMaxValueOffset
-                setOnValueChangedListener(defaultMaxValueOffset) {
+                setOnValueChangedListener(defaultMaxValueOffset) { _, newValue ->
                     editMinPicker.maxValue = editMaxPicker.maxValue
 
-                    if (editMinPicker.value > it) editMinPicker.value = it
+                    if (editMinPicker.value > newValue) editMinPicker.value = newValue
 
                     listener.onMinMaxValues(
                         editMinPicker.value,
-                        it
+                        newValue
                     )
                 }
             }

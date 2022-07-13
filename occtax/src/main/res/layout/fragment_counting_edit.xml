@@ -42,13 +42,13 @@
         android:id="@+id/fab"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/padding_default"
         android:layout_marginBottom="@dimen/padding_default"
         android:gravity="center"
         android:text="@string/action_save"
         app:elevation="@dimen/fab_elevation"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintWidth_percent="0.5" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
