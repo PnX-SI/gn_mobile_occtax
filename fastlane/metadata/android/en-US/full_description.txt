@@ -1,0 +1,2 @@
+Occtax-mobile allows you to enter observations of fauna and flora in the Occtax module of GeoNature.
+It must be connected to a web instance of GeoNature by entering its URL during the first launch.
