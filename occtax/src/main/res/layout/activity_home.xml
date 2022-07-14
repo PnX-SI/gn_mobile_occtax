@@ -11,14 +11,13 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="@dimen/padding_default"
         tools:context=".ui.home.HomeActivity">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardViewAppSyncView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/padding_default"
             app:cardCornerRadius="@dimen/cardview_radius"
             app:cardElevation="@dimen/cardview_elevation"
             app:contentPadding="@dimen/padding_default"
@@ -38,8 +37,7 @@
             android:id="@+id/textViewLastInputs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_default"
-            android:layout_marginBottom="@dimen/padding_default"
+            android:layout_margin="@dimen/padding_default"
             android:text="@string/home_last_inputs"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textStyle="bold"
@@ -48,6 +46,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_margin="@dimen/padding_default"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textViewLastInputs">
 

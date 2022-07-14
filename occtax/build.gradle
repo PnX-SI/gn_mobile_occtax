@@ -5,6 +5,8 @@ plugins {
     id 'kotlin-kapt'
 }
 
+version = "2.2.0"
+
 android {
     compileSdkVersion 31
 
@@ -21,8 +23,8 @@ android {
         applicationId "fr.geonature.occtax2"
         minSdkVersion 26
         targetSdkVersion 31
-        versionCode 3020
-        versionName "2.2.0"
+        versionCode 3070
+        versionName "2.3.0"
         buildConfigField "String", "BUILD_DATE", "\"" + new Date().getTime() + "\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         archivesBaseName = project.name + "-" + versionName

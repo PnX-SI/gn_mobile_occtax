@@ -7,7 +7,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
-import fr.geonature.datasync.auth.worker.CheckAuthLoginWorker
 import fr.geonature.datasync.packageinfo.worker.CheckInputsToSynchronizeWorker
 import fr.geonature.mountpoint.model.MountPoint
 import fr.geonature.mountpoint.util.FileUtils
@@ -45,7 +44,6 @@ class MainApplication : Application(), Configuration.Provider {
         configureCheckInputsToSynchronizeChannel(notificationManager)
         configureSynchronizeDataChannel(notificationManager)
 
-        checkAuthLogin()
         checkInputsToSynchronize()
     }
 
@@ -74,10 +72,6 @@ class MainApplication : Application(), Configuration.Provider {
 
         Logger.info { "starting ${BuildConfig.APPLICATION_ID}..." }
         Logger.info { "logs directory: '$directoryForLogs'" }
-    }
-
-    private fun checkAuthLogin() {
-        CheckAuthLoginWorker.enqueueUniquePeriodicWork(this)
     }
 
     private fun checkInputsToSynchronize() {

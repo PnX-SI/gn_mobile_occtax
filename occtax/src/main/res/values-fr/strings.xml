@@ -65,8 +65,11 @@
     <string name="alert_counting_title_discard_changes">Abandonner les changements apportés à ce dénombrement ?</string>
     <string name="alert_counting_action_discard">Abandonner</string>
     <string name="alert_counting_action_keep">Continuer la saisie</string>
+    <string name="alert_dialog_input_delete_title">Souhaitez vous supprimer ce relevé ?</string>
+    <string name="alert_dialog_counting_delete_title">Souhaitez vous supprimer ce dénombrement ?</string>
+    <string name="alert_dialog_taxon_delete_title">Souhaitez vous supprimer ce taxon ?</string>
     <string name="alert_dialog_add_comment_title">Ajouter un commentaire</string>
-    <string name="alert_dialog_edit_comment_title">Editer un commentaire</string>
+    <string name="alert_dialog_edit_comment_title">Éditer le commentaire</string>
     <string name="alert_dialog_add_comment_hint">Ajouter un commentaire</string>
     <string name="alert_dialog_ok">OK</string>
     <string name="alert_dialog_cancel">Annuler</string>
@@ -104,6 +107,7 @@
     <string name="observers_and_date_selected_observers_no_data">Aucun observateur sélectionné.\nAjouter en un via le bouton "Ajouter".</string>
     <string name="observers_and_date_dataset">Jeu de données</string>
     <string name="observers_and_date_date">Date</string>
+    <string name="observers_and_date_date_hint">Date du relevé</string>
     <string name="observers_and_date_date_start_hint">Date de début</string>
     <string name="observers_and_date_date_end_hint">Date de fin</string>
     <string name="observers_and_date_error_date_start_not_set">La date de début n\'a pas été définie</string>
@@ -112,6 +116,9 @@
     <string name="observers_and_date_error_date_end_before_start_date">La date de fin doit être après celle du début</string>
     <string name="observers_and_date_date_format">EEE dd MMM yyyy</string>
     <string name="observers_and_date_datetime_format">EEE dd MMM yyyy \'à\' HH:mm</string>
+    <string name="observers_and_date_comment">Commentaire du relevé</string>
+    <string name="observers_and_date_comment_add_hint">Ajouter un commentaire</string>
+    <string name="observers_and_date_comment_edit_hint">Éditer le commentaire</string>
 
     <plurals name="taxa_found">
         <item quantity="one">%d taxon trouvé</item>

@@ -1,6 +1,7 @@
 package fr.geonature.occtax.ui.input.summary
 
 import android.os.Bundle
+import android.os.VibrationEffect
 import android.os.Vibrator
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -11,7 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.TextView
-import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
@@ -19,8 +20,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
 import fr.geonature.commons.input.AbstractInput
 import fr.geonature.commons.input.AbstractInputTaxon
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
@@ -42,7 +41,6 @@ class InputTaxaSummaryFragment : Fragment(),
 
     private var input: Input? = null
     private var adapter: InputTaxaSummaryRecyclerViewAdapter? = null
-    private var contentView: CoordinatorLayout? = null
     private var recyclerView: RecyclerView? = null
     private var emptyTextView: TextView? = null
     private var fab: ExtendedFloatingActionButton? = null
@@ -89,7 +87,6 @@ class InputTaxaSummaryFragment : Fragment(),
         // we have a menu item to show in action bar
         setHasOptionsMenu(true)
 
-        contentView = view.findViewById(android.R.id.content)
         recyclerView = view.findViewById(android.R.id.list)
         fab = view.findViewById(R.id.fab)
 
@@ -119,63 +116,31 @@ class InputTaxaSummaryFragment : Fragment(),
                 position: Int,
                 item: AbstractInputTaxon
             ) {
-                adapter?.remove(item)
-                input?.removeInputTaxon(item.taxon.id)
-                (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
-
                 context?.run {
-                    @Suppress("DEPRECATION")
                     getSystemService(
                         this,
                         Vibrator::class.java
-                    )?.vibrate(100)
-                }
-
-                contentView?.also {
-                    Snackbar.make(
-                        it,
-                        R.string.summary_snackbar_input_taxon_deleted,
-                        Snackbar.LENGTH_LONG
+                    )?.vibrate(
+                        VibrationEffect.createOneShot(
+                            100,
+                            VibrationEffect.DEFAULT_AMPLITUDE
+                        )
                     )
-                        .setAction(
-                            R.string.summary_snackbar_input_taxon_undo
-                        ) {
-                            adapter?.add(
-                                item,
-                                position
-                            )
-                            input?.addInputTaxon(item)
+
+                    AlertDialog.Builder(this)
+                        .setTitle(R.string.alert_dialog_taxon_delete_title)
+                        .setPositiveButton(
+                            R.string.alert_dialog_ok
+                        ) { dialog, _ ->
+                            adapter?.remove(item)
+                            input?.removeInputTaxon(item.taxon.id)
+                            (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+
+                            dialog.dismiss()
                         }
-                        .addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
-                            override fun onDismissed(
-                                transientBottomBar: Snackbar?,
-                                event: Int
-                            ) {
-                                super.onDismissed(
-                                    transientBottomBar,
-                                    event
-                                )
-
-                                (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
-
-                                // check if this step is still valid and apply automatic redirection if any
-                                if (!this@InputTaxaSummaryFragment.validate()) {
-                                    val context = context ?: return
-
-                                    Toast.makeText(
-                                        context,
-                                        R.string.summary_toast_no_input_taxon,
-                                        Toast.LENGTH_LONG
-                                    )
-                                        .show()
-
-                                    ((activity as AbstractPagerFragmentActivity?))?.also { activity ->
-                                        activity.goToPreviousPage()
-                                        activity.goToNextPage()
-                                    }
-                                }
-                            }
-                        })
+                        .setNegativeButton(
+                            R.string.alert_dialog_cancel
+                        ) { dialog, _ -> dialog.dismiss() }
                         .show()
                 }
             }

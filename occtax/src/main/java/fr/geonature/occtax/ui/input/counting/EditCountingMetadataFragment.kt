@@ -6,14 +6,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.core.os.bundleOf
-import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.GeoNatureModuleName
@@ -50,6 +53,10 @@ class EditCountingMetadataFragment : Fragment(),
     @GeoNatureModuleName
     @Inject
     lateinit var moduleName: String
+
+    private var progressBar: ProgressBar? = null
+    private var emptyTextView: TextView? = null
+    private var fab: ExtendedFloatingActionButton? = null
 
     private var listener: OnEditCountingMetadataFragmentListener? = null
     private var adapter: NomenclatureTypesRecyclerViewAdapter? = null
@@ -174,12 +181,28 @@ class EditCountingMetadataFragment : Fragment(),
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val recyclerView = inflater.inflate(
-            R.layout.recycler_view,
+        return inflater.inflate(
+            R.layout.fragment_counting_edit,
             container,
             false
         )
-        recyclerView.setPadding(resources.getDimensionPixelOffset(R.dimen.padding_default))
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        val recyclerView = view.findViewById<RecyclerView>(android.R.id.list)
+
+        progressBar = view.findViewById(android.R.id.progress)
+        emptyTextView = view.findViewById(android.R.id.empty)
+
+        fab = view.findViewById(R.id.fab)
+        fab?.apply {
+            setOnClickListener {
+                listener?.onSave(countingMetadata)
+            }
+        }
 
         // Set the adapter
         adapter = NomenclatureTypesRecyclerViewAdapter(object :
@@ -187,7 +210,7 @@ class EditCountingMetadataFragment : Fragment(),
 
             override fun onAction(nomenclatureTypeMnemonic: String) {
                 // workaround to force hide the soft keyboard
-                view?.rootView?.also {
+                view.rootView?.also {
                     hideSoftKeyboard(it)
                 }
 
@@ -212,26 +235,40 @@ class EditCountingMetadataFragment : Fragment(),
 
                 listener?.onCountingMetadata(countingMetadata)
             }
+
+            override fun showEmptyTextView(show: Boolean) {
+                progressBar?.visibility = View.GONE
+
+                if (emptyTextView?.visibility == View.VISIBLE == show) {
+                    return
+                }
+
+                if (show) {
+                    emptyTextView?.startAnimation(
+                        AnimationUtils.loadAnimation(
+                            context,
+                            android.R.anim.fade_in
+                        )
+                    )
+                    emptyTextView?.visibility = View.VISIBLE
+                } else {
+                    emptyTextView?.startAnimation(
+                        AnimationUtils.loadAnimation(
+                            context,
+                            android.R.anim.fade_out
+                        )
+                    )
+                    emptyTextView?.visibility = View.GONE
+                }
+            }
         })
 
-        with(recyclerView as RecyclerView) {
+        with(recyclerView) {
             layoutManager = LinearLayoutManager(context)
             adapter = this@EditCountingMetadataFragment.adapter
         }
 
-        return recyclerView
-    }
-
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
-    ) {
-        LoaderManager.getInstance(this)
-            .initLoader(
-                LOADER_NOMENCLATURE_TYPES,
-                null,
-                loaderCallbacks
-            )
+        loadNomenclatureTypes()
     }
 
     override fun onAttach(context: Context) {
@@ -256,6 +293,17 @@ class EditCountingMetadataFragment : Fragment(),
         listener?.onCountingMetadata(countingMetadata)
     }
 
+    private fun loadNomenclatureTypes() {
+        progressBar?.visibility = View.VISIBLE
+        
+        LoaderManager.getInstance(this)
+            .initLoader(
+                LOADER_NOMENCLATURE_TYPES,
+                null,
+                loaderCallbacks
+            )
+    }
+
     private fun loadDefaultNomenclatureValues() {
         LoaderManager.getInstance(this)
             .initLoader(
@@ -275,6 +323,7 @@ class EditCountingMetadataFragment : Fragment(),
      */
     interface OnEditCountingMetadataFragmentListener {
         fun onCountingMetadata(countingMetadata: CountingMetadata)
+        fun onSave(countingMetadata: CountingMetadata)
     }
 
     companion object {

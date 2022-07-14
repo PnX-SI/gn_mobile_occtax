@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.database.Cursor
 import android.os.Bundle
+import android.os.VibrationEffect
 import android.os.Vibrator
 import android.view.Menu
 import android.view.MenuItem
@@ -210,18 +211,28 @@ class HomeActivity : AppCompatActivity() {
                 position: Int,
                 item: Input
             ) {
-                inputViewModel.deleteInput(item)
-
                 ContextCompat.getSystemService(
                     this@HomeActivity,
                     Vibrator::class.java
-                )?.vibrate(100)
+                )?.vibrate(
+                    VibrationEffect.createOneShot(
+                        100,
+                        VibrationEffect.DEFAULT_AMPLITUDE
+                    )
+                )
 
-                makeSnackbar(getString(R.string.home_snackbar_input_deleted))
-                    ?.setAction(R.string.home_snackbar_input_undo) {
-                        inputViewModel.restoreDeletedInput()
+                AlertDialog.Builder(this@HomeActivity)
+                    .setTitle(R.string.alert_dialog_input_delete_title)
+                    .setPositiveButton(
+                        R.string.alert_dialog_ok
+                    ) { dialog, _ ->
+                        inputViewModel.deleteInput(item)
+                        dialog.dismiss()
                     }
-                    ?.show()
+                    .setNegativeButton(
+                        R.string.alert_dialog_cancel
+                    ) { dialog, _ -> dialog.dismiss() }
+                    .show()
             }
 
             override fun showEmptyTextView(show: Boolean) {
@@ -450,7 +461,7 @@ class HomeActivity : AppCompatActivity() {
                     HomeActivity::class.java,
                     MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                 )
-                
+
                 loadAppSettings()
             }
             onFailure(

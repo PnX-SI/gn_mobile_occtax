@@ -66,6 +66,9 @@
     <string name="alert_counting_title_discard_changes">Discard changes to this counting?</string>
     <string name="alert_counting_action_discard">Discard</string>
     <string name="alert_counting_action_keep">Keep editing</string>
+    <string name="alert_dialog_input_delete_title">Delete this input?</string>
+    <string name="alert_dialog_counting_delete_title">Delete this counting?</string>
+    <string name="alert_dialog_taxon_delete_title">Delete this taxon?</string>
     <string name="alert_dialog_add_comment_title">Add a comment</string>
     <string name="alert_dialog_edit_comment_title">Edit a comment</string>
     <string name="alert_dialog_add_comment_hint">Add a comment</string>
@@ -104,6 +107,7 @@
     <string name="observers_and_date_selected_observers_no_data">No selected observer.\nAdd one by tapping the "Add" button.</string>
     <string name="observers_and_date_dataset">Dataset</string>
     <string name="observers_and_date_date">Date</string>
+    <string name="observers_and_date_date_hint">Input date</string>
     <string name="observers_and_date_date_start_hint">Start date</string>
     <string name="observers_and_date_date_end_hint">End date</string>
     <string name="observers_and_date_error_date_start_not_set">Missing start date</string>
@@ -112,6 +116,9 @@
     <string name="observers_and_date_error_date_end_before_start_date">End date should be after start date</string>
     <string name="observers_and_date_date_format">EEE dd MMM yyyy</string>
     <string name="observers_and_date_datetime_format">EEE dd MMM yyyy \'at\' HH:mm</string>
+    <string name="observers_and_date_comment">Input comment</string>
+    <string name="observers_and_date_comment_add_hint">Add a comment</string>
+    <string name="observers_and_date_comment_edit_hint">Edit a comment</string>
 
     <plurals name="taxa_found">
         <item quantity="one">%d taxon found</item>

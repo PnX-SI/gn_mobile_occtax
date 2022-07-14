@@ -12,6 +12,8 @@
         <item name="colorSecondary">?attr/colorAccent</item>
         <item name="colorOnSecondary">@android:color/white</item>
 
+        <item name="android:windowBackground">@color/grey_10</item>
+
         <item name="underlinePageIndicatorStyle">@style/UnderlinePageIndicator</item>
 
         <item name="materialThemeOverlay">@style/ButtonThemeOverlay</item>
