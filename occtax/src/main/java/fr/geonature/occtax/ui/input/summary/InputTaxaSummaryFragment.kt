@@ -240,7 +240,13 @@ class InputTaxaSummaryFragment : Fragment(),
     }
 
     override fun getSubtitle(): CharSequence? {
-        return input?.getCurrentSelectedInputTaxon()?.taxon?.name
+        return input?.getInputTaxa()?.size?.let {
+            resources.getQuantityString(
+                R.plurals.summary_taxa_subtitle,
+                it,
+                it
+            )
+        }
     }
 
     override fun pagingEnabled(): Boolean {

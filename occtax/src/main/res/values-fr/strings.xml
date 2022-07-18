@@ -162,6 +162,11 @@
     <string name="counting_min_label">Min</string>
     <string name="counting_max_label">Max</string>
 
+    <plurals name="summary_taxa_subtitle">
+        <item quantity="one">%d taxon</item>
+        <item quantity="other">%d taxons</item>
+        <item quantity="many">%d taxons</item>
+    </plurals>
     <string name="summary_no_data">Aucune saisie.\nAjouter un nouveau taxon via le bouton +.</string>
     <string name="summary_taxon_information"><![CDATA[<b>%1$s :</b>]]> <![CDATA[<i>%2$s</i>]]></string>
     <plurals name="summary_taxon_counting">
