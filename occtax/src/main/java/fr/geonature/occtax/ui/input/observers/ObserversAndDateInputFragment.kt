@@ -373,24 +373,26 @@ class ObserversAndDateInputFragment : Fragment(),
     override fun refreshView() {
         setDefaultDatasetFromSettings()
 
-        val selectedInputObserverIds =
-            input?.getAllInputObserverIds() ?: context?.let { getDefaultObserversId(it) }
-            ?: emptyList()
+        input?.getAllInputObserverIds()?.also { selectedInputObserverIdsFromInput ->
+            val selectedInputObserverIds = selectedInputObserverIdsFromInput.ifEmpty {
+                context?.let { getDefaultObserversId(it) } ?: emptyList()
+            }
 
-        if (selectedInputObserverIds.isNotEmpty()) {
-            LoaderManager.getInstance(this)
-                .initLoader(
-                    LOADER_OBSERVERS_IDS,
-                    bundleOf(
-                        kotlin.Pair(
-                            KEY_SELECTED_INPUT_OBSERVER_IDS,
-                            selectedInputObserverIds.toTypedArray().toLongArray()
-                        )
-                    ),
-                    loaderCallbacks
-                )
-        } else {
-            updateSelectedObserversActionView(emptyList())
+            if (selectedInputObserverIds.isNotEmpty()) {
+                LoaderManager.getInstance(this)
+                    .initLoader(
+                        LOADER_OBSERVERS_IDS,
+                        bundleOf(
+                            kotlin.Pair(
+                                KEY_SELECTED_INPUT_OBSERVER_IDS,
+                                selectedInputObserverIds.toTypedArray().toLongArray()
+                            )
+                        ),
+                        loaderCallbacks
+                    )
+            } else {
+                updateSelectedObserversActionView(emptyList())
+            }
         }
 
         val selectedDatasetId = input?.datasetId
