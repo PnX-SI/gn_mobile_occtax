@@ -1,8 +1,10 @@
 package fr.geonature.occtax.ui.shared.dialog
 
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
@@ -24,6 +26,7 @@ class InputDateDialogFragment : DialogFragment() {
         InputDateSettings(endDateSettings = InputDateSettings.DateSettings.DATE)
     private var startDate: Date = Date()
     private var endDate: Date = startDate
+    private var buttonValidate: Button? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val context = requireContext()
@@ -43,7 +46,7 @@ class InputDateDialogFragment : DialogFragment() {
         endDate = (savedInstanceState?.getSerializable(KEY_DATE_END) as Date?)
             ?: (arguments?.getSerializable(KEY_DATE_END) as Date?) ?: startDate
 
-        val inputDateView = view.findViewById<InputDateView>(R.id.input_date)?.also {
+        view.findViewById<InputDateView>(R.id.input_date)?.also {
             it.setInputDateSettings(dateSettings)
             it.setDates(
                 startDate,
@@ -57,11 +60,18 @@ class InputDateDialogFragment : DialogFragment() {
                 override fun onDatesChanged(startDate: Date, endDate: Date) {
                     this@InputDateDialogFragment.startDate = startDate
                     this@InputDateDialogFragment.endDate = endDate
+
+                    buttonValidate?.isEnabled = true
+                }
+
+                override fun hasError(message: CharSequence) {
+                    // disable validate button unless start and end date are valid
+                    buttonValidate?.isEnabled = false
                 }
             })
         }
 
-        return AlertDialog.Builder(context)
+        val alertDialog = AlertDialog.Builder(context)
             .setTitle(
                 if (dateSettings.startDateSettings != null && dateSettings.endDateSettings == null) R.string.input_date_start_hint
                 else if (dateSettings.startDateSettings == null && dateSettings.endDateSettings != null) R.string.input_date_end_hint
@@ -79,6 +89,12 @@ class InputDateDialogFragment : DialogFragment() {
                 null
             )
             .create()
+
+        alertDialog.setOnShowListener {
+            buttonValidate = (it as AlertDialog).getButton(DialogInterface.BUTTON_POSITIVE)
+        }
+
+        return alertDialog
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

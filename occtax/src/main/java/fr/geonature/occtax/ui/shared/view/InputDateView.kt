@@ -48,6 +48,34 @@ class InputDateView : ConstraintLayout {
 
     private var listener: OnInputDateViewListener? = null
 
+    constructor(context: Context) : super(context) {
+        init(
+            null,
+            0
+        )
+    }
+
+    constructor(context: Context, attrs: AttributeSet) : super(
+        context,
+        attrs
+    ) {
+        init(
+            attrs,
+            0
+        )
+    }
+
+    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(
+        context,
+        attrs,
+        defStyle
+    ) {
+        init(
+            attrs,
+            defStyle
+        )
+    }
+
     fun setListener(listener: OnInputDateViewListener) {
         this.listener = listener
     }
@@ -95,32 +123,9 @@ class InputDateView : ConstraintLayout {
         }
     }
 
-    constructor(context: Context) : super(context) {
-        init(
-            null,
-            0
-        )
-    }
-
-    constructor(context: Context, attrs: AttributeSet) : super(
-        context,
-        attrs
-    ) {
-        init(
-            attrs,
-            0
-        )
-    }
-
-    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(
-        context,
-        attrs,
-        defStyle
-    ) {
-        init(
-            attrs,
-            defStyle
-        )
+    fun hasErrors(): Boolean {
+        return checkStartDateConstraints() != null ||
+            checkEndDateConstraints() != null
     }
 
     private fun init(attrs: AttributeSet?, defStyle: Int) {
@@ -141,6 +146,10 @@ class InputDateView : ConstraintLayout {
             editText?.afterTextChanged {
                 error = checkStartDateConstraints()
                 dateEndTextInputLayout.error = checkEndDateConstraints()
+
+                error?.also {
+                    listener?.hasError(it)
+                }
             }
             editText?.setOnClickListener {
                 CoroutineScope(Dispatchers.Main).launch {
@@ -174,10 +183,12 @@ class InputDateView : ConstraintLayout {
                         )
                     }
 
-                    listener?.onDatesChanged(
-                        startDate,
-                        endDate
-                    )
+                    if (error == null && dateEndTextInputLayout.editText?.error == null) {
+                        listener?.onDatesChanged(
+                            startDate,
+                            endDate
+                        )
+                    }
                 }
             }
         }
@@ -187,6 +198,10 @@ class InputDateView : ConstraintLayout {
             editText?.afterTextChanged {
                 error = checkEndDateConstraints()
                 dateStartTextInputLayout.error = checkStartDateConstraints()
+
+                error?.also {
+                    listener?.hasError(it)
+                }
             }
             editText?.setOnClickListener {
                 CoroutineScope(Dispatchers.Main).launch {
@@ -232,10 +247,12 @@ class InputDateView : ConstraintLayout {
                         )
                     }
 
-                    listener?.onDatesChanged(
-                        startDate,
-                        endDate
-                    )
+                    if (error == null && dateStartTextInputLayout.editText?.error == null) {
+                        listener?.onDatesChanged(
+                            startDate,
+                            endDate
+                        )
+                    }
                 }
             }
         }
@@ -416,6 +433,11 @@ class InputDateView : ConstraintLayout {
          * Called when the start and end dates have been changed.
          */
         fun onDatesChanged(startDate: Date, endDate: Date)
+
+        /**
+         * Called when the current start or end dates is not valid.
+         */
+        fun hasError(message: CharSequence)
     }
 
     companion object {

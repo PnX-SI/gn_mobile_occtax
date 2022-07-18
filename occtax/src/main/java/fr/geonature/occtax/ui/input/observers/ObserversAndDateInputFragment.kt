@@ -334,6 +334,10 @@ class ObserversAndDateInputFragment : Fragment(),
 
                     (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
                 }
+
+                override fun hasError(message: CharSequence) {
+                    (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+                }
             })
         }
 
@@ -363,8 +367,7 @@ class ObserversAndDateInputFragment : Fragment(),
             ?.isNotEmpty() ?: false &&
             this.input?.datasetId != null &&
             this.input?.properties?.isNotEmpty() == true &&
-            checkStartDateConstraints() == null &&
-            checkEndDateConstraints() == null
+            inputDateView?.hasErrors() == false
     }
 
     override fun refreshView() {
@@ -508,53 +511,6 @@ class ObserversAndDateInputFragment : Fragment(),
                 }
             }
         }
-    }
-
-    /**
-     * Checks start date constraints from current [AbstractInput].
-     *
-     * @return `null` if all constraints are valid, or an error message
-     */
-    private fun checkStartDateConstraints(): CharSequence? {
-        if (input == null) {
-            return null
-        }
-
-        val startDate = input?.startDate
-            ?: return getString(R.string.input_error_date_start_not_set)
-
-        if (startDate.after(Date())) {
-            return getString(R.string.input_error_date_start_after_now)
-        }
-
-        return null
-    }
-
-    /**
-     * Checks end date constraints from current [AbstractInput].
-     *
-     * @return `null` if all constraints are valid, or an error message
-     */
-    private fun checkEndDateConstraints(): CharSequence? {
-        if (input == null) {
-            return null
-        }
-
-        val endDate = input?.endDate
-
-        if (dateSettings.endDateSettings == null) {
-            return null
-        }
-
-        if (endDate == null) {
-            return getString(R.string.input_error_date_end_not_set)
-        }
-
-        if ((input?.startDate ?: Date()).after(endDate)) {
-            return getString(R.string.input_error_date_end_before_start_date)
-        }
-
-        return null
     }
 
     companion object {
