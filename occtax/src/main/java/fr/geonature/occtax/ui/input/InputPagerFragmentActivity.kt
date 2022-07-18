@@ -126,7 +126,7 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
             )
             put(
                 R.string.pager_fragment_summary_title,
-                InputTaxaSummaryFragment.newInstance()
+                InputTaxaSummaryFragment.newInstance(appSettings.inputSettings.dateSettings)
             )
         }
 

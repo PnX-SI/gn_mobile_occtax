@@ -62,75 +62,11 @@
             app:cardElevation="@dimen/cardview_elevation"
             app:contentPadding="@dimen/padding_default">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <fr.geonature.occtax.ui.shared.view.InputDateView
+                android:id="@+id/input_date"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/date_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/padding_default"
-                    android:text="@string/observers_and_date_date"
-                    android:textAllCaps="false"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textStyle="bold"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/dateStart"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/observers_and_date_date_start_hint"
-                    android:paddingBottom="@dimen/padding_default"
-                    app:layout_constraintEnd_toEndOf="@+id/date_title"
-                    app:layout_constraintStart_toStartOf="@+id/date_title"
-                    app:layout_constraintTop_toBottomOf="@+id/date_title"
-                    app:startIconDrawable="@drawable/ic_action_edit_calendar">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:clickable="false"
-                        android:cursorVisible="false"
-                        android:ellipsize="end"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"
-                        android:inputType="textNoSuggestions"
-                        android:scrollHorizontally="false"
-                        android:singleLine="true"
-                        tools:ignore="TextContrastCheck" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/dateEnd"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/observers_and_date_date_end_hint"
-                    android:visibility="visible"
-                    app:layout_constraintEnd_toEndOf="@+id/date_title"
-                    app:layout_constraintStart_toStartOf="@+id/date_title"
-                    app:layout_constraintTop_toBottomOf="@+id/dateStart"
-                    app:startIconDrawable="@drawable/ic_action_edit_calendar">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:clickable="false"
-                        android:cursorVisible="false"
-                        android:ellipsize="end"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"
-                        android:inputType="textNoSuggestions"
-                        android:singleLine="true"
-                        tools:ignore="TextContrastCheck" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_height="wrap_content"
+                app:title="@string/input_date" />
 
         </androidx.cardview.widget.CardView>
 
@@ -153,7 +89,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="@dimen/padding_default"
-                    android:text="@string/observers_and_date_comment"
+                    android:text="@string/input_comment"
                     android:textAllCaps="false"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:textStyle="bold" />
@@ -163,13 +99,12 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/padding_default"
                     app:endIconMode="clear_text">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/alert_dialog_add_comment_hint"
+                        android:hint="@string/input_comment_add_hint"
                         android:imeOptions="actionDone"
                         android:importantForAutofill="no"
                         android:inputType="textMultiLine|textAutoCorrect"

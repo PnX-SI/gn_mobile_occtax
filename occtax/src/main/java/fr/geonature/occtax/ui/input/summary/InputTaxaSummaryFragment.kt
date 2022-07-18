@@ -3,7 +3,6 @@ package fr.geonature.occtax.ui.input.summary
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -13,7 +12,6 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -25,10 +23,12 @@ import fr.geonature.commons.input.AbstractInputTaxon
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
+import fr.geonature.occtax.settings.InputDateSettings
 import fr.geonature.occtax.ui.input.IInputFragment
-import fr.geonature.occtax.ui.shared.dialog.CommentDialogFragment
+import fr.geonature.occtax.ui.shared.dialog.InputDateDialogFragment
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
 import fr.geonature.viewpager.ui.IValidateFragment
+import java.util.Date
 
 /**
  * Summary of all edited taxa.
@@ -39,27 +39,33 @@ class InputTaxaSummaryFragment : Fragment(),
     IValidateFragment,
     IInputFragment {
 
+    private lateinit var dateSettings: InputDateSettings
+
     private var input: Input? = null
     private var adapter: InputTaxaSummaryRecyclerViewAdapter? = null
     private var recyclerView: RecyclerView? = null
     private var emptyTextView: TextView? = null
     private var fab: ExtendedFloatingActionButton? = null
 
-    private val onCommentDialogFragmentListener =
-        object : CommentDialogFragment.OnCommentDialogFragmentListener {
-            override fun onChanged(comment: String?) {
-                input?.comment = comment
-                activity?.invalidateOptionsMenu()
+    private val onInputDateDialogFragmentListener =
+        object : InputDateDialogFragment.OnInputDateDialogFragmentListener {
+            override fun onDatesChanged(startDate: Date, endDate: Date) {
+                input?.apply {
+                    this.startDate = startDate
+                    this.endDate = endDate
+                }
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        dateSettings = arguments?.getParcelable(ARG_DATE_SETTINGS) ?: InputDateSettings.DEFAULT
+
         val supportFragmentManager = activity?.supportFragmentManager ?: return
 
-        (supportFragmentManager.findFragmentByTag(COMMENT_DIALOG_FRAGMENT) as CommentDialogFragment?)?.also {
-            it.setOnCommentDialogFragmentListener(onCommentDialogFragmentListener)
+        (supportFragmentManager.findFragmentByTag(INPUT_DATE_DIALOG_FRAGMENT) as InputDateDialogFragment?)?.also {
+            it.setOnInputDateDialogFragmentListenerListener(onInputDateDialogFragmentListener)
         }
     }
 
@@ -193,7 +199,7 @@ class InputTaxaSummaryFragment : Fragment(),
         )
 
         inflater.inflate(
-            R.menu.comment,
+            R.menu.date,
             menu
         )
     }
@@ -201,24 +207,25 @@ class InputTaxaSummaryFragment : Fragment(),
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
 
-        val commentItem = menu.findItem(R.id.menu_comment)
-        commentItem.title =
-            if (TextUtils.isEmpty(input?.comment)) getString(R.string.action_comment_add) else getString(
-                R.string.action_comment_edit
-            )
+        val dateMenuItem = menu.findItem(R.id.menu_date)
+        dateMenuItem.isVisible = dateSettings.endDateSettings != null
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.menu_comment -> {
+            R.id.menu_date -> {
                 val supportFragmentManager = activity?.supportFragmentManager ?: return true
 
-                CommentDialogFragment.newInstance(input?.comment)
+                InputDateDialogFragment.newInstance(
+                    InputDateSettings(endDateSettings = dateSettings.endDateSettings),
+                    input?.startDate ?: Date(),
+                    input?.endDate
+                )
                     .apply {
-                        setOnCommentDialogFragmentListener(onCommentDialogFragmentListener)
+                        setOnInputDateDialogFragmentListenerListener(onInputDateDialogFragmentListener)
                         show(
                             supportFragmentManager,
-                            COMMENT_DIALOG_FRAGMENT
+                            INPUT_DATE_DIALOG_FRAGMENT
                         )
                     }
 
@@ -256,7 +263,8 @@ class InputTaxaSummaryFragment : Fragment(),
 
     companion object {
 
-        private const val COMMENT_DIALOG_FRAGMENT = "comment_dialog_fragment"
+        private const val INPUT_DATE_DIALOG_FRAGMENT = "input_date_dialog_fragment"
+        private const val ARG_DATE_SETTINGS = "arg_date_settings"
 
         /**
          * Use this factory method to create a new instance of [InputTaxaSummaryFragment].
@@ -264,6 +272,13 @@ class InputTaxaSummaryFragment : Fragment(),
          * @return A new instance of [InputTaxaSummaryFragment]
          */
         @JvmStatic
-        fun newInstance() = InputTaxaSummaryFragment()
+        fun newInstance(dateSettings: InputDateSettings) = InputTaxaSummaryFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(
+                    ARG_DATE_SETTINGS,
+                    dateSettings
+                )
+            }
+        }
     }
 }

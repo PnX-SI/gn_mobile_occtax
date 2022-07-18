@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <declare-styleable name="InputDateView">
+        <attr name="title" />
+    </declare-styleable>
+
     <declare-styleable name="ListItemActionView">
         <attr name="title" />
         <attr name="no_data" format="reference" />
