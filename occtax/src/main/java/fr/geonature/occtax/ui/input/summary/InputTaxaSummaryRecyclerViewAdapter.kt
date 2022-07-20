@@ -58,15 +58,17 @@ class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapte
     inner class ViewHolder(itemView: View) :
         AbstractListItemRecyclerViewAdapter<AbstractInputTaxon>.AbstractViewHolder(itemView) {
         private val title: TextView = itemView.findViewById(android.R.id.title)
-        private val filterChipGroup: ChipGroup = itemView.findViewById(R.id.chip_group_filter)
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
+        private val filterChipGroup: ChipGroup = itemView.findViewById(R.id.chip_group_filter)
+        private val summary: TextView = itemView.findViewById(android.R.id.summary)
         private val text2: TextView = itemView.findViewById(android.R.id.text2)
 
         override fun onBind(item: AbstractInputTaxon) {
             title.text = item.taxon.name
+            text1.text = item.taxon.commonName
             buildTaxonomyChips(item.taxon.taxonomy)
-            text1.text = buildInformation(*(item as InputTaxon).properties.values.toTypedArray())
-            text1.isSelected = true
+            summary.text = buildInformation(*(item as InputTaxon).properties.values.toTypedArray())
+            summary.isSelected = true
             text2.text = buildCounting(item.getCounting().size)
         }
 
