@@ -41,6 +41,7 @@ class InputObserverListFragment : Fragment() {
     @Inject
     lateinit var authority: String
 
+    private lateinit var savedState: Bundle
     private var listener: OnInputObserverListFragmentListener? = null
     private var adapter: InputObserverRecyclerViewAdapter? = null
 
@@ -52,7 +53,8 @@ class InputObserverListFragment : Fragment() {
 
             return when (id) {
                 LOADER_OBSERVERS -> {
-                    val selections = InputObserver.filter(args?.getString(KEY_FILTER))
+                    val observersFilter =
+                        InputObserver.Filter().byName(args?.getString(KEY_FILTER)).build()
 
                     CursorLoader(
                         requireContext(),
@@ -61,9 +63,9 @@ class InputObserverListFragment : Fragment() {
                             InputObserver.TABLE_NAME
                         ),
                         null,
-                        selections.first,
-                        selections.second,
-                        null
+                        observersFilter.first,
+                        observersFilter.second.map { it.toString() }.toTypedArray(),
+                        InputObserver.OrderBy().byName(args?.getString(KEY_FILTER)).build()
                     )
                 }
 
@@ -96,6 +98,15 @@ class InputObserverListFragment : Fragment() {
             mode: ActionMode?,
             menu: Menu?
         ): Boolean {
+            mode?.menuInflater?.inflate(
+                R.menu.search,
+                menu
+            )
+
+            (menu?.findItem(R.id.action_search)?.actionView as SearchView?)?.apply {
+                configureSearchView(this)
+            }
+
             return true
         }
 
@@ -103,7 +114,17 @@ class InputObserverListFragment : Fragment() {
             mode: ActionMode?,
             menu: Menu?
         ): Boolean {
-            return false
+            val searchCriterion = savedState.getString(KEY_FILTER)
+
+            (menu?.findItem(R.id.action_search)?.actionView as SearchView?)?.apply {
+                isIconified = searchCriterion.isNullOrEmpty()
+                setQuery(
+                    searchCriterion,
+                    false
+                )
+            }
+            
+            return !searchCriterion.isNullOrEmpty()
         }
 
         override fun onActionItemClicked(
@@ -117,6 +138,12 @@ class InputObserverListFragment : Fragment() {
             actionMode = null
             listener?.onSelectedInputObservers(adapter?.getSelectedInputObservers() ?: listOf())
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        savedState = savedInstanceState ?: Bundle()
     }
 
     override fun onCreateView(
@@ -192,6 +219,10 @@ class InputObserverListFragment : Fragment() {
         setHasOptionsMenu(true)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(savedState.apply { putAll(outState) })
+    }
+
     override fun onCreateOptionsMenu(
         menu: Menu,
         inflater: MenuInflater
@@ -207,29 +238,9 @@ class InputObserverListFragment : Fragment() {
             menu
         )
 
-        val searchItem = menu.findItem(R.id.action_search)
-        val searchView = searchItem.actionView as SearchView
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String): Boolean {
-                LoaderManager.getInstance(this@InputObserverListFragment)
-                    .restartLoader(
-                        LOADER_OBSERVERS,
-                        bundleOf(
-                            Pair(
-                                KEY_FILTER,
-                                newText
-                            )
-                        ),
-                        loaderCallbacks
-                    )
-
-                return true
-            }
-        })
+        (menu.findItem(R.id.action_search)?.actionView as SearchView?)?.apply {
+            configureSearchView(this)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -257,6 +268,35 @@ class InputObserverListFragment : Fragment() {
         super.onDetach()
 
         listener = null
+    }
+
+    private fun configureSearchView(searchView: SearchView) {
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                savedState.putString(
+                    KEY_FILTER,
+                    newText
+                )
+
+                LoaderManager.getInstance(this@InputObserverListFragment)
+                    .restartLoader(
+                        LOADER_OBSERVERS,
+                        bundleOf(
+                            Pair(
+                                KEY_FILTER,
+                                newText
+                            )
+                        ),
+                        loaderCallbacks
+                    )
+
+                return true
+            }
+        })
     }
 
     private fun updateActionMode(inputObservers: List<InputObserver>) {
