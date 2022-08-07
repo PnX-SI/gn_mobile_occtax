@@ -126,7 +126,7 @@ class TaxaFragment : Fragment(),
                         null,
                         taxonFilter.first,
                         taxonFilter.second.map { it.toString() }.toTypedArray(),
-                        TaxonWithArea.OrderBy().by(AbstractTaxon.COLUMN_NAME).build()
+                        TaxonWithArea.OrderBy().byName(args?.getString(KEY_FILTER_BY_NAME)).build()
                     )
                 }
                 LOADER_TAXON -> {
