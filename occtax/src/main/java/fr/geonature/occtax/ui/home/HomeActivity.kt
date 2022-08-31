@@ -421,6 +421,7 @@ class HomeActivity : AppCompatActivity() {
             vm.isSyncRunning.observe(
                 this@HomeActivity
             ) {
+                appSyncView?.enableActionButton(!it)
                 invalidateOptionsMenu()
             }
             vm
