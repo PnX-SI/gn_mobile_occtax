@@ -14,7 +14,6 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
@@ -29,7 +28,6 @@ import fr.geonature.commons.data.entity.DefaultNomenclatureWithType
 import fr.geonature.commons.data.entity.InputObserver
 import fr.geonature.commons.data.entity.NomenclatureType
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
-import fr.geonature.commons.input.AbstractInput
 import fr.geonature.commons.util.afterTextChanged
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
@@ -37,29 +35,25 @@ import fr.geonature.occtax.input.NomenclatureTypeViewType
 import fr.geonature.occtax.input.PropertyValue
 import fr.geonature.occtax.settings.InputDateSettings
 import fr.geonature.occtax.ui.dataset.DatasetListActivity
-import fr.geonature.occtax.ui.input.IInputFragment
+import fr.geonature.occtax.ui.input.AbstractInputFragment
 import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
 import fr.geonature.occtax.ui.observers.InputObserverListActivity
 import fr.geonature.occtax.ui.shared.view.InputDateView
 import fr.geonature.occtax.ui.shared.view.ListItemActionView
 import fr.geonature.occtax.util.SettingsUtils.getDefaultDatasetId
 import fr.geonature.occtax.util.SettingsUtils.getDefaultObserversId
-import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
-import fr.geonature.viewpager.ui.IValidateFragment
 import org.tinylog.kotlin.Logger
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 
 /**
- * Selected observer and current date as first {@code Fragment} used by [InputPagerFragmentActivity].
+ * Selected observer and current date as first page used by [InputPagerFragmentActivity].
  *
  * @author S. Grimault
  */
 @AndroidEntryPoint
-class ObserversAndDateInputFragment : Fragment(),
-    IValidateFragment,
-    IInputFragment {
+class ObserversAndDateInputFragment : AbstractInputFragment() {
 
     @ContentProviderAuthority
     @Inject
@@ -73,7 +67,6 @@ class ObserversAndDateInputFragment : Fragment(),
     private lateinit var datasetResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var dateSettings: InputDateSettings
 
-    private var input: Input? = null
     private val defaultInputObservers: MutableList<InputObserver> = mutableListOf()
     private val selectedInputObservers: MutableList<InputObserver> = mutableListOf()
     private var selectedDataset: Dataset? = null
@@ -181,7 +174,7 @@ class ObserversAndDateInputFragment : Fragment(),
                     if (data.count == 0) {
                         selectedDataset = null
                         input?.datasetId = null
-                        (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+                        listener.validateCurrentPage()
                     }
 
                     if (data.moveToFirst()) {
@@ -219,7 +212,7 @@ class ObserversAndDateInputFragment : Fragment(),
                         data.moveToNext()
                     }
 
-                    (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+                    listener.validateCurrentPage()
 
                     if (input?.properties?.isNotEmpty() == false) {
                         val context = context ?: return
@@ -332,11 +325,11 @@ class ObserversAndDateInputFragment : Fragment(),
                     input?.startDate = startDate
                     input?.endDate = endDate
 
-                    (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+                    listener.validateCurrentPage()
                 }
 
                 override fun hasError(message: CharSequence) {
-                    (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+                    listener.validateCurrentPage()
                 }
             })
         }
@@ -446,10 +439,6 @@ class ObserversAndDateInputFragment : Fragment(),
         }
     }
 
-    override fun setInput(input: AbstractInput) {
-        this.input = input as Input
-    }
-
     private fun updateSelectedObservers(selectedInputObservers: List<InputObserver>) {
         this.selectedInputObservers.clear()
         this.selectedInputObservers.addAll(selectedInputObservers)
@@ -461,7 +450,7 @@ class ObserversAndDateInputFragment : Fragment(),
 
         updateSelectedObserversActionView(selectedInputObservers)
 
-        (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+        listener.validateCurrentPage()
     }
 
     private fun updateSelectedDataset(selectedDataset: Dataset?) {
@@ -471,7 +460,7 @@ class ObserversAndDateInputFragment : Fragment(),
             it.datasetId = selectedDataset?.id
         }
 
-        (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+        listener.validateCurrentPage()
 
         updateSelectedDatasetActionView(selectedDataset)
     }

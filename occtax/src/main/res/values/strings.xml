@@ -6,6 +6,7 @@
 
     <string name="activity_login_title">Sign in</string>
     <string name="activity_preferences_title">Settings</string>
+    <string name="activity_input_title">Edit input</string>
     <string name="activity_dataset_title">Dataset</string>
     <string name="activity_observers_title">Observers</string>
     <string name="activity_taxa_filter_title">Taxa filters</string>
@@ -89,7 +90,8 @@
 
     <string name="pager_fragment_observers_and_date_input_title">Observers &#38; date</string>
     <string name="pager_fragment_map_title">Pointing</string>
-    <string name="pager_fragment_taxa_title">Taxa</string>
+    <string name="pager_fragment_taxa_added_title">Taxa added</string>
+    <string name="pager_fragment_taxa_title">Select taxon</string>
     <string name="pager_fragment_information_title">Information</string>
     <string name="pager_fragment_counting_title">Counting</string>
     <string name="pager_fragment_summary_title">Summary</string>

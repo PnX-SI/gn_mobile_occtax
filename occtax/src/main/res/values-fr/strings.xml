@@ -3,6 +3,7 @@
 
     <string name="activity_login_title">Authentification</string>
     <string name="activity_preferences_title">Paramètres</string>
+    <string name="activity_input_title">Editer le relevé</string>
     <string name="activity_dataset_title">Jeu de données</string>
     <string name="activity_observers_title">Observateurs</string>
     <string name="activity_taxa_filter_title">Filtres sur les taxons</string>
@@ -88,7 +89,8 @@
 
     <string name="pager_fragment_observers_and_date_input_title">Observateur &#38; date</string>
     <string name="pager_fragment_map_title">Pointage</string>
-    <string name="pager_fragment_taxa_title">Taxons</string>
+    <string name="pager_fragment_taxa_added_title">Taxons ajoutés</string>
+    <string name="pager_fragment_taxa_title">Choix du taxon</string>
     <string name="pager_fragment_information_title">Informations</string>
     <string name="pager_fragment_counting_title">Dénombrements</string>
     <string name="pager_fragment_summary_title">Bilan de la saisie</string>

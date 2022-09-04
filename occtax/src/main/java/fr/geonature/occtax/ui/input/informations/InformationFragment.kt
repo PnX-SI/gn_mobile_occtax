@@ -19,15 +19,13 @@ import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.NomenclatureType
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
-import fr.geonature.commons.input.AbstractInput
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.input.PropertyValue
 import fr.geonature.occtax.settings.PropertySettings
-import fr.geonature.occtax.ui.input.IInputFragment
+import fr.geonature.occtax.ui.input.AbstractInputFragment
 import fr.geonature.occtax.ui.input.dialog.ChooseNomenclatureDialogFragment
-import fr.geonature.viewpager.ui.IValidateFragment
 import org.tinylog.kotlin.Logger
 import javax.inject.Inject
 
@@ -37,18 +35,16 @@ import javax.inject.Inject
  * @author S. Grimault
  */
 @AndroidEntryPoint
-class InformationFragment : Fragment(),
-    IValidateFragment,
-    IInputFragment,
+class InformationFragment : AbstractInputFragment(),
     ChooseNomenclatureDialogFragment.OnChooseNomenclatureDialogFragmentListener {
 
     @ContentProviderAuthority
     @Inject
     lateinit var authority: String
 
-    private var input: Input? = null
-    private var adapter: NomenclatureTypesRecyclerViewAdapter? = null
     private lateinit var savedState: Bundle
+
+    private var adapter: NomenclatureTypesRecyclerViewAdapter? = null
 
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(
@@ -238,10 +234,6 @@ class InformationFragment : Fragment(),
                 null,
                 loaderCallbacks
             )
-    }
-
-    override fun setInput(input: AbstractInput) {
-        this.input = input as Input
     }
 
     override fun onSelectedNomenclature(

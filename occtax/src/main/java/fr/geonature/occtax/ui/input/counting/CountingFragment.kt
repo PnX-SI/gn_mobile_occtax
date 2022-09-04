@@ -21,29 +21,23 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.commons.input.AbstractInput
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.CountingMetadata
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.settings.PropertySettings
-import fr.geonature.occtax.ui.input.IInputFragment
-import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
-import fr.geonature.viewpager.ui.IValidateFragment
+import fr.geonature.occtax.ui.input.AbstractInputFragment
 
 /**
  * [Fragment] to let the user to add additional counting information for the given [Input].
  *
  * @author S. Grimault
  */
-class CountingFragment : Fragment(),
-    IValidateFragment,
-    IInputFragment {
+class CountingFragment : AbstractInputFragment() {
 
     private lateinit var editCountingResultLauncher: ActivityResultLauncher<Intent>
 
-    private var input: Input? = null
     private var adapter: CountingRecyclerViewAdapter? = null
     private var recyclerView: RecyclerView? = null
     private var emptyTextView: TextView? = null
@@ -125,7 +119,7 @@ class CountingFragment : Fragment(),
                         ) { dialog, _ ->
                             adapter?.remove(item)
                             (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.deleteCountingMetadata(item.index)
-                            (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+                            listener.validateCurrentPage()
 
                             dialog.dismiss()
                         }
@@ -203,10 +197,6 @@ class CountingFragment : Fragment(),
         if (counting.isEmpty()) {
             launchEditCountingMetadataActivity()
         }
-    }
-
-    override fun setInput(input: AbstractInput) {
-        this.input = input as Input
     }
 
     private fun launchEditCountingMetadataActivity(countingMetadata: CountingMetadata? = null) {

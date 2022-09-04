@@ -1,6 +1,8 @@
 package fr.geonature.occtax.ui.input.summary
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.view.LayoutInflater
@@ -13,21 +15,16 @@ import android.view.animation.AnimationUtils
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat.getSystemService
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import fr.geonature.commons.input.AbstractInput
 import fr.geonature.commons.input.AbstractInputTaxon
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.settings.InputDateSettings
-import fr.geonature.occtax.ui.input.IInputFragment
+import fr.geonature.occtax.ui.input.AbstractInputFragment
 import fr.geonature.occtax.ui.shared.dialog.InputDateDialogFragment
-import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
-import fr.geonature.viewpager.ui.IValidateFragment
 import java.util.Date
 
 /**
@@ -35,17 +32,15 @@ import java.util.Date
  *
  * @author S. Grimault
  */
-class InputTaxaSummaryFragment : Fragment(),
-    IValidateFragment,
-    IInputFragment {
+class InputTaxaSummaryFragment : AbstractInputFragment() {
 
     private lateinit var dateSettings: InputDateSettings
 
-    private var input: Input? = null
     private var adapter: InputTaxaSummaryRecyclerViewAdapter? = null
     private var recyclerView: RecyclerView? = null
     private var emptyTextView: TextView? = null
     private var fab: ExtendedFloatingActionButton? = null
+    private var startEditTaxon = false
 
     private val onInputDateDialogFragmentListener =
         object : InputDateDialogFragment.OnInputDateDialogFragmentListener {
@@ -103,19 +98,18 @@ class InputTaxaSummaryFragment : Fragment(),
             setText(R.string.action_add_taxon)
             extend()
             setOnClickListener {
-                ((activity as AbstractPagerFragmentActivity?))?.also {
-                    input?.clearCurrentSelectedInputTaxon()
-                    it.goToPreviousPage()
-                    it.goToNextPage()
-                }
+                startEditTaxon = true
+                input?.clearCurrentSelectedInputTaxon()
+                listener.startEditTaxon()
             }
         }
 
         adapter = InputTaxaSummaryRecyclerViewAdapter(object :
             AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<AbstractInputTaxon> {
             override fun onClick(item: AbstractInputTaxon) {
+                startEditTaxon = true
                 input?.setCurrentSelectedInputTaxonId(item.taxon.id)
-                (activity as AbstractPagerFragmentActivity?)?.goToPageByKey(R.string.pager_fragment_information_title)
+                listener.startEditTaxon()
             }
 
             override fun onLongClicked(
@@ -140,7 +134,7 @@ class InputTaxaSummaryFragment : Fragment(),
                         ) { dialog, _ ->
                             adapter?.remove(item)
                             input?.removeInputTaxon(item.taxon.id)
-                            (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+                            listener.validateCurrentPage()
 
                             dialog.dismiss()
                         }
@@ -185,6 +179,30 @@ class InputTaxaSummaryFragment : Fragment(),
                 (layoutManager as LinearLayoutManager).orientation
             )
             addItemDecoration(dividerItemDecoration)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        Handler(Looper.getMainLooper()).post {
+            // bypass this page and redirect to the previous one if we have started editing the first taxon
+            if (startEditTaxon && input?.getInputTaxa()?.isEmpty() == true) {
+                startEditTaxon = false
+                listener.goToPreviousPage()
+                return@post
+            }
+
+            // no taxon added yet: redirect to the edit taxon pages
+            if (input?.getInputTaxa()?.isEmpty() == true) {
+                startEditTaxon = true
+                listener.startEditTaxon()
+                return@post
+            }
+
+            // finish taxon editing workflow
+            startEditTaxon = false
+            listener.finishEditTaxon()
         }
     }
 
@@ -240,8 +258,10 @@ class InputTaxaSummaryFragment : Fragment(),
     }
 
     override fun getSubtitle(): CharSequence? {
+        val context = context ?: return null
+
         return input?.getInputTaxa()?.size?.let {
-            resources.getQuantityString(
+            context.resources.getQuantityString(
                 R.plurals.summary_taxa_subtitle,
                 it,
                 it
@@ -254,17 +274,13 @@ class InputTaxaSummaryFragment : Fragment(),
     }
 
     override fun validate(): Boolean {
-        return this.input?.getCurrentSelectedInputTaxon() != null
+        return startEditTaxon || this.input?.getInputTaxa()?.isNotEmpty() ?: false
     }
 
     override fun refreshView() {
         // FIXME: this is a workaround to refresh adapter's list as getInputTaxa() items are not immutable...
         if ((adapter?.itemCount ?: 0) > 0) adapter?.clear()
         adapter?.setItems(input?.getInputTaxa() ?: emptyList())
-    }
-
-    override fun setInput(input: AbstractInput) {
-        this.input = input as Input
     }
 
     companion object {
