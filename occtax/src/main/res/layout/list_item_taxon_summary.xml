@@ -36,17 +36,6 @@
         app:layout_constraintTop_toBottomOf="@android:id/title"
         tools:text="@tools:sample/first_names" />
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chip_group_filter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/padding_default"
-        android:elevation="4dp"
-        app:chipSpacing="@dimen/padding_default"
-        app:layout_constraintTop_toBottomOf="@android:id/text1"
-        app:singleLine="true"
-        app:singleSelection="true" />
-
     <TextView
         android:id="@android:id/summary"
         android:layout_width="0dp"
@@ -59,7 +48,7 @@
         android:textAppearance="?attr/textAppearanceListItemSecondary"
         app:layout_constraintEnd_toEndOf="@android:id/title"
         app:layout_constraintStart_toStartOf="@android:id/title"
-        app:layout_constraintTop_toBottomOf="@+id/chip_group_filter"
+        app:layout_constraintTop_toBottomOf="@android:id/text1"
         tools:text="@tools:sample/lorem/random" />
 
     <TextView

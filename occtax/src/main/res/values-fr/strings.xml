@@ -171,6 +171,7 @@
     </plurals>
     <string name="summary_no_data">Aucune saisie.\nAjouter un nouveau taxon via le bouton +.</string>
     <string name="summary_taxon_information"><![CDATA[<b>%1$s :</b>]]> <![CDATA[<i>%2$s</i>]]></string>
+    <string name="summary_taxon_information_empty">aucune information saisie</string>
     <plurals name="summary_taxon_counting">
         <item quantity="one">%d dénombrement</item>
         <item quantity="other">%d dénombrements</item>

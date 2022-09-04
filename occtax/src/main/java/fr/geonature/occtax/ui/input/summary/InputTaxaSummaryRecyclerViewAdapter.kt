@@ -1,13 +1,10 @@
 package fr.geonature.occtax.ui.input.summary
 
 import android.text.Spanned
-import android.view.LayoutInflater
+import android.text.SpannedString
 import android.view.View
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
-import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.input.AbstractInputTaxon
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
@@ -59,55 +56,20 @@ class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapte
         AbstractListItemRecyclerViewAdapter<AbstractInputTaxon>.AbstractViewHolder(itemView) {
         private val title: TextView = itemView.findViewById(android.R.id.title)
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
-        private val filterChipGroup: ChipGroup = itemView.findViewById(R.id.chip_group_filter)
         private val summary: TextView = itemView.findViewById(android.R.id.summary)
         private val text2: TextView = itemView.findViewById(android.R.id.text2)
 
         override fun onBind(item: AbstractInputTaxon) {
             title.text = item.taxon.name
             text1.text = item.taxon.commonName
-            buildTaxonomyChips(item.taxon.taxonomy)
             summary.text = buildInformation(*(item as InputTaxon).properties.values.toTypedArray())
             summary.isSelected = true
             text2.text = buildCounting(item.getCounting().size)
         }
 
-        private fun buildTaxonomyChips(taxonomy: Taxonomy) {
-            filterChipGroup.removeAllViews()
-
-            // build kingdom taxonomy filter chip
-            with(
-                LayoutInflater.from(itemView.context).inflate(
-                    R.layout.chip,
-                    filterChipGroup,
-                    false
-                ) as Chip
-            ) {
-                text = taxonomy.kingdom
-                filterChipGroup.addView(this)
-                isCloseIconVisible = false
-                isEnabled = false
-            }
-
-            // build group taxonomy filter chip
-            if (taxonomy.group != Taxonomy.ANY) {
-                with(
-                    LayoutInflater.from(itemView.context).inflate(
-                        R.layout.chip,
-                        filterChipGroup,
-                        false
-                    ) as Chip
-                ) {
-                    text = taxonomy.group
-                    filterChipGroup.addView(this)
-                    isCloseIconVisible = false
-                    isEnabled = false
-                }
-            }
-        }
-
         private fun buildInformation(vararg propertyValue: PropertyValue): Spanned {
-            return HtmlCompat.fromHtml(propertyValue
+            return if (propertyValue.isEmpty()) SpannedString(itemView.context.getString(R.string.summary_taxon_information_empty))
+            else HtmlCompat.fromHtml(propertyValue
                 .asSequence()
                 .filterNot { it.isEmpty() }
                 .map {
