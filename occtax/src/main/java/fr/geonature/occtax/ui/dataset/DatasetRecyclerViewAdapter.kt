@@ -146,6 +146,7 @@ class DatasetRecyclerViewAdapter(private val listener: OnDatasetRecyclerViewAdap
             if (dataset != null) {
                 title.text = dataset.name
                 title.isSelected = selectedDataset?.id == dataset.id
+                title.isSelected = true
                 text1.text = dataset.description
                 text1.isSelected = selectedDataset?.id == dataset.id
                 text2.text = itemView.context.getString(

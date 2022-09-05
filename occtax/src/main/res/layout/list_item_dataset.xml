@@ -34,7 +34,7 @@
         android:layout_marginStart="?attr/listPreferredItemPaddingStart"
         android:ellipsize="marquee"
         android:marqueeRepeatLimit="marquee_forever"
-        android:lines="2"
+        android:lines="3"
         android:scrollHorizontally="true"
         android:textAppearance="?attr/textAppearanceListItemSecondary"
         app:layout_constraintEnd_toEndOf="@android:id/title"
