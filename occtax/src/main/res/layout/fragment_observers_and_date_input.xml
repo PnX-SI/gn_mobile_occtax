@@ -42,13 +42,53 @@
             app:cardElevation="@dimen/cardview_elevation"
             app:contentPadding="@dimen/padding_default">
 
-            <fr.geonature.occtax.ui.shared.view.ListItemActionView
+            <fr.geonature.occtax.ui.shared.view.ActionView
                 android:id="@+id/selected_dataset_action_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:action="@string/action_edit"
                 app:action_empty="@string/action_set"
-                app:title="@string/observers_and_date_dataset" />
+                app:content_visibility="gone"
+                app:title="@string/observers_and_date_dataset">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="@dimen/padding_default"
+                    android:paddingTop="@dimen/padding_default">
+
+                    <TextView
+                        android:id="@+id/dataset_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:duplicateParentState="true"
+                        android:ellipsize="marquee"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:scrollHorizontally="true"
+                        android:singleLine="true"
+                        android:textAppearance="?attr/textAppearanceListItem"
+                        android:textStyle="bold"
+                        tools:text="@tools:sample/last_names" />
+
+                    <TextView
+                        android:id="@+id/dataset_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:duplicateParentState="true"
+                        android:ellipsize="marquee"
+                        android:lines="3"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:scrollHorizontally="true"
+                        android:textAppearance="?attr/textAppearanceListItemSecondary"
+                        tools:text="@tools:sample/first_names" />
+
+                </LinearLayout>
+
+            </fr.geonature.occtax.ui.shared.view.ActionView>
 
         </androidx.cardview.widget.CardView>
 

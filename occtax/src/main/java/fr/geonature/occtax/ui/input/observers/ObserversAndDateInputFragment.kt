@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -38,6 +39,7 @@ import fr.geonature.occtax.ui.dataset.DatasetListActivity
 import fr.geonature.occtax.ui.input.AbstractInputFragment
 import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
 import fr.geonature.occtax.ui.observers.InputObserverListActivity
+import fr.geonature.occtax.ui.shared.view.ActionView
 import fr.geonature.occtax.ui.shared.view.InputDateView
 import fr.geonature.occtax.ui.shared.view.ListItemActionView
 import fr.geonature.occtax.util.SettingsUtils.getDefaultDatasetId
@@ -72,7 +74,7 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
     private var selectedDataset: Dataset? = null
 
     private var selectedInputObserversActionView: ListItemActionView? = null
-    private var selectedDatasetActionView: ListItemActionView? = null
+    private var selectedDatasetActionView: ActionView? = null
     private var inputDateView: InputDateView? = null
     private var commentTextInputLayout: TextInputLayout? = null
 
@@ -299,8 +301,8 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
             }
 
         selectedDatasetActionView =
-            view.findViewById<ListItemActionView?>(R.id.selected_dataset_action_view)?.apply {
-                setListener(object : ListItemActionView.OnListItemActionViewListener {
+            view.findViewById<ActionView?>(R.id.selected_dataset_action_view)?.apply {
+                setListener(object : ActionView.OnActionViewListener {
                     override fun onAction() {
                         val context = context ?: return
 
@@ -482,15 +484,13 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
     }
 
     private fun updateSelectedDatasetActionView(selectedDataset: Dataset?) {
-        selectedDatasetActionView?.setItems(
-            if (selectedDataset == null) emptyList()
-            else listOf(
-                Pair.create(
-                    selectedDataset.name,
-                    selectedDataset.description
-                )
-            )
-        )
+        selectedDatasetActionView?.getContentView()?.also { contentView ->
+            contentView.isSelected = true
+            contentView.findViewById<TextView>(R.id.dataset_name)?.text = selectedDataset?.name
+            contentView.findViewById<TextView>(R.id.dataset_description)?.text =
+                selectedDataset?.description
+        }
+        selectedDatasetActionView?.setContentViewVisibility(if (selectedDataset == null) View.GONE else View.VISIBLE)
     }
 
     private fun setDefaultDatasetFromSettings() {
