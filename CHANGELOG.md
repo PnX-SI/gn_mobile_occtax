@@ -1,5 +1,32 @@
 # Changelog
 
+## [2.4.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.0-rc0) (2022-09-07, pre-release)
+
+### 🚀 Nouveautés
+
+* Amélioration sur la recherche des taxons, notamment sur la distinction des mots (avec ou sans
+  majuscules, avec ou sans accents) (https://github.com/PnX-SI/gn_mobile_occtax/issues/91).
+* Petites améliorations sur la présentation des jeux de données, aussi bien dans la page de 
+  sélection des jeux de données que dans l'affichage du jeu de données sélectionnée dans la saisie (https://github.com/PnX-SI/gn_mobile_occtax/issues/120).
+* Petites améliorations sur la page de sélection des observateurs et sur la fonction de recherche
+  des observateurs (https://github.com/PnX-SI/gn_mobile_occtax/issues/142).
+* Petites améliorations sur les messages d'information lors de la synchronisation des données (https://github.com/PnX-SI/gn_mobile_occtax/issues/143).
+* Affichage du nom vernaculaire du taxon dans le bilan de la saisie (https://github.com/PnX-SI/gn_mobile_occtax/issues/153).
+* Ajout d'une fonction de filtre sur les rangs taxonomique des taxons dans la page du bilan de la
+  saisie (https://github.com/PnX-SI/gn_mobile_occtax/issues/166).
+* Affichage du nombre de taxon en en-tête de page (https://github.com/PnX-SI/gn_mobile_occtax/issues/167).
+* Permettre de modifier la date et l'heure de fin des relevés en fin de saisie (https://github.com/PnX-SI/gn_mobile_occtax/issues/168).
+* Refonte ergonomique sur l'enchaînement des écrans de la saisie. Le bilan de la saisie intervient
+  notamment après le pointage sur la carte si le relevé contient au moins un taxon (https://github.com/PnX-SI/gn_mobile_occtax/issues/177).
+
+### 🐛 Corrections
+
+* Correction concernant la mémorisation de la sélection des observateurs lors de la saisie (https://github.com/PnX-SI/gn_mobile_occtax/issues/110).
+
+### ⚠️ Notes de version
+
+* Code de version : 3075
+
 ## [2.3.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0) (2022-07-14, release)
 
 ### 🚀 Nouveautés
