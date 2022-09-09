@@ -320,7 +320,7 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
     }
 
     override fun validate(): Boolean {
-        return startEditTaxon || (this.input?.getInputTaxa() ?: emptyList()).any {
+        return startEditTaxon || (this.input?.getInputTaxa() ?: emptyList()).all {
             it is InputTaxon && it.properties.isNotEmpty() && it.getCounting().isNotEmpty()
         }
     }
