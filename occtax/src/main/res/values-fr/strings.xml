@@ -153,7 +153,7 @@
 
     <string name="information_action_more">Informations avancées</string>
     <string name="information_determiner_hint">Déterminateur</string>
-    <string name="information_comment_hint">Ajouter un commentaire optionnel</string>
+    <string name="information_comment_hint">Commentaire du taxon</string>
 
     <string name="counting_no_data">Aucun dénombrement effectué.\nCréer un nouveau dénombrement via le bouton +</string>
     <string name="counting_main_label">Dénombrement #%d</string>
