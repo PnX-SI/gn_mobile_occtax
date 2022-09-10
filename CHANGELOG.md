@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.4.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.0-rc1) (2022-09-10, pre-release)
+
+### 🐛 Corrections
+
+* Défilement automatique du nom vernaculaire du taxon sélectionné (https://github.com/PnX-SI/gn_mobile_occtax/issues/49).
+* Validation sur l'ensemble des taxons ajoutés au relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/177).
+
+### ⚠️ Notes de version
+
+* Code de version : 3079
+
 ## [2.4.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.0-rc0) (2022-09-07, pre-release)
 
 ### 🚀 Nouveautés
