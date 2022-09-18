@@ -3,35 +3,27 @@ package fr.geonature.occtax.features.nomenclature.presentation
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
+import fr.geonature.commons.data.entity.Nomenclature
+import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.error.Failure
-import fr.geonature.commons.fp.Either
 import fr.geonature.commons.fp.Either.Left
 import fr.geonature.commons.fp.Either.Right
-import fr.geonature.datasync.settings.DataSyncSettings
-import fr.geonature.datasync.settings.DataSyncSettingsViewModel
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.nomenclature.domain.BaseEditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
-import fr.geonature.occtax.features.nomenclature.repository.INomenclatureRepository
+import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureValuesFoundFailure
 import fr.geonature.occtax.features.nomenclature.usecase.GetEditableNomenclaturesUseCase
 import fr.geonature.occtax.features.nomenclature.usecase.GetNomenclatureValuesByTypeAndTaxonomyUseCase
 import fr.geonature.occtax.input.PropertyValue
-import io.mockk.Call
-import io.mockk.Called
-import io.mockk.MockKAnnotations
 import io.mockk.MockKAnnotations.init
-import io.mockk.OfTypeMatcher
 import io.mockk.coEvery
 import io.mockk.confirmVerified
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.verify
-import io.mockk.verifyOrder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.core.AnyOf
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -58,6 +50,9 @@ class NomenclatureViewModelTest {
 
     @RelaxedMockK
     private lateinit var editableNomenclaturesObserver: Observer<List<EditableNomenclatureType>>
+
+    @RelaxedMockK
+    private lateinit var nomenclatureValuesObserver: Observer<List<Nomenclature>>
 
     @RelaxedMockK
     private lateinit var failureObserver: Observer<Failure>
@@ -159,6 +154,118 @@ class NomenclatureViewModelTest {
 
             // then
             verify(atLeast = 1) { failureObserver.onChanged(NoNomenclatureTypeFoundLocallyFailure) }
+            confirmVerified(failureObserver)
+        }
+
+    @Test
+    fun `should get nomenclature values by type matching given taxonomy kingdom and group`() =
+        runTest {
+            // given some nomenclature values from given type
+            val expectedNomenclatureValues = listOf(
+                Nomenclature(
+                    id = 29,
+                    code = "1",
+                    hierarchy = "013.001",
+                    defaultLabel = "Non renseigné",
+                    typeId = 13
+                ),
+                Nomenclature(
+                    id = 31,
+                    code = "3",
+                    hierarchy = "013.003",
+                    defaultLabel = "Reproduction",
+                    typeId = 13
+                ),
+                Nomenclature(
+                    id = 32,
+                    code = "4",
+                    hierarchy = "013.004",
+                    defaultLabel = "Hibernation",
+                    typeId = 13
+                )
+            )
+            // from usecase
+            coEvery {
+                getNomenclatureValuesByTypeAndTaxonomyUseCase.run(
+                    GetNomenclatureValuesByTypeAndTaxonomyUseCase.Params(
+                        mnemonic = "STATUT_BIO",
+                        Taxonomy(
+                            kingdom = "Animalia",
+                            group = "Oiseaux"
+                        )
+                    )
+                )
+            } returns Right(expectedNomenclatureValues)
+            coEvery {
+                getNomenclatureValuesByTypeAndTaxonomyUseCase(
+                    GetNomenclatureValuesByTypeAndTaxonomyUseCase.Params(
+                        mnemonic = "STATUT_BIO",
+                        Taxonomy(
+                            kingdom = "Animalia",
+                            group = "Oiseaux"
+                        )
+                    ),
+                    nomenclatureViewModel.viewModelScope,
+                    any()
+                )
+            } answers { callOriginal() }
+
+            // when
+            nomenclatureViewModel.getNomenclatureValuesByTypeAndTaxonomy(
+                mnemonic = "STATUT_BIO",
+                Taxonomy(
+                    kingdom = "Animalia",
+                    group = "Oiseaux"
+                )
+            ).observeForever(nomenclatureValuesObserver)
+            nomenclatureViewModel.failure.observeForever(failureObserver)
+
+            // then
+            verify(atLeast = 1) { nomenclatureValuesObserver.onChanged(expectedNomenclatureValues) }
+            confirmVerified(nomenclatureValuesObserver)
+        }
+
+    @Test
+    fun `should return NoNomenclatureValuesFoundFailure if no nomenclature values was found from given type`() =
+        runTest {
+            // given some failure from usecase
+            coEvery {
+                getNomenclatureValuesByTypeAndTaxonomyUseCase.run(
+                    GetNomenclatureValuesByTypeAndTaxonomyUseCase.Params(
+                        mnemonic = "STATUT_BIO",
+                        Taxonomy(
+                            kingdom = "Animalia",
+                            group = "Oiseaux"
+                        )
+                    )
+                )
+            } returns Left(NoNomenclatureValuesFoundFailure("STATUT_BIO"))
+            coEvery {
+                getNomenclatureValuesByTypeAndTaxonomyUseCase(
+                    GetNomenclatureValuesByTypeAndTaxonomyUseCase.Params(
+                        mnemonic = "STATUT_BIO",
+                        Taxonomy(
+                            kingdom = "Animalia",
+                            group = "Oiseaux"
+                        )
+                    ),
+                    nomenclatureViewModel.viewModelScope,
+                    any()
+                )
+            } answers { callOriginal() }
+
+            // when
+            nomenclatureViewModel.getNomenclatureValuesByTypeAndTaxonomy(
+                mnemonic = "STATUT_BIO",
+                Taxonomy(
+                    kingdom = "Animalia",
+                    group = "Oiseaux"
+                )
+            ).observeForever(nomenclatureValuesObserver)
+            nomenclatureViewModel.failure.observeForever(failureObserver)
+
+            // then
+            verify(atLeast = 1) { failureObserver.onChanged(NoNomenclatureValuesFoundFailure("STATUT_BIO")) }
             confirmVerified(failureObserver)
         }
 }

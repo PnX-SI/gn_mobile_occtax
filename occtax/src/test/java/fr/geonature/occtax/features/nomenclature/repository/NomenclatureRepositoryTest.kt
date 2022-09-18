@@ -13,6 +13,7 @@ import fr.geonature.occtax.features.nomenclature.data.INomenclatureSettingsLocal
 import fr.geonature.occtax.features.nomenclature.domain.BaseEditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
+import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureValuesFoundFailure
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
@@ -65,6 +66,7 @@ class NomenclatureRepositoryTest {
 
     @Test
     fun `should get default nomenclature type settings by nomenclature main type`() = runTest {
+        // given no nomenclature types found
         coEvery { nomenclatureLocalDataSource.getAllNomenclatureTypes() } returns listOf(
             NomenclatureType(
                 id = 7,
@@ -82,6 +84,7 @@ class NomenclatureRepositoryTest {
                 defaultLabel = "Méthodes d'observation"
             )
         )
+        // and corresponding editable nomenclature types
         coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(BaseEditableNomenclatureType.Type.INFORMATION) } returns listOf(
             BaseEditableNomenclatureType.from(
                 BaseEditableNomenclatureType.Type.INFORMATION,
@@ -104,9 +107,11 @@ class NomenclatureRepositoryTest {
             ),
         )
 
+        // when
         val editableNomenclatureSettings =
             nomenclatureRepository.getEditableNomenclatures(BaseEditableNomenclatureType.Type.INFORMATION)
 
+        // then
         assertTrue(editableNomenclatureSettings.isRight)
         assertEquals(
             listOf(
@@ -137,7 +142,9 @@ class NomenclatureRepositoryTest {
     @Test
     fun `should return NoNomenclatureTypeFoundLocallyFailure if no nomenclature types was found`() =
         runTest {
+            // given no nomenclature types found
             coEvery { nomenclatureLocalDataSource.getAllNomenclatureTypes() } returns listOf()
+            // and some editable nomenclature types
             coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(BaseEditableNomenclatureType.Type.INFORMATION) } returns listOf(
                 BaseEditableNomenclatureType.from(
                     BaseEditableNomenclatureType.Type.INFORMATION,
@@ -160,9 +167,11 @@ class NomenclatureRepositoryTest {
                 ),
             )
 
+            // when
             val editableNomenclatureSettings =
                 nomenclatureRepository.getEditableNomenclatures(BaseEditableNomenclatureType.Type.INFORMATION)
 
+            // then
             assertTrue(editableNomenclatureSettings.isLeft)
             assertTrue(editableNomenclatureSettings.fold(::identity) {} is NoNomenclatureTypeFoundLocallyFailure)
         }
@@ -170,6 +179,7 @@ class NomenclatureRepositoryTest {
     @Test
     fun `should return NoNomenclatureTypeFoundLocallyFailure if no nomenclature type settings matches nomenclature types`() =
         runTest {
+            // given some nomenclature types
             coEvery { nomenclatureLocalDataSource.getAllNomenclatureTypes() } returns listOf(
                 NomenclatureType(
                     id = 7,
@@ -187,6 +197,7 @@ class NomenclatureRepositoryTest {
                     defaultLabel = "Méthodes d'observation"
                 )
             )
+            // and some other editable nomenclature types
             coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(BaseEditableNomenclatureType.Type.INFORMATION) } returns listOf(
                 BaseEditableNomenclatureType.from(
                     BaseEditableNomenclatureType.Type.COUNTING,
@@ -205,15 +216,18 @@ class NomenclatureRepositoryTest {
                 )
             )
 
+            // when
             val editableNomenclatureSettings =
                 nomenclatureRepository.getEditableNomenclatures(BaseEditableNomenclatureType.Type.INFORMATION)
 
+            // then
             assertTrue(editableNomenclatureSettings.isLeft)
             assertTrue(editableNomenclatureSettings.fold(::identity) {} is NoNomenclatureTypeFoundLocallyFailure)
         }
 
     @Test
     fun `should get all default nomenclature values with type`() = runTest {
+        // given some nomenclature types
         coEvery { nomenclatureLocalDataSource.getAllNomenclatureTypes() } returns listOf(
             NomenclatureType(
                 id = 7,
@@ -231,6 +245,7 @@ class NomenclatureRepositoryTest {
                 defaultLabel = "Méthodes d'observation"
             )
         )
+        // and some default values for these types
         coEvery { nomenclatureLocalDataSource.getAllDefaultNomenclatureValues() } returns listOf(
             Nomenclature(
                 id = 29,
@@ -241,8 +256,10 @@ class NomenclatureRepositoryTest {
             ),
         )
 
+        // when
         val defaultNomenclatureValues = nomenclatureRepository.getAllDefaultNomenclatureValues()
 
+        // then
         assertTrue(defaultNomenclatureValues.isRight)
         assertEquals(
             listOf(
@@ -264,8 +281,10 @@ class NomenclatureRepositoryTest {
     }
 
     @Test
-    fun `should return an empty list if no nomenclature types was found`() = runTest {
+    fun `should return no default nomenclature values if no nomenclature types was found`() = runTest {
+        // given no nomenclature types
         coEvery { nomenclatureLocalDataSource.getAllNomenclatureTypes() } returns listOf()
+        // and some default values
         coEvery { nomenclatureLocalDataSource.getAllDefaultNomenclatureValues() } returns listOf(
             Nomenclature(
                 id = 29,
@@ -276,14 +295,17 @@ class NomenclatureRepositoryTest {
             ),
         )
 
+        // when
         val defaultNomenclatureValues = nomenclatureRepository.getAllDefaultNomenclatureValues()
 
+        // then
         assertTrue(defaultNomenclatureValues.isRight)
         assertTrue(defaultNomenclatureValues.orNull()?.isEmpty() ?: false)
     }
 
     @Test
     fun `should return an empty list if no default nomenclature values was found`() = runTest {
+        // given some nomenclature types
         coEvery { nomenclatureLocalDataSource.getAllNomenclatureTypes() } returns listOf(
             NomenclatureType(
                 id = 7,
@@ -301,17 +323,21 @@ class NomenclatureRepositoryTest {
                 defaultLabel = "Méthodes d'observation"
             )
         )
+        // and no default values for these types
         coEvery { nomenclatureLocalDataSource.getAllDefaultNomenclatureValues() } returns listOf()
 
+        // then
         val defaultNomenclatureValues = nomenclatureRepository.getAllDefaultNomenclatureValues()
 
+        // when
         assertTrue(defaultNomenclatureValues.isRight)
         assertTrue(defaultNomenclatureValues.orNull()?.isEmpty() ?: false)
     }
 
     @Test
-    fun `should get nomenclatures by type matching given taxonomy kingdom and group`() = runTest {
+    fun `should get nomenclature values by type matching given taxonomy kingdom and group`() = runTest {
         coEvery {
+            // given some nomenclature values from given type
             nomenclatureLocalDataSource.getNomenclatureValuesByTypeAndTaxonomy(
                 mnemonic = "STATUT_BIO",
                 Taxonomy(
@@ -343,6 +369,7 @@ class NomenclatureRepositoryTest {
             )
         )
 
+        // when
         val nomenclatures = nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
             mnemonic = "STATUT_BIO",
             Taxonomy(
@@ -351,6 +378,7 @@ class NomenclatureRepositoryTest {
             )
         )
 
+        // then
         assertTrue(nomenclatures.isRight)
         assertEquals(
             listOf(
@@ -379,4 +407,35 @@ class NomenclatureRepositoryTest {
             nomenclatures.orNull()
         )
     }
+
+    @Test
+    fun `should return NoNomenclatureValuesFoundFailure if no nomenclature values was found from given type`() =
+        runTest {
+            // given no nomenclature values from given type
+            coEvery {
+                nomenclatureLocalDataSource.getNomenclatureValuesByTypeAndTaxonomy(
+                    "STATUT_BIO",
+                    Taxonomy(
+                        kingdom = "Animalia",
+                        group = "Oiseaux"
+                    )
+                )
+            } returns emptyList()
+
+            // when
+            val nomenclatures = nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
+                mnemonic = "STATUT_BIO",
+                Taxonomy(
+                    kingdom = "Animalia",
+                    group = "Oiseaux"
+                )
+            )
+
+            // then
+            assertTrue(nomenclatures.isLeft)
+            assertEquals(
+                nomenclatures.fold(::identity) {},
+                NoNomenclatureValuesFoundFailure("STATUT_BIO")
+            )
+        }
 }

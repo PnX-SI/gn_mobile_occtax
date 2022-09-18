@@ -6,14 +6,16 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
 import fr.geonature.commons.data.entity.Nomenclature
-import fr.geonature.commons.util.KeyboardUtils
+import fr.geonature.commons.lifecycle.observeOnce
+import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.BaseEditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
@@ -111,38 +113,46 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                 ?: it.value)
         })
 
-        if (showAllNomenclatureTypes) showAllNomenclatureTypes() else showDefaultNomenclatureTypes()
+        if (showAllNomenclatureTypes) showAllNomenclatureTypes(notify = true) else showDefaultNomenclatureTypes(notify = true)
     }
 
-    fun setPropertyValue(vararg propertyValue: PropertyValue) {
-        setSelectedNomenclatureTypes(selectedNomenclatureTypes.map {
-            it.copy(value = propertyValue.firstOrNull { propertyValue -> propertyValue.code == it.code }
-                ?: it.value)
-        })
-    }
-
-    fun showDefaultNomenclatureTypes() {
+    fun showDefaultNomenclatureTypes(notify: Boolean = false) {
         showAllNomenclatureTypes = false
         setSelectedNomenclatureTypes(
-            availableNomenclatureTypes.filter { it.visible } + listOf(
-                EditableNomenclatureType(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
-                    "MORE",
-                    BaseEditableNomenclatureType.ViewType.NONE,
-                    true
+            availableNomenclatureTypes.filter { it.visible }.takeIf { it.isNotEmpty() }?.let {
+                it + listOf(
+                    EditableNomenclatureType(
+                        BaseEditableNomenclatureType.Type.INFORMATION,
+                        "MORE",
+                        BaseEditableNomenclatureType.ViewType.NONE,
+                        true
+                    )
                 )
-            )
+            } ?: emptyList(),
+            notify
         )
     }
 
-    fun showAllNomenclatureTypes() {
+    fun showAllNomenclatureTypes(notify: Boolean = false) {
         showAllNomenclatureTypes = true
-        setSelectedNomenclatureTypes(availableNomenclatureTypes)
+        setSelectedNomenclatureTypes(
+            availableNomenclatureTypes,
+            notify
+        )
     }
 
-    private fun setSelectedNomenclatureTypes(nomenclatureTypes: List<EditableNomenclatureType>) {
+    private fun setSelectedNomenclatureTypes(
+        nomenclatureTypes: List<EditableNomenclatureType>,
+        notify: Boolean = false
+    ) {
         val oldKeys = selectedNomenclatureTypes.map { it.code }
         val newKeys = nomenclatureTypes.map { it.code }
+
+        if (notify && oldKeys.isEmpty() && newKeys.isEmpty()) {
+            listener.showEmptyTextView(true)
+
+            return
+        }
 
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun getOldListSize(): Int = oldKeys.size
@@ -199,35 +209,54 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
         )
     ) {
         private var edit: TextInputLayout = itemView.findViewById(android.R.id.edit)
+        private var nomenclatureAdapter = NomenclatureValueAdapter(parent.context)
+        private var showDropdown = false
 
         init {
-            (edit.editText as? AutoCompleteTextView)?.setAdapter(
-                ArrayAdapter<Nomenclature>(
-                    parent.context,
-                    R.layout.list_item_2
-                )
-            )
+            (edit.editText as? AutoCompleteTextView)?.also {
+                it.setAdapter(nomenclatureAdapter)
+                it.setOnItemClickListener { _, _, position, _ ->
+                    showDropdown = false
+                    nomenclatureType?.also { nomenclatureType ->
+                        listener.onPropertyValue(
+                            PropertyValue.fromNomenclature(
+                                nomenclatureType.code,
+                                nomenclatureAdapter.getNomenclatureValue(position)
+                            )
+                        )
+                    }
+                }
+            }
         }
 
         override fun onBind(nomenclatureType: EditableNomenclatureType) {
             with(edit) {
                 hint = nomenclatureType.label
-                setEndIconOnClickListener {
-                    listener.onAction(nomenclatureType.code)
-                }
-
-                editText?.apply {
-                    setOnClickListener {
-                        listener.onAction(nomenclatureType.code)
-                    }
+                setEndIconOnClickListener { setNomenclatureValues(nomenclatureType) }
+                (editText as? AutoCompleteTextView)?.apply {
+                    setOnClickListener { setNomenclatureValues(nomenclatureType) }
                     text = nomenclatureType.value?.let {
                         Editable.Factory
                             .getInstance()
                             .newEditable(it.label ?: it.code)
                     }
                 }
-
             }
+        }
+
+        private fun setNomenclatureValues(nomenclatureType: EditableNomenclatureType) {
+            if (showDropdown) {
+                showDropdown = false
+                (edit.editText as? AutoCompleteTextView)?.dismissDropDown()
+                return
+            }
+
+            listener.getNomenclatureValues(nomenclatureType.code)
+                .observeOnce(listener.getLifecycleOwner()) {
+                    showDropdown = true
+                    nomenclatureAdapter.setNomenclatureValues(it ?: listOf())
+                    (edit.editText as? AutoCompleteTextView)?.showDropDown()
+                }
         }
     }
 
@@ -278,8 +307,11 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
 
             override fun afterTextChanged(s: Editable?) {
                 nomenclatureType?.also {
-                    listener.onEdit(it.code,
-                        s?.toString()?.ifEmpty { null }?.ifBlank { null })
+                    listener.onPropertyValue(
+                        PropertyValue.fromValue(
+                            it.code,
+                            s?.toString()?.ifEmpty { null }?.ifBlank { null })
+                    )
                 }
             }
         }
@@ -290,7 +322,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                 setOnFocusChangeListener { v, hasFocus ->
                     if (!hasFocus) {
                         // workaround to force hide the soft keyboard
-                        KeyboardUtils.hideSoftKeyboard(v)
+                        hideSoftKeyboard(v)
                     }
                 }
             }
@@ -334,6 +366,8 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
      */
     interface OnEditableNomenclatureTypeAdapter {
 
+        fun getLifecycleOwner(): LifecycleOwner
+
         /**
          * Whether to show an empty text view when data changed.
          */
@@ -345,21 +379,15 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
         fun showMore()
 
         /**
-         * Called when the action button has been clicked for a given nomenclature type.
-         *
-         * @param nomenclatureTypeMnemonic the selected nomenclature type
+         * Requests showing all available nomenclature values from given nomenclature type.
          */
-        fun onAction(nomenclatureTypeMnemonic: String)
+        fun getNomenclatureValues(nomenclatureTypeMnemonic: String): LiveData<List<Nomenclature>>
 
         /**
-         * Called when a value has been directly edited for a given nomenclature type.
+         * Called when a new value has been set for a given nomenclature type.
          *
-         * @param nomenclatureTypeMnemonic the selected nomenclature type
-         * @param value the corresponding value (may be `null`)
+         * @param propertyValue the new property value
          */
-        fun onEdit(
-            nomenclatureTypeMnemonic: String,
-            value: String?
-        )
+        fun onPropertyValue(propertyValue: PropertyValue)
     }
 }

@@ -5,9 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,8 +28,6 @@ import fr.geonature.occtax.input.InputTaxon
 import fr.geonature.occtax.input.PropertyValue
 import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
-import fr.geonature.occtax.ui.input.dialog.ChooseNomenclatureDialogFragment
-import org.tinylog.kotlin.Logger
 import javax.inject.Inject
 
 /**
@@ -35,8 +36,7 @@ import javax.inject.Inject
  * @author S. Grimault
  */
 @AndroidEntryPoint
-class InformationFragment : AbstractInputFragment(),
-    ChooseNomenclatureDialogFragment.OnChooseNomenclatureDialogFragmentListener {
+class InformationFragment : AbstractInputFragment() {
 
     @ContentProviderAuthority
     @Inject
@@ -81,10 +81,18 @@ class InformationFragment : AbstractInputFragment(),
 
         val recyclerView = view.findViewById<RecyclerView>(android.R.id.list)
         val emptyTextView = view.findViewById<TextView>(android.R.id.empty)
+        val progressBar = view.findViewById<ProgressBar>(android.R.id.progress)
+        progressBar.visibility = View.VISIBLE
 
         adapter = EditableNomenclatureTypeAdapter(object :
             EditableNomenclatureTypeAdapter.OnEditableNomenclatureTypeAdapter {
+            override fun getLifecycleOwner(): LifecycleOwner {
+                return this@InformationFragment
+            }
+
             override fun showEmptyTextView(show: Boolean) {
+                progressBar?.visibility = View.GONE
+
                 if (emptyTextView?.visibility == View.VISIBLE == show) {
                     return
                 }
@@ -115,34 +123,21 @@ class InformationFragment : AbstractInputFragment(),
                 )
             }
 
-            override fun onAction(nomenclatureTypeMnemonic: String) {
-
-                val taxonomy = input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
-                    ?: Taxonomy(
-                        Taxonomy.ANY,
-                        Taxonomy.ANY
-                    )
-
-                val chooseNomenclatureDialogFragment = ChooseNomenclatureDialogFragment.newInstance(
+            override fun getNomenclatureValues(nomenclatureTypeMnemonic: String): LiveData<List<Nomenclature>> {
+                return nomenclatureViewModel.getNomenclatureValuesByTypeAndTaxonomy(
                     nomenclatureTypeMnemonic,
-                    taxonomy
-                )
-                chooseNomenclatureDialogFragment.show(
-                    childFragmentManager,
-                    CHOOSE_NOMENCLATURE_DIALOG_FRAGMENT
+                    input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
+                        ?: Taxonomy(
+                            Taxonomy.ANY,
+                            Taxonomy.ANY
+                        )
                 )
             }
 
-            override fun onEdit(
-                nomenclatureTypeMnemonic: String,
-                value: String?
-            ) {
+            override fun onPropertyValue(propertyValue: PropertyValue) {
                 (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.set(
-                    nomenclatureTypeMnemonic,
-                    PropertyValue.fromValue(
-                        nomenclatureTypeMnemonic,
-                        value
-                    )
+                    propertyValue.code,
+                    propertyValue
                 )
             }
         })
@@ -150,7 +145,8 @@ class InformationFragment : AbstractInputFragment(),
         if (savedState.getBoolean(
                 KEY_SHOW_ALL_NOMENCLATURE_TYPES,
                 false
-            )) adapter?.showAllNomenclatureTypes() else adapter?.showDefaultNomenclatureTypes()
+            )
+        ) adapter?.showAllNomenclatureTypes() else adapter?.showDefaultNomenclatureTypes()
 
         with(recyclerView) {
             layoutManager = LinearLayoutManager(context)
@@ -187,26 +183,6 @@ class InformationFragment : AbstractInputFragment(),
         )
     }
 
-    override fun onSelectedNomenclature(
-        nomenclatureType: String,
-        nomenclature: Nomenclature
-    ) {
-        with(
-            PropertyValue.fromNomenclature(
-                nomenclatureType,
-                nomenclature
-            )
-        ) {
-            Logger.debug { "selected nomenclature value: $nomenclatureType:${nomenclature.code} (id: ${nomenclature.id})" }
-
-            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.set(
-                nomenclatureType,
-                this
-            )
-            adapter?.setPropertyValue(this)
-        }
-    }
-
     private fun handleEditableNomenclatureTypes(editableNomenclatureTypes: List<EditableNomenclatureType>) {
         adapter?.bind(
             editableNomenclatureTypes,
@@ -218,9 +194,6 @@ class InformationFragment : AbstractInputFragment(),
     companion object {
 
         private const val ARG_PROPERTIES = "arg_properties"
-        private const val CHOOSE_NOMENCLATURE_DIALOG_FRAGMENT =
-            "choose_nomenclature_dialog_fragment"
-
         private const val KEY_SHOW_ALL_NOMENCLATURE_TYPES = "show_all_nomenclature_types"
 
         /**

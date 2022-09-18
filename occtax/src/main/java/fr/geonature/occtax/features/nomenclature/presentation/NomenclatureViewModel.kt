@@ -29,13 +29,8 @@ class NomenclatureViewModel @Inject constructor(
 ) :
     BaseViewModel() {
 
-    private val _editableNomenclatures = MutableLiveData<List<EditableNomenclatureType>>(listOf())
+    private val _editableNomenclatures = MutableLiveData<List<EditableNomenclatureType>>()
     val editableNomenclatures: LiveData<List<EditableNomenclatureType>> = _editableNomenclatures
-
-    private val _nomenclatureValuesByTypeAndTaxonomy =
-        MutableLiveData<Map<String, List<Nomenclature>>>(mapOf())
-    val nomenclatureValuesByTypeAndTaxonomy: LiveData<Map<String, List<Nomenclature>>> =
-        _nomenclatureValuesByTypeAndTaxonomy
 
     /**
      * Gets all editable nomenclatures from given type with default values.
@@ -69,7 +64,9 @@ class NomenclatureViewModel @Inject constructor(
     fun getNomenclatureValuesByTypeAndTaxonomy(
         mnemonic: String,
         taxonomy: Taxonomy? = null
-    ) {
+    ): LiveData<List<Nomenclature>> {
+        val nomenclatureValuesByTypeAndTaxonomy = MutableLiveData<List<Nomenclature>>()
+
         getNomenclatureValuesByTypeAndTaxonomyUseCase(
             GetNomenclatureValuesByTypeAndTaxonomyUseCase.Params(
                 mnemonic,
@@ -78,13 +75,10 @@ class NomenclatureViewModel @Inject constructor(
             viewModelScope
         ) {
             it.fold(::handleFailure) { nomenclatureValues ->
-                _nomenclatureValuesByTypeAndTaxonomy.value =
-                    mapOf(
-                        *(_nomenclatureValuesByTypeAndTaxonomy.value?.entries?.map { entry -> entry.key to entry.value }
-                            ?.toTypedArray() ?: emptyArray()),
-                        mnemonic to nomenclatureValues
-                    )
+                nomenclatureValuesByTypeAndTaxonomy.value = nomenclatureValues
             }
         }
+
+        return nomenclatureValuesByTypeAndTaxonomy
     }
 }
