@@ -20,6 +20,22 @@ import org.robolectric.RobolectricTestRunner
 class PropertyValueTest {
 
     @Test
+    fun `should be the same property value`() {
+        assertEquals(
+            PropertyValue(
+                "STATUT_BIO",
+                "Non renseigné",
+                29
+            ),
+            PropertyValue(
+                "STATUT_BIO",
+                "Non renseigné",
+                29
+            )
+        )
+    }
+
+    @Test
     fun testCreateFromNomenclature() {
         assertEquals(
             PropertyValue(
