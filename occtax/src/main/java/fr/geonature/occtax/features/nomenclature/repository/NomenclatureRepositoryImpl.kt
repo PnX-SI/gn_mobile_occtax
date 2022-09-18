@@ -33,11 +33,12 @@ class NomenclatureRepositoryImpl(
         return runCatching {
             val nomenclatureTypes =
                 nomenclatureLocalDataSource.getAllNomenclatureTypes().associateBy { it.mnemonic }
+
             nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(
                 type,
                 *defaultPropertySettings
             ).mapNotNull {
-                nomenclatureTypes[it.code]?.let { nomenclatureType ->
+                if (it.viewType == BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE) nomenclatureTypes[it.code]?.let { nomenclatureType ->
                     EditableNomenclatureType(
                         it.type,
                         it.code,
@@ -45,11 +46,16 @@ class NomenclatureRepositoryImpl(
                         it.visible,
                         nomenclatureType.defaultLabel.takeIf { label -> label.isNotEmpty() }
                             ?: run {
-                                Logger.warn { "no label found for nomenclature type '${nomenclatureType.mnemonic}'" }
-                                nomenclatureType.mnemonic
+                                Logger.warn { "no label found for nomenclature type '${nomenclatureType.mnemonic}', use default…" }
+                                null
                             }
                     )
-                }
+                } else EditableNomenclatureType(
+                    it.type,
+                    it.code,
+                    it.viewType,
+                    it.visible,
+                )
             }
         }.fold(
             onSuccess = {

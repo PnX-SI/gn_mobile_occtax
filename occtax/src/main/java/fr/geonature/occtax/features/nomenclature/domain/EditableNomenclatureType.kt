@@ -138,7 +138,7 @@ data class EditableNomenclatureType(
     /**
      * Nomenclature type's label.
      */
-    val label: String = code.lowercase(),
+    val label: String? = null,
 
     /**
      * The current value for this nomenclature type.

@@ -1,10 +1,8 @@
 package fr.geonature.occtax.features.nomenclature
 
-import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import fr.geonature.commons.data.GeoNatureModuleName
 import fr.geonature.commons.data.dao.NomenclatureDao

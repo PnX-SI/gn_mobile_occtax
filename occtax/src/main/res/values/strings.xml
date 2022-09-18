@@ -148,9 +148,6 @@
     </plurals>
 
     <string name="information_no_data">⚠ No nomenclature found.\nPlease start a data synchronization.</string>
-    <string name="information_action_more">More information</string>
-    <string name="information_determiner_hint">Add determiner</string>
-    <string name="information_comment_hint">Add comment</string>
 
     <string name="counting_no_data">No counting.\nCreate a new one by tapping the + button.</string>
     <string name="counting_main_label">Counting #%d</string>

@@ -89,9 +89,8 @@ class NomenclatureSettingsLocalDataSourceTest {
                     BaseEditableNomenclatureType.ViewType.TEXT_MULTIPLE,
                     false
                 )
-            ).sortedBy { it.code },
+            ),
             nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(BaseEditableNomenclatureType.Type.INFORMATION)
-                .sortedBy { it.code }
         )
 
         assertEquals(
@@ -126,9 +125,8 @@ class NomenclatureSettingsLocalDataSourceTest {
                     "MAX",
                     BaseEditableNomenclatureType.ViewType.MIN_MAX
                 )
-            ).sortedBy { it.code },
+            ),
             nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(BaseEditableNomenclatureType.Type.COUNTING)
-                .sortedBy { it.code }
         )
     }
 
@@ -149,7 +147,7 @@ class NomenclatureSettingsLocalDataSourceTest {
                         BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                         false
                     ),
-                ).sortedBy { it.code },
+                ),
                 nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     PropertySettings(
@@ -168,7 +166,6 @@ class NomenclatureSettingsLocalDataSourceTest {
                         default = true
                     ),
                 )
-                    .sortedBy { it.code }
             )
 
             assertEquals(
@@ -178,7 +175,7 @@ class NomenclatureSettingsLocalDataSourceTest {
                         "STADE_VIE",
                         BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
                     ),
-                ).sortedBy { it.code },
+                ),
                 nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(
                     BaseEditableNomenclatureType.Type.COUNTING,
                     PropertySettings(
@@ -192,7 +189,6 @@ class NomenclatureSettingsLocalDataSourceTest {
                         default = true
                     ),
                 )
-                    .sortedBy { it.code }
             )
         }
 }

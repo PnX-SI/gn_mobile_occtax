@@ -101,6 +101,12 @@ class NomenclatureRepositoryTest {
             ),
             BaseEditableNomenclatureType.from(
                 BaseEditableNomenclatureType.Type.INFORMATION,
+                "DETERMINER",
+                BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE,
+                false
+            ),
+            BaseEditableNomenclatureType.from(
+                BaseEditableNomenclatureType.Type.INFORMATION,
                 "STATUT_BIO",
                 BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                 false
@@ -129,15 +135,86 @@ class NomenclatureRepositoryTest {
                 ),
                 EditableNomenclatureType(
                     BaseEditableNomenclatureType.Type.INFORMATION,
+                    "DETERMINER",
+                    BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE,
+                    visible = false
+                ),
+                EditableNomenclatureType(
+                    BaseEditableNomenclatureType.Type.INFORMATION,
                     "STATUT_BIO",
                     BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                     label = "Statut biologique",
                     visible = false
                 )
-            ).sortedBy { it.code },
-            editableNomenclatureSettings.orNull()?.sortedBy { it.code }
+            ),
+            editableNomenclatureSettings.orNull()
         )
     }
+
+    @Test
+    fun `should get other default nomenclature type settings even if no nomenclature types was found`() =
+        runTest {
+            // given no nomenclature types found
+            coEvery { nomenclatureLocalDataSource.getAllNomenclatureTypes() } returns listOf()
+            // and some editable nomenclature types
+            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(BaseEditableNomenclatureType.Type.INFORMATION) } returns listOf(
+                BaseEditableNomenclatureType.from(
+                    BaseEditableNomenclatureType.Type.INFORMATION,
+                    "METH_OBS",
+                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    true
+                ),
+                BaseEditableNomenclatureType.from(
+
+                    BaseEditableNomenclatureType.Type.INFORMATION,
+                    "ETA_BIO",
+                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    true
+                ),
+                EditableNomenclatureType(
+                    BaseEditableNomenclatureType.Type.INFORMATION,
+                    "DETERMINER",
+                    BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE,
+                    visible = false
+                ),
+                BaseEditableNomenclatureType.from(
+                    BaseEditableNomenclatureType.Type.INFORMATION,
+                    "STATUT_BIO",
+                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    false
+                ),
+                EditableNomenclatureType(
+                    BaseEditableNomenclatureType.Type.INFORMATION,
+                    "COMMENT",
+                    BaseEditableNomenclatureType.ViewType.TEXT_MULTIPLE,
+                    visible = false
+                )
+            )
+
+            // when
+            val editableNomenclatureSettings =
+                nomenclatureRepository.getEditableNomenclatures(BaseEditableNomenclatureType.Type.INFORMATION)
+
+            // then
+            assertTrue(editableNomenclatureSettings.isRight)
+            assertEquals(
+                listOf(
+                    EditableNomenclatureType(
+                        BaseEditableNomenclatureType.Type.INFORMATION,
+                        "DETERMINER",
+                        BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE,
+                        visible = false
+                    ),
+                    EditableNomenclatureType(
+                        BaseEditableNomenclatureType.Type.INFORMATION,
+                        "COMMENT",
+                        BaseEditableNomenclatureType.ViewType.TEXT_MULTIPLE,
+                        visible = false
+                    )
+                ),
+                editableNomenclatureSettings.orNull()
+            )
+        }
 
     @Test
     fun `should return NoNomenclatureTypeFoundLocallyFailure if no nomenclature types was found`() =
@@ -203,16 +280,6 @@ class NomenclatureRepositoryTest {
                     BaseEditableNomenclatureType.Type.COUNTING,
                     "TYP_DENBR",
                     BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
-                ),
-                BaseEditableNomenclatureType.from(
-                    BaseEditableNomenclatureType.Type.COUNTING,
-                    "MIN",
-                    BaseEditableNomenclatureType.ViewType.MIN_MAX
-                ),
-                BaseEditableNomenclatureType.from(
-                    BaseEditableNomenclatureType.Type.COUNTING,
-                    "MAX",
-                    BaseEditableNomenclatureType.ViewType.MIN_MAX
                 )
             )
 
@@ -281,27 +348,28 @@ class NomenclatureRepositoryTest {
     }
 
     @Test
-    fun `should return no default nomenclature values if no nomenclature types was found`() = runTest {
-        // given no nomenclature types
-        coEvery { nomenclatureLocalDataSource.getAllNomenclatureTypes() } returns listOf()
-        // and some default values
-        coEvery { nomenclatureLocalDataSource.getAllDefaultNomenclatureValues() } returns listOf(
-            Nomenclature(
-                id = 29,
-                code = "1",
-                hierarchy = "013.001",
-                defaultLabel = "Non renseigné",
-                typeId = 13
-            ),
-        )
+    fun `should return no default nomenclature values if no nomenclature types was found`() =
+        runTest {
+            // given no nomenclature types
+            coEvery { nomenclatureLocalDataSource.getAllNomenclatureTypes() } returns listOf()
+            // and some default values
+            coEvery { nomenclatureLocalDataSource.getAllDefaultNomenclatureValues() } returns listOf(
+                Nomenclature(
+                    id = 29,
+                    code = "1",
+                    hierarchy = "013.001",
+                    defaultLabel = "Non renseigné",
+                    typeId = 13
+                ),
+            )
 
-        // when
-        val defaultNomenclatureValues = nomenclatureRepository.getAllDefaultNomenclatureValues()
+            // when
+            val defaultNomenclatureValues = nomenclatureRepository.getAllDefaultNomenclatureValues()
 
-        // then
-        assertTrue(defaultNomenclatureValues.isRight)
-        assertTrue(defaultNomenclatureValues.orNull()?.isEmpty() ?: false)
-    }
+            // then
+            assertTrue(defaultNomenclatureValues.isRight)
+            assertTrue(defaultNomenclatureValues.orNull()?.isEmpty() ?: false)
+        }
 
     @Test
     fun `should return an empty list if no default nomenclature values was found`() = runTest {
@@ -335,53 +403,18 @@ class NomenclatureRepositoryTest {
     }
 
     @Test
-    fun `should get nomenclature values by type matching given taxonomy kingdom and group`() = runTest {
-        coEvery {
-            // given some nomenclature values from given type
-            nomenclatureLocalDataSource.getNomenclatureValuesByTypeAndTaxonomy(
-                mnemonic = "STATUT_BIO",
-                Taxonomy(
-                    kingdom = "Animalia",
-                    group = "Oiseaux"
+    fun `should get nomenclature values by type matching given taxonomy kingdom and group`() =
+        runTest {
+            coEvery {
+                // given some nomenclature values from given type
+                nomenclatureLocalDataSource.getNomenclatureValuesByTypeAndTaxonomy(
+                    mnemonic = "STATUT_BIO",
+                    Taxonomy(
+                        kingdom = "Animalia",
+                        group = "Oiseaux"
+                    )
                 )
-            )
-        } returns listOf(
-            Nomenclature(
-                id = 29,
-                code = "1",
-                hierarchy = "013.001",
-                defaultLabel = "Non renseigné",
-                typeId = 13
-            ),
-            Nomenclature(
-                id = 31,
-                code = "3",
-                hierarchy = "013.003",
-                defaultLabel = "Reproduction",
-                typeId = 13
-            ),
-            Nomenclature(
-                id = 32,
-                code = "4",
-                hierarchy = "013.004",
-                defaultLabel = "Hibernation",
-                typeId = 13
-            )
-        )
-
-        // when
-        val nomenclatures = nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
-            mnemonic = "STATUT_BIO",
-            Taxonomy(
-                kingdom = "Animalia",
-                group = "Oiseaux"
-            )
-        )
-
-        // then
-        assertTrue(nomenclatures.isRight)
-        assertEquals(
-            listOf(
+            } returns listOf(
                 Nomenclature(
                     id = 29,
                     code = "1",
@@ -403,10 +436,46 @@ class NomenclatureRepositoryTest {
                     defaultLabel = "Hibernation",
                     typeId = 13
                 )
-            ),
-            nomenclatures.orNull()
-        )
-    }
+            )
+
+            // when
+            val nomenclatures = nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
+                mnemonic = "STATUT_BIO",
+                Taxonomy(
+                    kingdom = "Animalia",
+                    group = "Oiseaux"
+                )
+            )
+
+            // then
+            assertTrue(nomenclatures.isRight)
+            assertEquals(
+                listOf(
+                    Nomenclature(
+                        id = 29,
+                        code = "1",
+                        hierarchy = "013.001",
+                        defaultLabel = "Non renseigné",
+                        typeId = 13
+                    ),
+                    Nomenclature(
+                        id = 31,
+                        code = "3",
+                        hierarchy = "013.003",
+                        defaultLabel = "Reproduction",
+                        typeId = 13
+                    ),
+                    Nomenclature(
+                        id = 32,
+                        code = "4",
+                        hierarchy = "013.004",
+                        defaultLabel = "Hibernation",
+                        typeId = 13
+                    )
+                ),
+                nomenclatures.orNull()
+            )
+        }
 
     @Test
     fun `should return NoNomenclatureValuesFoundFailure if no nomenclature values was found from given type`() =

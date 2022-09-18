@@ -15,16 +15,7 @@ import java.util.TreeMap
 class InputTaxon : AbstractInputTaxon {
 
     val properties: SortedMap<String, PropertyValue> =
-        TreeMap { o1, o2 ->
-            val i1 = defaultPropertiesMnemonic.indexOfFirst { it.first == o1 }
-            val i2 = defaultPropertiesMnemonic.indexOfFirst { it.first == o2 }
-
-            when {
-                i1 == -1 -> 1
-                i2 == -1 -> -1
-                else -> i1 - i2
-            }
-        }
+        TreeMap { o1, o2 -> o1.compareTo(o2) }
     private val counting: SortedMap<Int, CountingMetadata> = TreeMap()
 
     constructor(taxon: AbstractTaxon) : super(taxon)
@@ -95,61 +86,6 @@ class InputTaxon : AbstractInputTaxon {
     }
 
     companion object {
-
-        /**
-         * default properties as triple:
-         *
-         * * first value: mnemonic code from nomenclature type
-         * * second value: the corresponding view type
-         * * third value: if this property is visible by default
-         */
-        val defaultPropertiesMnemonic = arrayOf(
-            Triple(
-                "METH_OBS",
-                NomenclatureTypeViewType.NOMENCLATURE_TYPE,
-                true
-            ),
-            Triple(
-                "ETA_BIO",
-                NomenclatureTypeViewType.NOMENCLATURE_TYPE,
-                true
-            ),
-            Triple(
-                "METH_DETERMIN",
-                NomenclatureTypeViewType.NOMENCLATURE_TYPE,
-                false
-            ),
-            Triple(
-                "DETERMINER",
-                NomenclatureTypeViewType.TEXT_SIMPLE,
-                false
-            ),
-            Triple(
-                "STATUT_BIO",
-                NomenclatureTypeViewType.NOMENCLATURE_TYPE,
-                false
-            ),
-            Triple(
-                "OCC_COMPORTEMENT",
-                NomenclatureTypeViewType.NOMENCLATURE_TYPE,
-                false
-            ),
-            Triple(
-                "NATURALITE",
-                NomenclatureTypeViewType.NOMENCLATURE_TYPE,
-                false
-            ),
-            Triple(
-                "PREUVE_EXIST",
-                NomenclatureTypeViewType.NOMENCLATURE_TYPE,
-                false
-            ),
-            Triple(
-                "COMMENT",
-                NomenclatureTypeViewType.TEXT_MULTIPLE,
-                false
-            )
-        )
 
         @JvmField
         val CREATOR: Parcelable.Creator<InputTaxon> = object : Parcelable.Creator<InputTaxon> {

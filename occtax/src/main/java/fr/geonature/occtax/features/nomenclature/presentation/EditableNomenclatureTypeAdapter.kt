@@ -20,7 +20,6 @@ import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.BaseEditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.input.PropertyValue
-import java.util.Locale
 
 /**
  * Default RecyclerView Adapter about [EditableNomenclatureType].
@@ -118,19 +117,24 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
 
     fun showDefaultNomenclatureTypes(notify: Boolean = false) {
         showAllNomenclatureTypes = false
-        setSelectedNomenclatureTypes(
-            availableNomenclatureTypes.filter { it.visible }.takeIf { it.isNotEmpty() }?.let {
-                it + listOf(
-                    EditableNomenclatureType(
-                        BaseEditableNomenclatureType.Type.INFORMATION,
-                        "MORE",
-                        BaseEditableNomenclatureType.ViewType.NONE,
-                        true
-                    )
+        availableNomenclatureTypes.filter { it.visible }.run {
+            if (isEmpty()) {
+                // nothing to show by default: show everything
+                showAllNomenclatureTypes(notify)
+            } else {
+                setSelectedNomenclatureTypes(
+                    // show 'MORE' button only if we have some other editable nomenclatures to show
+                    this + if (this.size < availableNomenclatureTypes.size) listOf(
+                        EditableNomenclatureType(
+                            BaseEditableNomenclatureType.Type.INFORMATION,
+                            "MORE",
+                            BaseEditableNomenclatureType.ViewType.NONE,
+                            true
+                        )
+                    ) else emptyList()
                 )
-            } ?: emptyList(),
-            notify
-        )
+            }
+        }
     }
 
     fun showAllNomenclatureTypes(notify: Boolean = false) {
@@ -192,6 +196,9 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
 
         abstract fun onBind(nomenclatureType: EditableNomenclatureType)
 
+        /**
+         * Build the default label for given editable nomenclature type as fallback.
+         */
         fun getNomenclatureTypeLabel(mnemonic: String): String {
             return itemView.resources.getIdentifier(
                 "nomenclature_${mnemonic.lowercase()}",
@@ -231,7 +238,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
 
         override fun onBind(nomenclatureType: EditableNomenclatureType) {
             with(edit) {
-                hint = nomenclatureType.label
+                hint = nomenclatureType.label ?: getNomenclatureTypeLabel(nomenclatureType.code)
                 setEndIconOnClickListener { setNomenclatureValues(nomenclatureType) }
                 (editText as? AutoCompleteTextView)?.apply {
                     setOnClickListener { setNomenclatureValues(nomenclatureType) }
@@ -329,7 +336,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
         }
 
         override fun onBind(nomenclatureType: EditableNomenclatureType) {
-            edit.hint = getEditTextHint(nomenclatureType.code)
+            edit.hint = getNomenclatureTypeLabel(nomenclatureType.code)
 
             if (nomenclatureType.value?.value is String? && !(nomenclatureType.value?.value as String?).isNullOrEmpty()) {
                 edit.editText?.removeTextChangedListener(textWatcher)
@@ -338,14 +345,6 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                 }
                 edit.editText?.addTextChangedListener(textWatcher)
             }
-        }
-
-        private fun getEditTextHint(mnemonic: String): String? {
-            return itemView.resources.getIdentifier(
-                "information_${mnemonic.lowercase(Locale.getDefault())}_hint",
-                "string",
-                itemView.context.packageName
-            ).takeIf { it > 0 }?.let { itemView.context.getString(it) }
         }
     }
 
