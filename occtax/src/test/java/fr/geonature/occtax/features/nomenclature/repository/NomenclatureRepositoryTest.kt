@@ -103,13 +103,15 @@ class NomenclatureRepositoryTest {
                 BaseEditableNomenclatureType.Type.INFORMATION,
                 "DETERMINER",
                 BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE,
-                false
+                visible = true,
+                default = false
             ),
             BaseEditableNomenclatureType.from(
                 BaseEditableNomenclatureType.Type.INFORMATION,
                 "STATUT_BIO",
                 BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                false
+                visible = false,
+                default = false
             ),
         )
 
@@ -137,14 +139,16 @@ class NomenclatureRepositoryTest {
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "DETERMINER",
                     BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE,
-                    visible = false
+                    visible = true,
+                    default = false
                 ),
                 EditableNomenclatureType(
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "STATUT_BIO",
                     BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                     label = "Statut biologique",
-                    visible = false
+                    visible = false,
+                    default = false
                 )
             ),
             editableNomenclatureSettings.orNull()
@@ -161,33 +165,31 @@ class NomenclatureRepositoryTest {
                 BaseEditableNomenclatureType.from(
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "METH_OBS",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                    true
+                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
                 ),
                 BaseEditableNomenclatureType.from(
 
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "ETA_BIO",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                    true
+                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
                 ),
                 EditableNomenclatureType(
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "DETERMINER",
-                    BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE,
-                    visible = false
+                    BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE
                 ),
                 BaseEditableNomenclatureType.from(
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "STATUT_BIO",
                     BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                    false
+                    default = false
                 ),
                 EditableNomenclatureType(
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "COMMENT",
                     BaseEditableNomenclatureType.ViewType.TEXT_MULTIPLE,
-                    visible = false
+                    visible = true,
+                    default = false
                 )
             )
 
@@ -202,14 +204,14 @@ class NomenclatureRepositoryTest {
                     EditableNomenclatureType(
                         BaseEditableNomenclatureType.Type.INFORMATION,
                         "DETERMINER",
-                        BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE,
-                        visible = false
+                        BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE
                     ),
                     EditableNomenclatureType(
                         BaseEditableNomenclatureType.Type.INFORMATION,
                         "COMMENT",
                         BaseEditableNomenclatureType.ViewType.TEXT_MULTIPLE,
-                        visible = false
+                        visible = true,
+                        default = false
                     )
                 ),
                 editableNomenclatureSettings.orNull()
@@ -226,21 +228,19 @@ class NomenclatureRepositoryTest {
                 BaseEditableNomenclatureType.from(
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "METH_OBS",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                    true
+                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
                 ),
                 BaseEditableNomenclatureType.from(
-
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "ETA_BIO",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                    true
+                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
                 ),
                 BaseEditableNomenclatureType.from(
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "STATUT_BIO",
                     BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                    false
+                    visible = false,
+                    default = false
                 ),
             )
 

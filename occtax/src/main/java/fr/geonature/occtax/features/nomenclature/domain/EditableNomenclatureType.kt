@@ -2,6 +2,8 @@ package fr.geonature.occtax.features.nomenclature.domain
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.core.os.ParcelCompat.readBoolean
+import androidx.core.os.ParcelCompat.writeBoolean
 import fr.geonature.occtax.input.PropertyValue
 
 /**
@@ -26,9 +28,14 @@ abstract class BaseEditableNomenclatureType {
     abstract val viewType: ViewType
 
     /**
-     * Whether this property is visible by default.
+     * Whether this property is visible (thus editable directly, default: `true`).
      */
     abstract val visible: Boolean
+
+    /**
+     * Whether this property is shown by default (default: `true`)
+     */
+    abstract val default: Boolean
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -40,6 +47,7 @@ abstract class BaseEditableNomenclatureType {
         if (code != other.code) return false
         if (viewType != other.viewType) return false
         if (visible != other.visible) return false
+        if (default != other.default) return false
 
         return true
     }
@@ -49,13 +57,15 @@ abstract class BaseEditableNomenclatureType {
         result = 31 * result + code.hashCode()
         result = 31 * result + viewType.hashCode()
         result = 31 * result + visible.hashCode()
+        result = 31 * result + default.hashCode()
+
         return result
     }
 
     override fun toString(): String {
-        return "BaseEditableNomenclatureType(type=$type, code='$code', viewType=$viewType, visible=$visible)"
+        return "BaseEditableNomenclatureType(type=$type, code='$code', viewType=$viewType, visible=$visible, default=$default)"
     }
-    
+
     companion object {
 
         /**
@@ -65,7 +75,8 @@ abstract class BaseEditableNomenclatureType {
             type: Type,
             code: String,
             viewType: ViewType,
-            visible: Boolean = true
+            visible: Boolean = true,
+            default: Boolean = true
         ): BaseEditableNomenclatureType = object : BaseEditableNomenclatureType() {
             override val type: Type
                 get() = type
@@ -75,6 +86,8 @@ abstract class BaseEditableNomenclatureType {
                 get() = viewType
             override val visible: Boolean
                 get() = visible
+            override val default: Boolean
+                get() = default
         }
     }
 
@@ -134,6 +147,7 @@ data class EditableNomenclatureType(
     override val code: String,
     override val viewType: ViewType,
     override val visible: Boolean = true,
+    override val default: Boolean = true,
 
     /**
      * Nomenclature type's label.
@@ -150,7 +164,8 @@ data class EditableNomenclatureType(
         source.readSerializable() as Type,
         source.readString()!!,
         source.readSerializable() as ViewType,
-        source.readByte() == 1.toByte(), // as boolean value
+        readBoolean(source),
+        readBoolean(source),
         source.readString()!!,
         source.readParcelable(PropertyValue::class.java.classLoader)
     )
@@ -166,8 +181,15 @@ data class EditableNomenclatureType(
         dest?.also {
             it.writeSerializable(type)
             it.writeString(code)
-            it.writeSerializable(type)
-            it.writeByte((if (visible) 1 else 0).toByte()) // as boolean value
+            it.writeSerializable(viewType)
+            writeBoolean(
+                it,
+                visible
+            )
+            writeBoolean(
+                it,
+                default
+            )
             it.writeString(label)
             it.writeParcelable(
                 value,

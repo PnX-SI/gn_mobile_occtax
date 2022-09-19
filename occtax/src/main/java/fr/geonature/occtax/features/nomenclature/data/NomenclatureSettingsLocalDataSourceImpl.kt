@@ -15,56 +15,54 @@ class NomenclatureSettingsLocalDataSourceImpl :
         BaseEditableNomenclatureType.from(
             BaseEditableNomenclatureType.Type.INFORMATION,
             "METH_OBS",
-            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-            true
+            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
         ),
         BaseEditableNomenclatureType.from(
             BaseEditableNomenclatureType.Type.INFORMATION,
             "ETA_BIO",
-            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-            true
+            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
         ),
         BaseEditableNomenclatureType.from(
             BaseEditableNomenclatureType.Type.INFORMATION,
             "METH_DETERMIN",
             BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-            false
+            default = false
         ),
         BaseEditableNomenclatureType.from(
             BaseEditableNomenclatureType.Type.INFORMATION,
             "DETERMINER",
             BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE,
-            false
+            default = false
         ),
         BaseEditableNomenclatureType.from(
             BaseEditableNomenclatureType.Type.INFORMATION,
             "STATUT_BIO",
             BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-            false
+            default = false
         ),
         BaseEditableNomenclatureType.from(
             BaseEditableNomenclatureType.Type.INFORMATION,
             "OCC_COMPORTEMENT",
             BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-            false
+            default = false
         ),
         BaseEditableNomenclatureType.from(
             BaseEditableNomenclatureType.Type.INFORMATION,
             "NATURALITE",
             BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-            false
+            default = false
         ),
         BaseEditableNomenclatureType.from(
             BaseEditableNomenclatureType.Type.INFORMATION,
             "PREUVE_EXIST",
             BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-            false
+            default = false
         ),
         BaseEditableNomenclatureType.from(
             BaseEditableNomenclatureType.Type.INFORMATION,
             "COMMENT",
             BaseEditableNomenclatureType.ViewType.TEXT_MULTIPLE,
-            false
+            default = false
         ),
         BaseEditableNomenclatureType.from(
             BaseEditableNomenclatureType.Type.COUNTING,
@@ -106,13 +104,14 @@ class NomenclatureSettingsLocalDataSourceImpl :
             return defaultNomenclatureTypes.filter { it.type == type }
         }
 
-        return defaultPropertySettings.filter { it.visible }
+        return defaultPropertySettings
             .mapNotNull { property ->
                 defaultNomenclatureTypes.find { it.code == property.key }?.let {
                     BaseEditableNomenclatureType.from(
                         it.type,
                         it.code,
                         it.viewType,
+                        property.visible,
                         property.default
                     )
                 }

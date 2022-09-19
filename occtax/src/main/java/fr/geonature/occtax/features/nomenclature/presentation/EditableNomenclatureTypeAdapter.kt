@@ -107,17 +107,22 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
         vararg propertyValue: PropertyValue
     ) {
         availableNomenclatureTypes.clear()
-        availableNomenclatureTypes.addAll(nomenclatureTypes.map {
-            it.copy(value = propertyValue.firstOrNull { propertyValue -> propertyValue.code == it.code }
-                ?: it.value)
-        })
+        availableNomenclatureTypes.addAll(
+            nomenclatureTypes.filter { it.visible }.map {
+                it.copy(value = propertyValue.firstOrNull { propertyValue -> propertyValue.code == it.code }
+                    ?: it.value)
+            }
+        )
 
         if (showAllNomenclatureTypes) showAllNomenclatureTypes(notify = true) else showDefaultNomenclatureTypes(notify = true)
     }
 
     fun showDefaultNomenclatureTypes(notify: Boolean = false) {
         showAllNomenclatureTypes = false
-        availableNomenclatureTypes.filter { it.visible }.run {
+
+        if (availableNomenclatureTypes.isEmpty()) return
+
+        availableNomenclatureTypes.filter { it.default }.run {
             if (isEmpty()) {
                 // nothing to show by default: show everything
                 showAllNomenclatureTypes(notify)

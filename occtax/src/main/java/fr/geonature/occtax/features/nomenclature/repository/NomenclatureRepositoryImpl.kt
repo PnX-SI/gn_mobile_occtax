@@ -44,6 +44,7 @@ class NomenclatureRepositoryImpl(
                         it.code,
                         it.viewType,
                         it.visible,
+                        it.default,
                         nomenclatureType.defaultLabel.takeIf { label -> label.isNotEmpty() }
                             ?: run {
                                 Logger.warn { "no label found for nomenclature type '${nomenclatureType.mnemonic}', use default…" }
@@ -55,6 +56,7 @@ class NomenclatureRepositoryImpl(
                     it.code,
                     it.viewType,
                     it.visible,
+                    it.default
                 )
             }
         }.fold(

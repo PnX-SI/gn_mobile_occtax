@@ -76,7 +76,7 @@ class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapte
                     itemView.context.getString(
                         R.string.summary_taxon_information,
                         getNomenclatureTypeLabel(it.code),
-                        it.label
+                        it.label ?: it.value
                     )
                 }
                 .joinToString(", "),

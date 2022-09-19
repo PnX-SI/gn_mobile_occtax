@@ -184,9 +184,19 @@ class InformationFragment : AbstractInputFragment() {
     }
 
     private fun handleEditableNomenclatureTypes(editableNomenclatureTypes: List<EditableNomenclatureType>) {
+        editableNomenclatureTypes.filter { it.value != null }.forEach {
+            if ((input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.containsKey(it.code) == true) return@forEach
+
+            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.set(
+                it.code,
+                it.value
+            )
+        }
+
         adapter?.bind(
             editableNomenclatureTypes,
-            *((input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.values?.toTypedArray()
+            *((input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.values?.filterNotNull()
+                ?.toTypedArray()
                 ?: emptyArray())
         )
     }

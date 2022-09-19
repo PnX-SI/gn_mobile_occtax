@@ -38,56 +38,54 @@ class NomenclatureSettingsLocalDataSourceTest {
                 BaseEditableNomenclatureType.from(
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "METH_OBS",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                    true
+                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
                 ),
                 BaseEditableNomenclatureType.from(
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "ETA_BIO",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                    true
+                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
                 ),
                 BaseEditableNomenclatureType.from(
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "METH_DETERMIN",
                     BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                    false
+                    default = false
                 ),
                 BaseEditableNomenclatureType.from(
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "DETERMINER",
                     BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE,
-                    false
+                    default = false
                 ),
                 BaseEditableNomenclatureType.from(
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "STATUT_BIO",
                     BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                    false
+                    default = false
                 ),
                 BaseEditableNomenclatureType.from(
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "OCC_COMPORTEMENT",
                     BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                    false
+                    default = false
                 ),
                 BaseEditableNomenclatureType.from(
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "NATURALITE",
                     BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                    false
+                    default = false
                 ),
                 BaseEditableNomenclatureType.from(
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "PREUVE_EXIST",
                     BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                    false
+                    default = false
                 ),
                 BaseEditableNomenclatureType.from(
                     BaseEditableNomenclatureType.Type.INFORMATION,
                     "COMMENT",
                     BaseEditableNomenclatureType.ViewType.TEXT_MULTIPLE,
-                    false
+                    default = false
                 )
             ),
             nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(BaseEditableNomenclatureType.Type.INFORMATION)
@@ -138,15 +136,21 @@ class NomenclatureSettingsLocalDataSourceTest {
                     BaseEditableNomenclatureType.from(
                         BaseEditableNomenclatureType.Type.INFORMATION,
                         "METH_OBS",
-                        BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                        true
+                        BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
                     ),
                     BaseEditableNomenclatureType.from(
                         BaseEditableNomenclatureType.Type.INFORMATION,
                         "ETA_BIO",
                         BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                        false
+                        visible = true,
+                        default = false
                     ),
+                    BaseEditableNomenclatureType.from(
+                        BaseEditableNomenclatureType.Type.INFORMATION,
+                        "OCC_COMPORTEMENT",
+                        BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                        visible = false
+                    )
                 ),
                 nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(
                     BaseEditableNomenclatureType.Type.INFORMATION,
@@ -164,7 +168,7 @@ class NomenclatureSettingsLocalDataSourceTest {
                         key = "OCC_COMPORTEMENT",
                         visible = false,
                         default = true
-                    ),
+                    )
                 )
             )
 
@@ -174,7 +178,7 @@ class NomenclatureSettingsLocalDataSourceTest {
                         BaseEditableNomenclatureType.Type.COUNTING,
                         "STADE_VIE",
                         BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
-                    ),
+                    )
                 ),
                 nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(
                     BaseEditableNomenclatureType.Type.COUNTING,
@@ -187,7 +191,7 @@ class NomenclatureSettingsLocalDataSourceTest {
                         key = "NO_SUCH_SETTINGS",
                         visible = true,
                         default = true
-                    ),
+                    )
                 )
             )
         }

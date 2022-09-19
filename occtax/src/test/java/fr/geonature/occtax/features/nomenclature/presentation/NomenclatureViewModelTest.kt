@@ -21,9 +21,11 @@ import io.mockk.coEvery
 import io.mockk.confirmVerified
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.unmockkAll
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -67,6 +69,11 @@ class NomenclatureViewModelTest {
             getEditableNomenclaturesUseCase,
             getNomenclatureValuesByTypeAndTaxonomyUseCase
         )
+    }
+
+    @After
+    fun tearDown() {
+        unmockkAll()
     }
 
     @Test
@@ -153,7 +160,7 @@ class NomenclatureViewModelTest {
             nomenclatureViewModel.failure.observeForever(failureObserver)
 
             // then
-            verify(atLeast = 1) { failureObserver.onChanged(NoNomenclatureTypeFoundLocallyFailure) }
+            verify { failureObserver.onChanged(NoNomenclatureTypeFoundLocallyFailure) }
             confirmVerified(failureObserver)
         }
 
