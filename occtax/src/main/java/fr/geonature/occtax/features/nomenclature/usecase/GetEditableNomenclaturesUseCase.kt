@@ -1,5 +1,6 @@
 package fr.geonature.occtax.features.nomenclature.usecase
 
+import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.error.Failure
 import fr.geonature.commons.fp.Either
 import fr.geonature.commons.fp.Either.Left
@@ -9,8 +10,8 @@ import fr.geonature.commons.interactor.BaseUseCase
 import fr.geonature.occtax.features.nomenclature.domain.BaseEditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
+import fr.geonature.occtax.features.nomenclature.repository.IDefaultPropertyValueRepository
 import fr.geonature.occtax.features.nomenclature.repository.INomenclatureRepository
-import fr.geonature.occtax.input.PropertyValue
 import fr.geonature.occtax.settings.PropertySettings
 import javax.inject.Inject
 
@@ -19,7 +20,10 @@ import javax.inject.Inject
  *
  * @author S. Grimault
  */
-class GetEditableNomenclaturesUseCase @Inject constructor(private val nomenclatureRepository: INomenclatureRepository) :
+class GetEditableNomenclaturesUseCase @Inject constructor(
+    private val nomenclatureRepository: INomenclatureRepository,
+    private val defaultPropertyValueRepository: IDefaultPropertyValueRepository
+) :
     BaseUseCase<List<EditableNomenclatureType>, GetEditableNomenclaturesUseCase.Params>() {
     override suspend fun run(params: Params): Either<Failure, List<EditableNomenclatureType>> {
         val editableNomenclaturesResult = nomenclatureRepository.getEditableNomenclatures(
@@ -37,22 +41,22 @@ class GetEditableNomenclaturesUseCase @Inject constructor(private val nomenclatu
             return Left(NoNomenclatureTypeFoundLocallyFailure)
         }
 
-        val defaultNomenclatureValues =
-            nomenclatureRepository.getAllDefaultNomenclatureValues().getOrElse { emptyList() }
+        val defaultPropertyValues =
+            defaultPropertyValueRepository.getPropertyValues(params.taxonomy)
+                .getOrElse { emptyList() }
 
         return Right(editableNomenclatures.map { editableNomenclature ->
-            editableNomenclature.copy(value = defaultNomenclatureValues.firstOrNull { it.type?.mnemonic == editableNomenclature.code }
-                ?.let {
-                    PropertyValue.fromNomenclature(
-                        editableNomenclature.code,
-                        it
-                    )
-                })
+            editableNomenclature.copy(
+                value = defaultPropertyValues.firstOrNull { it.code == editableNomenclature.code }
+                    ?: editableNomenclature.value,
+                locked = defaultPropertyValues.any { it.code == editableNomenclature.code }
+            )
         })
     }
 
     data class Params(
         val type: BaseEditableNomenclatureType.Type,
-        val settings: List<PropertySettings> = listOf()
+        val settings: List<PropertySettings> = listOf(),
+        val taxonomy: Taxonomy? = null
     )
 }

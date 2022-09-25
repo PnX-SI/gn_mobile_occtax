@@ -13,6 +13,7 @@ import fr.geonature.occtax.features.nomenclature.domain.BaseEditableNomenclature
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureValuesFoundFailure
+import fr.geonature.occtax.input.PropertyValue
 import fr.geonature.occtax.settings.PropertySettings
 import org.tinylog.Logger
 
@@ -33,6 +34,14 @@ class NomenclatureRepositoryImpl(
         return runCatching {
             val nomenclatureTypes =
                 nomenclatureLocalDataSource.getAllNomenclatureTypes().associateBy { it.mnemonic }
+
+            val defaultNomenclatureValues =
+                nomenclatureLocalDataSource.getAllDefaultNomenclatureValues().map { nomenclature ->
+                    NomenclatureWithType(nomenclature).apply {
+                        this.type =
+                            nomenclatureTypes.entries.firstOrNull { it.value.id == typeId }?.value
+                    }
+                }.filter { it.type != null }
 
             nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(
                 type,
@@ -58,28 +67,18 @@ class NomenclatureRepositoryImpl(
                     it.visible,
                     it.default
                 )
+            }.map { editableNomenclature ->
+                editableNomenclature.copy(value = defaultNomenclatureValues.firstOrNull { it.type?.mnemonic == editableNomenclature.code }
+                    ?.let {
+                        PropertyValue.fromNomenclature(
+                            editableNomenclature.code,
+                            it
+                        )
+                    })
             }
         }.fold(
             onSuccess = {
                 if (it.isEmpty()) Left(NoNomenclatureTypeFoundLocallyFailure) else Right(it)
-            },
-            onFailure = {
-                Left(Failure.DbFailure(it))
-            }
-        )
-    }
-
-    override suspend fun getAllDefaultNomenclatureValues(): Either<Failure, List<NomenclatureWithType>> {
-        return runCatching {
-            val nomenclatureTypes = nomenclatureLocalDataSource.getAllNomenclatureTypes()
-            nomenclatureLocalDataSource.getAllDefaultNomenclatureValues().map { nomenclature ->
-                NomenclatureWithType(nomenclature).apply {
-                    type = nomenclatureTypes.firstOrNull { it.id == typeId }
-                }
-            }.filter { it.type != null }
-        }.fold(
-            onSuccess = {
-                Right(it)
             },
             onFailure = {
                 Left(Failure.DbFailure(it))

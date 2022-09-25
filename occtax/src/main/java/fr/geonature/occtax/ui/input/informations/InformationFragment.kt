@@ -23,9 +23,9 @@ import fr.geonature.occtax.features.nomenclature.domain.BaseEditableNomenclature
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.presentation.EditableNomenclatureTypeAdapter
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
+import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.InputTaxon
-import fr.geonature.occtax.input.PropertyValue
 import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
 import javax.inject.Inject
@@ -43,6 +43,7 @@ class InformationFragment : AbstractInputFragment() {
     lateinit var authority: String
 
     private val nomenclatureViewModel: NomenclatureViewModel by viewModels()
+    private val propertyValueModel: PropertyValueModel by viewModels()
 
     private lateinit var savedState: Bundle
 
@@ -67,7 +68,7 @@ class InformationFragment : AbstractInputFragment() {
         savedInstanceState: Bundle?
     ): View {
         return inflater.inflate(
-            R.layout.fragment_information,
+            R.layout.fragment_recycler_view_loader,
             container,
             false
         )
@@ -80,9 +81,11 @@ class InformationFragment : AbstractInputFragment() {
         )
 
         val recyclerView = view.findViewById<RecyclerView>(android.R.id.list)
-        val emptyTextView = view.findViewById<TextView>(android.R.id.empty)
+        val emptyTextView = view.findViewById<TextView>(android.R.id.empty).apply {
+            text = getString(R.string.information_no_data)
+        }
         val progressBar = view.findViewById<ProgressBar>(android.R.id.progress)
-        progressBar.visibility = View.VISIBLE
+            .apply { visibility = View.VISIBLE }
 
         adapter = EditableNomenclatureTypeAdapter(object :
             EditableNomenclatureTypeAdapter.OnEditableNomenclatureTypeAdapter {
@@ -134,10 +137,28 @@ class InformationFragment : AbstractInputFragment() {
                 )
             }
 
-            override fun onPropertyValue(propertyValue: PropertyValue) {
+            override fun onUpdate(editableNomenclatureType: EditableNomenclatureType) {
                 (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.set(
-                    propertyValue.code,
+                    editableNomenclatureType.code,
+                    editableNomenclatureType.value
+                )
+
+                val propertyValue = editableNomenclatureType.value
+
+                if (propertyValue !== null && editableNomenclatureType.locked) propertyValueModel.setPropertyValue(
+                    input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
+                        ?: Taxonomy(
+                            Taxonomy.ANY,
+                            Taxonomy.ANY
+                        ),
                     propertyValue
+                ) else propertyValueModel.clearPropertyValue(
+                    input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
+                        ?: Taxonomy(
+                            Taxonomy.ANY,
+                            Taxonomy.ANY
+                        ),
+                    editableNomenclatureType.code
                 )
             }
         })
@@ -177,9 +198,10 @@ class InformationFragment : AbstractInputFragment() {
     override fun refreshView() {
         nomenclatureViewModel.getEditableNomenclatures(
             BaseEditableNomenclatureType.Type.INFORMATION,
-            *(arguments?.getParcelableArray(ARG_PROPERTIES)
+            (arguments?.getParcelableArray(ARG_PROPERTIES)
                 ?.map { it as PropertySettings }
-                ?.toTypedArray() ?: emptyArray())
+                ?.toList() ?: emptyList()),
+            input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
         )
     }
 

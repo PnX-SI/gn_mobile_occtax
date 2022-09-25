@@ -9,8 +9,12 @@ import fr.geonature.commons.data.dao.NomenclatureDao
 import fr.geonature.commons.data.dao.NomenclatureTypeDao
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureLocalDataSource
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureSettingsLocalDataSource
+import fr.geonature.occtax.features.nomenclature.data.IPropertyValueLocalDataSource
+import fr.geonature.occtax.features.nomenclature.data.InMemoryPropertyValueLocalDataSourceImpl
 import fr.geonature.occtax.features.nomenclature.data.NomenclatureLocalDataSourceImpl
 import fr.geonature.occtax.features.nomenclature.data.NomenclatureSettingsLocalDataSourceImpl
+import fr.geonature.occtax.features.nomenclature.repository.DefaultPropertyValueRepositoryImpl
+import fr.geonature.occtax.features.nomenclature.repository.IDefaultPropertyValueRepository
 import fr.geonature.occtax.features.nomenclature.repository.INomenclatureRepository
 import fr.geonature.occtax.features.nomenclature.repository.NomenclatureRepositoryImpl
 import javax.inject.Singleton
@@ -46,6 +50,12 @@ object NomenclatureModule {
 
     @Singleton
     @Provides
+    fun providePropertyValueLocalDataSource(): IPropertyValueLocalDataSource {
+        return InMemoryPropertyValueLocalDataSourceImpl()
+    }
+
+    @Singleton
+    @Provides
     fun provideNomenclatureRepository(
         nomenclatureLocalDataSource: INomenclatureLocalDataSource,
         nomenclatureSettingsLocalDataSource: INomenclatureSettingsLocalDataSource
@@ -53,6 +63,18 @@ object NomenclatureModule {
         return NomenclatureRepositoryImpl(
             nomenclatureLocalDataSource,
             nomenclatureSettingsLocalDataSource
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideDefaultPropertyValueRepository(
+        propertyValueLocalDataSource: IPropertyValueLocalDataSource,
+        nomenclatureLocalDataSource: INomenclatureLocalDataSource,
+    ): IDefaultPropertyValueRepository {
+        return DefaultPropertyValueRepositoryImpl(
+            propertyValueLocalDataSource,
+            nomenclatureLocalDataSource
         )
     }
 }

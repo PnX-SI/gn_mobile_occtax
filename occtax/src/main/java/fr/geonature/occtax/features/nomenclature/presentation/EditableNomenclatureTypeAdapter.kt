@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AutoCompleteTextView
 import android.widget.Button
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.DiffUtil
@@ -229,13 +230,12 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                 it.setAdapter(nomenclatureAdapter)
                 it.setOnItemClickListener { _, _, position, _ ->
                     showDropdown = false
-                    nomenclatureType?.also { nomenclatureType ->
-                        listener.onPropertyValue(
-                            PropertyValue.fromNomenclature(
-                                nomenclatureType.code,
-                                nomenclatureAdapter.getNomenclatureValue(position)
-                            )
+                    nomenclatureType?.run {
+                        value = PropertyValue.fromNomenclature(
+                            code,
+                            nomenclatureAdapter.getNomenclatureValue(position)
                         )
+                        listener.onUpdate(this)
                     }
                 }
             }
@@ -243,6 +243,20 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
 
         override fun onBind(nomenclatureType: EditableNomenclatureType) {
             with(edit) {
+                startIconDrawable = ResourcesCompat.getDrawable(
+                    itemView.resources,
+                    if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                    itemView.context.theme
+                )
+                setStartIconOnClickListener {
+                    nomenclatureType.locked = !nomenclatureType.locked
+                    startIconDrawable = ResourcesCompat.getDrawable(
+                        itemView.resources,
+                        if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                        itemView.context.theme
+                    )
+                    listener.onUpdate(nomenclatureType)
+                }
                 hint = nomenclatureType.label ?: getNomenclatureTypeLabel(nomenclatureType.code)
                 setEndIconOnClickListener { setNomenclatureValues(nomenclatureType) }
                 (editText as? AutoCompleteTextView)?.apply {
@@ -318,12 +332,12 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
             }
 
             override fun afterTextChanged(s: Editable?) {
-                nomenclatureType?.also {
-                    listener.onPropertyValue(
-                        PropertyValue.fromValue(
-                            it.code,
-                            s?.toString()?.ifEmpty { null }?.ifBlank { null })
+                nomenclatureType?.run {
+                    value = PropertyValue.fromValue(
+                        code,
+                        s?.toString()?.ifEmpty { null }?.ifBlank { null }
                     )
+                    listener.onUpdate(this)
                 }
             }
         }
@@ -341,7 +355,23 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
         }
 
         override fun onBind(nomenclatureType: EditableNomenclatureType) {
-            edit.hint = getNomenclatureTypeLabel(nomenclatureType.code)
+            with(edit) {
+                startIconDrawable = ResourcesCompat.getDrawable(
+                    itemView.resources,
+                    if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                    itemView.context.theme
+                )
+                setStartIconOnClickListener {
+                    nomenclatureType.locked = !nomenclatureType.locked
+                    startIconDrawable = ResourcesCompat.getDrawable(
+                        itemView.resources,
+                        if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                        itemView.context.theme
+                    )
+                    listener.onUpdate(nomenclatureType)
+                }
+                hint = getNomenclatureTypeLabel(nomenclatureType.code)
+            }
 
             if (nomenclatureType.value?.value is String? && !(nomenclatureType.value?.value as String?).isNullOrEmpty()) {
                 edit.editText?.removeTextChangedListener(textWatcher)
@@ -388,10 +418,10 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
         fun getNomenclatureValues(nomenclatureTypeMnemonic: String): LiveData<List<Nomenclature>>
 
         /**
-         * Called when a new value has been set for a given nomenclature type.
+         * Called when an [EditableNomenclatureType] has been updated.
          *
-         * @param propertyValue the new property value
+         * @param editableNomenclatureType the [EditableNomenclatureType] updated
          */
-        fun onPropertyValue(propertyValue: PropertyValue)
+        fun onUpdate(editableNomenclatureType: EditableNomenclatureType)
     }
 }

@@ -2,8 +2,7 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="@dimen/padding_default">
+    android:layout_height="match_parent">
 
     <include
         android:id="@android:id/list"
@@ -15,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="@string/information_no_data"
+        android:text="@string/no_data"
         android:visibility="gone" />
 
     <ProgressBar

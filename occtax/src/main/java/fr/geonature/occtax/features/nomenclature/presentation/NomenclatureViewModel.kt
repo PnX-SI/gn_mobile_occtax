@@ -40,12 +40,14 @@ class NomenclatureViewModel @Inject constructor(
      */
     fun getEditableNomenclatures(
         type: BaseEditableNomenclatureType.Type,
-        vararg defaultPropertySettings: PropertySettings
+        defaultPropertySettings: List<PropertySettings> = listOf(),
+        taxonomy: Taxonomy? = null
     ) {
         getEditableNomenclaturesUseCase(
             GetEditableNomenclaturesUseCase.Params(
                 type,
-                defaultPropertySettings.asList()
+                defaultPropertySettings,
+                taxonomy
             ),
             viewModelScope
         ) {

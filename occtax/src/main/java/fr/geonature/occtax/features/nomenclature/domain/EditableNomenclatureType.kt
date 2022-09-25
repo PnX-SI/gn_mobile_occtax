@@ -157,7 +157,12 @@ data class EditableNomenclatureType(
     /**
      * The current value for this nomenclature type.
      */
-    var value: PropertyValue? = null
+    var value: PropertyValue? = null,
+
+    /**
+     * Whether this property is locked for modification (default: `false`).
+     */
+    var locked: Boolean = false
 ) : BaseEditableNomenclatureType(), Parcelable {
 
     private constructor(source: Parcel) : this(
@@ -166,8 +171,9 @@ data class EditableNomenclatureType(
         source.readSerializable() as ViewType,
         readBoolean(source),
         readBoolean(source),
-        source.readString()!!,
-        source.readParcelable(PropertyValue::class.java.classLoader)
+        source.readString(),
+        source.readParcelable(PropertyValue::class.java.classLoader),
+        readBoolean(source)
     )
 
     override fun describeContents(): Int {
@@ -194,6 +200,10 @@ data class EditableNomenclatureType(
             it.writeParcelable(
                 value,
                 flags
+            )
+            writeBoolean(
+                it,
+                locked
             )
         }
     }
