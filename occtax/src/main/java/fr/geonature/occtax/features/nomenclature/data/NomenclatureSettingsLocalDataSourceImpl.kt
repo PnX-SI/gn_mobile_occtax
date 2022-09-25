@@ -13,6 +13,11 @@ class NomenclatureSettingsLocalDataSourceImpl :
 
     private val defaultNomenclatureTypes = listOf(
         BaseEditableNomenclatureType.from(
+            BaseEditableNomenclatureType.Type.DEFAULT,
+            "TYP_GRP",
+            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+        ),
+        BaseEditableNomenclatureType.from(
             BaseEditableNomenclatureType.Type.INFORMATION,
             "METH_OBS",
             BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE

@@ -2,17 +2,21 @@ package fr.geonature.occtax.settings
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.core.os.ParcelCompat
+import androidx.core.os.ParcelCompat.readBoolean
 
 /**
  * Nomenclature settings.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 data class NomenclatureSettings(
+    val saveDefaultValues: Boolean = false,
     val information: List<PropertySettings>,
     val counting: List<PropertySettings>
 ) : Parcelable {
     private constructor(source: Parcel) : this(
+        readBoolean(source),
         mutableListOf(),
         mutableListOf()
     ) {
@@ -35,6 +39,10 @@ data class NomenclatureSettings(
         flags: Int
     ) {
         dest?.also {
+            ParcelCompat.writeBoolean(
+                it,
+                saveDefaultValues
+            )
             it.writeTypedList(information)
             it.writeTypedList(counting)
         }

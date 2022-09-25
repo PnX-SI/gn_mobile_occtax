@@ -93,7 +93,10 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
         inputViewModel.editInput(input)
 
         pageFragmentViewModel.set(
-            R.string.pager_fragment_observers_and_date_input_title to ObserversAndDateInputFragment.newInstance(appSettings.inputSettings.dateSettings),
+            R.string.pager_fragment_observers_and_date_input_title to ObserversAndDateInputFragment.newInstance(
+                dateSettings = appSettings.inputSettings.dateSettings,
+                saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues ?: false
+            ),
             R.string.pager_fragment_map_title to InputMapFragment.newInstance(
                 MapSettings.Builder.newInstance()
                     .from(appSettings.mapSettings!!)
@@ -168,6 +171,7 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
         pageFragmentViewModel.add(
             R.string.pager_fragment_taxa_title to TaxaFragment.newInstance(appSettings.areaObservationDuration),
             R.string.pager_fragment_information_title to InformationFragment.newInstance(
+                saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues ?: false,
                 *appSettings.nomenclatureSettings?.information?.toTypedArray()
                     ?: emptyArray()
             ),

@@ -61,10 +61,22 @@ class PropertyValueModel @Inject constructor(
         code: String
     ) {
         clearDefaultPropertyValueUseCase(
-            ClearDefaultPropertyValueUseCase.Params(
+            ClearDefaultPropertyValueUseCase.Params.Params(
                 taxonomy,
                 code
             ),
+            viewModelScope
+        ) {
+            it.fold(::handleFailure) {}
+        }
+    }
+
+    /**
+     * Clears all saved property values.
+     */
+    fun clearAllPropertyValues() {
+        clearDefaultPropertyValueUseCase(
+            ClearDefaultPropertyValueUseCase.Params.None,
             viewModelScope
         ) {
             it.fold(::handleFailure) {}

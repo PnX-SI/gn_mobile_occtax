@@ -46,4 +46,9 @@ interface IDefaultPropertyValueRepository {
         ),
         code: String
     ): Either<Failure, Unit>
+
+    /**
+     * Clears all saved property values.
+     */
+    suspend fun clearAllPropertyValues(): Either<Failure, Unit>
 }

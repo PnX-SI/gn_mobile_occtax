@@ -75,4 +75,10 @@ class DefaultPropertyValueRepositoryImpl(
             onFailure = { Left(PropertyValueFailure(code)) }
         )
     }
+
+    override suspend fun clearAllPropertyValues(): Either<Failure, Unit> {
+        propertyValueLocalDataSource.clearAllPropertyValues()
+        
+        return Right(Unit)
+    }
 }

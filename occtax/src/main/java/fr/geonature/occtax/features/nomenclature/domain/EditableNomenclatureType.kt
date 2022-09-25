@@ -96,6 +96,11 @@ abstract class BaseEditableNomenclatureType {
      */
     enum class Type {
         /**
+         * Default nomenclature types.
+         */
+        DEFAULT,
+
+        /**
          * Nomenclature types used for main information.
          */
         INFORMATION,

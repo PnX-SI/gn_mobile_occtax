@@ -51,7 +51,7 @@ interface IPropertyValueLocalDataSource {
     )
 
     /**
-     * Clears all saved property value.
+     * Clears all saved property values.
      */
     suspend fun clearAllPropertyValues()
 }

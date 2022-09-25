@@ -85,6 +85,7 @@ class Input : AbstractInput {
 
     companion object {
 
+        @Deprecated("see: INomenclatureSettingsLocalDataSource")
         val defaultPropertiesMnemonic = arrayOf(
             Pair(
                 "TYP_GRP",

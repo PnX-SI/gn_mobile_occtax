@@ -57,9 +57,9 @@ class ClearDefaultPropertyValueUseCaseTest {
             )
         } returns Right(Unit)
 
-        // when setting new property value
+        // when remove existing property value
         val result = clearDefaultPropertyValueUseCase.run(
-            ClearDefaultPropertyValueUseCase.Params(
+            ClearDefaultPropertyValueUseCase.Params.Params(
                 taxonomy = Taxonomy(
                     kingdom = "Animalia",
                     group = "Oiseaux"
@@ -67,6 +67,20 @@ class ClearDefaultPropertyValueUseCaseTest {
                 "STATUT_BIO"
             )
         )
+
+        // then
+        assertTrue(result.isRight)
+    }
+
+    @Test
+    fun `should clear all property values`() = runTest {
+        coEvery {
+            defaultPropertyValueRepository.clearAllPropertyValues()
+        } returns Right(Unit)
+
+        // when remove existing property value
+        val result =
+            clearDefaultPropertyValueUseCase.run(ClearDefaultPropertyValueUseCase.Params.None)
 
         // then
         assertTrue(result.isRight)
@@ -84,9 +98,9 @@ class ClearDefaultPropertyValueUseCaseTest {
             )
         } returns Left(PropertyValueFailure("STATUT_BIO"))
 
-        // when setting new property value
+        // when remove a property value
         val result = clearDefaultPropertyValueUseCase.run(
-            ClearDefaultPropertyValueUseCase.Params(
+            ClearDefaultPropertyValueUseCase.Params.Params(
                 taxonomy = Taxonomy(
                     kingdom = "Animalia",
                     group = "Oiseaux"

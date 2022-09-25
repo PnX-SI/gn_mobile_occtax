@@ -168,6 +168,7 @@ class InformationFragment : AbstractInputFragment() {
                 false
             )
         ) adapter?.showAllNomenclatureTypes() else adapter?.showDefaultNomenclatureTypes()
+        adapter?.lockDefaultValues(arguments?.getBoolean(ARG_SAVE_DEFAULT_VALUES) == true)
 
         with(recyclerView) {
             layoutManager = LinearLayoutManager(context)
@@ -225,6 +226,7 @@ class InformationFragment : AbstractInputFragment() {
 
     companion object {
 
+        private const val ARG_SAVE_DEFAULT_VALUES = "arg_save_default_values"
         private const val ARG_PROPERTIES = "arg_properties"
         private const val KEY_SHOW_ALL_NOMENCLATURE_TYPES = "show_all_nomenclature_types"
 
@@ -234,8 +236,15 @@ class InformationFragment : AbstractInputFragment() {
          * @return A new instance of [InformationFragment]
          */
         @JvmStatic
-        fun newInstance(vararg propertySettings: PropertySettings) = InformationFragment().apply {
+        fun newInstance(
+            saveDefaultValues: Boolean = false,
+            vararg propertySettings: PropertySettings
+        ) = InformationFragment().apply {
             arguments = Bundle().apply {
+                putBoolean(
+                    ARG_SAVE_DEFAULT_VALUES,
+                    saveDefaultValues
+                )
                 putParcelableArray(
                     ARG_PROPERTIES,
                     propertySettings

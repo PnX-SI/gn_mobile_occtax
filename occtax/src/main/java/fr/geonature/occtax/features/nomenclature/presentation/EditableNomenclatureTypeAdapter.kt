@@ -33,6 +33,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
     private val availableNomenclatureTypes = mutableListOf<EditableNomenclatureType>()
     private val selectedNomenclatureTypes = mutableListOf<EditableNomenclatureType>()
     private var showAllNomenclatureTypes = false
+    private var lockDefaultValues = false
 
     init {
         this.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
@@ -151,6 +152,10 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
         )
     }
 
+    fun lockDefaultValues(lock: Boolean = false) {
+        lockDefaultValues = lock
+    }
+
     private fun setSelectedNomenclatureTypes(
         nomenclatureTypes: List<EditableNomenclatureType>,
         notify: Boolean = false
@@ -242,13 +247,19 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
         }
 
         override fun onBind(nomenclatureType: EditableNomenclatureType) {
+            if (!lockDefaultValues) {
+                nomenclatureType.locked = false
+            }
+
             with(edit) {
-                startIconDrawable = ResourcesCompat.getDrawable(
+                startIconDrawable = if (lockDefaultValues) ResourcesCompat.getDrawable(
                     itemView.resources,
                     if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
                     itemView.context.theme
-                )
+                ) else null
                 setStartIconOnClickListener {
+                    if (!lockDefaultValues) return@setStartIconOnClickListener
+
                     nomenclatureType.locked = !nomenclatureType.locked
                     startIconDrawable = ResourcesCompat.getDrawable(
                         itemView.resources,
@@ -355,13 +366,19 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
         }
 
         override fun onBind(nomenclatureType: EditableNomenclatureType) {
+            if (!lockDefaultValues) {
+                nomenclatureType.locked = false
+            }
+
             with(edit) {
-                startIconDrawable = ResourcesCompat.getDrawable(
+                startIconDrawable = if (lockDefaultValues) ResourcesCompat.getDrawable(
                     itemView.resources,
                     if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
                     itemView.context.theme
-                )
+                ) else null
                 setStartIconOnClickListener {
+                    if (!lockDefaultValues) return@setStartIconOnClickListener
+                    
                     nomenclatureType.locked = !nomenclatureType.locked
                     startIconDrawable = ResourcesCompat.getDrawable(
                         itemView.resources,

@@ -16,6 +16,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.viewModels
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
@@ -31,6 +32,7 @@ import fr.geonature.commons.data.entity.NomenclatureType
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.commons.util.afterTextChanged
 import fr.geonature.occtax.R
+import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
 import fr.geonature.occtax.input.Input
 import fr.geonature.occtax.input.NomenclatureTypeViewType
 import fr.geonature.occtax.input.PropertyValue
@@ -64,6 +66,8 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
     @GeoNatureModuleName
     @Inject
     lateinit var moduleName: String
+
+    private val propertyValueModel: PropertyValueModel by viewModels()
 
     private lateinit var observersResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var datasetResultLauncher: ActivityResultLauncher<Intent>
@@ -366,6 +370,11 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
     }
 
     override fun refreshView() {
+        // clear any existing local property default values
+        if (arguments?.getBoolean(ARG_SAVE_DEFAULT_VALUES) == false) {
+            propertyValueModel.clearAllPropertyValues()
+        }
+
         setDefaultDatasetFromSettings()
 
         input?.getAllInputObserverIds()?.also { selectedInputObserverIdsFromInput ->
@@ -507,6 +516,7 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
     companion object {
 
         private const val ARG_DATE_SETTINGS = "arg_date_settings"
+        private const val ARG_SAVE_DEFAULT_VALUES = "arg_save_default_values"
 
         private const val LOADER_OBSERVERS_IDS = 1
         private const val LOADER_DATASET_ID = 2
@@ -519,13 +529,18 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
          * @return A new instance of [ObserversAndDateInputFragment]
          */
         @JvmStatic
-        fun newInstance(dateSettings: InputDateSettings) = ObserversAndDateInputFragment().apply {
-            arguments = Bundle().apply {
-                putParcelable(
-                    ARG_DATE_SETTINGS,
-                    dateSettings
-                )
+        fun newInstance(dateSettings: InputDateSettings, saveDefaultValues: Boolean = false) =
+            ObserversAndDateInputFragment().apply {
+                arguments = Bundle().apply {
+                    putParcelable(
+                        ARG_DATE_SETTINGS,
+                        dateSettings
+                    )
+                    putBoolean(
+                        ARG_SAVE_DEFAULT_VALUES,
+                        saveDefaultValues
+                    )
+                }
             }
-        }
     }
 }
