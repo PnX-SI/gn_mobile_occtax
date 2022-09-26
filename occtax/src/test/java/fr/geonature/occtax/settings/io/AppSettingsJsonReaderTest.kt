@@ -79,7 +79,7 @@ class AppSettingsJsonReaderTest {
                 ),
                 inputSettings = InputSettings(dateSettings = InputDateSettings.DEFAULT),
                 nomenclatureSettings = NomenclatureSettings(
-                    saveDefaultValues = false,
+                    saveDefaultValues = true,
                     information = arrayListOf(
                         PropertySettings(
                             "METH_OBS",

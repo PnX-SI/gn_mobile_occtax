@@ -125,7 +125,7 @@ class OnAppSettingsJsonReaderListenerImpl :
             return null
         }
 
-        val saveDefaultValues = false
+        var saveDefaultValues = false
         val information = mutableListOf<PropertySettings>()
         val counting = mutableListOf<PropertySettings>()
 
@@ -133,7 +133,7 @@ class OnAppSettingsJsonReaderListenerImpl :
 
         while (reader.hasNext()) {
             when (reader.nextName()) {
-                "save_default_values" -> reader.nextBooleanOrElse { false }
+                "save_default_values" -> saveDefaultValues = reader.nextBooleanOrElse { false }
                 "information" -> information.addAll(readPropertySettingsAsList(reader))
                 "counting" -> counting.addAll(readPropertySettingsAsList(reader))
             }
