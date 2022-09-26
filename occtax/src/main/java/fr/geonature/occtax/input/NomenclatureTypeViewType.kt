@@ -5,6 +5,7 @@ package fr.geonature.occtax.input
  *
  * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
  */
+@Deprecated(message = "see EditableNomenclatureType")
 enum class NomenclatureTypeViewType {
     NOMENCLATURE_TYPE,
     MORE,

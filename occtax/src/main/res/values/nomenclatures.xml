@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- nomenclature type default label -->
     <string name="nomenclature_meth_obs">Technical observation</string>
     <string name="nomenclature_eta_bio">Biological state</string>
     <string name="nomenclature_more">More information</string>
@@ -10,7 +11,7 @@
     <string name="nomenclature_occ_comportement">Behaviour</string>
     <string name="nomenclature_naturalite">Level of naturalness</string>
     <string name="nomenclature_preuve_exist">Proof of existence</string>
-    <string name="nomenclature_comment">Comment</string>
+    <string name="nomenclature_comment">Taxon comment</string>
     <string name="nomenclature_stade_vie">Life stage</string>
     <string name="nomenclature_sexe">Sex</string>
     <string name="nomenclature_obj_denbr">Purpose of the enumeration</string>

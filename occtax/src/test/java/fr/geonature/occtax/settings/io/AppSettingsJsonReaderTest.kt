@@ -79,7 +79,8 @@ class AppSettingsJsonReaderTest {
                 ),
                 inputSettings = InputSettings(dateSettings = InputDateSettings.DEFAULT),
                 nomenclatureSettings = NomenclatureSettings(
-                    arrayListOf(
+                    saveDefaultValues = true,
+                    information = arrayListOf(
                         PropertySettings(
                             "METH_OBS",
                             visible = true,
@@ -111,7 +112,7 @@ class AppSettingsJsonReaderTest {
                             default = false
                         )
                     ),
-                    arrayListOf(
+                    counting = arrayListOf(
                         PropertySettings(
                             "STADE_VIE",
                             visible = true,

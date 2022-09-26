@@ -28,6 +28,7 @@ import kotlin.math.ceil
  *
  * @author S. Grimault
  */
+@Deprecated("use EditableNomenclatureTypeAdapter")
 class NomenclatureTypesRecyclerViewAdapter(private val listener: OnNomenclatureTypesRecyclerViewAdapterListener) :
     RecyclerView.Adapter<NomenclatureTypesRecyclerViewAdapter.AbstractViewHolder>() {
 
