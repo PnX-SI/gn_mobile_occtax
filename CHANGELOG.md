@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.4.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.0-rc2) (2022-09-26, pre-release)
+
+### 🚀 Nouveautés
+
+* Refonte ergonomique des listes de choix des nomenclatures. 
+* Accélérer la saisie en permettant de mémoriser les dernières nomenclatures saisies (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
+
+### ⚠️ Notes de version
+
+* Code de version : 3083
+
 ## [2.4.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.0-rc1) (2022-09-10, pre-release)
 
 ### 🐛 Corrections
