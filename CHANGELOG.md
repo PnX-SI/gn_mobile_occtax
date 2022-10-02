@@ -1,5 +1,40 @@
 # Changelog
 
+## [2.4.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.0) (2022-10-02, release)
+
+### 🚀 Nouveautés
+
+* Refonte ergonomique des listes de choix des nomenclatures. Cette refonte ne concerne pour l'instant
+  que l'étape "Informations" lors de la saisie d'un taxon.
+* Accélérer la saisie en permettant de mémoriser les dernières nomenclatures saisies (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
+  Cette fonctionnalité est accessible via la propriété `nomenclature/save_default_values` dans le
+  [fichier de paramétrage](https://github.com/PnX-SI/gn_mobile_occtax/blob/develop/README.md#nomenclature-settings).
+* Amélioration sur la recherche des taxons, notamment sur la distinction des mots (avec ou sans
+  majuscules, avec ou sans accents) (https://github.com/PnX-SI/gn_mobile_occtax/issues/91).
+* Petites améliorations sur la présentation des jeux de données, aussi bien dans la page de
+  sélection des jeux de données que dans l'affichage du jeu de données sélectionnée dans la saisie (https://github.com/PnX-SI/gn_mobile_occtax/issues/120).
+* Petites améliorations sur la page de sélection des observateurs et sur la fonction de recherche
+  des observateurs (https://github.com/PnX-SI/gn_mobile_occtax/issues/142).
+* Petites améliorations sur les messages d'information lors de la synchronisation des données (https://github.com/PnX-SI/gn_mobile_occtax/issues/143).
+* Affichage du nom vernaculaire du taxon dans le bilan de la saisie (https://github.com/PnX-SI/gn_mobile_occtax/issues/153).
+* Ajout d'une fonction de filtre sur les rangs taxonomique des taxons dans la page du bilan de la
+  saisie (https://github.com/PnX-SI/gn_mobile_occtax/issues/166).
+* Affichage du nombre de taxon en en-tête de page (https://github.com/PnX-SI/gn_mobile_occtax/issues/167).
+* Permettre de modifier la date et l'heure de fin des relevés en fin de saisie (https://github.com/PnX-SI/gn_mobile_occtax/issues/168).
+* Refonte ergonomique sur l'enchaînement des écrans de la saisie. Le bilan de la saisie intervient
+  notamment après le pointage sur la carte si le relevé contient au moins un taxon (https://github.com/PnX-SI/gn_mobile_occtax/issues/177).
+
+### 🐛 Corrections
+
+* Défilement automatique du nom vernaculaire du taxon sélectionné (https://github.com/PnX-SI/gn_mobile_occtax/issues/49).
+* Validation sur l'ensemble des taxons ajoutés au relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/177).
+* Correction concernant la mémorisation de la sélection des observateurs lors de la saisie (https://github.com/PnX-SI/gn_mobile_occtax/issues/110).
+* Validation automatique du compte utilisateur lors de l'authentification (https://github.com/PnX-SI/gn_mobile_occtax/issues/184).
+
+### ⚠️ Notes de version
+
+* Code de version : 3090
+
 ## [2.4.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.0-rc2) (2022-09-26, pre-release)
 
 ### 🚀 Nouveautés

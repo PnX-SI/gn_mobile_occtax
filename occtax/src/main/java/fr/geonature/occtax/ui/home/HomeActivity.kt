@@ -430,7 +430,7 @@ class HomeActivity : AppCompatActivity() {
                     this@HomeActivity
                 ) {
                     if (it == null) {
-                        appSyncView?.setDataSyncStatus(it)
+                        appSyncView?.setDataSyncStatus(null)
                     }
 
                     it?.run {
