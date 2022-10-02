@@ -1,8 +1,10 @@
 package fr.geonature.occtax.ui.input.map
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import fr.geonature.commons.input.AbstractInput
+import androidx.fragment.app.activityViewModels
+import fr.geonature.commons.lifecycle.observeUntil
 import fr.geonature.commons.util.ThemeUtils
 import fr.geonature.maps.jts.geojson.GeometryUtils.fromPoint
 import fr.geonature.maps.jts.geojson.GeometryUtils.toPoint
@@ -14,9 +16,10 @@ import fr.geonature.maps.ui.overlay.feature.filter.ContainsFeaturesFilter
 import fr.geonature.maps.ui.widget.EditFeatureButton
 import fr.geonature.occtax.R
 import fr.geonature.occtax.input.Input
+import fr.geonature.occtax.input.InputViewModel
 import fr.geonature.occtax.ui.input.IInputFragment
-import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
-import fr.geonature.viewpager.ui.IValidateFragment
+import fr.geonature.viewpager.model.IPageWithValidationFragment
+import fr.geonature.viewpager.ui.OnPageFragmentListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
@@ -30,8 +33,12 @@ import org.osmdroid.views.MapView
  * @author S. Grimault
  */
 class InputMapFragment : MapFragment(),
-    IValidateFragment,
+    IPageWithValidationFragment,
     IInputFragment {
+
+    private val inputViewModel: InputViewModel by activityViewModels()
+
+    private lateinit var listener: OnPageFragmentListener
 
     private var input: Input? = null
 
@@ -53,6 +60,29 @@ class InputMapFragment : MapFragment(),
                     selectPOI(fromPoint(geometry))
                 }
             }
+        }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        if (context is OnPageFragmentListener) {
+            listener = context
+        } else {
+            throw RuntimeException("$context must implement ${OnPageFragmentListener::class.simpleName}")
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        inputViewModel.input.observeUntil(
+            viewLifecycleOwner,
+            { it != null }) {
+            if (it == null) return@observeUntil
+
+            input = it
+            refreshView()
         }
     }
 
@@ -86,14 +116,10 @@ class InputMapFragment : MapFragment(),
         }
     }
 
-    override fun setInput(input: AbstractInput) {
-        this.input = input as Input
-    }
-
     private fun clearInputSelection() {
         input?.geometry = null
 
-        (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+        listener.validateCurrentPage()
 
         CoroutineScope(Main).launch {
             getOverlays { overlay -> overlay is FeatureCollectionOverlay }
@@ -131,7 +157,7 @@ class InputMapFragment : MapFragment(),
                     .map { it.id }
                     .firstOrNull()
 
-            (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+            listener.validateCurrentPage()
         }
     }
 

@@ -10,19 +10,11 @@
     android:paddingStart="?attr/listPreferredItemPaddingStart"
     android:paddingEnd="?attr/listPreferredItemPaddingEnd">
 
-    <CheckBox
-        android:id="@android:id/checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
         android:id="@android:id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/listPreferredItemPaddingStart"
         android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
         android:ellipsize="marquee"
         android:marqueeRepeatLimit="marquee_forever"
@@ -30,8 +22,7 @@
         android:singleLine="true"
         android:textAppearance="?attr/textAppearanceListItem"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@android:id/text1"
-        app:layout_constraintEnd_toStartOf="@android:id/checkbox"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/last_names" />
@@ -43,8 +34,8 @@
         android:layout_marginStart="?attr/listPreferredItemPaddingStart"
         android:ellipsize="marquee"
         android:marqueeRepeatLimit="marquee_forever"
+        android:lines="3"
         android:scrollHorizontally="true"
-        android:singleLine="true"
         android:textAppearance="?attr/textAppearanceListItemSecondary"
         app:layout_constraintEnd_toEndOf="@android:id/title"
         app:layout_constraintStart_toStartOf="@android:id/title"

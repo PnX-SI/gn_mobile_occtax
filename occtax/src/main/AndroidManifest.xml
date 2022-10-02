@@ -49,6 +49,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.input.InputPagerFragmentActivity"
+            android:label="@string/activity_input_title"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity

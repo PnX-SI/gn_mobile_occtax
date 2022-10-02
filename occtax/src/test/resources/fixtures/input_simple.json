@@ -30,8 +30,11 @@
         "regne": "Animalia",
         "group2_inpn": "Ascidies",
         "properties": {
-          "meth_obs": {
-            "value": 41
+          "comment": {
+            "value": "Some comment"
+          },
+          "determiner": {
+            "value": "Determiner value"
           },
           "eta_bio": {
             "value": 29
@@ -39,23 +42,20 @@
           "meth_determin": {
             "value": 445
           },
-          "determiner": {
-            "value": "Determiner value"
-          },
-          "statut_bio": {
-            "value": 29
-          },
-          "occ_comportement": {
-            "value": 580
+          "meth_obs": {
+            "value": 41
           },
           "naturalite": {
             "value": 160
           },
+          "occ_comportement": {
+            "value": 580
+          },
           "preuve_exist": {
             "value": 81
           },
-          "comment": {
-            "value": "Some comment"
+          "statut_bio": {
+            "value": 29
           },
           "counting": [
             {
@@ -77,15 +77,15 @@
             }
           ]
         },
-        "id_nomenclature_obs_technique": 41,
+        "comment": "Some comment",
+        "determiner": "Determiner value",
         "id_nomenclature_bio_condition": 29,
         "id_nomenclature_determination_method": 445,
-        "determiner": "Determiner value",
-        "id_nomenclature_bio_status": 29,
-        "id_nomenclature_behaviour": 580,
+        "id_nomenclature_obs_technique": 41,
         "id_nomenclature_naturalness": 160,
+        "id_nomenclature_behaviour": 580,
         "id_nomenclature_exist_proof": 81,
-        "comment": "Some comment",
+        "id_nomenclature_bio_status": 29,
         "cor_counting_occtax": [
           {
             "id_nomenclature_life_stage": 2,

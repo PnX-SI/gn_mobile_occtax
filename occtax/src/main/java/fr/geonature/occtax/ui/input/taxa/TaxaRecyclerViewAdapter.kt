@@ -83,8 +83,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
             val checkbox: CheckBox = v.findViewById(android.R.id.checkbox)
             checkbox.isChecked = !checkbox.isChecked
 
-            val summary: TextView = v.findViewById(android.R.id.summary)
-            summary.isSelected = true
+            v.isSelected = true
 
             val taxon = v.tag as AbstractTaxon
 
@@ -227,8 +226,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
                     "${if (taxon.description.isNullOrBlank()) "" else "<i>${taxon.description ?: ""}</i>"}${if (taxon.rank.isNullOrBlank()) "" else "${if (taxon.description.isNullOrBlank()) "" else " - [${taxon.rank}]"} "}",
                     HtmlCompat.FROM_HTML_MODE_COMPACT
                 )
-                summary.isSelected = selectedTaxon?.id == taxon.id
-
+                itemView.isSelected = selectedTaxon?.id == taxon.id
                 checkbox.isChecked = selectedTaxon?.id == taxon.id
 
                 with(taxon.taxonArea) {

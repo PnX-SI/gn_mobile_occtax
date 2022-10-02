@@ -3,13 +3,17 @@ package fr.geonature.occtax.ui.input
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.core.graphics.ColorUtils
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.viewpager.widget.ViewPager
 import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.input.AbstractInput
+import fr.geonature.commons.util.KeyboardUtils.hideKeyboard
+import fr.geonature.commons.util.ThemeUtils
 import fr.geonature.maps.settings.MapSettings
 import fr.geonature.maps.ui.MapFragment
 import fr.geonature.maps.util.CheckPermissionLifecycleObserver
@@ -27,23 +31,21 @@ import fr.geonature.occtax.ui.input.map.InputMapFragment
 import fr.geonature.occtax.ui.input.observers.ObserversAndDateInputFragment
 import fr.geonature.occtax.ui.input.summary.InputTaxaSummaryFragment
 import fr.geonature.occtax.ui.input.taxa.TaxaFragment
-import fr.geonature.viewpager.ui.AbstractNavigationHistoryPagerFragmentActivity
+import fr.geonature.viewpager.model.IPageWithValidationFragment
 import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
-import fr.geonature.viewpager.ui.IValidateFragment
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.tinylog.kotlin.Logger
 import kotlin.coroutines.resume
 
 /**
- * [ViewPager] implementation as [AbstractPagerFragmentActivity] with navigation history support.
+ * `ViewPager2` implementation through [AbstractPagerFragmentActivity].
  *
  * @author S. Grimault
  */
 @AndroidEntryPoint
-class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivity(),
+class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
+    OnInputPageFragmentListener,
     MapFragment.OnMapFragmentPermissionsListener {
 
     private val inputViewModel: InputViewModel by viewModels()
@@ -59,6 +61,10 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // FIXME: this is a workaround to keep MapView alive from InputMapFragment…
+        // see: https://github.com/osmdroid/osmdroid/issues/1581
+        viewPager.offscreenPageLimit = 6
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             manageExternalStoragePermissionLifecycleObserver =
@@ -84,72 +90,108 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
         }
 
         Logger.info { "loading input: ${input.id}" }
+        inputViewModel.editInput(input)
 
-        CoroutineScope(Dispatchers.Main).launch {
-            pagerManager.load(input.id)
-        }
+        pageFragmentViewModel.set(
+            R.string.pager_fragment_observers_and_date_input_title to ObserversAndDateInputFragment.newInstance(
+                dateSettings = appSettings.inputSettings.dateSettings,
+                saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues ?: false
+            ),
+            R.string.pager_fragment_map_title to InputMapFragment.newInstance(
+                MapSettings.Builder.newInstance()
+                    .from(appSettings.mapSettings!!)
+                    .showCompass(showCompass(this))
+                    .showScale(showScale(this))
+                    .showZoom(showZoom(this))
+                    .build()
+            ),
+            R.string.pager_fragment_summary_title to InputTaxaSummaryFragment.newInstance(appSettings.inputSettings.dateSettings)
+        )
     }
 
     override fun onPause() {
         super.onPause()
 
-        if (input.status == AbstractInput.Status.DRAFT) {
-            inputViewModel.saveInput(input)
+        inputViewModel.input.value?.takeIf { it.status == AbstractInput.Status.DRAFT }?.also {
+            inputViewModel.saveInput(it)
         }
     }
 
-    override val pagerFragments: Map<Int, IValidateFragment>
-        get() = LinkedHashMap<Int, IValidateFragment>().apply {
-            put(
-                R.string.pager_fragment_observers_and_date_input_title,
-                ObserversAndDateInputFragment.newInstance(appSettings.inputSettings.dateSettings)
-            )
-            put(
-                R.string.pager_fragment_map_title,
-                InputMapFragment.newInstance(getMapSettings())
-            )
-            put(
-                R.string.pager_fragment_taxa_title,
-                TaxaFragment.newInstance(appSettings.areaObservationDuration)
-            )
-            put(
-                R.string.pager_fragment_information_title,
-                InformationFragment.newInstance(
-                    *appSettings.nomenclatureSettings?.information?.toTypedArray() ?: emptyArray()
-                )
-            )
-            put(
-                R.string.pager_fragment_counting_title,
-                CountingFragment.newInstance(
-                    *appSettings.nomenclatureSettings?.counting?.toTypedArray() ?: emptyArray()
-                )
-            )
-            put(
-                R.string.pager_fragment_summary_title,
-                InputTaxaSummaryFragment.newInstance()
-            )
-        }
+    override fun getDefaultTitle(): CharSequence {
+        return getString(R.string.activity_input_title)
+    }
+
+    override fun onNextAction(): Boolean {
+        return false
+    }
 
     override fun performFinishAction() {
-        inputViewModel.exportInput(
-            input,
-            appSettings
-        ) {
-            finish()
+        inputViewModel.input.value?.also {
+            inputViewModel.exportInput(
+                it,
+                appSettings
+            ) {
+                finish()
+            }
         }
     }
 
     override fun onPageSelected(position: Int) {
         super.onPageSelected(position)
 
-        val pageFragment = getCurrentPageFragment()
+        getCurrentPageFragment()?.also { page ->
+            if (page is IPageWithValidationFragment) {
+                // override the default next button color for the last page
+                nextButton.backgroundTintList = ColorStateList(
+                    arrayOf(
+                        intArrayOf(-android.R.attr.state_enabled),
+                        IntArray(0)
+                    ),
+                    intArrayOf(
+                        ColorUtils.setAlphaComponent(
+                            ThemeUtils.getColor(
+                                this,
+                                R.attr.colorOnSurface
+                            ),
+                            32
+                        ),
+                        if (position < ((viewPager.adapter?.itemCount
+                                ?: 0) - 1)
+                        ) ThemeUtils.getAccentColor(this)
+                        else ThemeUtils.getPrimaryColor(this)
+                    )
+                )
 
-        if (pageFragment is IInputFragment && ::input.isInitialized) {
-            pageFragment.setInput(input)
-            pageFragment.refreshView()
-            validateCurrentPage()
-            inputViewModel.saveInput(input)
+                hideKeyboard(page as Fragment)
+            }
         }
+    }
+
+    override fun startEditTaxon() {
+        pageFragmentViewModel.add(
+            R.string.pager_fragment_taxa_title to TaxaFragment.newInstance(appSettings.areaObservationDuration),
+            R.string.pager_fragment_information_title to InformationFragment.newInstance(
+                saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues ?: false,
+                *appSettings.nomenclatureSettings?.information?.toTypedArray()
+                    ?: emptyArray()
+            ),
+            R.string.pager_fragment_counting_title to CountingFragment.newInstance(
+                *appSettings.nomenclatureSettings?.counting?.toTypedArray()
+                    ?: emptyArray()
+            ),
+            R.string.pager_fragment_taxa_added_title to InputTaxaSummaryFragment.newInstance(appSettings.inputSettings.dateSettings)
+        )
+        goToNextPage()
+    }
+
+    override fun finishEditTaxon() {
+        input.clearCurrentSelectedInputTaxon()
+        removePage(
+            R.string.pager_fragment_taxa_title,
+            R.string.pager_fragment_information_title,
+            R.string.pager_fragment_counting_title,
+            R.string.pager_fragment_taxa_added_title
+        )
     }
 
     override suspend fun onStoragePermissionsGranted() =
@@ -174,15 +216,6 @@ class InputPagerFragmentActivity : AbstractNavigationHistoryPagerFragmentActivit
                 )
             }
         }
-
-    private fun getMapSettings(): MapSettings {
-        return MapSettings.Builder.newInstance()
-            .from(appSettings.mapSettings!!)
-            .showCompass(showCompass(this))
-            .showScale(showScale(this))
-            .showZoom(showZoom(this))
-            .build()
-    }
 
     companion object {
 

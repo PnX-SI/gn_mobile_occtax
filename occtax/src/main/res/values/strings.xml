@@ -6,6 +6,7 @@
 
     <string name="activity_login_title">Sign in</string>
     <string name="activity_preferences_title">Settings</string>
+    <string name="activity_input_title">Edit input</string>
     <string name="activity_dataset_title">Dataset</string>
     <string name="activity_observers_title">Observers</string>
     <string name="activity_taxa_filter_title">Taxa filters</string>
@@ -55,8 +56,6 @@
         <item quantity="other">%d selected</item>
     </plurals>
     <string name="action_save">Save</string>
-    <string name="action_comment_add">Add comment</string>
-    <string name="action_comment_edit">Edit comment</string>
 
     <string name="alert_new_app_version_available_title">New version available</string>
     <string name="alert_new_app_version_available_description">A new version of this app is available.\nWould you like to upgrade now?</string>
@@ -69,9 +68,6 @@
     <string name="alert_dialog_input_delete_title">Delete this input?</string>
     <string name="alert_dialog_counting_delete_title">Delete this counting?</string>
     <string name="alert_dialog_taxon_delete_title">Delete this taxon?</string>
-    <string name="alert_dialog_add_comment_title">Add a comment</string>
-    <string name="alert_dialog_edit_comment_title">Edit a comment</string>
-    <string name="alert_dialog_add_comment_hint">Add a comment</string>
     <string name="alert_dialog_ok">OK</string>
     <string name="alert_dialog_cancel">Cancel</string>
 
@@ -94,7 +90,8 @@
 
     <string name="pager_fragment_observers_and_date_input_title">Observers &#38; date</string>
     <string name="pager_fragment_map_title">Pointing</string>
-    <string name="pager_fragment_taxa_title">Taxa</string>
+    <string name="pager_fragment_taxa_added_title">Taxa added</string>
+    <string name="pager_fragment_taxa_title">Select taxon</string>
     <string name="pager_fragment_information_title">Information</string>
     <string name="pager_fragment_counting_title">Counting</string>
     <string name="pager_fragment_summary_title">Summary</string>
@@ -106,19 +103,20 @@
     </plurals>
     <string name="observers_and_date_selected_observers_no_data">No selected observer.\nAdd one by tapping the "Add" button.</string>
     <string name="observers_and_date_dataset">Dataset</string>
-    <string name="observers_and_date_date">Date</string>
-    <string name="observers_and_date_date_hint">Input date</string>
-    <string name="observers_and_date_date_start_hint">Start date</string>
-    <string name="observers_and_date_date_end_hint">End date</string>
-    <string name="observers_and_date_error_date_start_not_set">Missing start date</string>
-    <string name="observers_and_date_error_date_start_after_now">Start date should be set before now</string>
-    <string name="observers_and_date_error_date_end_not_set">Missing end date</string>
-    <string name="observers_and_date_error_date_end_before_start_date">End date should be after start date</string>
-    <string name="observers_and_date_date_format">EEE dd MMM yyyy</string>
-    <string name="observers_and_date_datetime_format">EEE dd MMM yyyy \'at\' HH:mm</string>
-    <string name="observers_and_date_comment">Input comment</string>
-    <string name="observers_and_date_comment_add_hint">Add a comment</string>
-    <string name="observers_and_date_comment_edit_hint">Edit a comment</string>
+
+    <string name="input_date">Date</string>
+    <string name="input_date_hint">Input date</string>
+    <string name="input_date_start_hint">Start date</string>
+    <string name="input_date_end_hint">End date</string>
+    <string name="input_error_date_start_not_set">Missing start date</string>
+    <string name="input_error_date_start_after_now">Start date should be set before now</string>
+    <string name="input_error_date_end_not_set">Missing end date</string>
+    <string name="input_error_date_end_before_start_date">End date should be after start date</string>
+    <string name="input_date_format">EEE dd MMM yyyy</string>
+    <string name="input_datetime_format">EEE dd MMM yyyy \'at\' HH:mm</string>
+    <string name="input_comment">Input comment</string>
+    <string name="input_comment_add_hint">Add a comment</string>
+    <string name="input_comment_edit_hint">Edit a comment</string>
 
     <plurals name="taxa_found">
         <item quantity="one">%d taxon found</item>
@@ -149,9 +147,7 @@
         <item quantity="other">%d days</item>
     </plurals>
 
-    <string name="information_action_more">More information</string>
-    <string name="information_determiner_hint">Add determiner</string>
-    <string name="information_comment_hint">Add comment</string>
+    <string name="information_no_data">⚠ No nomenclature found.\nPlease start a data synchronization.</string>
 
     <string name="counting_no_data">No counting.\nCreate a new one by tapping the + button.</string>
     <string name="counting_main_label">Counting #%d</string>
@@ -162,13 +158,18 @@
     <string name="counting_min_label">Min</string>
     <string name="counting_max_label">Max</string>
 
+    <plurals name="summary_taxa_subtitle">
+        <item quantity="one">%d taxon</item>
+        <item quantity="other">%d taxa</item>
+    </plurals>
     <string name="summary_no_data">No input taxon.\nCreate a new one by tapping the + button.</string>
     <string name="summary_taxon_information"><![CDATA[<b>%1$s:</b>]]> <![CDATA[<i>%2$s</i>]]></string>
+    <string name="summary_taxon_information_empty">⚠ no information</string>
     <plurals name="summary_taxon_counting">
         <item quantity="one">one counting</item>
         <item quantity="other">%d counting</item>
     </plurals>
-    <string name="summary_taxon_counting_zero">no counting</string>
+    <string name="summary_taxon_counting_zero">⚠ no counting</string>
     <string name="summary_snackbar_input_taxon_deleted">Input taxon deleted</string>
     <string name="summary_snackbar_input_taxon_undo">Undo</string>
     <string name="summary_toast_no_input_taxon">No input taxon.\nRedirecting to the last valid step.</string>

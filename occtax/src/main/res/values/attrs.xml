@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <declare-styleable name="InputDateView">
+        <attr name="title" />
+    </declare-styleable>
+
+    <declare-styleable name="ActionView">
+        <attr name="title" />
+        <attr name="no_data" />
+        <attr name="action" />
+        <attr name="action_empty" />
+        <attr name="action_enabled" />
+        <attr name="content_visibility" format="enum">
+            <enum name="visible" value="0" />
+            <enum name="invisible" value="4" />
+            <enum name="gone" value="8" />
+        </attr>
+    </declare-styleable>
+
     <declare-styleable name="ListItemActionView">
         <attr name="title" />
         <attr name="no_data" format="reference" />

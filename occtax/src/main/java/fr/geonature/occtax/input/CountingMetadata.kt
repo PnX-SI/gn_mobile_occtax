@@ -16,7 +16,7 @@ class CountingMetadata() : Parcelable {
         internal set
 
     val properties: SortedMap<String, PropertyValue> =
-        TreeMap<String, PropertyValue> { o1, o2 ->
+        TreeMap { o1, o2 ->
             val i1 = defaultMnemonic.indexOfFirst { it.first == o1 }
             val i2 = defaultMnemonic.indexOfFirst { it.first == o2 }
 
@@ -100,6 +100,7 @@ class CountingMetadata() : Parcelable {
          * * first value: mnemonic code from nomenclature type
          * * second value: the corresponding view type
          */
+        @Deprecated("see: INomenclatureSettingsLocalDataSource")
         val defaultMnemonic = arrayOf(
             Pair(
                 "STADE_VIE",

@@ -5,8 +5,6 @@ plugins {
     id 'kotlin-kapt'
 }
 
-version = "2.2.0"
-
 android {
     compileSdkVersion 31
 
@@ -23,8 +21,8 @@ android {
         applicationId "fr.geonature.occtax2"
         minSdkVersion 26
         targetSdkVersion 31
-        versionCode 3070
-        versionName "2.3.0"
+        versionCode 3090
+        versionName "2.4.0"
         buildConfigField "String", "BUILD_DATE", "\"" + new Date().getTime() + "\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         archivesBaseName = project.name + "-" + versionName
@@ -88,6 +86,11 @@ dependencies {
     runtimeOnly "org.tinylog:tinylog-impl:$tinylog_version"
 
     // Testing dependencies
+    testImplementation 'androidx.arch.core:core-testing:2.1.0'
+    testImplementation 'androidx.test.ext:junit-ktx:1.1.3'
+    testImplementation 'io.mockk:mockk:1.12.3'
+    testImplementation 'io.mockk:mockk-agent-jvm:1.12.3'
     testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1'
     testImplementation 'org.robolectric:robolectric:4.8.1'
 }

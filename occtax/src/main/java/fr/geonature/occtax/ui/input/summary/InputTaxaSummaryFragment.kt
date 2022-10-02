@@ -1,9 +1,12 @@
 package fr.geonature.occtax.ui.input.summary
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -11,56 +14,81 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
-import android.widget.TextView
+import android.widget.ProgressBar
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat.getSystemService
-import androidx.fragment.app.Fragment
+import androidx.core.view.get
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import fr.geonature.commons.input.AbstractInput
+import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.input.AbstractInputTaxon
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.ui.input.IInputFragment
-import fr.geonature.occtax.ui.shared.dialog.CommentDialogFragment
-import fr.geonature.viewpager.ui.AbstractPagerFragmentActivity
-import fr.geonature.viewpager.ui.IValidateFragment
+import fr.geonature.occtax.input.InputTaxon
+import fr.geonature.occtax.settings.InputDateSettings
+import fr.geonature.occtax.ui.input.AbstractInputFragment
+import fr.geonature.occtax.ui.input.taxa.Filter
+import fr.geonature.occtax.ui.input.taxa.FilterTaxonomy
+import fr.geonature.occtax.ui.input.taxa.TaxaFilterActivity
+import fr.geonature.occtax.ui.shared.dialog.InputDateDialogFragment
+import java.util.Date
 
 /**
  * Summary of all edited taxa.
  *
  * @author S. Grimault
  */
-class InputTaxaSummaryFragment : Fragment(),
-    IValidateFragment,
-    IInputFragment {
+class InputTaxaSummaryFragment : AbstractInputFragment() {
 
-    private var input: Input? = null
+    private lateinit var savedState: Bundle
+    private lateinit var dateSettings: InputDateSettings
+    private lateinit var taxaFilterResultLauncher: ActivityResultLauncher<Intent>
+
     private var adapter: InputTaxaSummaryRecyclerViewAdapter? = null
-    private var recyclerView: RecyclerView? = null
-    private var emptyTextView: TextView? = null
-    private var fab: ExtendedFloatingActionButton? = null
+    private var progressBar: ProgressBar? = null
+    private var emptyTextView: View? = null
+    private var filterChipGroup: ChipGroup? = null
+    private var startEditTaxon = false
 
-    private val onCommentDialogFragmentListener =
-        object : CommentDialogFragment.OnCommentDialogFragmentListener {
-            override fun onChanged(comment: String?) {
-                input?.comment = comment
-                activity?.invalidateOptionsMenu()
+    private val onInputDateDialogFragmentListener =
+        object : InputDateDialogFragment.OnInputDateDialogFragmentListener {
+            override fun onDatesChanged(startDate: Date, endDate: Date) {
+                input?.apply {
+                    this.startDate = startDate
+                    this.endDate = endDate
+                }
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        savedState = savedInstanceState ?: Bundle()
+        dateSettings = arguments?.getParcelable(ARG_DATE_SETTINGS) ?: InputDateSettings.DEFAULT
+
         val supportFragmentManager = activity?.supportFragmentManager ?: return
 
-        (supportFragmentManager.findFragmentByTag(COMMENT_DIALOG_FRAGMENT) as CommentDialogFragment?)?.also {
-            it.setOnCommentDialogFragmentListener(onCommentDialogFragmentListener)
+        (supportFragmentManager.findFragmentByTag(INPUT_DATE_DIALOG_FRAGMENT) as InputDateDialogFragment?)?.also {
+            it.setOnInputDateDialogFragmentListenerListener(onInputDateDialogFragmentListener)
         }
+
+        taxaFilterResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
+                if ((activityResult.resultCode != Activity.RESULT_OK) || (activityResult.data == null)) {
+                    return@registerForActivityResult
+                }
+
+                val selectedFilters =
+                    activityResult.data?.getParcelableArrayExtra(TaxaFilterActivity.EXTRA_SELECTED_FILTERS)
+                        ?.map { it as Filter<*> }?.toTypedArray() ?: emptyArray()
+                applyFilters(*selectedFilters)
+            }
     }
 
     override fun onCreateView(
@@ -69,7 +97,7 @@ class InputTaxaSummaryFragment : Fragment(),
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(
-            R.layout.fragment_recycler_view_fab,
+            R.layout.fragment_input_summary,
             container,
             false
         )
@@ -87,29 +115,25 @@ class InputTaxaSummaryFragment : Fragment(),
         // we have a menu item to show in action bar
         setHasOptionsMenu(true)
 
-        recyclerView = view.findViewById(android.R.id.list)
-        fab = view.findViewById(R.id.fab)
-
+        val recyclerView = view.findViewById<RecyclerView>(android.R.id.list)
+        progressBar = view.findViewById(android.R.id.progress)
         emptyTextView = view.findViewById(android.R.id.empty)
-        emptyTextView?.text = getString(R.string.summary_no_data)
+        filterChipGroup = view.findViewById(R.id.chip_group_filter)
 
-        fab?.apply {
-            setText(R.string.action_add_taxon)
-            extend()
+        view.findViewById<ExtendedFloatingActionButton>(R.id.fab).apply {
             setOnClickListener {
-                ((activity as AbstractPagerFragmentActivity?))?.also {
-                    input?.clearCurrentSelectedInputTaxon()
-                    it.goToPreviousPage()
-                    it.goToNextPage()
-                }
+                startEditTaxon = true
+                input?.clearCurrentSelectedInputTaxon()
+                listener.startEditTaxon()
             }
         }
 
         adapter = InputTaxaSummaryRecyclerViewAdapter(object :
             AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<AbstractInputTaxon> {
             override fun onClick(item: AbstractInputTaxon) {
+                startEditTaxon = true
                 input?.setCurrentSelectedInputTaxonId(item.taxon.id)
-                (activity as AbstractPagerFragmentActivity?)?.goToPageByKey(R.string.pager_fragment_information_title)
+                listener.startEditTaxon()
             }
 
             override fun onLongClicked(
@@ -134,7 +158,7 @@ class InputTaxaSummaryFragment : Fragment(),
                         ) { dialog, _ ->
                             adapter?.remove(item)
                             input?.removeInputTaxon(item.taxon.id)
-                            (activity as AbstractPagerFragmentActivity?)?.validateCurrentPage()
+                            listener.validateCurrentPage()
 
                             dialog.dismiss()
                         }
@@ -182,6 +206,34 @@ class InputTaxaSummaryFragment : Fragment(),
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(savedState.apply { putAll(outState) })
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        Handler(Looper.getMainLooper()).post {
+            // bypass this page and redirect to the previous one if we have started editing the first taxon
+            if (startEditTaxon && input?.getInputTaxa()?.isEmpty() == true) {
+                startEditTaxon = false
+                listener.goToPreviousPage()
+                return@post
+            }
+
+            // no taxon added yet: redirect to the edit taxon pages
+            if (input?.getInputTaxa()?.isEmpty() == true) {
+                startEditTaxon = true
+                listener.startEditTaxon()
+                return@post
+            }
+
+            // finish taxon editing workflow
+            startEditTaxon = false
+            listener.finishEditTaxon()
+        }
+    }
+
     override fun onCreateOptionsMenu(
         menu: Menu,
         inflater: MenuInflater
@@ -192,37 +244,56 @@ class InputTaxaSummaryFragment : Fragment(),
             inflater
         )
 
-        inflater.inflate(
-            R.menu.comment,
-            menu
-        )
+        with(inflater) {
+            inflate(
+                R.menu.date,
+                menu
+            )
+            inflate(
+                R.menu.filter,
+                menu
+            )
+        }
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
 
-        val commentItem = menu.findItem(R.id.menu_comment)
-        commentItem.title =
-            if (TextUtils.isEmpty(input?.comment)) getString(R.string.action_comment_add) else getString(
-                R.string.action_comment_edit
-            )
+        val dateMenuItem = menu.findItem(R.id.menu_date)
+        dateMenuItem.isVisible = dateSettings.endDateSettings != null
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.menu_comment -> {
+            R.id.menu_date -> {
                 val supportFragmentManager = activity?.supportFragmentManager ?: return true
 
-                CommentDialogFragment.newInstance(input?.comment)
+                InputDateDialogFragment.newInstance(
+                    InputDateSettings(endDateSettings = dateSettings.endDateSettings),
+                    input?.startDate ?: Date(),
+                    input?.endDate
+                )
                     .apply {
-                        setOnCommentDialogFragmentListener(onCommentDialogFragmentListener)
+                        setOnInputDateDialogFragmentListenerListener(onInputDateDialogFragmentListener)
                         show(
                             supportFragmentManager,
-                            COMMENT_DIALOG_FRAGMENT
+                            INPUT_DATE_DIALOG_FRAGMENT
                         )
                     }
 
                 return true
+            }
+            R.id.menu_filter -> {
+                val context = context ?: return true
+
+                taxaFilterResultLauncher.launch(
+                    TaxaFilterActivity.newIntent(
+                        context,
+                        filter = getSelectedFilters().toTypedArray()
+                    )
+                )
+
+                true
             }
             else -> super.onOptionsItemSelected(item)
         }
@@ -233,7 +304,15 @@ class InputTaxaSummaryFragment : Fragment(),
     }
 
     override fun getSubtitle(): CharSequence? {
-        return input?.getCurrentSelectedInputTaxon()?.taxon?.name
+        val context = context ?: return null
+
+        return input?.getInputTaxa()?.size?.let {
+            context.resources.getQuantityString(
+                R.plurals.summary_taxa_subtitle,
+                it,
+                it
+            )
+        }
     }
 
     override fun pagingEnabled(): Boolean {
@@ -241,22 +320,127 @@ class InputTaxaSummaryFragment : Fragment(),
     }
 
     override fun validate(): Boolean {
-        return this.input?.getCurrentSelectedInputTaxon() != null
+        return startEditTaxon || (this.input?.getInputTaxa() ?: emptyList()).all {
+            it is InputTaxon && it.properties.isNotEmpty() && it.getCounting().isNotEmpty()
+        }
     }
 
     override fun refreshView() {
         // FIXME: this is a workaround to refresh adapter's list as getInputTaxa() items are not immutable...
         if ((adapter?.itemCount ?: 0) > 0) adapter?.clear()
-        adapter?.setItems(input?.getInputTaxa() ?: emptyList())
+
+        val selectedFilters =
+            savedState.getParcelableArray(KEY_SELECTED_FILTERS)?.map { it as Filter<*> }
+                ?.toList() ?: emptyList()
+        val filterByTaxonomy =
+            selectedFilters.find { filter -> filter.type == Filter.FilterType.TAXONOMY }?.value as Taxonomy?
+
+        adapter?.setItems((input?.getInputTaxa() ?: emptyList()).filter {
+            val taxonomy = filterByTaxonomy ?: return@filter true
+
+            // filter by kingdom only
+            if (taxonomy.group == Taxonomy.ANY) {
+                return@filter it.taxon.taxonomy.kingdom == taxonomy.kingdom
+            }
+
+            it.taxon.taxonomy == taxonomy
+        })
     }
 
-    override fun setInput(input: AbstractInput) {
-        this.input = input as Input
+    private fun applyFilters(vararg filter: Filter<*>) {
+        savedState.putParcelableArray(
+            KEY_SELECTED_FILTERS,
+            filter
+        )
+
+        val selectedTaxonomy =
+            filter.find { it.type == Filter.FilterType.TAXONOMY }?.value as Taxonomy?
+
+        filterByTaxonomy(selectedTaxonomy)
+        refreshView()
+    }
+
+    private fun filterByTaxonomy(selectedTaxonomy: Taxonomy?) {
+        val filterChipGroup = filterChipGroup ?: return
+        val context = context ?: return
+
+        val taxonomyChipsToDelete = arrayListOf<Chip>()
+
+        for (i in 0 until filterChipGroup.childCount) {
+            with(filterChipGroup[i]) {
+                if (this is Chip && tag is Taxonomy) {
+                    taxonomyChipsToDelete.add(this)
+                }
+            }
+        }
+
+        taxonomyChipsToDelete.forEach {
+            filterChipGroup.removeView(it)
+        }
+
+        filterChipGroup.visibility = if (filterChipGroup.childCount > 0) View.VISIBLE else View.GONE
+
+        if (selectedTaxonomy != null) {
+            filterChipGroup.visibility = View.VISIBLE
+
+            // build kingdom taxonomy filter chip
+            with(
+                LayoutInflater.from(context).inflate(
+                    R.layout.chip,
+                    filterChipGroup,
+                    false
+                ) as Chip
+            ) {
+                tag = Taxonomy(selectedTaxonomy.kingdom)
+                text = selectedTaxonomy.kingdom
+                setOnClickListener {
+                    applyFilters(*getSelectedFilters().filter { it.type != Filter.FilterType.TAXONOMY }
+                        .toTypedArray())
+                }
+                setOnCloseIconClickListener {
+                    applyFilters(*getSelectedFilters().filter { it.type != Filter.FilterType.TAXONOMY }
+                        .toTypedArray())
+                }
+
+                filterChipGroup.addView(this)
+            }
+
+            // build group taxonomy filter chip
+            if (selectedTaxonomy.group != Taxonomy.ANY) {
+                with(
+                    LayoutInflater.from(context).inflate(
+                        R.layout.chip,
+                        filterChipGroup,
+                        false
+                    ) as Chip
+                ) {
+                    tag = selectedTaxonomy
+                    text = selectedTaxonomy.group
+                    setOnClickListener {
+                        applyFilters(*(getSelectedFilters().filter { filter -> filter.type != Filter.FilterType.TAXONOMY }
+                            .toTypedArray() + mutableListOf(FilterTaxonomy(Taxonomy((it.tag as Taxonomy).kingdom)))))
+                    }
+                    setOnCloseIconClickListener {
+                        applyFilters(*(getSelectedFilters().filter { filter -> filter.type != Filter.FilterType.TAXONOMY }
+                            .toTypedArray() + mutableListOf(FilterTaxonomy(Taxonomy((it.tag as Taxonomy).kingdom)))))
+                    }
+
+                    filterChipGroup.addView(this)
+                }
+            }
+        }
+    }
+
+    private fun getSelectedFilters(): List<Filter<*>> {
+        return savedState.getParcelableArray(KEY_SELECTED_FILTERS)?.map { it as Filter<*> }
+            ?.toList() ?: emptyList()
     }
 
     companion object {
 
-        private const val COMMENT_DIALOG_FRAGMENT = "comment_dialog_fragment"
+        private const val INPUT_DATE_DIALOG_FRAGMENT = "input_date_dialog_fragment"
+        private const val ARG_DATE_SETTINGS = "arg_date_settings"
+        private const val KEY_SELECTED_FILTERS = "key_selected_filters"
 
         /**
          * Use this factory method to create a new instance of [InputTaxaSummaryFragment].
@@ -264,6 +448,13 @@ class InputTaxaSummaryFragment : Fragment(),
          * @return A new instance of [InputTaxaSummaryFragment]
          */
         @JvmStatic
-        fun newInstance() = InputTaxaSummaryFragment()
+        fun newInstance(dateSettings: InputDateSettings) = InputTaxaSummaryFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(
+                    ARG_DATE_SETTINGS,
+                    dateSettings
+                )
+            }
+        }
     }
 }

@@ -29,6 +29,7 @@
     ]
   },
   "nomenclature": {
+    "save_default_values": true,
     "information": [
       "METH_OBS",
       {

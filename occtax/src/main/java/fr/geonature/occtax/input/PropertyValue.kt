@@ -4,6 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.input.AbstractInputTaxon
+import org.tinylog.Logger
 import java.io.Serializable
 
 /**
@@ -17,7 +18,7 @@ data class PropertyValue(
     val value: Serializable?
 ) : Parcelable {
 
-    internal constructor(source: Parcel) : this(
+    private constructor(source: Parcel) : this(
         source.readString()!!,
         source.readString(),
         source.readSerializable()
@@ -51,6 +52,10 @@ data class PropertyValue(
             code: String,
             nomenclature: Nomenclature?
         ): PropertyValue {
+            if (nomenclature?.defaultLabel.isNullOrEmpty()) {
+                Logger.warn { "no label found for nomenclature '$code:${nomenclature?.code}'" }
+            }
+
             return PropertyValue(
                 code,
                 nomenclature?.defaultLabel,

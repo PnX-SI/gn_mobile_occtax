@@ -7,8 +7,7 @@
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     android:minHeight="?attr/listPreferredItemHeightLarge"
-    android:paddingStart="?attr/listPreferredItemPaddingStart"
-    android:paddingEnd="?attr/listPreferredItemPaddingEnd">
+    android:paddingHorizontal="@dimen/padding_default">
 
     <TextView
         android:id="@android:id/title"
@@ -24,22 +23,24 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/last_names" />
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chip_group_filter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="?attr/listPreferredItemPaddingStart"
-        android:elevation="4dp"
-        app:chipSpacing="@dimen/padding_default"
-        app:layout_constraintTop_toBottomOf="@android:id/title"
-        app:singleLine="true"
-        app:singleSelection="true" />
-
     <TextView
         android:id="@android:id/text1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="?attr/listPreferredItemPaddingStart"
+        android:layout_marginStart="@dimen/padding_default"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textAppearance="?attr/textAppearanceListItemSecondary"
+        app:layout_constraintEnd_toEndOf="@android:id/title"
+        app:layout_constraintStart_toStartOf="@android:id/title"
+        app:layout_constraintTop_toBottomOf="@android:id/title"
+        tools:text="@tools:sample/first_names" />
+
+    <TextView
+        android:id="@android:id/summary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_default"
         android:ellipsize="marquee"
         android:marqueeRepeatLimit="marquee_forever"
         android:scrollHorizontally="true"
@@ -47,7 +48,7 @@
         android:textAppearance="?attr/textAppearanceListItemSecondary"
         app:layout_constraintEnd_toEndOf="@android:id/title"
         app:layout_constraintStart_toStartOf="@android:id/title"
-        app:layout_constraintTop_toBottomOf="@+id/chip_group_filter"
+        app:layout_constraintTop_toBottomOf="@android:id/text1"
         tools:text="@tools:sample/lorem/random" />
 
     <TextView
@@ -57,9 +58,9 @@
         android:ellipsize="end"
         android:singleLine="true"
         android:textAppearance="?attr/textAppearanceListItemSecondary"
-        app:layout_constraintEnd_toEndOf="@android:id/text1"
-        app:layout_constraintStart_toStartOf="@android:id/text1"
-        app:layout_constraintTop_toBottomOf="@android:id/text1"
+        app:layout_constraintEnd_toEndOf="@android:id/summary"
+        app:layout_constraintStart_toStartOf="@android:id/summary"
+        app:layout_constraintTop_toBottomOf="@android:id/summary"
         tools:text="@tools:sample/lorem/random" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

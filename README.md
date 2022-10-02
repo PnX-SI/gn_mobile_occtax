@@ -16,7 +16,7 @@ Based on [datasync module](https://github.com/PnX-SI/gn_mobile_core) to synchron
 ## Launcher icons
 
 | Name    | Flavor    | Launcher icon                                                                                                                                                                                                                                                    |
-| ------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|---------|-----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Default | _generic_ | ![PNX](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/main/res/mipmap-xxxhdpi/ic_launcher.png) ![PNX_debug](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/debug/res/mipmap-xxxhdpi/ic_launcher.png) |
 
 ## Settings
@@ -81,16 +81,17 @@ Example:
 
 ### Parameters description
 
-| Parameter                   | UI      | Description                                                                                        | Default value |
-| --------------------------- | ------- | -------------------------------------------------------------------------------------------------- | ------------- |
-| `area_observation_duration` | &#9744; | Area observation duration period (in days)                                                         | 365           |
-| `sync`                      | &#9744; | Data synchronization settings (cf. https://github.com/PnX-SI/gn_mobile_core/tree/develop/datasync) |               |
-| `map`                       | &#9744; | Maps settings (cf. https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps)                     |               |
-| `input`                     | &#9744; | Input form settings                                                                                |               |
-| `input/date`                | &#9744; | Date settings                                                                                      |               |
-| `nomenclature`              | &#9744; | Nomenclature settings                                                                              |               |
-| `nomenclature/information`  | &#9744; | Information settings (as array)                                                                    |               |
-| `nomenclature/counting`     | &#9744; | Counting settings (as array)                                                                       |               |
+| Parameter                          | UI      | Description                                                                                        | Default value |
+|------------------------------------|---------|----------------------------------------------------------------------------------------------------|---------------|
+| `area_observation_duration`        | &#9744; | Area observation duration period (in days)                                                         | 365           |
+| `sync`                             | &#9744; | Data synchronization settings (cf. https://github.com/PnX-SI/gn_mobile_core/tree/develop/datasync) |               |
+| `map`                              | &#9744; | Maps settings (cf. https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps)                     |               |
+| `input`                            | &#9744; | Input form settings                                                                                |               |
+| `input/date`                       | &#9744; | Date settings                                                                                      |               |
+| `nomenclature`                     | &#9744; | Nomenclature settings                                                                              |               |
+| `nomenclature/save_default_values` | &#9744; | Save default nomenclature values                                                                   | false         |
+| `nomenclature/information`         | &#9744; | Information settings (as array)                                                                    |               |
+| `nomenclature/counting`            | &#9744; | Counting settings (as array)                                                                       |               |
 
 ### Input settings
 
@@ -101,7 +102,7 @@ Allows to configure settings related to user input.
 How the user can set the start and end date of the input:
 
 | Parameter         | Description                                                                  | Default value |
-| ----------------- | ---------------------------------------------------------------------------- | ------------- |
+|-------------------|------------------------------------------------------------------------------|---------------|
 | `enable_end_date` | Whether to edit as well the end date of the input                            | `false`       |
 | `enable_hours`    | Whether to edit as well the hour part of the start and end date (if enabled) | `false`       |
 
@@ -116,15 +117,18 @@ If nothing is configured, only the start date without the hour part is editable.
 
 ### Nomenclature settings
 
-Allows to define if fields are displayed by default and if they are editable (visible). If a field is not editable (visible),
-it will use the default value set in Occtax database.
+`save_default_values`: Allows to save locally and only during a session of use selected nomenclature
+values as default values (default: `false`).
+
+Allows to define if fields are displayed by default and if they are editable (visible).
+If a field is not editable (visible), it will use the default value set in Occtax database.
 
 All these settings may not be defined and the default values will then be used instead:
 
 **Information settings**
 
 | Nomenclature     | Label                | Displayed by default | Editable (visible) |
-| ---------------- | -------------------- | -------------------- | ------------------ |
+|------------------|----------------------|----------------------|--------------------|
 | METH_OBS         | Observation methods  | `true`               | `true`             |
 | ETA_BIO          | Biological state     | `true`               | `true`             |
 | METH_DETERMIN    | Determination method | `false`              | `true`             |
@@ -138,7 +142,7 @@ All these settings may not be defined and the default values will then be used i
 **Counting settings**
 
 | Nomenclature | Label                      | Displayed by default | Editable (visible) |
-| ------------ | -------------------------- | -------------------- | ------------------ |
+|--------------|----------------------------|----------------------|--------------------|
 | STADE_VIE    | Life stage                 | `true`               | `true`             |
 | SEXE         | Sex                        | `true`               | `true`             |
 | OBJ_DENBR    | Purpose of the enumeration | `true`               | `true`             |
@@ -153,6 +157,7 @@ You can override these default settings by adding a property for each nomenclatu
 ```json
 {
   "nomenclature": {
+    "save_default_values": false,
     "information": [
       "METH_OBS",
       {
@@ -192,7 +197,7 @@ You can override these default settings by adding a property for each nomenclatu
 Each property may be a simple string representing the nomenclature attribute to show or an object with the following properties:
 
 | Property  | Description                                                           | Mandatory |
-| --------- | --------------------------------------------------------------------- | --------- |
+|-----------|-----------------------------------------------------------------------|-----------|
 | `key`     | The nomenclature attribute                                            | &#9745;   |
 | `visible` | If this attribute is visible (thus editable) or not (default: `true`) | &#9744;   |
 | `default` | If this attribute is shown by default (default: `true`)               | &#9744;   |
@@ -275,4 +280,4 @@ A full build can be executed with the following command:
 
 ## Financial support
 
-This application have been developped with the financial support of the [Office Français de la Biodiversité](https://www.ofb.gouv.fr/)
+This application have been developed with the financial support of the [Office Français de la Biodiversité](https://www.ofb.gouv.fr).

@@ -10,9 +10,7 @@ import fr.geonature.commons.input.AbstractInput
 interface IInputFragment {
 
     /**
-     * Sets the current [AbstractInput] to update.
-     *
-     * @param input the current [AbstractInput] to update
+     * Updates the current view.
      */
-    fun setInput(input: AbstractInput)
+    fun refreshView()
 }

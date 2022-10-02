@@ -5,7 +5,6 @@ import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.l4digital.fastscroll.FastScroller
@@ -36,15 +35,9 @@ class DatasetRecyclerViewAdapter(private val listener: OnDatasetRecyclerViewAdap
             val text1: TextView = v.findViewById(android.R.id.text1)
             text1.isSelected = true
 
-            val checkbox: CheckBox = v.findViewById(android.R.id.checkbox)
-            checkbox.isChecked = !checkbox.isChecked
-
             val dataset = v.tag as Dataset
-
-            if (checkbox.isChecked) {
-                selectedDataset = dataset
-                listener.onSelectedDataset(dataset)
-            }
+            selectedDataset = dataset
+            listener.onSelectedDataset(dataset)
 
             if (previousSelectedItemPosition >= 0) {
                 notifyItemChanged(previousSelectedItemPosition)
@@ -133,7 +126,7 @@ class DatasetRecyclerViewAdapter(private val listener: OnDatasetRecyclerViewAdap
 
     inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
         LayoutInflater.from(parent.context).inflate(
-            R.layout.list_selectable_item_3,
+            R.layout.list_item_dataset,
             parent,
             false
         )
@@ -142,7 +135,6 @@ class DatasetRecyclerViewAdapter(private val listener: OnDatasetRecyclerViewAdap
         private val title: TextView = itemView.findViewById(android.R.id.title)
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
         private val text2: TextView = itemView.findViewById(android.R.id.text2)
-        private val checkbox: CheckBox = itemView.findViewById(android.R.id.checkbox)
 
         fun bind(position: Int) {
             val cursor = cursor ?: return
@@ -154,6 +146,7 @@ class DatasetRecyclerViewAdapter(private val listener: OnDatasetRecyclerViewAdap
             if (dataset != null) {
                 title.text = dataset.name
                 title.isSelected = selectedDataset?.id == dataset.id
+                title.isSelected = true
                 text1.text = dataset.description
                 text1.isSelected = selectedDataset?.id == dataset.id
                 text2.text = itemView.context.getString(
@@ -163,9 +156,9 @@ class DatasetRecyclerViewAdapter(private val listener: OnDatasetRecyclerViewAdap
                         dataset.createdAt
                     )
                 )
-                checkbox.isChecked = selectedDataset?.id == dataset.id
 
                 with(itemView) {
+                    isPressed = selectedDataset?.id == dataset.id
                     tag = dataset
                     setOnClickListener(onClickListener)
                 }
