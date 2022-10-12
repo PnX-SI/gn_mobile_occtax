@@ -1,9 +1,9 @@
-package fr.geonature.occtax.input
+package fr.geonature.occtax.features.input.domain
 
 import android.os.Parcel
 import android.os.Parcelable
 import fr.geonature.commons.data.entity.Nomenclature
-import fr.geonature.commons.input.AbstractInputTaxon
+import fr.geonature.commons.features.input.domain.AbstractInputTaxon
 import org.tinylog.Logger
 import java.io.Serializable
 

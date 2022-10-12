@@ -1,4 +1,4 @@
-package fr.geonature.occtax.input
+package fr.geonature.occtax.features.input.domain
 
 import android.os.Parcel
 import fr.geonature.commons.data.entity.Nomenclature
@@ -61,7 +61,8 @@ class InputTaxonTest {
         }
 
         assertArrayEquals(
-            arrayOf(CountingMetadata().apply {
+            arrayOf(
+                CountingMetadata().apply {
                 index = 1
                 properties["STADE_VIE"] = PropertyValue(
                     "STADE_VIE",

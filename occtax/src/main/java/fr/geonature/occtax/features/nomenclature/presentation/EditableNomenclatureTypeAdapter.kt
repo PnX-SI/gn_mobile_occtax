@@ -20,7 +20,7 @@ import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.BaseEditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
-import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.features.input.domain.PropertyValue
 
 /**
  * Default RecyclerView Adapter about [EditableNomenclatureType].

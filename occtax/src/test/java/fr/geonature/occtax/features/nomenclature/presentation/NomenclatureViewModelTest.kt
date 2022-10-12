@@ -15,7 +15,7 @@ import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLo
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureValuesFoundFailure
 import fr.geonature.occtax.features.nomenclature.usecase.GetEditableNomenclaturesUseCase
 import fr.geonature.occtax.features.nomenclature.usecase.GetNomenclatureValuesByTypeAndTaxonomyUseCase
-import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
 import io.mockk.confirmVerified

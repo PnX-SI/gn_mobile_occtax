@@ -17,6 +17,9 @@
     <color name="datasync_status_pending">#FFA000</color>
     <color name="datasync_status_unknown">#CCC</color>
 
+    <color name="input_status_draft">#FFA000</color>
+    <color name="input_status_to_sync">#689F38</color>
+
     <color name="area_observation_more_than_duration">#f00</color>
     <color name="area_observation_less_than_duration">#808080</color>
     <color name="area_observation_none">#fff</color>

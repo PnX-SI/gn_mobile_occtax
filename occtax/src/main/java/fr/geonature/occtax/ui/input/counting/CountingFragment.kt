@@ -23,9 +23,9 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.CountingMetadata
-import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.input.InputTaxon
+import fr.geonature.occtax.features.input.domain.CountingMetadata
+import fr.geonature.occtax.features.input.domain.Input
+import fr.geonature.occtax.features.input.domain.InputTaxon
 import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
 

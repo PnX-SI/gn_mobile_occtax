@@ -1,9 +1,9 @@
-package fr.geonature.occtax.input
+package fr.geonature.occtax.features.input.domain
 
 /**
  * Describes nomenclature type view type.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 @Deprecated(message = "see EditableNomenclatureType")
 enum class NomenclatureTypeViewType {

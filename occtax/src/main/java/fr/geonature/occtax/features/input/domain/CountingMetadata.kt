@@ -1,4 +1,4 @@
-package fr.geonature.occtax.input
+package fr.geonature.occtax.features.input.domain
 
 import android.os.Parcel
 import android.os.Parcelable
@@ -8,7 +8,7 @@ import java.util.TreeMap
 /**
  * Counting metadata.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class CountingMetadata() : Parcelable {
 

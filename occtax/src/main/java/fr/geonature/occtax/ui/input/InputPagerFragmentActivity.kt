@@ -11,7 +11,6 @@ import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import fr.geonature.commons.input.AbstractInput
 import fr.geonature.commons.util.KeyboardUtils.hideKeyboard
 import fr.geonature.commons.util.ThemeUtils
 import fr.geonature.maps.settings.MapSettings
@@ -22,8 +21,8 @@ import fr.geonature.maps.util.MapSettingsPreferencesUtils.showCompass
 import fr.geonature.maps.util.MapSettingsPreferencesUtils.showScale
 import fr.geonature.maps.util.MapSettingsPreferencesUtils.showZoom
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.input.InputViewModel
+import fr.geonature.occtax.features.input.domain.Input
+import fr.geonature.occtax.features.input.presentation.InputViewModel
 import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.ui.input.counting.CountingFragment
 import fr.geonature.occtax.ui.input.informations.InformationFragment
@@ -52,6 +51,8 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
 
     private lateinit var appSettings: AppSettings
     private lateinit var input: Input
+
+    private var inputExported = false
 
     private var manageExternalStoragePermissionLifecycleObserver: ManageExternalStoragePermissionLifecycleObserver? =
         null
@@ -112,8 +113,10 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
     override fun onPause() {
         super.onPause()
 
-        inputViewModel.input.value?.takeIf { it.status == AbstractInput.Status.DRAFT }?.also {
-            inputViewModel.saveInput(it)
+        if (!inputExported) {
+            inputViewModel.input.value?.also {
+                inputViewModel.saveInput(it)
+            }
         }
     }
 
@@ -131,6 +134,7 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
                 it,
                 appSettings
             ) {
+                inputExported = true
                 finish()
             }
         }

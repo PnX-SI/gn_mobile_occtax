@@ -15,8 +15,8 @@ import fr.geonature.maps.ui.overlay.feature.FeatureCollectionOverlay
 import fr.geonature.maps.ui.overlay.feature.filter.ContainsFeaturesFilter
 import fr.geonature.maps.ui.widget.EditFeatureButton
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.input.InputViewModel
+import fr.geonature.occtax.features.input.domain.Input
+import fr.geonature.occtax.features.input.presentation.InputViewModel
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.viewpager.model.IPageWithValidationFragment
 import fr.geonature.viewpager.ui.OnPageFragmentListener

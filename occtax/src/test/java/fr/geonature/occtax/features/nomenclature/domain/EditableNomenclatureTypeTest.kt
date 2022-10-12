@@ -2,7 +2,7 @@ package fr.geonature.occtax.features.nomenclature.domain
 
 import android.os.Bundle
 import android.os.Parcel
-import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Test

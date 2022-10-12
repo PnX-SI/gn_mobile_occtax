@@ -6,10 +6,10 @@ import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import fr.geonature.commons.input.AbstractInput
+import fr.geonature.commons.features.input.domain.AbstractInput
 import fr.geonature.commons.lifecycle.observeUntil
-import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.input.InputViewModel
+import fr.geonature.occtax.features.input.domain.Input
+import fr.geonature.occtax.features.input.presentation.InputViewModel
 import fr.geonature.viewpager.model.IPageWithValidationFragment
 
 /**

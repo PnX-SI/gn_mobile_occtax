@@ -1,8 +1,8 @@
-package fr.geonature.occtax.input
+package fr.geonature.occtax.features.input.domain
 
 import android.os.Parcel
 import fr.geonature.commons.data.entity.Nomenclature
-import fr.geonature.occtax.input.PropertyValue.Companion.fromNomenclature
+import fr.geonature.occtax.features.input.domain.PropertyValue.Companion.fromNomenclature
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

@@ -32,10 +32,10 @@ import fr.geonature.commons.data.entity.NomenclatureType
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.commons.util.afterTextChanged
 import fr.geonature.occtax.R
+import fr.geonature.occtax.features.input.domain.Input
+import fr.geonature.occtax.features.input.domain.NomenclatureTypeViewType
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
-import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.input.NomenclatureTypeViewType
-import fr.geonature.occtax.input.PropertyValue
 import fr.geonature.occtax.settings.InputDateSettings
 import fr.geonature.occtax.ui.dataset.DatasetListActivity
 import fr.geonature.occtax.ui.input.AbstractInputFragment

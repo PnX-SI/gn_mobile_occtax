@@ -7,7 +7,7 @@ import fr.geonature.commons.fp.orNull
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureLocalDataSource
 import fr.geonature.occtax.features.nomenclature.data.IPropertyValueLocalDataSource
-import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
 import io.mockk.coVerify

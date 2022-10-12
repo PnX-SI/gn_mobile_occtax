@@ -36,7 +36,7 @@ import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.commons.util.ThemeUtils
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.InputTaxon
+import fr.geonature.occtax.features.input.domain.InputTaxon
 import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
 import org.tinylog.Logger

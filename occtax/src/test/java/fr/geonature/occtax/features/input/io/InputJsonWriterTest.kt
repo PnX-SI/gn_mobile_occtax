@@ -1,16 +1,16 @@
-package fr.geonature.occtax.input.io
+package fr.geonature.occtax.features.input.io
 
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.commons.input.io.InputJsonWriter
+import fr.geonature.commons.features.input.io.InputJsonWriter
 import fr.geonature.commons.util.toDate
 import fr.geonature.commons.util.toIsoDateString
 import fr.geonature.commons.util.toMap
 import fr.geonature.occtax.FixtureHelper.getFixture
-import fr.geonature.occtax.input.CountingMetadata
-import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.input.InputTaxon
-import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.features.input.domain.CountingMetadata
+import fr.geonature.occtax.features.input.domain.Input
+import fr.geonature.occtax.features.input.domain.InputTaxon
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.settings.InputDateSettings
 import fr.geonature.occtax.settings.InputSettings
@@ -58,7 +58,8 @@ class InputJsonWriterTest {
             addInputObserverId(2L)
             addInputObserverId(3L)
             comment = "Global comment"
-            addInputTaxon(InputTaxon(
+            addInputTaxon(
+                InputTaxon(
                 Taxon(
                     10L,
                     "taxon_01",

@@ -13,7 +13,7 @@ import fr.geonature.occtax.features.nomenclature.domain.BaseEditableNomenclature
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureValuesFoundFailure
-import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK

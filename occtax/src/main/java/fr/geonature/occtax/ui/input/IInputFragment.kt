@@ -1,11 +1,11 @@
 package fr.geonature.occtax.ui.input
 
-import fr.geonature.commons.input.AbstractInput
+import fr.geonature.commons.features.input.domain.AbstractInput
 
 /**
  * `Fragment` using [AbstractInput].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 interface IInputFragment {
 

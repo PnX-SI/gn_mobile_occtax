@@ -1,25 +1,20 @@
-package fr.geonature.occtax.input.io
+package fr.geonature.occtax.features.input.io
 
 import android.text.TextUtils
 import android.util.JsonReader
 import android.util.JsonToken
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.commons.input.io.InputJsonReader
+import fr.geonature.commons.features.input.io.InputJsonReader
 import fr.geonature.commons.util.toDate
 import fr.geonature.maps.jts.geojson.io.GeoJsonReader
-import fr.geonature.occtax.input.CountingMetadata
-import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.input.InputTaxon
-import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.features.input.domain.CountingMetadata
+import fr.geonature.occtax.features.input.domain.Input
+import fr.geonature.occtax.features.input.domain.InputTaxon
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import java.io.Serializable
 import java.util.Date
 import java.util.Locale
-import kotlin.collections.List
-import kotlin.collections.Map
-import kotlin.collections.forEach
-import kotlin.collections.mutableListOf
-import kotlin.collections.mutableMapOf
 import kotlin.collections.set
 
 /**
@@ -268,7 +263,8 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
 
         if (id == null || TextUtils.isEmpty(name) || TextUtils.isEmpty(kingdom)) return
 
-        input.addInputTaxon(InputTaxon(
+        input.addInputTaxon(
+            InputTaxon(
             Taxon(
                 id,
                 name!!,

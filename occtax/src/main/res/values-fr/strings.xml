@@ -23,10 +23,12 @@
     <string name="sync_inputs_not_synchronized">Relevés non synchronisés</string>
     <string name="sync_action_synchronize">Synchroniser</string>
 
-    <string name="home_last_inputs">Relevés en cours</string>
+    <string name="home_last_inputs">Derniers relevés</string>
     <string name="home_no_input">Aucun relevé en cours.\nCréer un nouveau relevé via le bouton +.</string>
     <string name="home_input_date">EEE dd MMM yyyy</string>
     <string name="home_input_created_at">Relevé du %s</string>
+    <string name="home_input_status_draft">En cours</string>
+    <string name="home_input_status_to_sync">Terminé</string>
     <plurals name="home_input_taxa_count">
         <item quantity="one">%d taxon ajouté</item>
         <item quantity="other">%d taxons ajoutés</item>

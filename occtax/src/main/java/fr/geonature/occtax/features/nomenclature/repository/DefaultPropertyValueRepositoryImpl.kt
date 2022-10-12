@@ -8,7 +8,7 @@ import fr.geonature.commons.fp.Either.Right
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureLocalDataSource
 import fr.geonature.occtax.features.nomenclature.data.IPropertyValueLocalDataSource
 import fr.geonature.occtax.features.nomenclature.error.PropertyValueFailure
-import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList

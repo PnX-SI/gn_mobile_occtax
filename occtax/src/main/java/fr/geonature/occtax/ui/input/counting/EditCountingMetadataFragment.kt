@@ -29,9 +29,9 @@ import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.CountingMetadata
-import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.features.input.domain.CountingMetadata
+import fr.geonature.occtax.features.input.domain.Input
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.input.dialog.ChooseNomenclatureDialogFragment
 import org.tinylog.kotlin.Logger

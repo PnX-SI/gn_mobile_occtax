@@ -1,6 +1,7 @@
 {
   "id": 1234,
   "module": "occtax",
+  "status": "draft",
   "geometry": null,
   "properties": {
     "meta_device_entry": "mobile",

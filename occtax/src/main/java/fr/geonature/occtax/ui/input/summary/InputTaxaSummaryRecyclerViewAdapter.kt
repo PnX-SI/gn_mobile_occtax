@@ -5,11 +5,11 @@ import android.text.SpannedString
 import android.view.View
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
-import fr.geonature.commons.input.AbstractInputTaxon
+import fr.geonature.commons.features.input.domain.AbstractInputTaxon
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.InputTaxon
-import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.features.input.domain.InputTaxon
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import java.util.Locale
 
 /**

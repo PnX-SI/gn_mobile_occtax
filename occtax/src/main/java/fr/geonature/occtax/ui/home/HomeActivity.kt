@@ -19,10 +19,12 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
+import androidx.core.view.children
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
@@ -39,6 +41,7 @@ import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.entity.AppSync
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.commons.error.Failure
+import fr.geonature.commons.features.input.domain.AbstractInput
 import fr.geonature.commons.lifecycle.observe
 import fr.geonature.commons.lifecycle.observeOnce
 import fr.geonature.commons.lifecycle.observeUntil
@@ -62,8 +65,8 @@ import fr.geonature.datasync.ui.login.LoginActivity
 import fr.geonature.occtax.BuildConfig
 import fr.geonature.occtax.MainApplication
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.input.InputViewModel
+import fr.geonature.occtax.features.input.domain.Input
+import fr.geonature.occtax.features.input.presentation.InputViewModel
 import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.settings.AppSettingsViewModel
 import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
@@ -97,6 +100,7 @@ class HomeActivity : AppCompatActivity() {
 
     private var homeContent: CoordinatorLayout? = null
     private var appSyncView: AppSyncView? = null
+    private var inputToolbar: Toolbar? = null
     private var inputRecyclerView: RecyclerView? = null
     private var inputEmptyTextView: TextView? = null
     private var fab: ExtendedFloatingActionButton? = null
@@ -164,6 +168,40 @@ class HomeActivity : AppCompatActivity() {
 
         homeContent = findViewById(R.id.homeContent)
         appSyncView = findViewById(R.id.appSyncView)
+
+        inputToolbar = findViewById<Toolbar?>(R.id.toolbar_inputs).apply {
+            inflateMenu(R.menu.status)
+            // all statuses checked by default
+            menu.children.forEach { it.isChecked = true }
+            setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.menu_status_draft -> {
+                        menuItem.isChecked = !menuItem.isChecked
+
+                        if (menu.children.all { !it.isChecked }) {
+                            menu.children.forEach { it.isChecked = true }
+                        }
+
+                        loadInputs()
+
+                        true
+                    }
+                    R.id.menu_status_to_sync -> {
+                        menuItem.isChecked = !menuItem.isChecked
+
+                        if (menu.children.all { !it.isChecked }) {
+                            menu.children.forEach { it.isChecked = true }
+                        }
+
+                        loadInputs()
+
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }
+
         inputRecyclerView = findViewById(R.id.inputRecyclerView)
         inputEmptyTextView = findViewById(R.id.inputEmptyTextView)
         fab = findViewById(R.id.fab)
@@ -173,6 +211,7 @@ class HomeActivity : AppCompatActivity() {
         configureDataSyncViewModel()
         configureConfigureServerSettingsViewModel()
         configureUpdateSettingsViewModel()
+        configureInputViewModel()
 
         appSyncView?.setListener(object : AppSyncView.OnAppSyncViewListener {
             override fun onAction() {
@@ -227,6 +266,7 @@ class HomeActivity : AppCompatActivity() {
                         R.string.alert_dialog_ok
                     ) { dialog, _ ->
                         inputViewModel.deleteInput(item)
+                        loadAppSync()
                         dialog.dismiss()
                     }
                     .setNegativeButton(
@@ -296,12 +336,11 @@ class HomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        LoaderManager.getInstance(this)
-            .restartLoader(
-                LOADER_APP_SYNC,
-                bundleOf(AppSync.COLUMN_ID to packageName),
-                loaderCallbacks
-            )
+        loadAppSync()
+
+        appSettings?.run {
+            loadInputs()
+        }
     }
 
     @SuppressLint("RestrictedApi")
@@ -411,6 +450,7 @@ class HomeActivity : AppCompatActivity() {
                 it.find { packageInfo -> packageInfo.packageName == BuildConfig.APPLICATION_ID }
                     ?.also { packageInfo ->
                         appSyncView?.setPackageInfo(packageInfo)
+                        loadInputs()
                     }
             }
         }
@@ -485,6 +525,24 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    private fun configureInputViewModel() {
+        with(inputViewModel) {
+            observe(
+                inputs,
+                ::handleInputs
+            )
+        }
+    }
+
+    private fun loadAppSync() {
+        LoaderManager.getInstance(this)
+            .restartLoader(
+                LOADER_APP_SYNC,
+                bundleOf(AppSync.COLUMN_ID to packageName),
+                loaderCallbacks
+            )
+    }
+
     private fun loadAppSettings() {
         appSettingsViewModel.loadAppSettings()
             .observeOnce(this) {
@@ -524,11 +582,17 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun loadInputs() {
-        inputViewModel.readInputs().observe(
-            this
-        ) {
-            adapter.setItems(it)
-        }
+        val filter = inputToolbar?.menu?.children?.filter { it.isChecked }?.map {
+            when (it.itemId) {
+                R.id.menu_status_to_sync -> AbstractInput.Status.TO_SYNC
+                else -> AbstractInput.Status.DRAFT
+            }
+        }?.toList() ?: listOf(
+            AbstractInput.Status.DRAFT,
+            AbstractInput.Status.TO_SYNC
+        )
+
+        inputViewModel.readInputs { input -> filter.any { input.status == it } }
     }
 
     private fun packageInfoUpdated(packageInfo: PackageInfo) {
@@ -541,6 +605,10 @@ class HomeActivity : AppCompatActivity() {
         }
 
         loadAppSettings()
+    }
+
+    private fun handleInputs(inputs: List<Input>) {
+        adapter.setItems(inputs)
     }
 
     private fun handleFailure(failure: Failure) {

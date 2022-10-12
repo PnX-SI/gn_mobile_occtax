@@ -1,4 +1,4 @@
-package fr.geonature.occtax.input
+package fr.geonature.occtax.features.input.domain
 
 import android.os.Parcel
 import fr.geonature.commons.data.entity.Taxon
@@ -19,7 +19,7 @@ import java.util.Date
 class InputTest {
 
     @Test
-    fun testParcelable() {
+    fun `should create input from Parcel`() {
         // given an Input instance to write
         val input = Input().apply {
             id = 1234
@@ -35,7 +35,8 @@ class InputTest {
             addInputObserverId(2L)
             addInputObserverId(3L)
             comment = "Global comment"
-            addInputTaxon(InputTaxon(
+            addInputTaxon(
+                InputTaxon(
                 Taxon(
                     10L,
                     "taxon_01",

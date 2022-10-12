@@ -1,16 +1,16 @@
-package fr.geonature.occtax.input.io
+package fr.geonature.occtax.features.input.io
 
 import android.text.TextUtils
 import android.util.JsonWriter
-import fr.geonature.commons.input.AbstractInputTaxon
-import fr.geonature.commons.input.io.InputJsonWriter
+import fr.geonature.commons.features.input.domain.AbstractInputTaxon
+import fr.geonature.commons.features.input.io.InputJsonWriter
 import fr.geonature.commons.util.format
 import fr.geonature.commons.util.toIsoDateString
 import fr.geonature.maps.jts.geojson.io.GeoJsonWriter
-import fr.geonature.occtax.input.CountingMetadata
-import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.input.InputTaxon
-import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.features.input.domain.CountingMetadata
+import fr.geonature.occtax.features.input.domain.Input
+import fr.geonature.occtax.features.input.domain.InputTaxon
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.settings.InputDateSettings
 import java.util.Locale

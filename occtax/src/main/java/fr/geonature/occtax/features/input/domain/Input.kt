@@ -1,9 +1,9 @@
-package fr.geonature.occtax.input
+package fr.geonature.occtax.features.input.domain
 
 import android.os.Parcel
 import android.os.Parcelable
-import fr.geonature.commons.input.AbstractInput
-import fr.geonature.commons.input.AbstractInputTaxon
+import fr.geonature.commons.features.input.domain.AbstractInput
+import fr.geonature.commons.features.input.domain.AbstractInputTaxon
 import org.locationtech.jts.geom.Geometry
 import java.util.SortedMap
 import java.util.TreeMap
@@ -11,7 +11,7 @@ import java.util.TreeMap
 /**
  * Describes a current input.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class Input : AbstractInput {
 

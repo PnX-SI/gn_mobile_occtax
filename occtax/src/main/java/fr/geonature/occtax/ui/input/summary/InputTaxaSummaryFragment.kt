@@ -27,10 +27,10 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.commons.input.AbstractInputTaxon
+import fr.geonature.commons.features.input.domain.AbstractInputTaxon
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.InputTaxon
+import fr.geonature.occtax.features.input.domain.InputTaxon
 import fr.geonature.occtax.settings.InputDateSettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
 import fr.geonature.occtax.ui.input.taxa.Filter

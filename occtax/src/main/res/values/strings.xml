@@ -30,6 +30,8 @@
     <string name="home_no_input">No existing input.\nCreate a new one by tapping the + button.</string>
     <string name="home_input_date">EEE dd MMM yyyy</string>
     <string name="home_input_created_at">Input from %s</string>
+    <string name="home_input_status_draft">Draft</string>
+    <string name="home_input_status_to_sync">Ready to sync</string>
     <plurals name="home_input_taxa_count">
         <item quantity="one">%d taxon added</item>
         <item quantity="other">%d taxa added</item>

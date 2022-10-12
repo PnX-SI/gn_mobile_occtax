@@ -1,15 +1,15 @@
-package fr.geonature.occtax.input.io
+package fr.geonature.occtax.features.input.io
 
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.commons.input.AbstractInputTaxon
-import fr.geonature.commons.input.io.InputJsonReader
+import fr.geonature.commons.features.input.domain.AbstractInputTaxon
+import fr.geonature.commons.features.input.io.InputJsonReader
 import fr.geonature.commons.util.toDate
 import fr.geonature.occtax.FixtureHelper.getFixture
-import fr.geonature.occtax.input.CountingMetadata
-import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.input.InputTaxon
-import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.features.input.domain.CountingMetadata
+import fr.geonature.occtax.features.input.domain.Input
+import fr.geonature.occtax.features.input.domain.InputTaxon
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -133,7 +133,8 @@ class InputJsonReaderTest {
             input.properties
         )
         assertEquals(
-            listOf(InputTaxon(
+            listOf(
+                InputTaxon(
                 Taxon(
                     10L,
                     "taxon_01",

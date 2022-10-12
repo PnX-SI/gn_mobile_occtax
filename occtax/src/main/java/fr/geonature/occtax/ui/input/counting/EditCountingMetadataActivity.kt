@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.CountingMetadata
+import fr.geonature.occtax.features.input.domain.CountingMetadata
 import fr.geonature.occtax.settings.PropertySettings
 
 /**

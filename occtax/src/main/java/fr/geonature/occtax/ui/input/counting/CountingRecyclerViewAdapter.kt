@@ -6,13 +6,13 @@ import android.widget.TextView
 import androidx.core.text.HtmlCompat
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.CountingMetadata
+import fr.geonature.occtax.features.input.domain.CountingMetadata
 import java.util.Locale
 
 /**
  * Default RecyclerView Adapter used by [CountingFragment].
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<CountingMetadata>) :
     AbstractListItemRecyclerViewAdapter<CountingMetadata>(listener) {

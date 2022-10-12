@@ -15,9 +15,9 @@ import com.google.android.material.textfield.TextInputLayout
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.NomenclatureType
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.CountingMetadata
-import fr.geonature.occtax.input.NomenclatureTypeViewType
-import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.features.input.domain.CountingMetadata
+import fr.geonature.occtax.features.input.domain.NomenclatureTypeViewType
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.shared.view.setOnValueChangedListener
 import java.util.Locale

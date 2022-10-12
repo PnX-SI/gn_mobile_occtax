@@ -17,7 +17,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import fr.geonature.commons.input.AbstractInput
+import fr.geonature.commons.features.input.domain.AbstractInput
 import fr.geonature.commons.util.afterTextChanged
 import fr.geonature.commons.util.get
 import fr.geonature.commons.util.set
