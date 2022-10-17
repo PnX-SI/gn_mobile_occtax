@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:labelFor="@id/editMinPicker"
-        android:text="@string/counting_min_label"
+        android:text="@string/nomenclature_min"
         app:layout_constraintBaseline_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/editMinPicker"
         app:layout_constraintStart_toStartOf="@+id/editMinPicker" />
@@ -30,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:labelFor="@id/editMaxPicker"
-        android:text="@string/counting_max_label"
+        android:text="@string/nomenclature_max"
         app:layout_constraintBaseline_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/editMaxPicker"
         app:layout_constraintStart_toStartOf="@+id/editMaxPicker" />

@@ -14,7 +14,6 @@ import fr.geonature.occtax.features.input.domain.InputTaxon
 import fr.geonature.occtax.features.input.domain.PropertyValue
 import java.io.Serializable
 import java.util.Date
-import java.util.Locale
 import kotlin.collections.set
 
 /**
@@ -194,7 +193,7 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
     /**
      * Reads input taxon as object:
      *
-     * ```
+     * ```json
      * {
      *  "cd_nom": "String",
      *  "nom_cite": "String",
@@ -206,7 +205,7 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
      *          "id": "Long",
      *          "label: "String"
      *      },
-     *      ...
+     *      // ...
      *      "counting": [
      *          {
      *              "property_code_x": {
@@ -217,8 +216,8 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
      *              ...
      *              "min": "Int",
      *              "max": "Int"
-     *          },
-     *          ...
+     *          }
+     *          // ...
      *      ]
      *  }
      * }
@@ -265,31 +264,31 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
 
         input.addInputTaxon(
             InputTaxon(
-            Taxon(
-                id,
-                name!!,
-                Taxonomy(
-                    kingdom!!,
-                    group
+                Taxon(
+                    id,
+                    name!!,
+                    Taxonomy(
+                        kingdom!!,
+                        group
+                    )
                 )
-            )
-        ).apply {
-            this.properties.putAll(properties.first)
-            properties.second.forEach { this.addCountingMetadata(it) }
-        })
+            ).apply {
+                this.properties.putAll(properties.first)
+                properties.second.forEach { this.addCountingMetadata(it) }
+            })
     }
 
     /**
      * Reads input taxon properties as object:
      *
-     * ```
+     * ```json
      * {
      *  "property_code_x": {
      *      "type": "PropertyType",
      *      "id": "Long",
      *      "label: "String"
      *  },
-     *  ...
+     *  // ...
      *  "counting": [
      *      {
      *          "property_code_x": {
@@ -299,8 +298,8 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
      *          ...
      *          "min": "Int",
      *          "max": "Int"
-     *      },
-     *      ...
+     *      }
+     *      // ...
      *  ]
      * }
      * ```
@@ -338,18 +337,18 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
     /**
      * Reads input taxon counting as array:
      *
-     * ```
+     * ```json
      * [
      *  {
      *      "property_code_x": {
      *          "id": "Long",
      *          "label: "String"
      *      },
-     *      ...
+     *      // ...
      *      "min": "Int",
      *      "max": "Int"
-     *  },
-     *  ...
+     *  }
+     *  // ...
      * ]
      * ```
      */
@@ -372,14 +371,14 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
     /**
      * Reads input taxon counting metadata as object:
      *
-     * ```
+     * ```json
      * {
      *  "index": "Int",
      *  "property_code_x": {
      *      "id": "Long",
      *      "label: "String"
      *  },
-     *  ...
+     *  // ...
      *  "min": "Int",
      *  "max": "Int"
      * }
@@ -388,15 +387,28 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
     private fun readInputTaxonCountingMetadata(reader: JsonReader): CountingMetadata? {
         reader.beginObject()
 
-        val countingMetadata = CountingMetadata()
+        var countingMetadata = CountingMetadata()
 
         while (reader.hasNext()) {
             when (reader.peek()) {
                 JsonToken.NAME -> {
                     when (val propertyName = reader.nextName()) {
-                        "index" -> countingMetadata.index = reader.nextInt()
-                        "min" -> countingMetadata.min = reader.nextInt()
-                        "max" -> countingMetadata.max = reader.nextInt()
+                        "index" -> countingMetadata =
+                            countingMetadata.copy(index = reader.nextInt())
+                        "min", "max" -> {
+                            when (reader.peek()) {
+                                JsonToken.NUMBER -> PropertyValue.fromValue(
+                                    propertyName.uppercase(),
+                                    reader.nextInt()
+                                )
+                                else -> readPropertyValue(
+                                    reader,
+                                    propertyName
+                                )
+                            }?.also {
+                                countingMetadata.properties[it.code] = it
+                            }
+                        }
                         else -> readPropertyValue(
                             reader,
                             propertyName
@@ -417,10 +429,10 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
     /**
      * Reads property value as object:
      *
-     * ```
+     * ```json
      * {
      *  "label: "String"
-     *  "value": "String"|Long|Int
+     *  "value": "String|Long|Int"
      * }
      * ```
      */
@@ -450,7 +462,7 @@ class OnInputJsonReaderListenerImpl : InputJsonReader.OnInputJsonReaderListener<
         reader.endObject()
 
         val propertyValue = PropertyValue(
-            code.uppercase(Locale.ROOT),
+            code.uppercase(),
             label,
             value
         )

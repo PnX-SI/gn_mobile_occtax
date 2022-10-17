@@ -16,5 +16,7 @@
     <string name="nomenclature_sexe">Sex</string>
     <string name="nomenclature_obj_denbr">Purpose of the enumeration</string>
     <string name="nomenclature_typ_denbr">Type of enumeration</string>
+    <string name="nomenclature_min">Min</string>
+    <string name="nomenclature_max">Max</string>
 
 </resources>

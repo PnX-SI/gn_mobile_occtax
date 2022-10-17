@@ -20,17 +20,17 @@ class EditableNomenclatureTypeTest {
     @Test
     fun `should be the same editable nomenclature type`() {
         assertEquals(
-            BaseEditableNomenclatureType.from(
-                BaseEditableNomenclatureType.Type.INFORMATION,
+            EditableNomenclatureType(
+                EditableNomenclatureType.Type.INFORMATION,
                 "ETA_BIO",
-                BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                 visible = true,
                 default = false
             ),
-            BaseEditableNomenclatureType.from(
-                BaseEditableNomenclatureType.Type.INFORMATION,
+            EditableNomenclatureType(
+                EditableNomenclatureType.Type.INFORMATION,
                 "ETA_BIO",
-                BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                 visible = true,
                 default = false
             ),
@@ -38,17 +38,17 @@ class EditableNomenclatureTypeTest {
 
         assertEquals(
             EditableNomenclatureType(
-                BaseEditableNomenclatureType.Type.INFORMATION,
+                EditableNomenclatureType.Type.INFORMATION,
                 "STATUT_BIO",
-                BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                 label = "Statut biologique",
                 visible = false,
                 default = false
             ),
             EditableNomenclatureType(
-                BaseEditableNomenclatureType.Type.INFORMATION,
+                EditableNomenclatureType.Type.INFORMATION,
                 "STATUT_BIO",
-                BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                 label = "Statut biologique",
                 visible = false,
                 default = false
@@ -60,9 +60,9 @@ class EditableNomenclatureTypeTest {
     fun `should create EditableNomenclatureType from Parcelable`() {
         // given an editable nomenclature type instance
         val editableNomenclatureType = EditableNomenclatureType(
-            BaseEditableNomenclatureType.Type.INFORMATION,
+            EditableNomenclatureType.Type.INFORMATION,
             "STATUT_BIO",
-            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+            EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
             label = "Statut biologique",
             visible = false,
             default = false,
@@ -91,16 +91,16 @@ class EditableNomenclatureTypeTest {
         // given a list of editable nomenclature types
         val expectedEditableNomenclatureTypes = listOf(
             EditableNomenclatureType(
-                BaseEditableNomenclatureType.Type.INFORMATION,
+                EditableNomenclatureType.Type.INFORMATION,
                 "DETERMINER",
-                BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE,
+                EditableNomenclatureType.ViewType.TEXT_SIMPLE,
                 visible = true,
                 default = false
             ),
             EditableNomenclatureType(
-                BaseEditableNomenclatureType.Type.INFORMATION,
+                EditableNomenclatureType.Type.INFORMATION,
                 "STATUT_BIO",
-                BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                 label = "Statut biologique",
                 visible = false,
                 default = false,

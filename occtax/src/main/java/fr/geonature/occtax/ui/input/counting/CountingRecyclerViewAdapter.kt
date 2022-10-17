@@ -67,20 +67,15 @@ class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListene
 
         private fun buildCountingDescription(countingMetadata: CountingMetadata): Spanned {
             return HtmlCompat.fromHtml(arrayOf(
-                Pair(
-                    itemView.context.getString(R.string.counting_min_label),
-                    countingMetadata.min.toString()
-                ),
-                Pair(
-                    itemView.context.getString(R.string.counting_max_label),
-                    countingMetadata.max.toString()
-                )
+                countingMetadata.properties["MIN"],
+                countingMetadata.properties["MAX"],
             ).asSequence()
+                .filterNotNull()
                 .map {
                     itemView.context.getString(
                         R.string.counting_description_separator,
-                        it.first,
-                        it.second
+                        it.code,
+                        it.value
                     )
                 }
                 .joinToString(", "),

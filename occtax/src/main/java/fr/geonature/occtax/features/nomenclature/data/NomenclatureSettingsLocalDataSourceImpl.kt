@@ -1,6 +1,7 @@
 package fr.geonature.occtax.features.nomenclature.data
 
-import fr.geonature.occtax.features.nomenclature.domain.BaseEditableNomenclatureType
+import fr.geonature.occtax.features.input.domain.PropertyValue
+import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.settings.PropertySettings
 
 /**
@@ -11,100 +12,111 @@ import fr.geonature.occtax.settings.PropertySettings
 class NomenclatureSettingsLocalDataSourceImpl :
     INomenclatureSettingsLocalDataSource {
 
+    // TODO: as EditableNomenclatureType to set also default values
     private val defaultNomenclatureTypes = listOf(
-        BaseEditableNomenclatureType.from(
-            BaseEditableNomenclatureType.Type.DEFAULT,
+        EditableNomenclatureType(
+            EditableNomenclatureType.Type.DEFAULT,
             "TYP_GRP",
-            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+            EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
         ),
-        BaseEditableNomenclatureType.from(
-            BaseEditableNomenclatureType.Type.INFORMATION,
+        EditableNomenclatureType(
+            EditableNomenclatureType.Type.INFORMATION,
             "METH_OBS",
-            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+            EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
         ),
-        BaseEditableNomenclatureType.from(
-            BaseEditableNomenclatureType.Type.INFORMATION,
+        EditableNomenclatureType(
+            EditableNomenclatureType.Type.INFORMATION,
             "ETA_BIO",
-            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+            EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
         ),
-        BaseEditableNomenclatureType.from(
-            BaseEditableNomenclatureType.Type.INFORMATION,
+        EditableNomenclatureType(
+            EditableNomenclatureType.Type.INFORMATION,
             "METH_DETERMIN",
-            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+            EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
             default = false
         ),
-        BaseEditableNomenclatureType.from(
-            BaseEditableNomenclatureType.Type.INFORMATION,
+        EditableNomenclatureType(
+            EditableNomenclatureType.Type.INFORMATION,
             "DETERMINER",
-            BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE,
+            EditableNomenclatureType.ViewType.TEXT_SIMPLE,
             default = false
         ),
-        BaseEditableNomenclatureType.from(
-            BaseEditableNomenclatureType.Type.INFORMATION,
+        EditableNomenclatureType(
+            EditableNomenclatureType.Type.INFORMATION,
             "STATUT_BIO",
-            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+            EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
             default = false
         ),
-        BaseEditableNomenclatureType.from(
-            BaseEditableNomenclatureType.Type.INFORMATION,
+        EditableNomenclatureType(
+            EditableNomenclatureType.Type.INFORMATION,
             "OCC_COMPORTEMENT",
-            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+            EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
             default = false
         ),
-        BaseEditableNomenclatureType.from(
-            BaseEditableNomenclatureType.Type.INFORMATION,
+        EditableNomenclatureType(
+            EditableNomenclatureType.Type.INFORMATION,
             "NATURALITE",
-            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+            EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
             default = false
         ),
-        BaseEditableNomenclatureType.from(
-            BaseEditableNomenclatureType.Type.INFORMATION,
+        EditableNomenclatureType(
+            EditableNomenclatureType.Type.INFORMATION,
             "PREUVE_EXIST",
-            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+            EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
             default = false
         ),
-        BaseEditableNomenclatureType.from(
-            BaseEditableNomenclatureType.Type.INFORMATION,
+        EditableNomenclatureType(
+            EditableNomenclatureType.Type.INFORMATION,
             "COMMENT",
-            BaseEditableNomenclatureType.ViewType.TEXT_MULTIPLE,
+            EditableNomenclatureType.ViewType.TEXT_MULTIPLE,
             default = false
         ),
-        BaseEditableNomenclatureType.from(
-            BaseEditableNomenclatureType.Type.COUNTING,
+        EditableNomenclatureType(
+            EditableNomenclatureType.Type.COUNTING,
             "STADE_VIE",
-            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+            EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
         ),
-        BaseEditableNomenclatureType.from(
-            BaseEditableNomenclatureType.Type.COUNTING,
+        EditableNomenclatureType(
+            EditableNomenclatureType.Type.COUNTING,
             "SEXE",
-            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+            EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
         ),
-        BaseEditableNomenclatureType.from(
-            BaseEditableNomenclatureType.Type.COUNTING,
+        EditableNomenclatureType(
+            EditableNomenclatureType.Type.COUNTING,
             "OBJ_DENBR",
-            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+            EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
         ),
-        BaseEditableNomenclatureType.from(
-            BaseEditableNomenclatureType.Type.COUNTING,
+        EditableNomenclatureType(
+            EditableNomenclatureType.Type.COUNTING,
             "TYP_DENBR",
-            BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+            EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
         ),
-        BaseEditableNomenclatureType.from(
-            BaseEditableNomenclatureType.Type.COUNTING,
+        EditableNomenclatureType(
+            EditableNomenclatureType.Type.COUNTING,
             "MIN",
-            BaseEditableNomenclatureType.ViewType.MIN_MAX
-        ),
-        BaseEditableNomenclatureType.from(
-            BaseEditableNomenclatureType.Type.COUNTING,
+            EditableNomenclatureType.ViewType.MIN_MAX
+        ).apply {
+            value = PropertyValue.fromValue(
+                code,
+                1
+            )
+        },
+        EditableNomenclatureType(
+            EditableNomenclatureType.Type.COUNTING,
             "MAX",
-            BaseEditableNomenclatureType.ViewType.MIN_MAX
-        )
+            EditableNomenclatureType.ViewType.MIN_MAX
+        ).apply {
+            value = PropertyValue.fromValue(
+                code,
+                1
+            )
+        }
     )
 
     override suspend fun getNomenclatureTypeSettings(
-        type: BaseEditableNomenclatureType.Type,
+        type: EditableNomenclatureType.Type,
         vararg defaultPropertySettings: PropertySettings
-    ): List<BaseEditableNomenclatureType> {
+    ): List<EditableNomenclatureType> {
         if (defaultPropertySettings.isEmpty()) {
             return defaultNomenclatureTypes.filter { it.type == type }
         }
@@ -112,7 +124,7 @@ class NomenclatureSettingsLocalDataSourceImpl :
         return defaultPropertySettings
             .mapNotNull { property ->
                 defaultNomenclatureTypes.find { it.code == property.key }?.let {
-                    BaseEditableNomenclatureType.from(
+                    EditableNomenclatureType(
                         it.type,
                         it.code,
                         it.viewType,

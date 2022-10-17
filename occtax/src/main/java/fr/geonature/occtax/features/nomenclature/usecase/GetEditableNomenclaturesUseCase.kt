@@ -7,7 +7,6 @@ import fr.geonature.commons.fp.Either.Left
 import fr.geonature.commons.fp.Either.Right
 import fr.geonature.commons.fp.getOrElse
 import fr.geonature.commons.interactor.BaseUseCase
-import fr.geonature.occtax.features.nomenclature.domain.BaseEditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
 import fr.geonature.occtax.features.nomenclature.repository.IDefaultPropertyValueRepository
@@ -55,7 +54,7 @@ class GetEditableNomenclaturesUseCase @Inject constructor(
     }
 
     data class Params(
-        val type: BaseEditableNomenclatureType.Type,
+        val type: EditableNomenclatureType.Type,
         val settings: List<PropertySettings> = listOf(),
         val taxonomy: Taxonomy? = null
     )

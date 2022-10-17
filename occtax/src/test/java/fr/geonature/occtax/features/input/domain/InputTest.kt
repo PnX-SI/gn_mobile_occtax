@@ -37,96 +37,94 @@ class InputTest {
             comment = "Global comment"
             addInputTaxon(
                 InputTaxon(
-                Taxon(
-                    10L,
-                    "taxon_01",
-                    Taxonomy(
-                        "Animalia",
-                        "Ascidies"
+                    Taxon(
+                        10L,
+                        "taxon_01",
+                        Taxonomy(
+                            "Animalia",
+                            "Ascidies"
+                        )
                     )
-                )
-            ).apply {
-                properties["METH_OBS"] = PropertyValue(
-                    "METH_OBS",
-                    null,
-                    41L
-                )
-                properties["ETA_BIO"] = PropertyValue(
-                    "ETA_BIO",
-                    null,
-                    29L
-                )
-                properties["METH_DETERMIN"] = PropertyValue(
-                    "METH_DETERMIN",
-                    null,
-                    445L
-                )
-                properties["DETERMINER"] = PropertyValue(
-                    "DETERMINER",
-                    null,
-                    "Determiner value"
-                )
-                properties["STATUT_BIO"] = PropertyValue(
-                    "STATUT_BIO",
-                    null,
-                    29L
-                )
-                properties["NATURALITE"] = PropertyValue(
-                    "NATURALITE",
-                    null,
-                    160L
-                )
-                properties["PREUVE_EXIST"] = PropertyValue(
-                    "PREUVE_EXIST",
-                    null,
-                    81L
-                )
-                properties["COMMENT"] = PropertyValue(
-                    "COMMENT",
-                    null,
-                    "Some comment"
-                )
-                addCountingMetadata(CountingMetadata().apply {
+                ).apply {
                     properties.putAll(
-                        mutableMapOf(
-                            Pair(
-                                "STADE_VIE",
+                        listOf(
+                            PropertyValue(
+                                "METH_OBS",
+                                null,
+                                41L
+                            ),
+                            PropertyValue(
+                                "ETA_BIO",
+                                null,
+                                29L
+                            ),
+                            PropertyValue(
+                                "METH_DETERMIN",
+                                null,
+                                445L
+                            ),
+                            PropertyValue(
+                                "DETERMINER",
+                                null,
+                                "Determiner value"
+                            ),
+                            PropertyValue(
+                                "STATUT_BIO",
+                                null,
+                                29L
+                            ),
+                            PropertyValue(
+                                "NATURALITE",
+                                null,
+                                160L
+                            ),
+                            PropertyValue(
+                                "PREUVE_EXIST",
+                                null,
+                                81L
+                            ),
+                            PropertyValue(
+                                "COMMENT",
+                                null,
+                                "Some comment"
+                            )
+                        ).associateBy { it.code }
+                    )
+                    addCountingMetadata(CountingMetadata().apply {
+                        properties.putAll(
+                            listOf(
                                 PropertyValue(
                                     "STADE_VIE",
                                     null,
                                     2L
-                                )
-                            ),
-                            Pair(
-                                "SEXE",
+                                ),
                                 PropertyValue(
                                     "SEXE",
                                     null,
                                     168L
-                                )
-                            ),
-                            Pair(
-                                "OBJ_DENBR",
+                                ),
                                 PropertyValue(
                                     "OBJ_DENBR",
                                     null,
                                     146L
-                                )
-                            ),
-                            Pair(
-                                "TYP_DENBR",
+                                ),
                                 PropertyValue(
                                     "TYP_DENBR",
                                     null,
                                     93L
+                                ),
+                                PropertyValue.fromValue(
+                                    "MIN",
+                                    1
+                                ),
+                                PropertyValue.fromValue(
+                                    "MAX",
+                                    2
                                 )
-                            )
+                            ).associateBy { it.code }
                         )
-                    )
-                    min = 1
-                    max = 2
+                    })
                 })
-            })
         }
 
         // when we obtain a Parcel object to write the input instance to it

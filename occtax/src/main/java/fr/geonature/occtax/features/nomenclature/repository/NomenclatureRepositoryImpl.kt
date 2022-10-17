@@ -7,13 +7,12 @@ import fr.geonature.commons.error.Failure
 import fr.geonature.commons.fp.Either
 import fr.geonature.commons.fp.Either.Left
 import fr.geonature.commons.fp.Either.Right
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureLocalDataSource
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureSettingsLocalDataSource
-import fr.geonature.occtax.features.nomenclature.domain.BaseEditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureValuesFoundFailure
-import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.settings.PropertySettings
 import org.tinylog.Logger
 
@@ -28,7 +27,7 @@ class NomenclatureRepositoryImpl(
 ) : INomenclatureRepository {
 
     override suspend fun getEditableNomenclatures(
-        type: BaseEditableNomenclatureType.Type,
+        type: EditableNomenclatureType.Type,
         vararg defaultPropertySettings: PropertySettings
     ): Either<Failure, List<EditableNomenclatureType>> {
         return runCatching {
@@ -47,7 +46,7 @@ class NomenclatureRepositoryImpl(
                 type,
                 *defaultPropertySettings
             ).mapNotNull {
-                if (it.viewType == BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE) nomenclatureTypes[it.code]?.let { nomenclatureType ->
+                if (it.viewType == EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE) nomenclatureTypes[it.code]?.let { nomenclatureType ->
                     EditableNomenclatureType(
                         it.type,
                         it.code,
@@ -60,13 +59,7 @@ class NomenclatureRepositoryImpl(
                                 null
                             }
                     )
-                } else EditableNomenclatureType(
-                    it.type,
-                    it.code,
-                    it.viewType,
-                    it.visible,
-                    it.default
-                )
+                } else it
             }.map { editableNomenclature ->
                 editableNomenclature.copy(value = defaultNomenclatureValues.firstOrNull { it.type?.mnemonic == editableNomenclature.code }
                     ?.let {
@@ -74,7 +67,7 @@ class NomenclatureRepositoryImpl(
                             editableNomenclature.code,
                             it
                         )
-                    })
+                    } ?: editableNomenclature.value)
             }
         }.fold(
             onSuccess = {

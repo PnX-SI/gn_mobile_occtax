@@ -310,13 +310,12 @@ class OnInputJsonWriterListenerImpl :
                         .value(p.value.value as Long)
                     "TYP_DENBR" -> writer.name("id_nomenclature_type_count")
                         .value(p.value.value as Long)
+                    "MIN" -> writer.name("count_min")
+                        .value(p.value.value as Number)
+                    "MAX" -> writer.name("count_max")
+                        .value(p.value.value as Number)
                 }
             }
-
-            writer.name("count_min")
-                .value(c.min)
-            writer.name("count_max")
-                .value(c.max)
 
             writer.endObject()
         }
@@ -357,11 +356,6 @@ class OnInputJsonWriterListenerImpl :
                 it.value
             )
         }
-
-        writer.name("min")
-            .value(countingMetadata.min)
-        writer.name("max")
-            .value(countingMetadata.max)
 
         writer.endObject()
     }

@@ -19,67 +19,137 @@ import org.robolectric.RobolectricTestRunner
 class CountingMetadataTest {
 
     @Test
-    fun testIsEmpty() {
-        assertFalse(CountingMetadata().apply {
-            properties.putAll(
-                mutableMapOf(
-                    Pair(
-                        "SEXE",
-                        fromNomenclature(
+    fun `should be the same`() {
+        assertEquals(
+            CountingMetadata().apply {
+                properties.putAll(
+                    listOf(
+                        PropertyValue(
+                            "STADE_VIE",
+                            null,
+                            2L
+                        ),
+                        PropertyValue(
                             "SEXE",
-                            Nomenclature(
-                                168L,
-                                "Femelle",
-                                "009.002",
-                                "Femelle",
-                                9L
-                            )
+                            null,
+                            168L
+                        ),
+                        PropertyValue(
+                            "OBJ_DENBR",
+                            null,
+                            146L
+                        ),
+                        PropertyValue(
+                            "TYP_DENBR",
+                            null,
+                            93L
+                        ),
+                        PropertyValue.fromValue(
+                            "MIN",
+                            1
+                        ),
+                        PropertyValue.fromValue(
+                            "MAX",
+                            2
                         )
-                    )
+                    ).associateBy { it.code }
                 )
-            )
-            min = 1
-            max = 2
-        }.isEmpty())
-
-        assertFalse(CountingMetadata().apply {
-            properties.putAll(
-                mutableMapOf(
-                    Pair(
-                        "SEXE",
-                        fromNomenclature(
+            },
+            CountingMetadata().apply {
+                properties.putAll(
+                    listOf(
+                        PropertyValue(
+                            "STADE_VIE",
+                            null,
+                            2L
+                        ),
+                        PropertyValue(
                             "SEXE",
-                            Nomenclature(
-                                168L,
-                                "Femelle",
-                                "009.002",
-                                "Femelle",
-                                9L
-                            )
+                            null,
+                            168L
+                        ),
+                        PropertyValue(
+                            "OBJ_DENBR",
+                            null,
+                            146L
+                        ),
+                        PropertyValue(
+                            "TYP_DENBR",
+                            null,
+                            93L
+                        ),
+                        PropertyValue.fromValue(
+                            "MIN",
+                            1
+                        ),
+                        PropertyValue.fromValue(
+                            "MAX",
+                            2
                         )
-                    )
+                    ).associateBy { it.code }
                 )
-            )
-        }.isEmpty())
+            })
+    }
 
+    @Test
+    fun `is empty`() {
         assertTrue(CountingMetadata().isEmpty())
+
         assertTrue(CountingMetadata().apply {
-            properties["MIN"] = PropertyValue(
-                "MIN",
-                null,
-                null
+            properties.putAll(
+                listOf(
+                    fromNomenclature(
+                        "SEXE",
+                        null
+                    ),
+                    PropertyValue(
+                        "MIN",
+                        null,
+                        null
+                    ),
+                    PropertyValue(
+                        "MAX",
+                        null,
+                        null
+                    )
+                ).associateBy { it.code }
+            )
+        }.isEmpty())
+
+        assertFalse(CountingMetadata().apply {
+            properties.putAll(
+                listOf(
+                    fromNomenclature(
+                        "SEXE",
+                        Nomenclature(
+                            168L,
+                            "Femelle",
+                            "009.002",
+                            "Femelle",
+                            9L
+                        )
+                    ),
+                    PropertyValue(
+                        "MIN",
+                        null,
+                        null
+                    ),
+                    PropertyValue(
+                        "MAX",
+                        null,
+                        null
+                    )
+                ).associateBy { it.code }
             )
         }.isEmpty())
     }
 
     @Test
-    fun testParcelable() {
-        // given counting metadata
-        val countingMetadata = CountingMetadata().apply {
-            properties.putAll(
-                mutableMapOf(
-                    Pair(
-                        "SEXE",
+    fun `should copy counting metadata`() {
+        assertEquals(
+            CountingMetadata().apply {
+                properties.putAll(
+                    listOf(
                         fromNomenclature(
                             "SEXE",
                             Nomenclature(
@@ -89,12 +159,131 @@ class CountingMetadataTest {
                                 "Femelle",
                                 9L
                             )
+                        ),
+                        PropertyValue(
+                            "MIN",
+                            null,
+                            1
+                        ),
+                        PropertyValue(
+                            "MAX",
+                            null,
+                            2
+                        )
+                    ).associateBy { it.code }
+                )
+            }.copy(index = 1),
+            CountingMetadata(1).apply {
+                properties.putAll(
+                    listOf(
+                        fromNomenclature(
+                            "SEXE",
+                            Nomenclature(
+                                168L,
+                                "Femelle",
+                                "009.002",
+                                "Femelle",
+                                9L
+                            )
+                        ),
+                        PropertyValue(
+                            "MIN",
+                            null,
+                            1
+                        ),
+                        PropertyValue(
+                            "MAX",
+                            null,
+                            2
+                        )
+                    ).associateBy { it.code }
+                )
+            })
+    }
+
+    @Test
+    fun `should update counting metadata`() {
+        assertEquals(
+            CountingMetadata(
+                properties = listOf(
+                    fromNomenclature(
+                        "SEXE",
+                        Nomenclature(
+                            168L,
+                            "Femelle",
+                            "009.002",
+                            "Femelle",
+                            9L
                         )
                     )
+                ).associateBy { it.code }.toSortedMap()
+            ).apply {
+                properties["MIN"] = PropertyValue(
+                    "MIN",
+                    null,
+                    1
                 )
+                properties["MAX"] = PropertyValue(
+                    "MAX",
+                    null,
+                    2
+                )
+            },
+            CountingMetadata(
+                properties = listOf(
+                    fromNomenclature(
+                        "SEXE",
+                        Nomenclature(
+                            168L,
+                            "Femelle",
+                            "009.002",
+                            "Femelle",
+                            9L
+                        )
+                    ),
+                    PropertyValue(
+                        "MIN",
+                        null,
+                        1
+                    ),
+                    PropertyValue(
+                        "MAX",
+                        null,
+                        2
+                    )
+                ).associateBy { it.code }.toSortedMap()
             )
-            min = 1
-            max = 2
+        )
+    }
+
+    @Test
+    fun `should create counting metadata from Parcel`() {
+        // given counting metadata
+        val countingMetadata = CountingMetadata().apply {
+            properties.putAll(
+                listOf(
+                    fromNomenclature(
+                        "SEXE",
+                        Nomenclature(
+                            168L,
+                            "Femelle",
+                            "009.002",
+                            "Femelle",
+                            9L
+                        )
+                    ),
+                    PropertyValue(
+                        "MIN",
+                        null,
+                        1
+                    ),
+                    PropertyValue(
+                        "MAX",
+                        null,
+                        2
+                    )
+                ).associateBy { it.code }
+            )
         }
 
         // when we obtain a Parcel object to write the selected counting metadata instance to it

@@ -14,8 +14,7 @@ import java.util.TreeMap
  */
 class InputTaxon : AbstractInputTaxon {
 
-    val properties: SortedMap<String, PropertyValue> =
-        TreeMap { o1, o2 -> o1.compareTo(o2) }
+    val properties: SortedMap<String, PropertyValue> = TreeMap { o1, o2 -> o1.compareTo(o2) }
     private val counting: SortedMap<Int, CountingMetadata> = TreeMap()
 
     constructor(taxon: AbstractTaxon) : super(taxon)
@@ -78,7 +77,7 @@ class InputTaxon : AbstractInputTaxon {
         val index = if (countingMetadata.index > 0) countingMetadata.index
         else this.counting.keys.maxOrNull()?.plus(1) ?: 1
 
-        counting[index] = countingMetadata.apply { this.index = index }
+        counting[index] = countingMetadata.copy(index = index)
     }
 
     fun deleteCountingMetadata(index: Int): CountingMetadata? {

@@ -14,21 +14,18 @@ import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.lifecycle.observe
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.nomenclature.domain.BaseEditableNomenclatureType
+import fr.geonature.occtax.features.input.domain.Input
+import fr.geonature.occtax.features.input.domain.InputTaxon
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.presentation.EditableNomenclatureTypeAdapter
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
-import fr.geonature.occtax.features.input.domain.Input
-import fr.geonature.occtax.features.input.domain.InputTaxon
 import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
-import javax.inject.Inject
 
 /**
  * [Fragment] to let the user to add additional information for the given [Input].
@@ -37,10 +34,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class InformationFragment : AbstractInputFragment() {
-
-    @ContentProviderAuthority
-    @Inject
-    lateinit var authority: String
 
     private val nomenclatureViewModel: NomenclatureViewModel by viewModels()
     private val propertyValueModel: PropertyValueModel by viewModels()
@@ -198,7 +191,7 @@ class InformationFragment : AbstractInputFragment() {
 
     override fun refreshView() {
         nomenclatureViewModel.getEditableNomenclatures(
-            BaseEditableNomenclatureType.Type.INFORMATION,
+            EditableNomenclatureType.Type.INFORMATION,
             (arguments?.getParcelableArray(ARG_PROPERTIES)
                 ?.map { it as PropertySettings }
                 ?.toList() ?: emptyList()),

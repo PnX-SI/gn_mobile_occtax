@@ -22,7 +22,7 @@ import org.robolectric.RobolectricTestRunner
 class InputTaxonTest {
 
     @Test
-    fun testAddCountingMetadata() {
+    fun `should add counting metadata`() {
         // given an input taxon
         val inputTaxon = InputTaxon(
             Taxon(
@@ -62,16 +62,14 @@ class InputTaxonTest {
 
         assertArrayEquals(
             arrayOf(
-                CountingMetadata().apply {
-                index = 1
-                properties["STADE_VIE"] = PropertyValue(
-                    "STADE_VIE",
-                    null,
-                    2L
-                )
-            },
-                CountingMetadata().apply {
-                    index = 2
+                CountingMetadata(1).apply {
+                    properties["STADE_VIE"] = PropertyValue(
+                        "STADE_VIE",
+                        null,
+                        2L
+                    )
+                },
+                CountingMetadata(2).apply {
                     properties["SEXE"] = PropertyValue(
                         "SEXE",
                         null,
@@ -83,7 +81,7 @@ class InputTaxonTest {
     }
 
     @Test
-    fun testDeleteCountingMetadata() {
+    fun `should delete counting metadata`() {
         // given an input taxon with counting metadata
         val inputTaxon = InputTaxon(
             Taxon(
@@ -113,7 +111,7 @@ class InputTaxonTest {
     }
 
     @Test
-    fun testParcelable() {
+    fun `should create input taxon from Parcel`() {
         // given an input taxon
         val inputTaxon = InputTaxon(
             Taxon(
@@ -138,24 +136,29 @@ class InputTaxonTest {
             )
             addCountingMetadata(CountingMetadata().apply {
                 properties.putAll(
-                    mutableMapOf(
-                        Pair(
+                    listOf(
+                        PropertyValue.fromNomenclature(
                             "SEXE",
-                            PropertyValue.fromNomenclature(
-                                "SEXE",
-                                Nomenclature(
-                                    168L,
-                                    "Femelle",
-                                    "009.002",
-                                    "Femelle",
-                                    9L
-                                )
+                            Nomenclature(
+                                168L,
+                                "Femelle",
+                                "009.002",
+                                "Femelle",
+                                9L
                             )
+                        ),
+                        PropertyValue(
+                            "MIN",
+                            null,
+                            1
+                        ),
+                        PropertyValue(
+                            "MAX",
+                            null,
+                            2
                         )
-                    )
+                    ).associateBy { it.code }
                 )
-                min = 1
-                max = 2
             })
         }
 

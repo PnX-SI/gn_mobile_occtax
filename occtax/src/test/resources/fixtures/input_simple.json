@@ -61,20 +61,24 @@
           "counting": [
             {
               "index": 1,
-              "stade_vie": {
+              "max": {
                 "value": 2
               },
-              "sexe": {
-                "value": 168
+              "min": {
+                "value": 1
               },
               "obj_denbr": {
                 "value": 146
               },
+              "sexe": {
+                "value": 168
+              },
+              "stade_vie": {
+                "value": 2
+              },
               "typ_denbr": {
                 "value": 93
-              },
-              "min": 1,
-              "max": 2
+              }
             }
           ]
         },
@@ -89,12 +93,12 @@
         "id_nomenclature_bio_status": 29,
         "cor_counting_occtax": [
           {
-            "id_nomenclature_life_stage": 2,
-            "id_nomenclature_sex": 168,
-            "id_nomenclature_obj_count": 146,
-            "id_nomenclature_type_count": 93,
+            "count_max": 2,
             "count_min": 1,
-            "count_max": 2
+            "id_nomenclature_obj_count": 146,
+            "id_nomenclature_sex": 168,
+            "id_nomenclature_life_stage": 2,
+            "id_nomenclature_type_count": 93
           }
         ]
       }
