@@ -1,18 +1,18 @@
 package fr.geonature.occtax.features.nomenclature.repository
 
-import fr.geonature.commons.data.entity.Nomenclature
-import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.error.Failure
 import fr.geonature.commons.fp.Either
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.settings.PropertySettings
+import fr.geonature.commons.features.nomenclature.repository.INomenclatureRepository as IBaseNomenclatureRepository
 
 /**
- * Editable nomenclature types repository.
+ * Editable nomenclature types repository based from [IBaseNomenclatureRepository].
  *
  * @author S. Grimault
+ * @see IBaseNomenclatureRepository
  */
-interface INomenclatureRepository {
+interface INomenclatureRepository : IBaseNomenclatureRepository {
 
     /**
      * Gets all editable nomenclatures from given type with default values from nomenclature.
@@ -26,17 +26,4 @@ interface INomenclatureRepository {
         type: EditableNomenclatureType.Type,
         vararg defaultPropertySettings: PropertySettings
     ): Either<Failure, List<EditableNomenclatureType>>
-
-    /**
-     * Gets all nomenclature values matching given nomenclature type and an optional taxonomy rank.
-     *
-     * @param mnemonic the nomenclature type as main filter
-     * @param taxonomy the taxonomy rank
-     *
-     * @return a list of [Nomenclature] matching given criteria or [Failure] if something goes wrong
-     */
-    suspend fun getNomenclatureValuesByTypeAndTaxonomy(
-        mnemonic: String,
-        taxonomy: Taxonomy? = null
-    ): Either<Failure, List<Nomenclature>>
 }

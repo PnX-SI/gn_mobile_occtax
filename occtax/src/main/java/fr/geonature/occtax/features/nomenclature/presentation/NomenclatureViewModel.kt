@@ -75,9 +75,12 @@ class NomenclatureViewModel @Inject constructor(
             ),
             viewModelScope
         ) {
-            it.fold(::handleFailure) { nomenclatureValues ->
-                nomenclatureValuesByTypeAndTaxonomy.value = nomenclatureValues
-            }
+            it.fold(
+                onSuccess = { nomenclatureValues ->
+                    nomenclatureValuesByTypeAndTaxonomy.value = nomenclatureValues
+                },
+                ::handleError
+            )
         }
 
         return nomenclatureValuesByTypeAndTaxonomy

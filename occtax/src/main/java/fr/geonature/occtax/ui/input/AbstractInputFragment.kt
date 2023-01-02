@@ -6,14 +6,13 @@ import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import fr.geonature.commons.features.input.domain.AbstractInput
 import fr.geonature.commons.lifecycle.observeUntil
-import fr.geonature.occtax.features.input.domain.Input
-import fr.geonature.occtax.features.input.presentation.InputViewModel
+import fr.geonature.occtax.features.record.domain.ObservationRecord
+import fr.geonature.occtax.features.record.presentation.ObservationRecordViewModel
 import fr.geonature.viewpager.model.IPageWithValidationFragment
 
 /**
- * `Fragment` using [AbstractInput] as page.
+ * `Fragment` using [ObservationRecord] as page.
  *
  * @author S. Grimault
  */
@@ -21,8 +20,8 @@ abstract class AbstractInputFragment : Fragment(), IPageWithValidationFragment, 
 
     lateinit var listener: OnInputPageFragmentListener
 
-    private val inputViewModel: InputViewModel by activityViewModels()
-    var input: Input? = null
+    private val observationRecordViewModel: ObservationRecordViewModel by activityViewModels()
+    var observationRecord: ObservationRecord? = null
         private set
 
     override fun onAttach(context: Context) {
@@ -46,12 +45,12 @@ abstract class AbstractInputFragment : Fragment(), IPageWithValidationFragment, 
             }
         }
 
-        inputViewModel.input.observeUntil(
+        observationRecordViewModel.observationRecord.observeUntil(
             viewLifecycleOwner,
             { it != null }) {
             if (it == null) return@observeUntil
 
-            input = it
+            observationRecord = it
             listener.validateCurrentPage()
             refreshView()
         }

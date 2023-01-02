@@ -3,16 +3,14 @@ package fr.geonature.occtax.features.nomenclature.repository
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.NomenclatureType
-import fr.geonature.commons.data.entity.Taxonomy
+import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSource
 import fr.geonature.commons.fp.identity
 import fr.geonature.commons.fp.orNull
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.input.domain.PropertyValue
-import fr.geonature.occtax.features.nomenclature.data.INomenclatureLocalDataSource
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureSettingsLocalDataSource
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
-import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureValuesFoundFailure
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
@@ -407,111 +405,5 @@ class NomenclatureRepositoryTest {
             // then
             assertTrue(editableNomenclatureSettings.isLeft)
             assertTrue(editableNomenclatureSettings.fold(::identity) {} is NoNomenclatureTypeFoundLocallyFailure)
-        }
-
-    @Test
-    fun `should get nomenclature values by type matching given taxonomy kingdom and group`() =
-        runTest {
-            coEvery {
-                // given some nomenclature values from given type
-                nomenclatureLocalDataSource.getNomenclatureValuesByTypeAndTaxonomy(
-                    mnemonic = "STATUT_BIO",
-                    Taxonomy(
-                        kingdom = "Animalia",
-                        group = "Oiseaux"
-                    )
-                )
-            } returns listOf(
-                Nomenclature(
-                    id = 29,
-                    code = "1",
-                    hierarchy = "013.001",
-                    defaultLabel = "Non renseigné",
-                    typeId = 13
-                ),
-                Nomenclature(
-                    id = 31,
-                    code = "3",
-                    hierarchy = "013.003",
-                    defaultLabel = "Reproduction",
-                    typeId = 13
-                ),
-                Nomenclature(
-                    id = 32,
-                    code = "4",
-                    hierarchy = "013.004",
-                    defaultLabel = "Hibernation",
-                    typeId = 13
-                )
-            )
-
-            // when
-            val nomenclatures = nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
-                mnemonic = "STATUT_BIO",
-                Taxonomy(
-                    kingdom = "Animalia",
-                    group = "Oiseaux"
-                )
-            )
-
-            // then
-            assertTrue(nomenclatures.isRight)
-            assertEquals(
-                listOf(
-                    Nomenclature(
-                        id = 29,
-                        code = "1",
-                        hierarchy = "013.001",
-                        defaultLabel = "Non renseigné",
-                        typeId = 13
-                    ),
-                    Nomenclature(
-                        id = 31,
-                        code = "3",
-                        hierarchy = "013.003",
-                        defaultLabel = "Reproduction",
-                        typeId = 13
-                    ),
-                    Nomenclature(
-                        id = 32,
-                        code = "4",
-                        hierarchy = "013.004",
-                        defaultLabel = "Hibernation",
-                        typeId = 13
-                    )
-                ),
-                nomenclatures.orNull()
-            )
-        }
-
-    @Test
-    fun `should return NoNomenclatureValuesFoundFailure if no nomenclature values was found from given type`() =
-        runTest {
-            // given no nomenclature values from given type
-            coEvery {
-                nomenclatureLocalDataSource.getNomenclatureValuesByTypeAndTaxonomy(
-                    "STATUT_BIO",
-                    Taxonomy(
-                        kingdom = "Animalia",
-                        group = "Oiseaux"
-                    )
-                )
-            } returns emptyList()
-
-            // when
-            val nomenclatures = nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
-                mnemonic = "STATUT_BIO",
-                Taxonomy(
-                    kingdom = "Animalia",
-                    group = "Oiseaux"
-                )
-            )
-
-            // then
-            assertTrue(nomenclatures.isLeft)
-            assertEquals(
-                nomenclatures.fold(::identity) {},
-                NoNomenclatureValuesFoundFailure("STATUT_BIO")
-            )
         }
 }

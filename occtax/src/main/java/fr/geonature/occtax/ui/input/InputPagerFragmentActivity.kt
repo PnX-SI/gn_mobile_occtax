@@ -6,11 +6,13 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import fr.geonature.commons.lifecycle.onError
 import fr.geonature.commons.util.KeyboardUtils.hideKeyboard
 import fr.geonature.commons.util.ThemeUtils
 import fr.geonature.maps.settings.MapSettings
@@ -21,8 +23,9 @@ import fr.geonature.maps.util.MapSettingsPreferencesUtils.showCompass
 import fr.geonature.maps.util.MapSettingsPreferencesUtils.showScale
 import fr.geonature.maps.util.MapSettingsPreferencesUtils.showZoom
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.input.domain.Input
-import fr.geonature.occtax.features.input.presentation.InputViewModel
+import fr.geonature.occtax.features.record.domain.ObservationRecord
+import fr.geonature.occtax.features.record.error.ObservationRecordException
+import fr.geonature.occtax.features.record.presentation.ObservationRecordViewModel
 import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.ui.input.counting.CountingFragment
 import fr.geonature.occtax.ui.input.informations.InformationFragment
@@ -47,12 +50,12 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
     OnInputPageFragmentListener,
     MapFragment.OnMapFragmentPermissionsListener {
 
-    private val inputViewModel: InputViewModel by viewModels()
+    private val observationRecordViewModel: ObservationRecordViewModel by viewModels()
 
     private lateinit var appSettings: AppSettings
-    private lateinit var input: Input
+    private lateinit var observationRecord: ObservationRecord
 
-    private var inputExported = false
+    private var observationRecordExported = false
 
     private var manageExternalStoragePermissionLifecycleObserver: ManageExternalStoragePermissionLifecycleObserver? =
         null
@@ -62,6 +65,13 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        with(observationRecordViewModel) {
+            onError(
+                error,
+                ::handleError
+            )
+        }
 
         // FIXME: this is a workaround to keep MapView alive from InputMapFragment…
         // see: https://github.com/osmdroid/osmdroid/issues/1581
@@ -83,15 +93,11 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
         )
 
         appSettings = intent.getParcelableExtra(EXTRA_APP_SETTINGS)!!
-        input = intent.getParcelableExtra(EXTRA_INPUT) ?: Input()
-        val lastAddedInputTaxon = input.getLastAddedInputTaxon()
+        observationRecord =
+            intent.getParcelableExtra(EXTRA_OBSERVATION_RECORD) ?: ObservationRecord()
 
-        if (lastAddedInputTaxon != null) {
-            input.setCurrentSelectedInputTaxonId(lastAddedInputTaxon.taxon.id)
-        }
-
-        Logger.info { "loading input: ${input.id}" }
-        inputViewModel.editInput(input)
+        Logger.info { "loading observation record: ${observationRecord.id}" }
+        observationRecordViewModel.loadDefaultNomenclatureValues(observationRecord)
 
         pageFragmentViewModel.set(
             R.string.pager_fragment_observers_and_date_input_title to ObserversAndDateInputFragment.newInstance(
@@ -113,9 +119,9 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
     override fun onPause() {
         super.onPause()
 
-        if (!inputExported) {
-            inputViewModel.input.value?.also {
-                inputViewModel.saveInput(it)
+        if (!observationRecordExported) {
+            observationRecordViewModel.observationRecord.value?.also {
+                observationRecordViewModel.save(it)
             }
         }
     }
@@ -129,12 +135,12 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
     }
 
     override fun performFinishAction() {
-        inputViewModel.input.value?.also {
-            inputViewModel.exportInput(
+        observationRecordViewModel.observationRecord.value?.also {
+            observationRecordViewModel.export(
                 it,
                 appSettings
             ) {
-                inputExported = true
+                observationRecordExported = true
                 finish()
             }
         }
@@ -189,7 +195,6 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
     }
 
     override fun finishEditTaxon() {
-        input.clearCurrentSelectedInputTaxon()
         removePage(
             R.string.pager_fragment_taxa_title,
             R.string.pager_fragment_information_title,
@@ -221,15 +226,32 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
             }
         }
 
+    private fun handleError(throwable: Throwable) {
+        throwable.message?.also {
+            Logger.error(throwable) { it }
+        }
+
+        when (throwable) {
+            is ObservationRecordException.NoDefaultNomenclatureValuesFoundException -> {
+                Toast.makeText(
+                    this,
+                    R.string.toast_input_default_properties_loading_failed,
+                    Toast.LENGTH_LONG
+                )
+                    .show()
+            }
+        }
+    }
+
     companion object {
 
         private const val EXTRA_APP_SETTINGS = "extra_app_settings"
-        private const val EXTRA_INPUT = "extra_input"
+        private const val EXTRA_OBSERVATION_RECORD = "extra_observation_record"
 
         fun newIntent(
             context: Context,
             appSettings: AppSettings,
-            input: Input? = null
+            input: ObservationRecord? = null
         ): Intent {
             return Intent(
                 context,
@@ -240,7 +262,7 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
                     appSettings
                 )
                 putExtra(
-                    EXTRA_INPUT,
+                    EXTRA_OBSERVATION_RECORD,
                     input
                 )
             }

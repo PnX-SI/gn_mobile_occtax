@@ -6,13 +6,13 @@ import androidx.lifecycle.viewModelScope
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.error.Failure
+import fr.geonature.commons.features.nomenclature.error.NomenclatureException
 import fr.geonature.commons.fp.Either.Left
 import fr.geonature.commons.fp.Either.Right
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
-import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureValuesFoundFailure
 import fr.geonature.occtax.features.nomenclature.usecase.GetEditableNomenclaturesUseCase
 import fr.geonature.occtax.features.nomenclature.usecase.GetNomenclatureValuesByTypeAndTaxonomyUseCase
 import io.mockk.MockKAnnotations.init
@@ -54,6 +54,9 @@ class NomenclatureViewModelTest {
 
     @RelaxedMockK
     private lateinit var nomenclatureValuesObserver: Observer<List<Nomenclature>>
+
+    @RelaxedMockK
+    private lateinit var errorObserver: Observer<Throwable>
 
     @RelaxedMockK
     private lateinit var failureObserver: Observer<Failure>
@@ -201,7 +204,7 @@ class NomenclatureViewModelTest {
                         )
                     )
                 )
-            } returns Right(expectedNomenclatureValues)
+            } returns Result.success(expectedNomenclatureValues)
             coEvery {
                 getNomenclatureValuesByTypeAndTaxonomyUseCase(
                     GetNomenclatureValuesByTypeAndTaxonomyUseCase.Params(
@@ -223,7 +226,8 @@ class NomenclatureViewModelTest {
                     kingdom = "Animalia",
                     group = "Oiseaux"
                 )
-            ).observeForever(nomenclatureValuesObserver)
+            )
+                .observeForever(nomenclatureValuesObserver)
             nomenclatureViewModel.failure.observeForever(failureObserver)
 
             // then
@@ -245,7 +249,7 @@ class NomenclatureViewModelTest {
                         )
                     )
                 )
-            } returns Left(NoNomenclatureValuesFoundFailure("STATUT_BIO"))
+            } returns Result.failure(NomenclatureException.NoNomenclatureValuesFoundException("STATUT_BIO"))
             coEvery {
                 getNomenclatureValuesByTypeAndTaxonomyUseCase(
                     GetNomenclatureValuesByTypeAndTaxonomyUseCase.Params(
@@ -267,11 +271,15 @@ class NomenclatureViewModelTest {
                     kingdom = "Animalia",
                     group = "Oiseaux"
                 )
-            ).observeForever(nomenclatureValuesObserver)
+            )
+                .observeForever(nomenclatureValuesObserver)
+            nomenclatureViewModel.error.observeForever(errorObserver)
             nomenclatureViewModel.failure.observeForever(failureObserver)
 
             // then
-            verify(atLeast = 1) { failureObserver.onChanged(NoNomenclatureValuesFoundFailure("STATUT_BIO")) }
+            verify(atLeast = 1) {
+                errorObserver.onChanged(NomenclatureException.NoNomenclatureValuesFoundException("STATUT_BIO"))
+            }
             confirmVerified(failureObserver)
         }
 }

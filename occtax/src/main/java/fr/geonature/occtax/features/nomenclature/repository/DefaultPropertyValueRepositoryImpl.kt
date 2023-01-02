@@ -2,13 +2,13 @@ package fr.geonature.occtax.features.nomenclature.repository
 
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.error.Failure
+import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSource
 import fr.geonature.commons.fp.Either
 import fr.geonature.commons.fp.Either.Left
 import fr.geonature.commons.fp.Either.Right
-import fr.geonature.occtax.features.nomenclature.data.INomenclatureLocalDataSource
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.data.IPropertyValueLocalDataSource
 import fr.geonature.occtax.features.nomenclature.error.PropertyValueFailure
-import fr.geonature.occtax.features.input.domain.PropertyValue
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList

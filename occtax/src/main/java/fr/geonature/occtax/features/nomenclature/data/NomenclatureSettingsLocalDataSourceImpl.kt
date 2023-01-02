@@ -2,6 +2,7 @@ package fr.geonature.occtax.features.nomenclature.data
 
 import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
+import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.settings.PropertySettings
 
 /**
@@ -12,7 +13,6 @@ import fr.geonature.occtax.settings.PropertySettings
 class NomenclatureSettingsLocalDataSourceImpl :
     INomenclatureSettingsLocalDataSource {
 
-    // TODO: as EditableNomenclatureType to set also default values
     private val defaultNomenclatureTypes = listOf(
         EditableNomenclatureType(
             EditableNomenclatureType.Type.DEFAULT,
@@ -37,7 +37,7 @@ class NomenclatureSettingsLocalDataSourceImpl :
         ),
         EditableNomenclatureType(
             EditableNomenclatureType.Type.INFORMATION,
-            "DETERMINER",
+            "determiner",
             EditableNomenclatureType.ViewType.TEXT_SIMPLE,
             default = false
         ),
@@ -67,7 +67,7 @@ class NomenclatureSettingsLocalDataSourceImpl :
         ),
         EditableNomenclatureType(
             EditableNomenclatureType.Type.INFORMATION,
-            "COMMENT",
+            "comment",
             EditableNomenclatureType.ViewType.TEXT_MULTIPLE,
             default = false
         ),
@@ -93,7 +93,7 @@ class NomenclatureSettingsLocalDataSourceImpl :
         ),
         EditableNomenclatureType(
             EditableNomenclatureType.Type.COUNTING,
-            "MIN",
+            CountingRecord.MIN_KEY,
             EditableNomenclatureType.ViewType.MIN_MAX
         ).apply {
             value = PropertyValue.fromValue(
@@ -103,7 +103,7 @@ class NomenclatureSettingsLocalDataSourceImpl :
         },
         EditableNomenclatureType(
             EditableNomenclatureType.Type.COUNTING,
-            "MAX",
+            CountingRecord.MAX_KEY,
             EditableNomenclatureType.ViewType.MIN_MAX
         ).apply {
             value = PropertyValue.fromValue(
@@ -117,7 +117,7 @@ class NomenclatureSettingsLocalDataSourceImpl :
         type: EditableNomenclatureType.Type,
         vararg defaultPropertySettings: PropertySettings
     ): List<EditableNomenclatureType> {
-        if (defaultPropertySettings.isEmpty()) {
+        if (defaultPropertySettings.isEmpty() || type == EditableNomenclatureType.Type.DEFAULT) {
             return defaultNomenclatureTypes.filter { it.type == type }
         }
 

@@ -2,7 +2,13 @@
   "id": 1234,
   "module": "occtax",
   "status": "draft",
-  "geometry": null,
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -1.554476,
+      47.225782
+    ]
+  },
   "properties": {
     "meta_device_entry": "mobile",
     "date_min": "2016-10-28T08:15:00Z",

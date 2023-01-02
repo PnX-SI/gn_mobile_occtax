@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
@@ -25,17 +24,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.GeoNatureModuleName
 import fr.geonature.commons.data.entity.Dataset
-import fr.geonature.commons.data.entity.DefaultNomenclature
-import fr.geonature.commons.data.entity.DefaultNomenclatureWithType
 import fr.geonature.commons.data.entity.InputObserver
-import fr.geonature.commons.data.entity.NomenclatureType
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.commons.util.afterTextChanged
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.input.domain.Input
-import fr.geonature.occtax.features.input.domain.NomenclatureTypeViewType
-import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.settings.InputDateSettings
 import fr.geonature.occtax.ui.dataset.DatasetListActivity
 import fr.geonature.occtax.ui.input.AbstractInputFragment
@@ -94,7 +88,8 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                     buildUri(
                         authority,
                         InputObserver.TABLE_NAME,
-                        args?.getLongArray(KEY_SELECTED_INPUT_OBSERVER_IDS)?.joinToString(",")
+                        args?.getLongArray(KEY_SELECTED_INPUT_OBSERVER_IDS)
+                            ?.joinToString(",")
                             ?: ""
                     ),
                     null,
@@ -111,20 +106,8 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                         args?.getLong(
                             Dataset.COLUMN_ID,
                             -1
-                        ).toString()
-                    ),
-                    null,
-                    null,
-                    null,
-                    null
-                )
-                LOADER_DEFAULT_NOMENCLATURE_VALUES -> CursorLoader(
-                    requireContext(),
-                    buildUri(
-                        authority,
-                        NomenclatureType.TABLE_NAME,
-                        args?.getString(Dataset.COLUMN_MODULE) ?: "",
-                        "default"
+                        )
+                            .toString()
                     ),
                     null,
                     null,
@@ -151,9 +134,10 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                         mutableListOf<InputObserver>().let {
                             if (cursor.moveToFirst()) {
                                 while (!cursor.isAfterLast) {
-                                    InputObserver.fromCursor(cursor)?.run {
-                                        it.add(this)
-                                    }
+                                    InputObserver.fromCursor(cursor)
+                                        ?.run {
+                                            it.add(this)
+                                        }
 
                                     cursor.moveToNext()
                                 }
@@ -179,7 +163,7 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                 LOADER_DATASET_ID -> {
                     if (data.count == 0) {
                         selectedDataset = null
-                        input?.datasetId = null
+                        observationRecord?.dataset?.datasetId = null
                         listener.validateCurrentPage()
                     }
 
@@ -188,48 +172,6 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                     }
 
                     updateSelectedDatasetActionView(selectedDataset)
-                }
-                LOADER_DEFAULT_NOMENCLATURE_VALUES -> {
-                    data.moveToFirst()
-
-                    val defaultMnemonicFilter = Input.defaultPropertiesMnemonic.asSequence()
-                        .filter { it.second == NomenclatureTypeViewType.NOMENCLATURE_TYPE }
-                        .map { it.first }
-                        .toList()
-
-                    while (!data.isAfterLast) {
-                        val defaultNomenclatureValue = DefaultNomenclatureWithType.fromCursor(data)
-                        val mnemonic =
-                            defaultNomenclatureValue?.nomenclatureWithType?.type?.mnemonic
-
-                        if (defaultNomenclatureValue != null && !mnemonic.isNullOrBlank() && defaultMnemonicFilter.contains(
-                                mnemonic
-                            )
-                        ) {
-                            input?.properties?.set(
-                                mnemonic,
-                                PropertyValue.fromNomenclature(
-                                    mnemonic,
-                                    defaultNomenclatureValue.nomenclatureWithType
-                                )
-                            )
-                        }
-
-                        data.moveToNext()
-                    }
-
-                    listener.validateCurrentPage()
-
-                    if (input?.properties?.isNotEmpty() == false) {
-                        val context = context ?: return
-
-                        Toast.makeText(
-                            context,
-                            R.string.toast_input_default_properties_loading_failed,
-                            Toast.LENGTH_LONG
-                        )
-                            .show()
-                    }
                 }
             }
 
@@ -288,63 +230,69 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
         )
 
         selectedInputObserversActionView =
-            view.findViewById<ListItemActionView?>(R.id.selected_observers_action_view)?.apply {
-                setListener(object : ListItemActionView.OnListItemActionViewListener {
-                    override fun onAction() {
-                        val context = context ?: return
+            view.findViewById<ListItemActionView?>(R.id.selected_observers_action_view)
+                ?.apply {
+                    setListener(object : ListItemActionView.OnListItemActionViewListener {
+                        override fun onAction() {
+                            val context = context ?: return
 
-                        observersResultLauncher.launch(
-                            InputObserverListActivity.newIntent(
-                                context,
-                                ListView.CHOICE_MODE_MULTIPLE,
-                                selectedInputObservers
+                            observersResultLauncher.launch(
+                                InputObserverListActivity.newIntent(
+                                    context,
+                                    ListView.CHOICE_MODE_MULTIPLE,
+                                    selectedInputObservers
+                                )
                             )
-                        )
-                    }
-                })
-            }
+                        }
+                    })
+                }
 
         selectedDatasetActionView =
-            view.findViewById<ActionView?>(R.id.selected_dataset_action_view)?.apply {
-                setListener(object : ActionView.OnActionViewListener {
-                    override fun onAction() {
-                        val context = context ?: return
+            view.findViewById<ActionView?>(R.id.selected_dataset_action_view)
+                ?.apply {
+                    setListener(object : ActionView.OnActionViewListener {
+                        override fun onAction() {
+                            val context = context ?: return
 
-                        datasetResultLauncher.launch(
-                            DatasetListActivity.newIntent(
-                                context,
-                                selectedDataset
+                            datasetResultLauncher.launch(
+                                DatasetListActivity.newIntent(
+                                    context,
+                                    selectedDataset
+                                )
                             )
-                        )
+                        }
+                    })
+                }
+
+        inputDateView = view.findViewById<InputDateView>(R.id.input_date)
+            ?.apply {
+                setInputDateSettings(dateSettings)
+                setListener(object : InputDateView.OnInputDateViewListener {
+                    override fun fragmentManager(): FragmentManager? {
+                        return activity?.supportFragmentManager
+                    }
+
+                    override fun onDatesChanged(startDate: Date, endDate: Date) {
+                        observationRecord?.dates?.start = startDate
+                        observationRecord?.dates?.end = endDate
+
+                        listener.validateCurrentPage()
+                    }
+
+                    override fun hasError(message: CharSequence) {
+                        listener.validateCurrentPage()
                     }
                 })
             }
 
-        inputDateView = view.findViewById<InputDateView>(R.id.input_date)?.apply {
-            setInputDateSettings(dateSettings)
-            setListener(object : InputDateView.OnInputDateViewListener {
-                override fun fragmentManager(): FragmentManager? {
-                    return activity?.supportFragmentManager
+        commentTextInputLayout = view.findViewById<TextInputLayout?>(android.R.id.edit)
+            ?.apply {
+                editText?.afterTextChanged {
+                    observationRecord?.comment?.comment = it?.toString()
+                        ?.ifEmpty { null }
+                        ?.ifBlank { null }
                 }
-
-                override fun onDatesChanged(startDate: Date, endDate: Date) {
-                    input?.startDate = startDate
-                    input?.endDate = endDate
-
-                    listener.validateCurrentPage()
-                }
-
-                override fun hasError(message: CharSequence) {
-                    listener.validateCurrentPage()
-                }
-            })
-        }
-
-        commentTextInputLayout = view.findViewById<TextInputLayout?>(android.R.id.edit)?.apply {
-            editText?.afterTextChanged {
-                input?.comment = it?.toString()?.ifEmpty { null }?.ifBlank { null }
             }
-        }
 
         return view
     }
@@ -362,10 +310,11 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
     }
 
     override fun validate(): Boolean {
-        return this.input?.getAllInputObserverIds()
+        return observationRecord?.observers?.getAllObserverIds()
             ?.isNotEmpty() ?: false &&
-            this.input?.datasetId != null &&
-            this.input?.properties?.isNotEmpty() == true &&
+            this.observationRecord?.dataset?.datasetId != null &&
+            this.observationRecord?.properties?.filterValues { it is PropertyValue.Nomenclature }
+                ?.isNotEmpty() == true &&
             inputDateView?.hasErrors() == false
     }
 
@@ -377,29 +326,31 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
 
         setDefaultDatasetFromSettings()
 
-        input?.getAllInputObserverIds()?.also { selectedInputObserverIdsFromInput ->
-            val selectedInputObserverIds = selectedInputObserverIdsFromInput.ifEmpty {
-                context?.let { getDefaultObserversId(it) } ?: emptyList()
+        observationRecord?.observers?.getAllObserverIds()
+            ?.also { selectedInputObserverIdsFromInput ->
+                val selectedInputObserverIds = selectedInputObserverIdsFromInput.ifEmpty {
+                    context?.let { getDefaultObserversId(it) } ?: emptyList()
+                }
+
+                if (selectedInputObserverIds.isNotEmpty()) {
+                    LoaderManager.getInstance(this)
+                        .initLoader(
+                            LOADER_OBSERVERS_IDS,
+                            bundleOf(
+                                kotlin.Pair(
+                                    KEY_SELECTED_INPUT_OBSERVER_IDS,
+                                    selectedInputObserverIds.toTypedArray()
+                                        .toLongArray()
+                                )
+                            ),
+                            loaderCallbacks
+                        )
+                } else {
+                    updateSelectedObserversActionView(emptyList())
+                }
             }
 
-            if (selectedInputObserverIds.isNotEmpty()) {
-                LoaderManager.getInstance(this)
-                    .initLoader(
-                        LOADER_OBSERVERS_IDS,
-                        bundleOf(
-                            kotlin.Pair(
-                                KEY_SELECTED_INPUT_OBSERVER_IDS,
-                                selectedInputObserverIds.toTypedArray().toLongArray()
-                            )
-                        ),
-                        loaderCallbacks
-                    )
-            } else {
-                updateSelectedObserversActionView(emptyList())
-            }
-        }
-
-        val selectedDatasetId = input?.datasetId
+        val selectedDatasetId = observationRecord?.dataset?.datasetId
 
         if (selectedDatasetId != null) {
             LoaderManager.getInstance(this)
@@ -421,31 +372,22 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
             updateSelectedDatasetActionView(null)
         }
 
-        LoaderManager.getInstance(this)
-            .initLoader(
-                LOADER_DEFAULT_NOMENCLATURE_VALUES,
-                bundleOf(
-                    kotlin.Pair(
-                        DefaultNomenclature.COLUMN_MODULE,
-                        moduleName
-                    )
-                ),
-                loaderCallbacks
-            )
-
         inputDateView?.setDates(
-            startDate = input?.startDate ?: Date(),
-            endDate = input?.endDate
+            startDate = observationRecord?.dates?.start ?: Date(),
+            endDate = observationRecord?.dates?.end
         )
 
         commentTextInputLayout?.apply {
             hint =
                 getString(
-                    if (input?.comment.isNullOrBlank()) R.string.input_comment_add_hint
+                    if (observationRecord?.comment?.comment.isNullOrBlank()) R.string.input_comment_add_hint
                     else R.string.input_comment_edit_hint
                 )
             editText?.apply {
-                text = input?.comment?.let { Editable.Factory.getInstance().newEditable(it) }
+                text = observationRecord?.comment?.comment?.let {
+                    Editable.Factory.getInstance()
+                        .newEditable(it)
+                }
             }
         }
     }
@@ -454,9 +396,12 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
         this.selectedInputObservers.clear()
         this.selectedInputObservers.addAll(selectedInputObservers)
 
-        input?.also {
-            it.clearAllInputObservers()
-            it.setAllInputObservers(selectedInputObservers.ifEmpty { this.defaultInputObservers })
+        observationRecord?.observers?.also { observersRecord ->
+            observersRecord.clearAll()
+            selectedInputObservers.map { it.id }
+                .forEach {
+                    observersRecord.addObserverId(it)
+                }
         }
 
         updateSelectedObserversActionView(selectedInputObservers)
@@ -467,7 +412,7 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
     private fun updateSelectedDataset(selectedDataset: Dataset?) {
         this.selectedDataset = selectedDataset
 
-        input?.also {
+        observationRecord?.dataset?.also {
             it.datasetId = selectedDataset?.id
         }
 
@@ -493,17 +438,18 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
     }
 
     private fun updateSelectedDatasetActionView(selectedDataset: Dataset?) {
-        selectedDatasetActionView?.getContentView()?.also { contentView ->
-            contentView.isSelected = true
-            contentView.findViewById<TextView>(R.id.dataset_name)?.text = selectedDataset?.name
-            contentView.findViewById<TextView>(R.id.dataset_description)?.text =
-                selectedDataset?.description
-        }
+        selectedDatasetActionView?.getContentView()
+            ?.also { contentView ->
+                contentView.isSelected = true
+                contentView.findViewById<TextView>(R.id.dataset_name)?.text = selectedDataset?.name
+                contentView.findViewById<TextView>(R.id.dataset_description)?.text =
+                    selectedDataset?.description
+            }
         selectedDatasetActionView?.setContentViewVisibility(if (selectedDataset == null) View.GONE else View.VISIBLE)
     }
 
     private fun setDefaultDatasetFromSettings() {
-        input?.run {
+        observationRecord?.dataset?.run {
             if (datasetId == null) {
                 val context = context ?: return
                 getDefaultDatasetId(context).also { defaultDatasetId ->
@@ -520,7 +466,6 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
 
         private const val LOADER_OBSERVERS_IDS = 1
         private const val LOADER_DATASET_ID = 2
-        private const val LOADER_DEFAULT_NOMENCLATURE_VALUES = 3
         private const val KEY_SELECTED_INPUT_OBSERVER_IDS = "selected_input_observer_ids"
 
         /**

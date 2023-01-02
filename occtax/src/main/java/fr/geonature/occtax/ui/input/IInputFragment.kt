@@ -1,9 +1,9 @@
 package fr.geonature.occtax.ui.input
 
-import fr.geonature.commons.features.input.domain.AbstractInput
+import fr.geonature.occtax.features.record.domain.ObservationRecord
 
 /**
- * `Fragment` using [AbstractInput].
+ * `Fragment` using [ObservationRecord].
  *
  * @author S. Grimault
  */

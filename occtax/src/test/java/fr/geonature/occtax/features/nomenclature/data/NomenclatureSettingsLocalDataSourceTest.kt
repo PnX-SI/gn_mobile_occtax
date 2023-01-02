@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
+import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.settings.PropertySettings
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -37,6 +38,17 @@ class NomenclatureSettingsLocalDataSourceTest {
         assertEquals(
             listOf(
                 EditableNomenclatureType(
+                    EditableNomenclatureType.Type.DEFAULT,
+                    "TYP_GRP",
+                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                )
+            ),
+            nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.DEFAULT)
+        )
+
+        assertEquals(
+            listOf(
+                EditableNomenclatureType(
                     EditableNomenclatureType.Type.INFORMATION,
                     "METH_OBS",
                     EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
@@ -54,7 +66,7 @@ class NomenclatureSettingsLocalDataSourceTest {
                 ),
                 EditableNomenclatureType(
                     EditableNomenclatureType.Type.INFORMATION,
-                    "DETERMINER",
+                    "determiner",
                     EditableNomenclatureType.ViewType.TEXT_SIMPLE,
                     default = false
                 ),
@@ -84,7 +96,7 @@ class NomenclatureSettingsLocalDataSourceTest {
                 ),
                 EditableNomenclatureType(
                     EditableNomenclatureType.Type.INFORMATION,
-                    "COMMENT",
+                    "comment",
                     EditableNomenclatureType.ViewType.TEXT_MULTIPLE,
                     default = false
                 )
@@ -116,7 +128,7 @@ class NomenclatureSettingsLocalDataSourceTest {
                 ),
                 EditableNomenclatureType(
                     EditableNomenclatureType.Type.COUNTING,
-                    "MIN",
+                    CountingRecord.MIN_KEY,
                     EditableNomenclatureType.ViewType.MIN_MAX
                 ).apply {
                     value = PropertyValue.fromValue(
@@ -126,7 +138,7 @@ class NomenclatureSettingsLocalDataSourceTest {
                 },
                 EditableNomenclatureType(
                     EditableNomenclatureType.Type.COUNTING,
-                    "MAX",
+                    CountingRecord.MAX_KEY,
                     EditableNomenclatureType.ViewType.MIN_MAX
                 ).apply {
                     value = PropertyValue.fromValue(
@@ -138,6 +150,39 @@ class NomenclatureSettingsLocalDataSourceTest {
             nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.COUNTING)
         )
     }
+
+    @Test
+    fun `should get the default nomenclature type settings if nomenclature default main type is requested`() =
+        runTest {
+            assertEquals(
+                listOf(
+                    EditableNomenclatureType(
+                        EditableNomenclatureType.Type.DEFAULT,
+                        "TYP_GRP",
+                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                    )
+                ),
+                nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.DEFAULT)
+            )
+
+            assertEquals(
+                listOf(
+                    EditableNomenclatureType(
+                        EditableNomenclatureType.Type.DEFAULT,
+                        "TYP_GRP",
+                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                    )
+                ),
+                nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(
+                    EditableNomenclatureType.Type.DEFAULT,
+                    PropertySettings(
+                        key = "TYP_GRP",
+                        visible = false,
+                        default = false
+                    )
+                )
+            )
+        }
 
     @Test
     fun `should get nomenclature type settings by nomenclature main type according to given settings`() =

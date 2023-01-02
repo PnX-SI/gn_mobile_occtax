@@ -3,15 +3,16 @@ package fr.geonature.occtax.features.input.domain
 import android.os.Parcel
 import android.os.Parcelable
 import fr.geonature.commons.data.entity.Nomenclature
-import fr.geonature.commons.features.input.domain.AbstractInputTaxon
+import fr.geonature.occtax.features.record.domain.ObservationRecord
 import org.tinylog.Logger
 import java.io.Serializable
 
 /**
- * Property value for [AbstractInputTaxon]
+ * Property value for [ObservationRecord].
  *
  * @author S. Grimault
  */
+@Deprecated(message = "see PropertyValue from record feature")
 data class PropertyValue(
     val code: String,
     val label: String?,

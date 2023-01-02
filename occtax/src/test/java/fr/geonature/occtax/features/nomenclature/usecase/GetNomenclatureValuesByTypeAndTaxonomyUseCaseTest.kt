@@ -3,12 +3,8 @@ package fr.geonature.occtax.features.nomenclature.usecase
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.commons.fp.Either.Left
-import fr.geonature.commons.fp.Either.Right
-import fr.geonature.commons.fp.identity
-import fr.geonature.commons.fp.orNull
+import fr.geonature.commons.features.nomenclature.error.NomenclatureException
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureValuesFoundFailure
 import fr.geonature.occtax.features.nomenclature.repository.INomenclatureRepository
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
@@ -49,63 +45,32 @@ class GetNomenclatureValuesByTypeAndTaxonomyUseCaseTest {
     }
 
     @Test
-    fun `should get nomenclature values by type matching given taxonomy kingdom and group`() = runTest {
-        // given some nomenclature values from given type
-        val expectedNomenclatureValues = listOf(
-            Nomenclature(
-                id = 29,
-                code = "1",
-                hierarchy = "013.001",
-                defaultLabel = "Non renseigné",
-                typeId = 13
-            ),
-            Nomenclature(
-                id = 31,
-                code = "3",
-                hierarchy = "013.003",
-                defaultLabel = "Reproduction",
-                typeId = 13
-            ),
-            Nomenclature(
-                id = 32,
-                code = "4",
-                hierarchy = "013.004",
-                defaultLabel = "Hibernation",
-                typeId = 13
-            )
-        )
-        coEvery {
-            nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
-                mnemonic = "STATUT_BIO",
-                Taxonomy(
-                    kingdom = "Animalia",
-                    group = "Oiseaux"
-                )
-            )
-        } returns Right(expectedNomenclatureValues)
-
-        // when getting all nomenclature values
-        val response = getNomenclatureValuesByTypeAndTaxonomyUseCase.run(
-            GetNomenclatureValuesByTypeAndTaxonomyUseCase.Params(
-                mnemonic = "STATUT_BIO",
-                Taxonomy(
-                    kingdom = "Animalia",
-                    group = "Oiseaux"
-                )
-            )
-        )
-
-        // then
-        assertEquals(
-            expectedNomenclatureValues,
-            response.orNull()
-        )
-    }
-
-    @Test
-    fun `should return NoNomenclatureValuesFoundFailure if no nomenclature values was found from given type`() =
+    fun `should get nomenclature values by type matching given taxonomy kingdom and group`() =
         runTest {
-            // given some failure from repository
+            // given some nomenclature values from given type
+            val expectedNomenclatureValues = listOf(
+                Nomenclature(
+                    id = 29,
+                    code = "1",
+                    hierarchy = "013.001",
+                    defaultLabel = "Non renseigné",
+                    typeId = 13
+                ),
+                Nomenclature(
+                    id = 31,
+                    code = "3",
+                    hierarchy = "013.003",
+                    defaultLabel = "Reproduction",
+                    typeId = 13
+                ),
+                Nomenclature(
+                    id = 32,
+                    code = "4",
+                    hierarchy = "013.004",
+                    defaultLabel = "Hibernation",
+                    typeId = 13
+                )
+            )
             coEvery {
                 nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
                     mnemonic = "STATUT_BIO",
@@ -114,7 +79,7 @@ class GetNomenclatureValuesByTypeAndTaxonomyUseCaseTest {
                         group = "Oiseaux"
                     )
                 )
-            } returns Left(NoNomenclatureValuesFoundFailure("STATUT_BIO"))
+            } returns Result.success(expectedNomenclatureValues)
 
             // when getting all nomenclature values
             val response = getNomenclatureValuesByTypeAndTaxonomyUseCase.run(
@@ -128,10 +93,42 @@ class GetNomenclatureValuesByTypeAndTaxonomyUseCaseTest {
             )
 
             // then
-            assertTrue(response.isLeft)
             assertEquals(
-                response.fold(::identity) {},
-                NoNomenclatureValuesFoundFailure("STATUT_BIO")
+                expectedNomenclatureValues,
+                response.getOrNull()
+            )
+        }
+
+    @Test
+    fun `should return NoNomenclatureValuesFoundFailure if no nomenclature values was found from given type`() =
+        runTest {
+            // given some failure from repository
+            coEvery {
+                nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
+                    mnemonic = "STATUT_BIO",
+                    Taxonomy(
+                        kingdom = "Animalia",
+                        group = "Oiseaux"
+                    )
+                )
+            } answers { Result.failure(NomenclatureException.NoNomenclatureValuesFoundException(firstArg())) }
+
+            // when getting all nomenclature values
+            val result = getNomenclatureValuesByTypeAndTaxonomyUseCase.run(
+                GetNomenclatureValuesByTypeAndTaxonomyUseCase.Params(
+                    mnemonic = "STATUT_BIO",
+                    Taxonomy(
+                        kingdom = "Animalia",
+                        group = "Oiseaux"
+                    )
+                )
+            )
+
+            // then
+            assertTrue(result.isFailure)
+            assertEquals(
+                NomenclatureException.NoNomenclatureValuesFoundException("STATUT_BIO"),
+                result.exceptionOrNull()
             )
         }
 }

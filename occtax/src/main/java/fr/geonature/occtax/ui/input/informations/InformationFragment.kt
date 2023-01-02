@@ -18,17 +18,17 @@ import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.lifecycle.observe
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.input.domain.Input
-import fr.geonature.occtax.features.input.domain.InputTaxon
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.presentation.EditableNomenclatureTypeAdapter
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
+import fr.geonature.occtax.features.record.domain.PropertyValue
+import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
 
 /**
- * [Fragment] to let the user to add additional information for the given [Input].
+ * [Fragment] to let the user to add additional information for the given [TaxonRecord].
  *
  * @author S. Grimault
  */
@@ -74,9 +74,10 @@ class InformationFragment : AbstractInputFragment() {
         )
 
         val recyclerView = view.findViewById<RecyclerView>(android.R.id.list)
-        val emptyTextView = view.findViewById<TextView>(android.R.id.empty).apply {
-            text = getString(R.string.information_no_data)
-        }
+        val emptyTextView = view.findViewById<TextView>(android.R.id.empty)
+            .apply {
+                text = getString(R.string.information_no_data)
+            }
         val progressBar = view.findViewById<ProgressBar>(android.R.id.progress)
             .apply { visibility = View.VISIBLE }
 
@@ -122,7 +123,7 @@ class InformationFragment : AbstractInputFragment() {
             override fun getNomenclatureValues(nomenclatureTypeMnemonic: String): LiveData<List<Nomenclature>> {
                 return nomenclatureViewModel.getNomenclatureValuesByTypeAndTaxonomy(
                     nomenclatureTypeMnemonic,
-                    input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
+                    observationRecord?.taxa?.selectedTaxonRecord?.taxon?.taxonomy
                         ?: Taxonomy(
                             Taxonomy.ANY,
                             Taxonomy.ANY
@@ -131,22 +132,27 @@ class InformationFragment : AbstractInputFragment() {
             }
 
             override fun onUpdate(editableNomenclatureType: EditableNomenclatureType) {
-                (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.set(
-                    editableNomenclatureType.code,
-                    editableNomenclatureType.value
-                )
+                toPropertyValue(editableNomenclatureType)
+                    ?.toPair()
+                    .also {
+                        if (it == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(editableNomenclatureType.code)
+                        else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
+                            it.first,
+                            it.second
+                        )
+                    }
 
                 val propertyValue = editableNomenclatureType.value
 
                 if (propertyValue !== null && editableNomenclatureType.locked) propertyValueModel.setPropertyValue(
-                    input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
+                    observationRecord?.taxa?.selectedTaxonRecord?.taxon?.taxonomy
                         ?: Taxonomy(
                             Taxonomy.ANY,
                             Taxonomy.ANY
                         ),
                     propertyValue
                 ) else propertyValueModel.clearPropertyValue(
-                    input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
+                    observationRecord?.taxa?.selectedTaxonRecord?.taxon?.taxonomy
                         ?: Taxonomy(
                             Taxonomy.ANY,
                             Taxonomy.ANY
@@ -178,7 +184,7 @@ class InformationFragment : AbstractInputFragment() {
     }
 
     override fun getSubtitle(): CharSequence? {
-        return input?.getCurrentSelectedInputTaxon()?.taxon?.name
+        return observationRecord?.taxa?.selectedTaxonRecord?.taxon?.name
     }
 
     override fun pagingEnabled(): Boolean {
@@ -186,7 +192,7 @@ class InformationFragment : AbstractInputFragment() {
     }
 
     override fun validate(): Boolean {
-        return this.input?.getCurrentSelectedInputTaxon() != null
+        return this.observationRecord?.taxa?.selectedTaxonRecord != null
     }
 
     override fun refreshView() {
@@ -195,26 +201,76 @@ class InformationFragment : AbstractInputFragment() {
             (arguments?.getParcelableArray(ARG_PROPERTIES)
                 ?.map { it as PropertySettings }
                 ?.toList() ?: emptyList()),
-            input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
+            observationRecord?.taxa?.selectedTaxonRecord?.taxon?.taxonomy
         )
     }
 
     private fun handleEditableNomenclatureTypes(editableNomenclatureTypes: List<EditableNomenclatureType>) {
-        editableNomenclatureTypes.filter { it.value != null }.forEach {
-            if ((input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.containsKey(it.code) == true) return@forEach
+        editableNomenclatureTypes.filter { it.value != null }
+            .forEach {
+                if (observationRecord?.taxa?.selectedTaxonRecord?.properties?.containsKey(it.code) == true) return@forEach
 
-            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.set(
-                it.code,
-                it.value
-            )
-        }
+                toPropertyValue(it)?.toPair()
+                    .also { pair ->
+                        if (pair == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(it.code)
+                        else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
+                            pair.first,
+                            pair.second
+                        )
+                    }
+            }
 
         adapter?.bind(
             editableNomenclatureTypes,
-            *((input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.properties?.values?.filterNotNull()
+            *(observationRecord?.taxa?.selectedTaxonRecord?.properties?.values?.filterNotNull()
+                ?.map {
+                    it.toPair()
+                }
+                ?.mapNotNull {
+                    when (it.second) {
+                        is PropertyValue.Number -> fr.geonature.occtax.features.input.domain.PropertyValue.fromValue(
+                            it.first,
+                            (it.second as PropertyValue.Number).value
+                        )
+                        is PropertyValue.Text -> fr.geonature.occtax.features.input.domain.PropertyValue.fromValue(
+                            it.first,
+                            (it.second as PropertyValue.Text).value
+                        )
+                        is PropertyValue.Nomenclature -> fr.geonature.occtax.features.input.domain.PropertyValue(
+                            it.first,
+                            (it.second as PropertyValue.Nomenclature).label,
+                            (it.second as PropertyValue.Nomenclature).value
+                        )
+                        else -> null
+                    }
+                }
                 ?.toTypedArray()
                 ?: emptyArray())
         )
+    }
+
+    private fun toPropertyValue(editableNomenclatureType: EditableNomenclatureType): PropertyValue? {
+        return editableNomenclatureType.value?.let {
+            when (it.value) {
+                is Long -> if (it.label.isNullOrEmpty()) PropertyValue.Number(
+                    editableNomenclatureType.code,
+                    it.value
+                ) else PropertyValue.Nomenclature(
+                    editableNomenclatureType.code,
+                    it.label,
+                    it.value
+                )
+                is Number -> PropertyValue.Number(
+                    editableNomenclatureType.code,
+                    it.value
+                )
+                is String -> PropertyValue.Text(
+                    editableNomenclatureType.code,
+                    it.value
+                )
+                else -> null
+            }
+        }
     }
 
     companion object {

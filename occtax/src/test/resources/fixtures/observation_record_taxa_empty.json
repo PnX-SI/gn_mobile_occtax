@@ -1,0 +1,37 @@
+{
+  "id": 1234,
+  "status": "draft",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -1.554476,
+      47.225782
+    ]
+  },
+  "properties": {
+    "internal_id": 1234,
+    "date_min": "2016-10-28T08:15:00Z",
+    "hour_min": null,
+    "date_max": "2016-10-29T09:00:00Z",
+    "hour_max": null,
+    "id_nomenclature_grp_typ": 133,
+    "comment": "Global comment",
+    "id_dataset": 17,
+    "id_digitiser": 1,
+    "meta_device_entry": "mobile",
+    "observers": [
+      1,
+      5,
+      2,
+      3
+    ],
+    "t_occurrences_occtax": [
+      {
+        "cd_nom": 10,
+        "nom_cite": "taxon_01",
+        "regne": "Animalia",
+        "group2_inpn": "Ascidies"
+      }
+    ]
+  }
+}

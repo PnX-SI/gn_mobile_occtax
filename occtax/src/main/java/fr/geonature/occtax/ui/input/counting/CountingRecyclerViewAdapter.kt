@@ -6,16 +6,16 @@ import android.widget.TextView
 import androidx.core.text.HtmlCompat
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.input.domain.CountingMetadata
-import java.util.Locale
+import fr.geonature.occtax.features.record.domain.CountingRecord
+import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
  * Default RecyclerView Adapter used by [CountingFragment].
  *
  * @author S. Grimault
  */
-class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<CountingMetadata>) :
-    AbstractListItemRecyclerViewAdapter<CountingMetadata>(listener) {
+class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<CountingRecord>) :
+    AbstractListItemRecyclerViewAdapter<CountingRecord>(listener) {
 
     override fun getViewHolder(
         view: View,
@@ -26,14 +26,14 @@ class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListene
 
     override fun getLayoutResourceId(
         position: Int,
-        item: CountingMetadata
+        item: CountingRecord
     ): Int {
         return R.layout.list_item_counting
     }
 
     override fun areItemsTheSame(
-        oldItems: List<CountingMetadata>,
-        newItems: List<CountingMetadata>,
+        oldItems: List<CountingRecord>,
+        newItems: List<CountingRecord>,
         oldItemPosition: Int,
         newItemPosition: Int
     ): Boolean {
@@ -41,8 +41,8 @@ class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListene
     }
 
     override fun areContentsTheSame(
-        oldItems: List<CountingMetadata>,
-        newItems: List<CountingMetadata>,
+        oldItems: List<CountingRecord>,
+        newItems: List<CountingRecord>,
         oldItemPosition: Int,
         newItemPosition: Int
     ): Boolean {
@@ -50,12 +50,12 @@ class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListene
     }
 
     inner class ViewHolder(itemView: View) :
-        AbstractListItemRecyclerViewAdapter<CountingMetadata>.AbstractViewHolder(itemView) {
+        AbstractListItemRecyclerViewAdapter<CountingRecord>.AbstractViewHolder(itemView) {
         private val title: TextView = itemView.findViewById(android.R.id.title)
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
         private val text2: TextView = itemView.findViewById(android.R.id.text2)
 
-        override fun onBind(item: CountingMetadata) {
+        override fun onBind(item: CountingRecord) {
             title.text = itemView.context.getString(
                 R.string.counting_main_label,
                 item.index
@@ -65,32 +65,51 @@ class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListene
             text2.isSelected = true
         }
 
-        private fun buildCountingDescription(countingMetadata: CountingMetadata): Spanned {
+        private fun buildCountingDescription(countingRecord: CountingRecord): Spanned {
             return HtmlCompat.fromHtml(arrayOf(
-                countingMetadata.properties["MIN"],
-                countingMetadata.properties["MAX"],
+                countingRecord.properties[CountingRecord.MIN_KEY],
+                countingRecord.properties[CountingRecord.MAX_KEY],
             ).asSequence()
                 .filterNotNull()
+                .map { it.toPair() }
+                .map { it.first to it.second as PropertyValue.Number }
+                .map { getNomenclatureTypeLabel(it.first) to it.second }
                 .map {
                     itemView.context.getString(
                         R.string.counting_description_separator,
-                        it.code,
-                        it.value
+                        it.first,
+                        it.second.value
                     )
                 }
                 .joinToString(", "),
                 HtmlCompat.FROM_HTML_MODE_LEGACY)
         }
 
-        private fun buildDescription(countingMetadata: CountingMetadata): Spanned {
-            return HtmlCompat.fromHtml(countingMetadata.properties.values
+        private fun buildDescription(countingRecord: CountingRecord): Spanned {
+            return HtmlCompat.fromHtml(countingRecord.properties.values
                 .asSequence()
                 .filterNot { it.isEmpty() }
+                .map { it.toPair() }
+                .filterNot {
+                    listOf(
+                        CountingRecord.MIN_KEY,
+                        CountingRecord.MAX_KEY
+                    ).contains(it.first)
+                }
+                .map {
+                    it.first to when (it.second) {
+                        is PropertyValue.Number -> (it.second as PropertyValue.Number).value
+                        is PropertyValue.Text -> (it.second as PropertyValue.Text).value
+                        is PropertyValue.Nomenclature -> (it.second as PropertyValue.Nomenclature).label
+                        else -> null
+                    }
+                }
+                .filterNot { it.second === null }
                 .map {
                     itemView.context.getString(
                         R.string.counting_description_separator,
-                        getNomenclatureTypeLabel(it.code),
-                        it.label
+                        getNomenclatureTypeLabel(it.first),
+                        it.second
                     )
                 }
                 .joinToString(", "),
@@ -99,7 +118,7 @@ class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListene
 
         private fun getNomenclatureTypeLabel(mnemonic: String): String {
             val resourceId = itemView.resources.getIdentifier(
-                "nomenclature_${mnemonic.lowercase(Locale.getDefault())}",
+                "nomenclature_${mnemonic.lowercase()}",
                 "string",
                 itemView.context.packageName
             )

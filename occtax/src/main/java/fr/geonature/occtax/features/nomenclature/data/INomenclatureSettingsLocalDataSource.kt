@@ -12,6 +12,8 @@ interface INomenclatureSettingsLocalDataSource {
 
     /**
      * Gets all [EditableNomenclatureType] matching given nomenclature main type.
+                                 * If the default main type is requested, returns all default [EditableNomenclatureType]
+     * whatever the given [PropertySettings].
      *
      * @return a list of [EditableNomenclatureType]
      */

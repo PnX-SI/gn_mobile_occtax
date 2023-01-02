@@ -22,6 +22,7 @@ import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
+import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.ui.shared.view.setOnValueChangedListener
 import kotlin.math.ceil
 
@@ -492,9 +493,9 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
 
         override fun onBind(nomenclatureType: EditableNomenclatureType) {
             minNomenclatureType =
-                selectedNomenclatureTypes.firstOrNull { it.viewType == EditableNomenclatureType.ViewType.MIN_MAX && it.code == "MIN" }
+                selectedNomenclatureTypes.firstOrNull { it.viewType == EditableNomenclatureType.ViewType.MIN_MAX && it.code == CountingRecord.MIN_KEY }
             maxNomenclatureType =
-                selectedNomenclatureTypes.firstOrNull { it.viewType == EditableNomenclatureType.ViewType.MIN_MAX && it.code == "MAX" }
+                selectedNomenclatureTypes.firstOrNull { it.viewType == EditableNomenclatureType.ViewType.MIN_MAX && it.code ==  CountingRecord.MAX_KEY }
 
             with(if (minNomenclatureType != null) View.VISIBLE else View.GONE) {
                 editMinLabel.visibility = this

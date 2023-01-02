@@ -9,15 +9,15 @@ import com.google.android.material.chip.ChipGroup
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.commons.util.ThemeUtils
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.input.domain.Input
+import fr.geonature.occtax.features.record.domain.ObservationRecord
 
 /**
  * Default RecyclerView Adapter used by [HomeActivity].
  *
  * @author S. Grimault
  */
-class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<Input>) :
-    AbstractListItemRecyclerViewAdapter<Input>(listener) {
+class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<ObservationRecord>) :
+    AbstractListItemRecyclerViewAdapter<ObservationRecord>(listener) {
     override fun getViewHolder(
         view: View,
         viewType: Int
@@ -27,14 +27,14 @@ class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<I
 
     override fun getLayoutResourceId(
         position: Int,
-        item: Input
+        item: ObservationRecord
     ): Int {
         return R.layout.list_item_input
     }
 
     override fun areItemsTheSame(
-        oldItems: List<Input>,
-        newItems: List<Input>,
+        oldItems: List<ObservationRecord>,
+        newItems: List<ObservationRecord>,
         oldItemPosition: Int,
         newItemPosition: Int
     ): Boolean {
@@ -42,8 +42,8 @@ class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<I
     }
 
     override fun areContentsTheSame(
-        oldItems: List<Input>,
-        newItems: List<Input>,
+        oldItems: List<ObservationRecord>,
+        newItems: List<ObservationRecord>,
         oldItemPosition: Int,
         newItemPosition: Int
     ): Boolean {
@@ -51,43 +51,46 @@ class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<I
     }
 
     inner class ViewHolder(itemView: View) :
-        AbstractListItemRecyclerViewAdapter<Input>.AbstractViewHolder(itemView) {
+        AbstractListItemRecyclerViewAdapter<ObservationRecord>.AbstractViewHolder(itemView) {
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
         private val text2: TextView = itemView.findViewById(android.R.id.text2)
         private val chipGroup: ChipGroup = itemView.findViewById(R.id.chip_group_status)
 
-        override fun onBind(item: Input) {
+        override fun onBind(item: ObservationRecord) {
             text1.text = itemView.context.getString(
                 R.string.home_input_created_at,
                 DateFormat.format(
                     itemView.context.getString(R.string.home_input_date),
-                    item.startDate
+                    item.dates.start
                 )
             )
-            text2.text = if (item.getInputTaxa().isNotEmpty())
+            text2.text = if (item.taxa.taxa.isNotEmpty())
                 itemView.resources.getQuantityString(
                     R.plurals.home_input_taxa_count,
-                    item.getInputTaxa().size,
-                    item.getInputTaxa().size
+                    item.taxa.taxa.size,
+                    item.taxa.taxa.size
                 ) else itemView.context.getString(R.string.home_input_taxa_count_empty)
             buildChipStatus(item)
         }
 
-        private fun buildChipStatus(item: Input) {
+        private fun buildChipStatus(item: ObservationRecord) {
             chipGroup.removeAllViews()
 
             with(
-                LayoutInflater.from(itemView.context).inflate(
-                    R.layout.chip,
-                    chipGroup,
-                    false
-                ) as Chip
+                LayoutInflater.from(itemView.context)
+                    .inflate(
+                        R.layout.chip,
+                        chipGroup,
+                        false
+                    ) as Chip
             ) {
                 text = itemView.resources.getIdentifier(
                     "home_input_status_${item.status.name.lowercase()}",
                     "string",
                     itemView.context.packageName
-                ).takeIf { it > 0 }?.let { itemView.context.getString(it) }
+                )
+                    .takeIf { it > 0 }
+                    ?.let { itemView.context.getString(it) }
                     ?: itemView.context.getString(R.string.home_input_status_draft)
                 isCloseIconVisible = false
                 isEnabled = false
@@ -96,7 +99,8 @@ class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<I
                         "input_status_${item.status.name.lowercase()}",
                         "color",
                         itemView.context.packageName
-                    ).takeIf { it > 0 } ?: R.color.input_status_draft
+                    )
+                        .takeIf { it > 0 } ?: R.color.input_status_draft
                 )
                 setTextColor(
                     ThemeUtils.getColor(

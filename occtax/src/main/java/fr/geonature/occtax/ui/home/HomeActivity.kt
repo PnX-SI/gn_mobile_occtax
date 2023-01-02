@@ -41,7 +41,6 @@ import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.entity.AppSync
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.commons.error.Failure
-import fr.geonature.commons.features.input.domain.AbstractInput
 import fr.geonature.commons.lifecycle.observe
 import fr.geonature.commons.lifecycle.observeOnce
 import fr.geonature.commons.lifecycle.observeUntil
@@ -65,8 +64,8 @@ import fr.geonature.datasync.ui.login.LoginActivity
 import fr.geonature.occtax.BuildConfig
 import fr.geonature.occtax.MainApplication
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.input.domain.Input
-import fr.geonature.occtax.features.input.presentation.InputViewModel
+import fr.geonature.occtax.features.record.domain.ObservationRecord
+import fr.geonature.occtax.features.record.presentation.ObservationRecordViewModel
 import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.settings.AppSettingsViewModel
 import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
@@ -89,7 +88,7 @@ class HomeActivity : AppCompatActivity() {
     private val dataSyncViewModel: DataSyncViewModel by viewModels()
     private val configureServerSettingsViewModel: ConfigureServerSettingsViewModel by viewModels()
     private val updateSettingsViewModel: UpdateSettingsViewModel by viewModels()
-    private val inputViewModel: InputViewModel by viewModels()
+    private val observationRecordViewModel: ObservationRecordViewModel by viewModels()
 
     @Inject
     lateinit var geoNatureAPIClient: IGeoNatureAPIClient
@@ -182,7 +181,7 @@ class HomeActivity : AppCompatActivity() {
                             menu.children.forEach { it.isChecked = true }
                         }
 
-                        loadInputs()
+                        loadObservationRecords()
 
                         true
                     }
@@ -193,7 +192,7 @@ class HomeActivity : AppCompatActivity() {
                             menu.children.forEach { it.isChecked = true }
                         }
 
-                        loadInputs()
+                        loadObservationRecords()
 
                         true
                     }
@@ -211,7 +210,7 @@ class HomeActivity : AppCompatActivity() {
         configureDataSyncViewModel()
         configureConfigureServerSettingsViewModel()
         configureUpdateSettingsViewModel()
-        configureInputViewModel()
+        configureObservationRecordViewModel()
 
         appSyncView?.setListener(object : AppSyncView.OnAppSyncViewListener {
             override fun onAction() {
@@ -234,8 +233,8 @@ class HomeActivity : AppCompatActivity() {
         }
 
         adapter = InputRecyclerViewAdapter(object :
-            AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<Input> {
-            override fun onClick(item: Input) {
+            AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<ObservationRecord> {
+            override fun onClick(item: ObservationRecord) {
                 val appSettings = appSettings ?: return
 
                 Logger.info { "input selected: ${item.id}" }
@@ -248,25 +247,25 @@ class HomeActivity : AppCompatActivity() {
 
             override fun onLongClicked(
                 position: Int,
-                item: Input
+                item: ObservationRecord
             ) {
                 ContextCompat.getSystemService(
                     this@HomeActivity,
                     Vibrator::class.java
-                )?.vibrate(
-                    VibrationEffect.createOneShot(
-                        100,
-                        VibrationEffect.DEFAULT_AMPLITUDE
-                    )
                 )
+                    ?.vibrate(
+                        VibrationEffect.createOneShot(
+                            100,
+                            VibrationEffect.DEFAULT_AMPLITUDE
+                        )
+                    )
 
                 AlertDialog.Builder(this@HomeActivity)
                     .setTitle(R.string.alert_dialog_input_delete_title)
                     .setPositiveButton(
                         R.string.alert_dialog_ok
                     ) { dialog, _ ->
-                        inputViewModel.deleteInput(item)
-                        loadAppSync()
+                        observationRecordViewModel.delete(item)
                         dialog.dismiss()
                     }
                     .setNegativeButton(
@@ -339,7 +338,7 @@ class HomeActivity : AppCompatActivity() {
         loadAppSync()
 
         appSettings?.run {
-            loadInputs()
+            loadObservationRecords()
         }
     }
 
@@ -413,13 +412,13 @@ class HomeActivity : AppCompatActivity() {
 
     private fun startInput(
         appSettings: AppSettings,
-        input: Input? = null
+        observationRecord: ObservationRecord? = null
     ) {
         startActivity(
             InputPagerFragmentActivity.newIntent(
                 this,
                 appSettings,
-                input
+                observationRecord
             )
         )
     }
@@ -450,7 +449,7 @@ class HomeActivity : AppCompatActivity() {
                 it.find { packageInfo -> packageInfo.packageName == BuildConfig.APPLICATION_ID }
                     ?.also { packageInfo ->
                         appSyncView?.setPackageInfo(packageInfo)
-                        loadInputs()
+                        loadObservationRecords()
                     }
             }
         }
@@ -525,11 +524,11 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun configureInputViewModel() {
-        with(inputViewModel) {
+    private fun configureObservationRecordViewModel() {
+        with(observationRecordViewModel) {
             observe(
-                inputs,
-                ::handleInputs
+                observationRecords,
+                ::handleObservationRecords
             )
         }
     }
@@ -576,23 +575,25 @@ class HomeActivity : AppCompatActivity() {
                         )
                     }
 
-                    loadInputs()
+                    loadObservationRecords()
                 }
             }
     }
 
-    private fun loadInputs() {
-        val filter = inputToolbar?.menu?.children?.filter { it.isChecked }?.map {
-            when (it.itemId) {
-                R.id.menu_status_to_sync -> AbstractInput.Status.TO_SYNC
-                else -> AbstractInput.Status.DRAFT
+    private fun loadObservationRecords() {
+        val filter = inputToolbar?.menu?.children?.filter { it.isChecked }
+            ?.map {
+                when (it.itemId) {
+                    R.id.menu_status_to_sync -> ObservationRecord.Status.TO_SYNC
+                    else -> ObservationRecord.Status.DRAFT
+                }
             }
-        }?.toList() ?: listOf(
-            AbstractInput.Status.DRAFT,
-            AbstractInput.Status.TO_SYNC
+            ?.toList() ?: listOf(
+            ObservationRecord.Status.DRAFT,
+            ObservationRecord.Status.TO_SYNC
         )
 
-        inputViewModel.readInputs { input -> filter.any { input.status == it } }
+        observationRecordViewModel.getAll { input -> filter.any { input.status == it } }
     }
 
     private fun packageInfoUpdated(packageInfo: PackageInfo) {
@@ -607,8 +608,9 @@ class HomeActivity : AppCompatActivity() {
         loadAppSettings()
     }
 
-    private fun handleInputs(inputs: List<Input>) {
-        adapter.setItems(inputs)
+    private fun handleObservationRecords(observationRecords: List<ObservationRecord>) {
+        loadAppSync()
+        adapter.setItems(observationRecords)
     }
 
     private fun handleFailure(failure: Failure) {

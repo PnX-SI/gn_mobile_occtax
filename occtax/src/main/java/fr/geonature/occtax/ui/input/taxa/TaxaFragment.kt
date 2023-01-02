@@ -36,7 +36,6 @@ import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.commons.util.ThemeUtils
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.input.domain.InputTaxon
 import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
 import org.tinylog.Logger
@@ -223,10 +222,10 @@ class TaxaFragment : AbstractInputFragment() {
         adapter = TaxaRecyclerViewAdapter(object :
             TaxaRecyclerViewAdapter.OnTaxaRecyclerViewAdapterListener {
             override fun onSelectedTaxon(taxon: AbstractTaxon) {
-                input?.getCurrentSelectedInputTaxon()
-                    ?.also { input?.removeInputTaxon(it.taxon.id) }
+                observationRecord?.taxa?.selectedTaxonRecord
+                    ?.also { observationRecord?.taxa?.delete(it.taxon.id) }
 
-                input?.addInputTaxon(InputTaxon(taxon))
+                observationRecord?.taxa?.add(taxon)
 
                 Logger.info { "selected taxon (id: ${taxon.id}, name: '${taxon.name}', taxonomy: (kingdom='${taxon.taxonomy.kingdom}', group='${taxon.taxonomy.group}'))" }
 
@@ -234,8 +233,8 @@ class TaxaFragment : AbstractInputFragment() {
             }
 
             override fun onNoTaxonSelected() {
-                input?.getCurrentSelectedInputTaxon()
-                    ?.also { input?.removeInputTaxon(it.taxon.id) }
+                observationRecord?.taxa?.selectedTaxonRecord
+                    ?.also { observationRecord?.taxa?.delete(it.taxon.id) }
 
                 listener.validateCurrentPage()
             }
@@ -396,22 +395,22 @@ class TaxaFragment : AbstractInputFragment() {
     }
 
     override fun validate(): Boolean {
-        return this.input?.getCurrentSelectedInputTaxon() != null
+        return this.observationRecord?.taxa?.selectedTaxonRecord != null
     }
 
     override fun refreshView() {
-        if (input?.selectedFeatureId.isNullOrEmpty()) savedState.remove(KEY_SELECTED_FEATURE_ID)
+        if (observationRecord?.feature?.id.isNullOrEmpty()) savedState.remove(KEY_SELECTED_FEATURE_ID)
         else savedState.putString(
             KEY_SELECTED_FEATURE_ID,
-            input?.selectedFeatureId
+            observationRecord?.feature?.id
         )
 
         loadTaxa()
 
-        val selectedInputTaxon = this.input?.getCurrentSelectedInputTaxon()
+        val selectedTaxonRecord = this.observationRecord?.taxa?.selectedTaxonRecord
 
-        if (selectedInputTaxon != null) {
-            Logger.info { "selected taxon (id: ${selectedInputTaxon.taxon.id}, name: '${selectedInputTaxon.taxon.name}', taxonomy: (kingdom='${selectedInputTaxon.taxon.taxonomy.kingdom}', group='${selectedInputTaxon.taxon.taxonomy.group}'))" }
+        if (selectedTaxonRecord != null) {
+            Logger.info { "selected taxon (id: ${selectedTaxonRecord.taxon.id}, name: '${selectedTaxonRecord.taxon.name}', taxonomy: (kingdom='${selectedTaxonRecord.taxon.taxonomy.kingdom}', group='${selectedTaxonRecord.taxon.taxonomy.group}'))" }
 
             LoaderManager.getInstance(this)
                 .initLoader(
@@ -419,7 +418,7 @@ class TaxaFragment : AbstractInputFragment() {
                     Bundle(savedState).apply {
                         putLong(
                             KEY_SELECTED_TAXON_ID,
-                            selectedInputTaxon.taxon.id
+                            selectedTaxonRecord.taxon.id
                         )
                     },
                     loaderCallbacks

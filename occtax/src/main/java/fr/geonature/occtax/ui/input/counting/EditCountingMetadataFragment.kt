@@ -21,16 +21,17 @@ import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.lifecycle.observe
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.input.domain.CountingMetadata
-import fr.geonature.occtax.features.input.domain.Input
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.presentation.EditableNomenclatureTypeAdapter
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
+import fr.geonature.occtax.features.record.domain.CountingRecord
+import fr.geonature.occtax.features.record.domain.PropertyValue
+import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.settings.PropertySettings
 
 /**
- * [Fragment] to let the user to edit additional counting information for the given [Input].
+ * [Fragment] to let the user to edit additional counting information for the given [TaxonRecord].
  *
  * @author S. Grimault
  */
@@ -41,7 +42,7 @@ class EditCountingMetadataFragment : Fragment() {
     private val propertyValueModel: PropertyValueModel by viewModels()
 
     private lateinit var taxonomy: Taxonomy
-    private lateinit var countingMetadata: CountingMetadata
+    private lateinit var countingRecord: CountingRecord
     private lateinit var savedState: Bundle
 
     private var fab: ExtendedFloatingActionButton? = null
@@ -59,7 +60,7 @@ class EditCountingMetadataFragment : Fragment() {
                 Taxonomy.ANY,
                 Taxonomy.ANY
             )
-            countingMetadata = it.getParcelable(ARG_COUNTING_METADATA) ?: CountingMetadata()
+            countingRecord = it.getParcelable(ARG_COUNTING_RECORD) ?: CountingRecord()
         }
 
         with(nomenclatureViewModel) {
@@ -94,7 +95,7 @@ class EditCountingMetadataFragment : Fragment() {
         fab = view.findViewById(R.id.fab)
         fab?.apply {
             setOnClickListener {
-                listener?.onSave(countingMetadata)
+                listener?.onSave(countingRecord)
             }
         }
 
@@ -152,10 +153,14 @@ class EditCountingMetadataFragment : Fragment() {
             }
 
             override fun onUpdate(editableNomenclatureType: EditableNomenclatureType) {
-                countingMetadata.properties[editableNomenclatureType.code] =
-                    editableNomenclatureType.value
+                toPropertyValue(editableNomenclatureType)
+                    ?.toPair()
+                    .also {
+                        if (it == null) countingRecord.properties.remove(editableNomenclatureType.code)
+                        else countingRecord.properties[it.first] = it.second
+                    }
 
-                listener?.onCountingMetadata(countingMetadata)
+                listener?.onCountingRecord(countingRecord)
 
                 val propertyValue = editableNomenclatureType.value
 
@@ -198,30 +203,81 @@ class EditCountingMetadataFragment : Fragment() {
     }
 
     private fun handleEditableNomenclatureTypes(editableNomenclatureTypes: List<EditableNomenclatureType>) {
-        editableNomenclatureTypes.filter { it.value != null }.forEach {
-            if (!countingMetadata.properties.containsKey(it.code)) {
-                countingMetadata.properties[it.code] = it.value
+        editableNomenclatureTypes.filter { it.value != null }
+            .forEach {
+                if (countingRecord.properties.containsKey(it.code)) return@forEach
+
+                toPropertyValue(it)?.toPair()
+                    .also { pair ->
+                        if (pair == null) countingRecord.properties.remove(it.code)
+                        else countingRecord.properties[pair.first] = pair.second
+                    }
             }
-        }
 
         adapter?.bind(
             editableNomenclatureTypes,
-            *countingMetadata.properties.values.filterNotNull().toTypedArray()
+            *(countingRecord.properties.values.filterNotNull()
+                .map {
+                    it.toPair()
+                }
+                .mapNotNull {
+                    when (it.second) {
+                        is PropertyValue.Number -> fr.geonature.occtax.features.input.domain.PropertyValue.fromValue(
+                            it.first,
+                            (it.second as PropertyValue.Number).value
+                        )
+                        is PropertyValue.Text -> fr.geonature.occtax.features.input.domain.PropertyValue.fromValue(
+                            it.first,
+                            (it.second as PropertyValue.Text).value
+                        )
+                        is PropertyValue.Nomenclature -> fr.geonature.occtax.features.input.domain.PropertyValue(
+                            it.first,
+                            (it.second as PropertyValue.Nomenclature).label,
+                            (it.second as PropertyValue.Nomenclature).value
+                        )
+                        else -> null
+                    }
+                }
+                .toTypedArray())
         )
+    }
+
+    private fun toPropertyValue(editableNomenclatureType: EditableNomenclatureType): PropertyValue? {
+        return editableNomenclatureType.value?.let {
+            when (it.value) {
+                is Long -> if (it.label.isNullOrEmpty()) PropertyValue.Number(
+                    editableNomenclatureType.code,
+                    it.value
+                ) else PropertyValue.Nomenclature(
+                    editableNomenclatureType.code,
+                    it.label,
+                    it.value
+                )
+                is Number -> PropertyValue.Number(
+                    editableNomenclatureType.code,
+                    it.value
+                )
+                is String -> PropertyValue.Text(
+                    editableNomenclatureType.code,
+                    it.value
+                )
+                else -> null
+            }
+        }
     }
 
     /**
      * Callback used by [EditCountingMetadataFragment].
      */
     interface OnEditCountingMetadataFragmentListener {
-        fun onCountingMetadata(countingMetadata: CountingMetadata)
-        fun onSave(countingMetadata: CountingMetadata)
+        fun onCountingRecord(countingRecord: CountingRecord)
+        fun onSave(countingRecord: CountingRecord)
     }
 
     companion object {
 
         const val ARG_TAXONOMY = "arg_taxonomy"
-        const val ARG_COUNTING_METADATA = "arg_counting_metadata"
+        const val ARG_COUNTING_RECORD = "arg_counting_record"
         const val ARG_PROPERTIES = "arg_properties"
 
         private const val KEY_SHOW_ALL_NOMENCLATURE_TYPES = "show_all_nomenclature_types"
@@ -234,7 +290,7 @@ class EditCountingMetadataFragment : Fragment() {
         @JvmStatic
         fun newInstance(
             taxonomy: Taxonomy,
-            countingMetadata: CountingMetadata? = null,
+            countingRecord: CountingRecord? = null,
             vararg propertySettings: PropertySettings
         ) = EditCountingMetadataFragment().apply {
             arguments = Bundle().apply {
@@ -242,10 +298,10 @@ class EditCountingMetadataFragment : Fragment() {
                     ARG_TAXONOMY,
                     taxonomy
                 )
-                countingMetadata?.let {
+                countingRecord?.also {
                     putParcelable(
-                        ARG_COUNTING_METADATA,
-                        countingMetadata
+                        ARG_COUNTING_RECORD,
+                        countingRecord
                     )
                 }
                 putParcelableArray(
