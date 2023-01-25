@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.4.1-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.1-rc0) (2023-01-25, pre-release)
+
+### 🚀 Nouveautés
+
+* Refonte de la gestion des relevés. 
+* Accélérer la saisie en permettant de mémoriser les dernières nomenclatures saisies sur la partie
+dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
+* Possibilité de reprendre en édition un relevé terminé prêt à être synchronisé (https://github.com/PnX-SI/gn_mobile_occtax/issues/78).
+
+### ⚠️ Notes de version
+
+* Code de version : 3109
+
 ## [2.4.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.0) (2022-10-02, release)
 
 ### 🚀 Nouveautés
