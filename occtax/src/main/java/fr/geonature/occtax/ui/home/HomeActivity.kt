@@ -19,10 +19,12 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
+import androidx.core.view.children
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
@@ -62,8 +64,8 @@ import fr.geonature.datasync.ui.login.LoginActivity
 import fr.geonature.occtax.BuildConfig
 import fr.geonature.occtax.MainApplication
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.input.InputViewModel
+import fr.geonature.occtax.features.record.domain.ObservationRecord
+import fr.geonature.occtax.features.record.presentation.ObservationRecordViewModel
 import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.settings.AppSettingsViewModel
 import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
@@ -86,7 +88,7 @@ class HomeActivity : AppCompatActivity() {
     private val dataSyncViewModel: DataSyncViewModel by viewModels()
     private val configureServerSettingsViewModel: ConfigureServerSettingsViewModel by viewModels()
     private val updateSettingsViewModel: UpdateSettingsViewModel by viewModels()
-    private val inputViewModel: InputViewModel by viewModels()
+    private val observationRecordViewModel: ObservationRecordViewModel by viewModels()
 
     @Inject
     lateinit var geoNatureAPIClient: IGeoNatureAPIClient
@@ -97,6 +99,7 @@ class HomeActivity : AppCompatActivity() {
 
     private var homeContent: CoordinatorLayout? = null
     private var appSyncView: AppSyncView? = null
+    private var inputToolbar: Toolbar? = null
     private var inputRecyclerView: RecyclerView? = null
     private var inputEmptyTextView: TextView? = null
     private var fab: ExtendedFloatingActionButton? = null
@@ -164,6 +167,40 @@ class HomeActivity : AppCompatActivity() {
 
         homeContent = findViewById(R.id.homeContent)
         appSyncView = findViewById(R.id.appSyncView)
+
+        inputToolbar = findViewById<Toolbar?>(R.id.toolbar_inputs).apply {
+            inflateMenu(R.menu.status)
+            // all statuses checked by default
+            menu.children.forEach { it.isChecked = true }
+            setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.menu_status_draft -> {
+                        menuItem.isChecked = !menuItem.isChecked
+
+                        if (menu.children.all { !it.isChecked }) {
+                            menu.children.forEach { it.isChecked = true }
+                        }
+
+                        loadObservationRecords()
+
+                        true
+                    }
+                    R.id.menu_status_to_sync -> {
+                        menuItem.isChecked = !menuItem.isChecked
+
+                        if (menu.children.all { !it.isChecked }) {
+                            menu.children.forEach { it.isChecked = true }
+                        }
+
+                        loadObservationRecords()
+
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }
+
         inputRecyclerView = findViewById(R.id.inputRecyclerView)
         inputEmptyTextView = findViewById(R.id.inputEmptyTextView)
         fab = findViewById(R.id.fab)
@@ -173,6 +210,7 @@ class HomeActivity : AppCompatActivity() {
         configureDataSyncViewModel()
         configureConfigureServerSettingsViewModel()
         configureUpdateSettingsViewModel()
+        configureObservationRecordViewModel()
 
         appSyncView?.setListener(object : AppSyncView.OnAppSyncViewListener {
             override fun onAction() {
@@ -195,8 +233,8 @@ class HomeActivity : AppCompatActivity() {
         }
 
         adapter = InputRecyclerViewAdapter(object :
-            AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<Input> {
-            override fun onClick(item: Input) {
+            AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<ObservationRecord> {
+            override fun onClick(item: ObservationRecord) {
                 val appSettings = appSettings ?: return
 
                 Logger.info { "input selected: ${item.id}" }
@@ -209,24 +247,25 @@ class HomeActivity : AppCompatActivity() {
 
             override fun onLongClicked(
                 position: Int,
-                item: Input
+                item: ObservationRecord
             ) {
                 ContextCompat.getSystemService(
                     this@HomeActivity,
                     Vibrator::class.java
-                )?.vibrate(
-                    VibrationEffect.createOneShot(
-                        100,
-                        VibrationEffect.DEFAULT_AMPLITUDE
-                    )
                 )
+                    ?.vibrate(
+                        VibrationEffect.createOneShot(
+                            100,
+                            VibrationEffect.DEFAULT_AMPLITUDE
+                        )
+                    )
 
                 AlertDialog.Builder(this@HomeActivity)
                     .setTitle(R.string.alert_dialog_input_delete_title)
                     .setPositiveButton(
                         R.string.alert_dialog_ok
                     ) { dialog, _ ->
-                        inputViewModel.deleteInput(item)
+                        observationRecordViewModel.delete(item)
                         dialog.dismiss()
                     }
                     .setNegativeButton(
@@ -296,12 +335,11 @@ class HomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        LoaderManager.getInstance(this)
-            .restartLoader(
-                LOADER_APP_SYNC,
-                bundleOf(AppSync.COLUMN_ID to packageName),
-                loaderCallbacks
-            )
+        loadAppSync()
+
+        appSettings?.run {
+            loadObservationRecords()
+        }
     }
 
     @SuppressLint("RestrictedApi")
@@ -374,13 +412,13 @@ class HomeActivity : AppCompatActivity() {
 
     private fun startInput(
         appSettings: AppSettings,
-        input: Input? = null
+        observationRecord: ObservationRecord? = null
     ) {
         startActivity(
             InputPagerFragmentActivity.newIntent(
                 this,
                 appSettings,
-                input
+                observationRecord
             )
         )
     }
@@ -411,6 +449,7 @@ class HomeActivity : AppCompatActivity() {
                 it.find { packageInfo -> packageInfo.packageName == BuildConfig.APPLICATION_ID }
                     ?.also { packageInfo ->
                         appSyncView?.setPackageInfo(packageInfo)
+                        loadObservationRecords()
                     }
             }
         }
@@ -485,6 +524,24 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    private fun configureObservationRecordViewModel() {
+        with(observationRecordViewModel) {
+            observe(
+                observationRecords,
+                ::handleObservationRecords
+            )
+        }
+    }
+
+    private fun loadAppSync() {
+        LoaderManager.getInstance(this)
+            .restartLoader(
+                LOADER_APP_SYNC,
+                bundleOf(AppSync.COLUMN_ID to packageName),
+                loaderCallbacks
+            )
+    }
+
     private fun loadAppSettings() {
         appSettingsViewModel.loadAppSettings()
             .observeOnce(this) {
@@ -518,17 +575,25 @@ class HomeActivity : AppCompatActivity() {
                         )
                     }
 
-                    loadInputs()
+                    loadObservationRecords()
                 }
             }
     }
 
-    private fun loadInputs() {
-        inputViewModel.readInputs().observe(
-            this
-        ) {
-            adapter.setItems(it)
-        }
+    private fun loadObservationRecords() {
+        val filter = inputToolbar?.menu?.children?.filter { it.isChecked }
+            ?.map {
+                when (it.itemId) {
+                    R.id.menu_status_to_sync -> ObservationRecord.Status.TO_SYNC
+                    else -> ObservationRecord.Status.DRAFT
+                }
+            }
+            ?.toList() ?: listOf(
+            ObservationRecord.Status.DRAFT,
+            ObservationRecord.Status.TO_SYNC
+        )
+
+        observationRecordViewModel.getAll { input -> filter.any { input.status == it } }
     }
 
     private fun packageInfoUpdated(packageInfo: PackageInfo) {
@@ -541,6 +606,11 @@ class HomeActivity : AppCompatActivity() {
         }
 
         loadAppSettings()
+    }
+
+    private fun handleObservationRecords(observationRecords: List<ObservationRecord>) {
+        loadAppSync()
+        adapter.setItems(observationRecords)
     }
 
     private fun handleFailure(failure: Failure) {

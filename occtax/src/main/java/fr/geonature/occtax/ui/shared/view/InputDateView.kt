@@ -17,11 +17,11 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import fr.geonature.commons.input.AbstractInput
 import fr.geonature.commons.util.afterTextChanged
 import fr.geonature.commons.util.get
 import fr.geonature.commons.util.set
 import fr.geonature.occtax.R
+import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.settings.InputDateSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +32,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 /**
- * Generic [View] about [AbstractInput] start and end date.
+ * Generic [View] about [ObservationRecord] start and end date.
  *
  * @author S. Grimault
  */
@@ -390,7 +390,7 @@ class InputDateView : ConstraintLayout {
     }
 
     /**
-     * Checks start date constraints from current [AbstractInput].
+     * Checks start date constraints from current [ObservationRecord].
      *
      * @return `null` if all constraints are valid, or an error message
      */
@@ -403,7 +403,7 @@ class InputDateView : ConstraintLayout {
     }
 
     /**
-     * Checks end date constraints from current [AbstractInput].
+     * Checks end date constraints from current [ObservationRecord].
      *
      * @return `null` if all constraints are valid, or an error message
      */

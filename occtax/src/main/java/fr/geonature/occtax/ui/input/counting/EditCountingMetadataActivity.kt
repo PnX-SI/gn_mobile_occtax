@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.CountingMetadata
+import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.settings.PropertySettings
 
 /**
@@ -24,7 +24,7 @@ import fr.geonature.occtax.settings.PropertySettings
 class EditCountingMetadataActivity : AppCompatActivity(),
     EditCountingMetadataFragment.OnEditCountingMetadataFragmentListener {
 
-    private lateinit var countingMetadata: CountingMetadata
+    private lateinit var countingRecord: CountingRecord
 
     // whether the current counting metadata is new or not
     private var isNew: Boolean = true
@@ -39,10 +39,10 @@ class EditCountingMetadataActivity : AppCompatActivity(),
             setDisplayHomeAsUpEnabled(true)
         }
 
-        countingMetadata = intent.getParcelableExtra(EXTRA_COUNTING_METADATA) ?: CountingMetadata()
+        countingRecord = intent.getParcelableExtra(EXTRA_COUNTING_RECORD) ?: CountingRecord()
 
-        isNew = countingMetadata.isEmpty()
-        setTitle(if (countingMetadata.isEmpty()) R.string.activity_counting_add_title else R.string.activity_counting_edit_title)
+        isNew = countingRecord.isEmpty()
+        setTitle(if (countingRecord.isEmpty()) R.string.activity_counting_add_title else R.string.activity_counting_edit_title)
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
@@ -53,7 +53,7 @@ class EditCountingMetadataActivity : AppCompatActivity(),
                             Taxonomy.ANY,
                             Taxonomy.ANY
                         ),
-                        countingMetadata,
+                        countingRecord,
                         *(intent.getParcelableArrayExtra(EXTRA_PROPERTIES)
                             ?.map { it as PropertySettings }
                             ?.toTypedArray() ?: emptyArray())
@@ -77,13 +77,13 @@ class EditCountingMetadataActivity : AppCompatActivity(),
         confirmBeforeQuit()
     }
 
-    override fun onCountingMetadata(countingMetadata: CountingMetadata) {
-        this.countingMetadata = countingMetadata
+    override fun onCountingRecord(countingRecord: CountingRecord) {
+        this.countingRecord = countingRecord
         this.isDirty = true
     }
 
-    override fun onSave(countingMetadata: CountingMetadata) {
-        this.countingMetadata = countingMetadata
+    override fun onSave(countingRecord: CountingRecord) {
+        this.countingRecord = countingRecord
         sendResult()
         finish()
     }
@@ -92,8 +92,8 @@ class EditCountingMetadataActivity : AppCompatActivity(),
         setResult(Activity.RESULT_OK,
             Intent().apply {
                 putExtra(
-                    EXTRA_COUNTING_METADATA,
-                    countingMetadata
+                    EXTRA_COUNTING_RECORD,
+                    countingRecord
                 )
             })
     }
@@ -121,13 +121,13 @@ class EditCountingMetadataActivity : AppCompatActivity(),
     companion object {
 
         const val EXTRA_TAXONOMY = "extra_taxonomy"
-        const val EXTRA_COUNTING_METADATA = "extra_counting_metadata"
+        const val EXTRA_COUNTING_RECORD = "extra_counting_record"
         const val EXTRA_PROPERTIES = "extra_properties"
 
         fun newIntent(
             context: Context,
             taxonomy: Taxonomy,
-            countingMetadata: CountingMetadata? = null,
+            countingRecord: CountingRecord? = null,
             vararg propertySettings: PropertySettings
         ): Intent {
             return Intent(
@@ -138,10 +138,10 @@ class EditCountingMetadataActivity : AppCompatActivity(),
                     EXTRA_TAXONOMY,
                     taxonomy
                 )
-                countingMetadata?.let {
+                countingRecord?.also {
                     putExtra(
-                        EXTRA_COUNTING_METADATA,
-                        countingMetadata
+                        EXTRA_COUNTING_RECORD,
+                        countingRecord
                     )
                 }
                 putExtra(

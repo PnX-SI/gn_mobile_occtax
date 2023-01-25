@@ -3,17 +3,14 @@ package fr.geonature.occtax.features.nomenclature.repository
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.NomenclatureType
-import fr.geonature.commons.data.entity.Taxonomy
+import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSource
 import fr.geonature.commons.fp.identity
 import fr.geonature.commons.fp.orNull
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.nomenclature.data.INomenclatureLocalDataSource
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureSettingsLocalDataSource
-import fr.geonature.occtax.features.nomenclature.domain.BaseEditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
-import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureValuesFoundFailure
-import fr.geonature.occtax.input.PropertyValue
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
@@ -85,31 +82,31 @@ class NomenclatureRepositoryTest {
             )
         )
         // and corresponding editable nomenclature types
-        coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(BaseEditableNomenclatureType.Type.INFORMATION) } returns listOf(
-            BaseEditableNomenclatureType.from(
-                BaseEditableNomenclatureType.Type.INFORMATION,
+        coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.INFORMATION) } returns listOf(
+            EditableNomenclatureType(
+                EditableNomenclatureType.Type.INFORMATION,
                 "METH_OBS",
-                BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                 true
             ),
-            BaseEditableNomenclatureType.from(
+            EditableNomenclatureType(
 
-                BaseEditableNomenclatureType.Type.INFORMATION,
+                EditableNomenclatureType.Type.INFORMATION,
                 "ETA_BIO",
-                BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                 true
             ),
-            BaseEditableNomenclatureType.from(
-                BaseEditableNomenclatureType.Type.INFORMATION,
+            EditableNomenclatureType(
+                EditableNomenclatureType.Type.INFORMATION,
                 "DETERMINER",
-                BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE,
+                EditableNomenclatureType.ViewType.TEXT_SIMPLE,
                 visible = true,
                 default = false
             ),
-            BaseEditableNomenclatureType.from(
-                BaseEditableNomenclatureType.Type.INFORMATION,
+            EditableNomenclatureType(
+                EditableNomenclatureType.Type.INFORMATION,
                 "STATUT_BIO",
-                BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                 visible = false,
                 default = false
             ),
@@ -127,35 +124,35 @@ class NomenclatureRepositoryTest {
 
         // when
         val editableNomenclatureSettings =
-            nomenclatureRepository.getEditableNomenclatures(BaseEditableNomenclatureType.Type.INFORMATION)
+            nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
 
         // then
         assertTrue(editableNomenclatureSettings.isRight)
         assertEquals(
             listOf(
                 EditableNomenclatureType(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
+                    EditableNomenclatureType.Type.INFORMATION,
                     "METH_OBS",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                     label = "Méthodes d'observation"
                 ),
                 EditableNomenclatureType(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
+                    EditableNomenclatureType.Type.INFORMATION,
                     "ETA_BIO",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                     label = "Etat biologique de l'observation"
                 ),
                 EditableNomenclatureType(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
+                    EditableNomenclatureType.Type.INFORMATION,
                     "DETERMINER",
-                    BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE,
+                    EditableNomenclatureType.ViewType.TEXT_SIMPLE,
                     visible = true,
                     default = false
                 ),
                 EditableNomenclatureType(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
+                    EditableNomenclatureType.Type.INFORMATION,
                     "STATUT_BIO",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                     label = "Statut biologique",
                     visible = false,
                     default = false,
@@ -187,31 +184,31 @@ class NomenclatureRepositoryTest {
                 )
             )
             // and corresponding editable nomenclature types
-            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(BaseEditableNomenclatureType.Type.INFORMATION) } returns listOf(
-                BaseEditableNomenclatureType.from(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
+            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.INFORMATION) } returns listOf(
+                EditableNomenclatureType(
+                    EditableNomenclatureType.Type.INFORMATION,
                     "METH_OBS",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                     true
                 ),
-                BaseEditableNomenclatureType.from(
+                EditableNomenclatureType(
 
-                    BaseEditableNomenclatureType.Type.INFORMATION,
+                    EditableNomenclatureType.Type.INFORMATION,
                     "ETA_BIO",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                     true
                 ),
-                BaseEditableNomenclatureType.from(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
+                EditableNomenclatureType(
+                    EditableNomenclatureType.Type.INFORMATION,
                     "DETERMINER",
-                    BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE,
+                    EditableNomenclatureType.ViewType.TEXT_SIMPLE,
                     visible = true,
                     default = false
                 ),
-                BaseEditableNomenclatureType.from(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
+                EditableNomenclatureType(
+                    EditableNomenclatureType.Type.INFORMATION,
                     "STATUT_BIO",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                     visible = false,
                     default = false
                 ),
@@ -229,28 +226,28 @@ class NomenclatureRepositoryTest {
 
             // when
             val editableNomenclatureSettings =
-                nomenclatureRepository.getEditableNomenclatures(BaseEditableNomenclatureType.Type.INFORMATION)
+                nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
 
             // then
             assertTrue(editableNomenclatureSettings.isRight)
             assertEquals(
                 listOf(
                     EditableNomenclatureType(
-                        BaseEditableNomenclatureType.Type.INFORMATION,
+                        EditableNomenclatureType.Type.INFORMATION,
                         "METH_OBS",
-                        BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                         label = "Méthodes d'observation"
                     ),
                     EditableNomenclatureType(
-                        BaseEditableNomenclatureType.Type.INFORMATION,
+                        EditableNomenclatureType.Type.INFORMATION,
                         "ETA_BIO",
-                        BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                         label = "Etat biologique de l'observation"
                     ),
                     EditableNomenclatureType(
-                        BaseEditableNomenclatureType.Type.INFORMATION,
+                        EditableNomenclatureType.Type.INFORMATION,
                         "DETERMINER",
-                        BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE,
+                        EditableNomenclatureType.ViewType.TEXT_SIMPLE,
                         visible = true,
                         default = false
                     )
@@ -265,33 +262,33 @@ class NomenclatureRepositoryTest {
             // given no nomenclature types found
             coEvery { nomenclatureLocalDataSource.getAllNomenclatureTypes() } returns listOf()
             // and some editable nomenclature types
-            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(BaseEditableNomenclatureType.Type.INFORMATION) } returns listOf(
-                BaseEditableNomenclatureType.from(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
+            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.INFORMATION) } returns listOf(
+                EditableNomenclatureType(
+                    EditableNomenclatureType.Type.INFORMATION,
                     "METH_OBS",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
-                ),
-                BaseEditableNomenclatureType.from(
-
-                    BaseEditableNomenclatureType.Type.INFORMATION,
-                    "ETA_BIO",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
                 ),
                 EditableNomenclatureType(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
-                    "DETERMINER",
-                    BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE
+
+                    EditableNomenclatureType.Type.INFORMATION,
+                    "ETA_BIO",
+                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
                 ),
-                BaseEditableNomenclatureType.from(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
+                EditableNomenclatureType(
+                    EditableNomenclatureType.Type.INFORMATION,
+                    "DETERMINER",
+                    EditableNomenclatureType.ViewType.TEXT_SIMPLE
+                ),
+                EditableNomenclatureType(
+                    EditableNomenclatureType.Type.INFORMATION,
                     "STATUT_BIO",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                     default = false
                 ),
                 EditableNomenclatureType(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
+                    EditableNomenclatureType.Type.INFORMATION,
                     "COMMENT",
-                    BaseEditableNomenclatureType.ViewType.TEXT_MULTIPLE,
+                    EditableNomenclatureType.ViewType.TEXT_MULTIPLE,
                     visible = true,
                     default = false
                 )
@@ -301,21 +298,21 @@ class NomenclatureRepositoryTest {
 
             // when
             val editableNomenclatureSettings =
-                nomenclatureRepository.getEditableNomenclatures(BaseEditableNomenclatureType.Type.INFORMATION)
+                nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
 
             // then
             assertTrue(editableNomenclatureSettings.isRight)
             assertEquals(
                 listOf(
                     EditableNomenclatureType(
-                        BaseEditableNomenclatureType.Type.INFORMATION,
+                        EditableNomenclatureType.Type.INFORMATION,
                         "DETERMINER",
-                        BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE
+                        EditableNomenclatureType.ViewType.TEXT_SIMPLE
                     ),
                     EditableNomenclatureType(
-                        BaseEditableNomenclatureType.Type.INFORMATION,
+                        EditableNomenclatureType.Type.INFORMATION,
                         "COMMENT",
-                        BaseEditableNomenclatureType.ViewType.TEXT_MULTIPLE,
+                        EditableNomenclatureType.ViewType.TEXT_MULTIPLE,
                         visible = true,
                         default = false
                     )
@@ -330,21 +327,21 @@ class NomenclatureRepositoryTest {
             // given no nomenclature types found
             coEvery { nomenclatureLocalDataSource.getAllNomenclatureTypes() } returns listOf()
             // and some editable nomenclature types
-            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(BaseEditableNomenclatureType.Type.INFORMATION) } returns listOf(
-                BaseEditableNomenclatureType.from(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
+            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.INFORMATION) } returns listOf(
+                EditableNomenclatureType(
+                    EditableNomenclatureType.Type.INFORMATION,
                     "METH_OBS",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
                 ),
-                BaseEditableNomenclatureType.from(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
+                EditableNomenclatureType(
+                    EditableNomenclatureType.Type.INFORMATION,
                     "ETA_BIO",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
                 ),
-                BaseEditableNomenclatureType.from(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
+                EditableNomenclatureType(
+                    EditableNomenclatureType.Type.INFORMATION,
                     "STATUT_BIO",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                     visible = false,
                     default = false
                 ),
@@ -354,7 +351,7 @@ class NomenclatureRepositoryTest {
 
             // when
             val editableNomenclatureSettings =
-                nomenclatureRepository.getEditableNomenclatures(BaseEditableNomenclatureType.Type.INFORMATION)
+                nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
 
             // then
             assertTrue(editableNomenclatureSettings.isLeft)
@@ -383,11 +380,11 @@ class NomenclatureRepositoryTest {
                 )
             )
             // and some other editable nomenclature types
-            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(BaseEditableNomenclatureType.Type.INFORMATION) } returns listOf(
-                BaseEditableNomenclatureType.from(
-                    BaseEditableNomenclatureType.Type.COUNTING,
+            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.INFORMATION) } returns listOf(
+                EditableNomenclatureType(
+                    EditableNomenclatureType.Type.COUNTING,
                     "TYP_DENBR",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
                 )
             )
             // and some default values for these types
@@ -403,116 +400,10 @@ class NomenclatureRepositoryTest {
 
             // when
             val editableNomenclatureSettings =
-                nomenclatureRepository.getEditableNomenclatures(BaseEditableNomenclatureType.Type.INFORMATION)
+                nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
 
             // then
             assertTrue(editableNomenclatureSettings.isLeft)
             assertTrue(editableNomenclatureSettings.fold(::identity) {} is NoNomenclatureTypeFoundLocallyFailure)
-        }
-
-    @Test
-    fun `should get nomenclature values by type matching given taxonomy kingdom and group`() =
-        runTest {
-            coEvery {
-                // given some nomenclature values from given type
-                nomenclatureLocalDataSource.getNomenclatureValuesByTypeAndTaxonomy(
-                    mnemonic = "STATUT_BIO",
-                    Taxonomy(
-                        kingdom = "Animalia",
-                        group = "Oiseaux"
-                    )
-                )
-            } returns listOf(
-                Nomenclature(
-                    id = 29,
-                    code = "1",
-                    hierarchy = "013.001",
-                    defaultLabel = "Non renseigné",
-                    typeId = 13
-                ),
-                Nomenclature(
-                    id = 31,
-                    code = "3",
-                    hierarchy = "013.003",
-                    defaultLabel = "Reproduction",
-                    typeId = 13
-                ),
-                Nomenclature(
-                    id = 32,
-                    code = "4",
-                    hierarchy = "013.004",
-                    defaultLabel = "Hibernation",
-                    typeId = 13
-                )
-            )
-
-            // when
-            val nomenclatures = nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
-                mnemonic = "STATUT_BIO",
-                Taxonomy(
-                    kingdom = "Animalia",
-                    group = "Oiseaux"
-                )
-            )
-
-            // then
-            assertTrue(nomenclatures.isRight)
-            assertEquals(
-                listOf(
-                    Nomenclature(
-                        id = 29,
-                        code = "1",
-                        hierarchy = "013.001",
-                        defaultLabel = "Non renseigné",
-                        typeId = 13
-                    ),
-                    Nomenclature(
-                        id = 31,
-                        code = "3",
-                        hierarchy = "013.003",
-                        defaultLabel = "Reproduction",
-                        typeId = 13
-                    ),
-                    Nomenclature(
-                        id = 32,
-                        code = "4",
-                        hierarchy = "013.004",
-                        defaultLabel = "Hibernation",
-                        typeId = 13
-                    )
-                ),
-                nomenclatures.orNull()
-            )
-        }
-
-    @Test
-    fun `should return NoNomenclatureValuesFoundFailure if no nomenclature values was found from given type`() =
-        runTest {
-            // given no nomenclature values from given type
-            coEvery {
-                nomenclatureLocalDataSource.getNomenclatureValuesByTypeAndTaxonomy(
-                    "STATUT_BIO",
-                    Taxonomy(
-                        kingdom = "Animalia",
-                        group = "Oiseaux"
-                    )
-                )
-            } returns emptyList()
-
-            // when
-            val nomenclatures = nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
-                mnemonic = "STATUT_BIO",
-                Taxonomy(
-                    kingdom = "Animalia",
-                    group = "Oiseaux"
-                )
-            )
-
-            // then
-            assertTrue(nomenclatures.isLeft)
-            assertEquals(
-                nomenclatures.fold(::identity) {},
-                NoNomenclatureValuesFoundFailure("STATUT_BIO")
-            )
         }
 }

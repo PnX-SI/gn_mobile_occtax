@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AutoCompleteTextView
 import android.widget.Button
+import android.widget.NumberPicker
+import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -18,9 +20,11 @@ import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.lifecycle.observeOnce
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.nomenclature.domain.BaseEditableNomenclatureType
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
-import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.features.record.domain.CountingRecord
+import fr.geonature.occtax.ui.shared.view.setOnValueChangedListener
+import kotlin.math.ceil
 
 /**
  * Default RecyclerView Adapter about [EditableNomenclatureType].
@@ -83,9 +87,10 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AbstractViewHolder {
         return when (viewType) {
-            BaseEditableNomenclatureType.ViewType.NONE.ordinal -> MoreViewHolder(parent)
-            BaseEditableNomenclatureType.ViewType.TEXT_SIMPLE.ordinal -> TextSimpleViewHolder(parent)
-            BaseEditableNomenclatureType.ViewType.TEXT_MULTIPLE.ordinal -> TextMultipleViewHolder(parent)
+            EditableNomenclatureType.ViewType.NONE.ordinal -> MoreViewHolder(parent)
+            EditableNomenclatureType.ViewType.TEXT_SIMPLE.ordinal -> TextSimpleViewHolder(parent)
+            EditableNomenclatureType.ViewType.TEXT_MULTIPLE.ordinal -> TextMultipleViewHolder(parent)
+            EditableNomenclatureType.ViewType.MIN_MAX.ordinal -> MinMaxViewHolder(parent)
             else -> NomenclatureTypeViewHolder(parent)
         }
     }
@@ -97,7 +102,8 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
     }
 
     override fun getItemCount(): Int {
-        return selectedNomenclatureTypes.size
+        return selectedNomenclatureTypes.filter { it.viewType != EditableNomenclatureType.ViewType.MIN_MAX }.size +
+            selectedNomenclatureTypes.filter { it.viewType == EditableNomenclatureType.ViewType.MIN_MAX }.size.coerceAtMost(1)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -133,9 +139,9 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                     // show 'MORE' button only if we have some other editable nomenclatures to show
                     this + if (this.size < availableNomenclatureTypes.size) listOf(
                         EditableNomenclatureType(
-                            BaseEditableNomenclatureType.Type.INFORMATION,
+                            EditableNomenclatureType.Type.INFORMATION,
                             "MORE",
-                            BaseEditableNomenclatureType.ViewType.NONE,
+                            EditableNomenclatureType.ViewType.NONE,
                             true
                         )
                     ) else emptyList()
@@ -378,7 +384,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                 ) else null
                 setStartIconOnClickListener {
                     if (!lockDefaultValues) return@setStartIconOnClickListener
-                    
+
                     nomenclatureType.locked = !nomenclatureType.locked
                     startIconDrawable = ResourcesCompat.getDrawable(
                         itemView.resources,
@@ -408,6 +414,117 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                 inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 minLines = 2
                 maxLines = 4
+            }
+        }
+    }
+
+    inner class MinMaxViewHolder(parent: ViewGroup) : AbstractViewHolder(
+        LayoutInflater.from(parent.context).inflate(
+            R.layout.view_action_min_max,
+            parent,
+            false
+        )
+    ) {
+        private val defaultMaxValueOffset = 50
+        private var editMinLabel: TextView = itemView.findViewById(R.id.editMinLabel)
+        private var editMaxLabel: TextView = itemView.findViewById(R.id.editMaxLabel)
+        private var editMinPicker: NumberPicker = itemView.findViewById(R.id.editMinPicker)
+        private var editMaxPicker: NumberPicker = itemView.findViewById(R.id.editMaxPicker)
+
+        private var minNomenclatureType: EditableNomenclatureType? = null
+        private var maxNomenclatureType: EditableNomenclatureType? = null
+
+        init {
+            with(editMinPicker) {
+                minValue = 0
+                maxValue = defaultMaxValueOffset
+                setOnValueChangedListener(defaultMaxValueOffset) { oldValue, newValue ->
+                    if (editMaxPicker.value < newValue) {
+                        editMaxPicker.maxValue = editMinPicker.maxValue
+                        editMaxPicker.value = newValue
+                    }
+
+                    if (editMaxPicker.value == oldValue) {
+                        editMaxPicker.value = newValue
+                    }
+
+                    minNomenclatureType?.also { nomenclatureType ->
+                        nomenclatureType.value = PropertyValue.fromValue(
+                            nomenclatureType.code,
+                            newValue
+                        )
+                        listener.onUpdate(nomenclatureType)
+                    }
+                    maxNomenclatureType?.also { nomenclatureType ->
+                        nomenclatureType.value = PropertyValue.fromValue(
+                            nomenclatureType.code,
+                            editMaxPicker.value
+                        )
+                        listener.onUpdate(nomenclatureType)
+                    }
+                }
+            }
+
+            with(editMaxPicker) {
+                minValue = 0
+                maxValue = defaultMaxValueOffset
+                setOnValueChangedListener(defaultMaxValueOffset) { _, newValue ->
+                    editMinPicker.maxValue = editMaxPicker.maxValue
+
+                    if (editMinPicker.value > newValue) editMinPicker.value = newValue
+
+                    minNomenclatureType?.also { nomenclatureType ->
+                        nomenclatureType.value = PropertyValue.fromValue(
+                            nomenclatureType.code,
+                            editMinPicker.value
+                        )
+                        listener.onUpdate(nomenclatureType)
+                    }
+                    maxNomenclatureType?.also { nomenclatureType ->
+                        nomenclatureType.value = PropertyValue.fromValue(
+                            nomenclatureType.code,
+                            newValue
+                        )
+                        listener.onUpdate(nomenclatureType)
+                    }
+                }
+            }
+        }
+
+        override fun onBind(nomenclatureType: EditableNomenclatureType) {
+            minNomenclatureType =
+                selectedNomenclatureTypes.firstOrNull { it.viewType == EditableNomenclatureType.ViewType.MIN_MAX && it.code == CountingRecord.MIN_KEY }
+            maxNomenclatureType =
+                selectedNomenclatureTypes.firstOrNull { it.viewType == EditableNomenclatureType.ViewType.MIN_MAX && it.code ==  CountingRecord.MAX_KEY }
+
+            with(if (minNomenclatureType != null) View.VISIBLE else View.GONE) {
+                editMinLabel.visibility = this
+                editMinPicker.visibility = this
+            }
+
+            with(if (maxNomenclatureType != null) View.VISIBLE else View.GONE) {
+                editMaxLabel.visibility = this
+                editMaxPicker.visibility = this
+            }
+
+            (minNomenclatureType?.value?.value as Number?)?.toInt()?.also {
+                if (it > editMinPicker.maxValue) {
+                    editMinPicker.maxValue =
+                        (ceil((it.toDouble() / defaultMaxValueOffset)) * defaultMaxValueOffset).toInt()
+                    editMaxPicker.maxValue = editMinPicker.maxValue
+                }
+
+                editMinPicker.value = it
+            }
+
+            (maxNomenclatureType?.value?.value as Number?)?.toInt()?.also {
+                if (it > editMaxPicker.maxValue) {
+                    editMaxPicker.maxValue =
+                        (ceil((it.toDouble() / defaultMaxValueOffset)) * defaultMaxValueOffset).toInt()
+                    editMinPicker.maxValue = editMaxPicker.maxValue
+                }
+
+                editMaxPicker.value = it
             }
         }
     }

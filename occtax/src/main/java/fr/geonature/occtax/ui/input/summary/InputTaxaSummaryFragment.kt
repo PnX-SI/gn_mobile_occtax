@@ -27,10 +27,9 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.commons.input.AbstractInputTaxon
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.InputTaxon
+import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.settings.InputDateSettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
 import fr.geonature.occtax.ui.input.taxa.Filter
@@ -59,9 +58,9 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
     private val onInputDateDialogFragmentListener =
         object : InputDateDialogFragment.OnInputDateDialogFragmentListener {
             override fun onDatesChanged(startDate: Date, endDate: Date) {
-                input?.apply {
-                    this.startDate = startDate
-                    this.endDate = endDate
+                observationRecord?.dates?.also {
+                    it.start = startDate
+                    it.end = endDate
                 }
             }
         }
@@ -123,22 +122,22 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
         view.findViewById<ExtendedFloatingActionButton>(R.id.fab).apply {
             setOnClickListener {
                 startEditTaxon = true
-                input?.clearCurrentSelectedInputTaxon()
+                observationRecord?.taxa?.selectedTaxonRecord = null
                 listener.startEditTaxon()
             }
         }
 
         adapter = InputTaxaSummaryRecyclerViewAdapter(object :
-            AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<AbstractInputTaxon> {
-            override fun onClick(item: AbstractInputTaxon) {
+            AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<TaxonRecord> {
+            override fun onClick(item: TaxonRecord) {
                 startEditTaxon = true
-                input?.setCurrentSelectedInputTaxonId(item.taxon.id)
+                observationRecord?.taxa?.selectedTaxonRecord = item
                 listener.startEditTaxon()
             }
 
             override fun onLongClicked(
                 position: Int,
-                item: AbstractInputTaxon
+                item: TaxonRecord
             ) {
                 context?.run {
                     getSystemService(
@@ -157,7 +156,7 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
                             R.string.alert_dialog_ok
                         ) { dialog, _ ->
                             adapter?.remove(item)
-                            input?.removeInputTaxon(item.taxon.id)
+                            observationRecord?.taxa?.delete(item.taxon.id)
                             listener.validateCurrentPage()
 
                             dialog.dismiss()
@@ -215,14 +214,14 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
 
         Handler(Looper.getMainLooper()).post {
             // bypass this page and redirect to the previous one if we have started editing the first taxon
-            if (startEditTaxon && input?.getInputTaxa()?.isEmpty() == true) {
+            if (startEditTaxon && observationRecord?.taxa?.taxa?.isEmpty() == true) {
                 startEditTaxon = false
                 listener.goToPreviousPage()
                 return@post
             }
 
             // no taxon added yet: redirect to the edit taxon pages
-            if (input?.getInputTaxa()?.isEmpty() == true) {
+            if (observationRecord?.taxa?.taxa?.isEmpty() == true) {
                 startEditTaxon = true
                 listener.startEditTaxon()
                 return@post
@@ -270,8 +269,8 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
 
                 InputDateDialogFragment.newInstance(
                     InputDateSettings(endDateSettings = dateSettings.endDateSettings),
-                    input?.startDate ?: Date(),
-                    input?.endDate
+                    observationRecord?.dates?.start ?: Date(),
+                    observationRecord?.dates?.end
                 )
                     .apply {
                         setOnInputDateDialogFragmentListenerListener(onInputDateDialogFragmentListener)
@@ -306,7 +305,7 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
     override fun getSubtitle(): CharSequence? {
         val context = context ?: return null
 
-        return input?.getInputTaxa()?.size?.let {
+        return observationRecord?.taxa?.taxa?.size?.let {
             context.resources.getQuantityString(
                 R.plurals.summary_taxa_subtitle,
                 it,
@@ -320,8 +319,8 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
     }
 
     override fun validate(): Boolean {
-        return startEditTaxon || (this.input?.getInputTaxa() ?: emptyList()).all {
-            it is InputTaxon && it.properties.isNotEmpty() && it.getCounting().isNotEmpty()
+        return startEditTaxon || (this.observationRecord?.taxa?.taxa ?: emptyList()).all {
+            it.properties.isNotEmpty() && it.counting.counting.isNotEmpty()
         }
     }
 
@@ -335,7 +334,7 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
         val filterByTaxonomy =
             selectedFilters.find { filter -> filter.type == Filter.FilterType.TAXONOMY }?.value as Taxonomy?
 
-        adapter?.setItems((input?.getInputTaxa() ?: emptyList()).filter {
+        adapter?.setItems((observationRecord?.taxa?.taxa ?: emptyList()).filter {
             val taxonomy = filterByTaxonomy ?: return@filter true
 
             // filter by kingdom only

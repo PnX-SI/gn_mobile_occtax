@@ -23,14 +23,13 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.CountingMetadata
-import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.input.InputTaxon
+import fr.geonature.occtax.features.record.domain.CountingRecord
+import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
 
 /**
- * [Fragment] to let the user to add additional counting information for the given [Input].
+ * [Fragment] to let the user to add additional counting information for the given [TaxonRecord].
  *
  * @author S. Grimault
  */
@@ -52,7 +51,7 @@ class CountingFragment : AbstractInputFragment() {
                     return@registerForActivityResult
                 }
 
-                updateCountingMetadata(it.data?.getParcelableExtra(EditCountingMetadataActivity.EXTRA_COUNTING_METADATA))
+                updateCountingMetadata(it.data?.getParcelableExtra(EditCountingMetadataActivity.EXTRA_COUNTING_RECORD))
             }
     }
 
@@ -92,14 +91,14 @@ class CountingFragment : AbstractInputFragment() {
         }
 
         adapter = CountingRecyclerViewAdapter(object :
-            AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<CountingMetadata> {
-            override fun onClick(item: CountingMetadata) {
+            AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<CountingRecord> {
+            override fun onClick(item: CountingRecord) {
                 launchEditCountingMetadataActivity(item)
             }
 
             override fun onLongClicked(
                 position: Int,
-                item: CountingMetadata
+                item: CountingRecord
             ) {
                 context?.run {
                     getSystemService(
@@ -118,7 +117,7 @@ class CountingFragment : AbstractInputFragment() {
                             R.string.alert_dialog_ok
                         ) { dialog, _ ->
                             adapter?.remove(item)
-                            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.deleteCountingMetadata(item.index)
+                            observationRecord?.taxa?.selectedTaxonRecord?.counting?.delete(item.index)
                             listener.validateCurrentPage()
 
                             dialog.dismiss()
@@ -172,7 +171,7 @@ class CountingFragment : AbstractInputFragment() {
     }
 
     override fun getSubtitle(): CharSequence? {
-        return input?.getCurrentSelectedInputTaxon()?.taxon?.name
+        return observationRecord?.taxa?.selectedTaxonRecord?.taxon?.name
     }
 
     override fun pagingEnabled(): Boolean {
@@ -180,17 +179,18 @@ class CountingFragment : AbstractInputFragment() {
     }
 
     override fun validate(): Boolean {
-        return (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()?.isNotEmpty()
+        return observationRecord?.taxa?.selectedTaxonRecord?.counting?.counting?.isNotEmpty()
             ?: false
     }
 
     override fun refreshView() {
-        if (input == null) {
+        if (observationRecord == null) {
             return
         }
 
-        val counting = (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()
-            ?: emptyList()
+        val counting =
+            observationRecord?.taxa?.selectedTaxonRecord?.counting?.counting
+                ?: emptyList()
 
         adapter?.setItems(counting)
 
@@ -199,12 +199,12 @@ class CountingFragment : AbstractInputFragment() {
         }
     }
 
-    private fun launchEditCountingMetadataActivity(countingMetadata: CountingMetadata? = null) {
+    private fun launchEditCountingMetadataActivity(countingMetadata: CountingRecord? = null) {
         val context = context ?: return
 
         editCountingResultLauncher.launch(EditCountingMetadataActivity.newIntent(
             context,
-            input?.getCurrentSelectedInputTaxon()?.taxon?.taxonomy
+            observationRecord?.taxa?.selectedTaxonRecord?.taxon?.taxonomy
                 ?: Taxonomy(
                     Taxonomy.ANY,
                     Taxonomy.ANY
@@ -216,7 +216,7 @@ class CountingFragment : AbstractInputFragment() {
         ))
     }
 
-    private fun updateCountingMetadata(countingMetadata: CountingMetadata?) {
+    private fun updateCountingMetadata(countingMetadata: CountingRecord?) {
         if (countingMetadata == null) {
             Toast.makeText(
                 context,
@@ -229,7 +229,7 @@ class CountingFragment : AbstractInputFragment() {
         }
 
         if (countingMetadata.isEmpty()) {
-            (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.deleteCountingMetadata(
+            observationRecord?.taxa?.selectedTaxonRecord?.counting?.delete(
                 countingMetadata.index
             )
             Toast.makeText(
@@ -242,12 +242,10 @@ class CountingFragment : AbstractInputFragment() {
             return
         }
 
-        (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.addCountingMetadata(
-            countingMetadata
-        )
+        observationRecord?.taxa?.selectedTaxonRecord?.counting?.addOrUpdate(countingMetadata)
 
-        val counting = (input?.getCurrentSelectedInputTaxon() as InputTaxon?)?.getCounting()
-            ?: emptyList()
+        val counting =
+            observationRecord?.taxa?.selectedTaxonRecord?.counting?.counting ?: emptyList()
 
         adapter?.setItems(counting)
     }

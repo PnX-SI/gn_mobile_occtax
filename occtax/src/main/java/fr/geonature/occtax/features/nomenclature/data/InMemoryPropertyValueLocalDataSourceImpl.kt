@@ -1,7 +1,7 @@
 package fr.geonature.occtax.features.nomenclature.data
 
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.occtax.input.PropertyValue
+import fr.geonature.occtax.features.input.domain.PropertyValue
 
 /**
  * In memory implementation of [IPropertyValueLocalDataSource].

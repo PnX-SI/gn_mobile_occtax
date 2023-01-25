@@ -1,0 +1,56 @@
+{
+  "id": 1234,
+  "status": "draft",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -1.554476,
+      47.225782
+    ]
+  },
+  "properties": {
+    "internal_id": 1234,
+    "date_min": "2016-10-28T08:15:00Z",
+    "hour_min": null,
+    "date_max": "2016-10-29T09:00:00Z",
+    "hour_max": null,
+    "id_nomenclature_grp_typ": 133,
+    "comment": "Global comment",
+    "id_dataset": 17,
+    "id_digitiser": 1,
+    "meta_device_entry": "mobile",
+    "observers": [
+      1,
+      5,
+      2,
+      3
+    ],
+    "t_occurrences_occtax": [
+      {
+        "cd_nom": 10,
+        "nom_cite": "taxon_01",
+        "regne": "Animalia",
+        "group2_inpn": "Ascidies",
+        "id_nomenclature_bio_condition": 29,
+        "id_nomenclature_determination_method": 445,
+        "id_nomenclature_obs_technique": 41,
+        "id_nomenclature_naturalness": 160,
+        "id_nomenclature_behaviour": 580,
+        "id_nomenclature_exist_proof": 81,
+        "id_nomenclature_bio_status": 29,
+        "comment": "Some comment",
+        "cor_counting_occtax": [
+          {
+            "id_nomenclature_obj_count": 146,
+            "id_nomenclature_sex": 168,
+            "id_nomenclature_life_stage": 2,
+            "id_nomenclature_type_count": 93,
+            "count_max": 2,
+            "count_min": 1
+          }
+        ],
+        "determiner": "Determiner value"
+      }
+    ]
+  }
+}

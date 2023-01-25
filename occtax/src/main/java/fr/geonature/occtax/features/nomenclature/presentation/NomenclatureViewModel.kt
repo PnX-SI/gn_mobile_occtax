@@ -7,7 +7,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.lifecycle.BaseViewModel
-import fr.geonature.occtax.features.nomenclature.domain.BaseEditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.usecase.GetEditableNomenclaturesUseCase
 import fr.geonature.occtax.features.nomenclature.usecase.GetNomenclatureValuesByTypeAndTaxonomyUseCase
@@ -39,7 +38,7 @@ class NomenclatureViewModel @Inject constructor(
      * @param defaultPropertySettings the default nomenclature settings
      */
     fun getEditableNomenclatures(
-        type: BaseEditableNomenclatureType.Type,
+        type: EditableNomenclatureType.Type,
         defaultPropertySettings: List<PropertySettings> = listOf(),
         taxonomy: Taxonomy? = null
     ) {
@@ -76,9 +75,12 @@ class NomenclatureViewModel @Inject constructor(
             ),
             viewModelScope
         ) {
-            it.fold(::handleFailure) { nomenclatureValues ->
-                nomenclatureValuesByTypeAndTaxonomy.value = nomenclatureValues
-            }
+            it.fold(
+                onSuccess = { nomenclatureValues ->
+                    nomenclatureValuesByTypeAndTaxonomy.value = nomenclatureValues
+                },
+                ::handleError
+            )
         }
 
         return nomenclatureValuesByTypeAndTaxonomy

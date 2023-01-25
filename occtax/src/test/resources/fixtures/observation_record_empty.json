@@ -1,0 +1,13 @@
+{
+  "id": 1234,
+  "status": "draft",
+  "geometry": null,
+  "properties": {
+    "internal_id": 1234,
+    "date_min": "2016-10-28T08:15:00Z",
+    "hour_min": null,
+    "date_max": "2016-10-29T09:00:00Z",
+    "hour_max": null,
+    "meta_device_entry": "mobile"
+  }
+}

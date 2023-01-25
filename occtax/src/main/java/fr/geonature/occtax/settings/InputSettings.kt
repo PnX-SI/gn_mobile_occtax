@@ -2,10 +2,10 @@ package fr.geonature.occtax.settings
 
 import android.os.Parcel
 import android.os.Parcelable
-import fr.geonature.occtax.input.Input
+import fr.geonature.occtax.features.record.domain.ObservationRecord
 
 /**
- * [Input] settings.
+ * [ObservationRecord] settings.
  *
  * @author S. Grimault
  */

@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import fr.geonature.commons.lifecycle.observeUntil
-import fr.geonature.commons.util.ThemeUtils
+import fr.geonature.commons.util.ThemeUtils.getAccentColor
 import fr.geonature.maps.jts.geojson.GeometryUtils.fromPoint
 import fr.geonature.maps.jts.geojson.GeometryUtils.toPoint
 import fr.geonature.maps.settings.LayerStyleSettings
@@ -15,8 +15,8 @@ import fr.geonature.maps.ui.overlay.feature.FeatureCollectionOverlay
 import fr.geonature.maps.ui.overlay.feature.filter.ContainsFeaturesFilter
 import fr.geonature.maps.ui.widget.EditFeatureButton
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.Input
-import fr.geonature.occtax.input.InputViewModel
+import fr.geonature.occtax.features.record.domain.ObservationRecord
+import fr.geonature.occtax.features.record.presentation.ObservationRecordViewModel
 import fr.geonature.occtax.ui.input.IInputFragment
 import fr.geonature.viewpager.model.IPageWithValidationFragment
 import fr.geonature.viewpager.ui.OnPageFragmentListener
@@ -36,11 +36,11 @@ class InputMapFragment : MapFragment(),
     IPageWithValidationFragment,
     IInputFragment {
 
-    private val inputViewModel: InputViewModel by activityViewModels()
+    private val observationRecordViewModel: ObservationRecordViewModel by activityViewModels()
 
     private lateinit var listener: OnPageFragmentListener
 
-    private var input: Input? = null
+    private var observationRecord: ObservationRecord? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +54,7 @@ class InputMapFragment : MapFragment(),
         }
         onVectorLayersChangedListener = {
             if (it.isNotEmpty()) {
-                val geometry = input?.geometry
+                val geometry = observationRecord?.geometry
 
                 if (geometry != null && geometry is Point) {
                     selectPOI(fromPoint(geometry))
@@ -76,12 +76,12 @@ class InputMapFragment : MapFragment(),
     override fun onResume() {
         super.onResume()
 
-        inputViewModel.input.observeUntil(
+        observationRecordViewModel.observationRecord.observeUntil(
             viewLifecycleOwner,
             { it != null }) {
             if (it == null) return@observeUntil
 
-            input = it
+            observationRecord = it
             refreshView()
         }
     }
@@ -105,11 +105,11 @@ class InputMapFragment : MapFragment(),
     }
 
     override fun validate(): Boolean {
-        return this.input?.geometry != null
+        return this.observationRecord?.geometry != null
     }
 
     override fun refreshView() {
-        val geometry = input?.geometry ?: return
+        val geometry = observationRecord?.geometry ?: return
 
         if (geometry is Point) {
             setSelectedPOIs(listOf(fromPoint(geometry)))
@@ -117,7 +117,7 @@ class InputMapFragment : MapFragment(),
     }
 
     private fun clearInputSelection() {
-        input?.geometry = null
+        observationRecord = observationRecord?.copy(geometry = null)
 
         listener.validateCurrentPage()
 
@@ -133,11 +133,14 @@ class InputMapFragment : MapFragment(),
         CoroutineScope(Main).launch {
             val context = context ?: return@launch
 
-            input?.geometry = toPoint(poi)
-            val accentColor = ThemeUtils.getAccentColor(context)
+            observationRecord = observationRecord?.copy(geometry = toPoint(poi))?.also {
+                observationRecordViewModel.edit(it)
+            }
+
+            val accentColor = getAccentColor(context)
 
             // select matching Feature from Overlays
-            input?.selectedFeatureId =
+            observationRecord?.feature?.id =
                 getOverlays { overlay -> overlay is FeatureCollectionOverlay }
                     .asSequence()
                     .map { it as FeatureCollectionOverlay }
@@ -146,9 +149,12 @@ class InputMapFragment : MapFragment(),
                         val filter = ContainsFeaturesFilter(
                             poi,
                             it.layerStyle,
-                            LayerStyleSettings.Builder.newInstance().from(it.layerStyle).color(
-                                accentColor
-                            ).build()
+                            LayerStyleSettings.Builder.newInstance()
+                                .from(it.layerStyle)
+                                .color(
+                                    accentColor
+                                )
+                                .build()
                         )
                         it.apply(filter)
                         filter.getSelectedFeatures()

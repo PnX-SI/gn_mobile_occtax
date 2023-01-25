@@ -15,5 +15,7 @@
     <string name="nomenclature_sexe">Sexe</string>
     <string name="nomenclature_obj_denbr">Objet du dénombrement</string>
     <string name="nomenclature_typ_denbr">Type de dénombrement</string>
+    <string name="nomenclature_count_min">Min</string>
+    <string name="nomenclature_count_max">Max</string>
 
 </resources>

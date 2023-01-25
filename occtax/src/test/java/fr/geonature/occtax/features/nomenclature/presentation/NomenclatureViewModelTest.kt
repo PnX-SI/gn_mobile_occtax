@@ -6,16 +6,15 @@ import androidx.lifecycle.viewModelScope
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.error.Failure
+import fr.geonature.commons.features.nomenclature.error.NomenclatureException
 import fr.geonature.commons.fp.Either.Left
 import fr.geonature.commons.fp.Either.Right
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.nomenclature.domain.BaseEditableNomenclatureType
+import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
-import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureValuesFoundFailure
 import fr.geonature.occtax.features.nomenclature.usecase.GetEditableNomenclaturesUseCase
 import fr.geonature.occtax.features.nomenclature.usecase.GetNomenclatureValuesByTypeAndTaxonomyUseCase
-import fr.geonature.occtax.input.PropertyValue
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
 import io.mockk.confirmVerified
@@ -57,6 +56,9 @@ class NomenclatureViewModelTest {
     private lateinit var nomenclatureValuesObserver: Observer<List<Nomenclature>>
 
     @RelaxedMockK
+    private lateinit var errorObserver: Observer<Throwable>
+
+    @RelaxedMockK
     private lateinit var failureObserver: Observer<Failure>
 
     private lateinit var nomenclatureViewModel: NomenclatureViewModel
@@ -82,21 +84,21 @@ class NomenclatureViewModelTest {
             // given some nomenclature types with default values
             val expectedEditableNomenclatures = listOf(
                 EditableNomenclatureType(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
+                    EditableNomenclatureType.Type.INFORMATION,
                     "METH_OBS",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                     label = "Méthodes d'observation"
                 ),
                 EditableNomenclatureType(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
+                    EditableNomenclatureType.Type.INFORMATION,
                     "ETA_BIO",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                     label = "Etat biologique de l'observation"
                 ),
                 EditableNomenclatureType(
-                    BaseEditableNomenclatureType.Type.INFORMATION,
+                    EditableNomenclatureType.Type.INFORMATION,
                     "STATUT_BIO",
-                    BaseEditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                     label = "Statut biologique",
                     visible = false,
                     value = PropertyValue(
@@ -109,14 +111,14 @@ class NomenclatureViewModelTest {
             coEvery {
                 getEditableNomenclaturesUseCase.run(
                     GetEditableNomenclaturesUseCase.Params(
-                        BaseEditableNomenclatureType.Type.INFORMATION,
+                        EditableNomenclatureType.Type.INFORMATION,
                     )
                 )
             } returns Right(expectedEditableNomenclatures)
             coEvery {
                 getEditableNomenclaturesUseCase(
                     GetEditableNomenclaturesUseCase.Params(
-                        BaseEditableNomenclatureType.Type.INFORMATION,
+                        EditableNomenclatureType.Type.INFORMATION,
                     ),
                     nomenclatureViewModel.viewModelScope,
                     any()
@@ -124,7 +126,7 @@ class NomenclatureViewModelTest {
             } answers { callOriginal() }
 
             // when
-            nomenclatureViewModel.getEditableNomenclatures(BaseEditableNomenclatureType.Type.INFORMATION)
+            nomenclatureViewModel.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
             nomenclatureViewModel.editableNomenclatures.observeForever(editableNomenclaturesObserver)
             nomenclatureViewModel.failure.observeForever(failureObserver)
 
@@ -140,14 +142,14 @@ class NomenclatureViewModelTest {
             coEvery {
                 getEditableNomenclaturesUseCase.run(
                     GetEditableNomenclaturesUseCase.Params(
-                        BaseEditableNomenclatureType.Type.INFORMATION,
+                        EditableNomenclatureType.Type.INFORMATION,
                     )
                 )
             } returns Left(NoNomenclatureTypeFoundLocallyFailure)
             coEvery {
                 getEditableNomenclaturesUseCase(
                     GetEditableNomenclaturesUseCase.Params(
-                        BaseEditableNomenclatureType.Type.INFORMATION,
+                        EditableNomenclatureType.Type.INFORMATION,
                     ),
                     nomenclatureViewModel.viewModelScope,
                     any()
@@ -155,7 +157,7 @@ class NomenclatureViewModelTest {
             } answers { callOriginal() }
 
             // when
-            nomenclatureViewModel.getEditableNomenclatures(BaseEditableNomenclatureType.Type.INFORMATION)
+            nomenclatureViewModel.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
             nomenclatureViewModel.editableNomenclatures.observeForever(editableNomenclaturesObserver)
             nomenclatureViewModel.failure.observeForever(failureObserver)
 
@@ -202,7 +204,7 @@ class NomenclatureViewModelTest {
                         )
                     )
                 )
-            } returns Right(expectedNomenclatureValues)
+            } returns Result.success(expectedNomenclatureValues)
             coEvery {
                 getNomenclatureValuesByTypeAndTaxonomyUseCase(
                     GetNomenclatureValuesByTypeAndTaxonomyUseCase.Params(
@@ -224,7 +226,8 @@ class NomenclatureViewModelTest {
                     kingdom = "Animalia",
                     group = "Oiseaux"
                 )
-            ).observeForever(nomenclatureValuesObserver)
+            )
+                .observeForever(nomenclatureValuesObserver)
             nomenclatureViewModel.failure.observeForever(failureObserver)
 
             // then
@@ -246,7 +249,7 @@ class NomenclatureViewModelTest {
                         )
                     )
                 )
-            } returns Left(NoNomenclatureValuesFoundFailure("STATUT_BIO"))
+            } returns Result.failure(NomenclatureException.NoNomenclatureValuesFoundException("STATUT_BIO"))
             coEvery {
                 getNomenclatureValuesByTypeAndTaxonomyUseCase(
                     GetNomenclatureValuesByTypeAndTaxonomyUseCase.Params(
@@ -268,11 +271,15 @@ class NomenclatureViewModelTest {
                     kingdom = "Animalia",
                     group = "Oiseaux"
                 )
-            ).observeForever(nomenclatureValuesObserver)
+            )
+                .observeForever(nomenclatureValuesObserver)
+            nomenclatureViewModel.error.observeForever(errorObserver)
             nomenclatureViewModel.failure.observeForever(failureObserver)
 
             // then
-            verify(atLeast = 1) { failureObserver.onChanged(NoNomenclatureValuesFoundFailure("STATUT_BIO")) }
+            verify(atLeast = 1) {
+                errorObserver.onChanged(NomenclatureException.NoNomenclatureValuesFoundException("STATUT_BIO"))
+            }
             confirmVerified(failureObserver)
         }
 }

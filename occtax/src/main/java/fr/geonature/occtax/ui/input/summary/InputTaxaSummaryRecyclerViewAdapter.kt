@@ -5,20 +5,18 @@ import android.text.SpannedString
 import android.view.View
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
-import fr.geonature.commons.input.AbstractInputTaxon
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
-import fr.geonature.occtax.input.InputTaxon
-import fr.geonature.occtax.input.PropertyValue
-import java.util.Locale
+import fr.geonature.occtax.features.record.domain.PropertyValue
+import fr.geonature.occtax.features.record.domain.TaxonRecord
 
 /**
  * Default RecyclerView Adapter used by [InputTaxaSummaryFragment].
  *
  * @author S. Grimault
  */
-class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<AbstractInputTaxon>) :
-    AbstractListItemRecyclerViewAdapter<AbstractInputTaxon>(listener) {
+class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<TaxonRecord>) :
+    AbstractListItemRecyclerViewAdapter<TaxonRecord>(listener) {
 
     override fun getViewHolder(
         view: View,
@@ -29,14 +27,14 @@ class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapte
 
     override fun getLayoutResourceId(
         position: Int,
-        item: AbstractInputTaxon
+        item: TaxonRecord
     ): Int {
         return R.layout.list_item_taxon_summary
     }
 
     override fun areItemsTheSame(
-        oldItems: List<AbstractInputTaxon>,
-        newItems: List<AbstractInputTaxon>,
+        oldItems: List<TaxonRecord>,
+        newItems: List<TaxonRecord>,
         oldItemPosition: Int,
         newItemPosition: Int
     ): Boolean {
@@ -44,8 +42,8 @@ class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapte
     }
 
     override fun areContentsTheSame(
-        oldItems: List<AbstractInputTaxon>,
-        newItems: List<AbstractInputTaxon>,
+        oldItems: List<TaxonRecord>,
+        newItems: List<TaxonRecord>,
         oldItemPosition: Int,
         newItemPosition: Int
     ): Boolean {
@@ -53,18 +51,18 @@ class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapte
     }
 
     inner class ViewHolder(itemView: View) :
-        AbstractListItemRecyclerViewAdapter<AbstractInputTaxon>.AbstractViewHolder(itemView) {
+        AbstractListItemRecyclerViewAdapter<TaxonRecord>.AbstractViewHolder(itemView) {
         private val title: TextView = itemView.findViewById(android.R.id.title)
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
         private val summary: TextView = itemView.findViewById(android.R.id.summary)
         private val text2: TextView = itemView.findViewById(android.R.id.text2)
 
-        override fun onBind(item: AbstractInputTaxon) {
+        override fun onBind(item: TaxonRecord) {
             title.text = item.taxon.name
             text1.text = item.taxon.commonName
-            summary.text = buildInformation(*(item as InputTaxon).properties.values.toTypedArray())
+            summary.text = buildInformation(*item.properties.values.toTypedArray())
             summary.isSelected = true
-            text2.text = buildCounting(item.getCounting().size)
+            text2.text = buildCounting(item.counting.counting.size)
         }
 
         private fun buildInformation(vararg propertyValue: PropertyValue): Spanned {
@@ -72,11 +70,19 @@ class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapte
             else HtmlCompat.fromHtml(propertyValue
                 .asSequence()
                 .filterNot { it.isEmpty() }
+                .mapNotNull {
+                    when (it) {
+                        is PropertyValue.Text -> it.code to it.value
+                        is PropertyValue.Number -> it.code to it.value
+                        is PropertyValue.Nomenclature -> it.code to (it.label ?: it.value)
+                        else -> null
+                    }
+                }
                 .map {
                     itemView.context.getString(
                         R.string.summary_taxon_information,
-                        getNomenclatureTypeLabel(it.code),
-                        it.label ?: it.value
+                        getNomenclatureTypeLabel(it.first),
+                        it.second
                     )
                 }
                 .joinToString(", "),
@@ -93,7 +99,7 @@ class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapte
 
         private fun getNomenclatureTypeLabel(mnemonic: String): String {
             val resourceId = itemView.resources.getIdentifier(
-                "nomenclature_${mnemonic.lowercase(Locale.getDefault())}",
+                "nomenclature_${mnemonic.lowercase()}",
                 "string",
                 itemView.context.packageName
             )
