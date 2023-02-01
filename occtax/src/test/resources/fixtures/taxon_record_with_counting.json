@@ -1,0 +1,24 @@
+{
+  "cd_nom": 10,
+  "nom_cite": "taxon_01",
+  "additional_fields": {},
+  "id_nomenclature_bio_condition": 29,
+  "id_nomenclature_determination_method": 445,
+  "id_nomenclature_obs_technique": 41,
+  "id_nomenclature_naturalness": 160,
+  "id_nomenclature_behaviour": 580,
+  "id_nomenclature_exist_proof": 81,
+  "id_nomenclature_bio_status": 29,
+  "comment": "Some comment",
+  "cor_counting_occtax": [
+    {
+      "id_nomenclature_obj_count": 146,
+      "id_nomenclature_sex": 168,
+      "id_nomenclature_life_stage": 2,
+      "id_nomenclature_type_count": 93,
+      "count_max": 2,
+      "count_min": 1
+    }
+  ],
+  "determiner": "Determiner value"
+}

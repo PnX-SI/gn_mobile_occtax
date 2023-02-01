@@ -1,0 +1,86 @@
+{
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -1.554476,
+      47.225782
+    ]
+  },
+  "id": 492,
+  "properties": {
+    "additional_fields": {},
+    "altitude_max": 507,
+    "altitude_min": 507,
+    "cd_hab": null,
+    "comment": "Global comment",
+    "dataset": {
+      "active": true,
+      "bbox_east": 6.85654,
+      "bbox_north": 45.25,
+      "bbox_south": 44.502,
+      "bbox_west": 4.85695,
+      "cruved": null,
+      "dataset_desc": "Observations aléatoires de la faune, de la flore ou de la fonge",
+      "dataset_name": "Contact aléatoire tous règnes confondus",
+      "dataset_shortname": "Contact aléatoire",
+      "id_acquisition_framework": 1,
+      "id_dataset": 1,
+      "id_digitizer": null,
+      "id_nomenclature_collecting_method": 396,
+      "id_nomenclature_data_origin": 76,
+      "id_nomenclature_data_type": 323,
+      "id_nomenclature_dataset_objectif": 408,
+      "id_nomenclature_resource_type": 321,
+      "id_nomenclature_source_status": 73,
+      "id_taxa_list": null,
+      "keywords": "Aléatoire, hors protocole, faune, flore, fonge",
+      "marine_domain": false,
+      "meta_create_date": "2021-12-01T17:38:54.084051",
+      "meta_update_date": "2022-01-07T15:45:00.671782",
+      "terrestrial_domain": true,
+      "unique_dataset_id": "4d331cae-65e4-4948-b0b2-a11bc5bb46c2",
+      "validable": true
+    },
+    "date_max": "2016-10-29",
+    "date_min": "2016-10-28",
+    "depth_max": null,
+    "depth_min": null,
+    "digitiser": {
+      "id_role": 3,
+      "nom_complet": "Administrateur test",
+      "nom_role": "Administrateur",
+      "prenom_role": "test"
+    },
+    "grp_method": null,
+    "habitat": null,
+    "hour_max": null,
+    "hour_min": null,
+    "id_dataset": 1,
+    "id_digitiser": 3,
+    "id_module": 4,
+    "id_nomenclature_geo_object_nature": 170,
+    "id_nomenclature_grp_typ": 129,
+    "id_nomenclature_tech_collect_campanule": 314,
+    "id_releve_occtax": 492,
+    "meta_device_entry": "mobile",
+    "observers": [
+      {
+        "id_role": 57,
+        "nom_complet": "Allain Paul",
+        "nom_role": "Allain",
+        "prenom_role": "Paul"
+      },
+      {
+        "id_role": 81,
+        "nom_complet": "Alonso Cédric",
+        "nom_role": "Alonso",
+        "prenom_role": "Cédric"
+      }
+    ],
+    "observers_txt": null,
+    "place_name": null,
+    "precision": null,
+    "t_occurrences_occtax": [],
+    "unique_id_sinp_grp": "a6ce0b6e-2927-4859-b612-e7cc7c4d0f68"
+  }
+}

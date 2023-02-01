@@ -4,11 +4,9 @@ import android.util.JsonWriter
 import fr.geonature.commons.util.format
 import fr.geonature.commons.util.toIsoDateString
 import fr.geonature.maps.jts.geojson.io.GeoJsonWriter
-import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.DatesRecord
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
-import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.settings.InputDateSettings
 import java.io.IOException
@@ -22,9 +20,11 @@ import java.util.TimeZone
  * @author S. Grimault
  *
  * @see ObservationRecordJsonReader
+ * @see TaxonRecordJsonWriter
  */
 class ObservationRecordJsonWriter {
 
+    private val taxonRecordJsonWriter: TaxonRecordJsonWriter = TaxonRecordJsonWriter()
     private var indent: String = ""
 
     /**
@@ -72,6 +72,8 @@ class ObservationRecordJsonWriter {
      *
      * @param out the `Writer` to use
      * @param observationRecord the [ObservationRecord] to convert
+     * @param settings additional settings
+     *
      * @throws IOException if something goes wrong
      */
     fun write(
@@ -140,8 +142,11 @@ class ObservationRecordJsonWriter {
     ) {
         writer.name("properties")
             .beginObject()
-        writer.name("internal_id")
-            .value(observationRecord.internalId)
+
+        if (settings == null) {
+            writer.name("internal_id")
+                .value(observationRecord.internalId)
+        }
 
         writeDates(
             writer,
@@ -172,9 +177,10 @@ class ObservationRecordJsonWriter {
                     writer.name(propertyValue.code)
                         .beginArray()
                     propertyValue.value.forEach { taxonRecord ->
-                        writeTaxon(
+                        taxonRecordJsonWriter.writeTaxonRecord(
                             writer,
-                            taxonRecord
+                            taxonRecord,
+                            settings
                         )
                     }
                     writer.endArray()
@@ -234,101 +240,5 @@ class ObservationRecordJsonWriter {
                     else null
                 )
         }
-    }
-
-    private fun writeTaxon(writer: JsonWriter, taxonRecord: TaxonRecord) {
-        writer.beginObject()
-
-        writer.name("cd_nom")
-            .value(taxonRecord.taxon.id)
-        writer.name("nom_cite")
-            .value(taxonRecord.taxon.name)
-        writer.name("regne")
-            .value(taxonRecord.taxon.taxonomy.kingdom)
-        writer.name("group2_inpn")
-            .value(taxonRecord.taxon.taxonomy.group)
-
-        taxonRecord.properties.forEach {
-            when (val propertyValue = it.value) {
-                is PropertyValue.Text -> writer.name(propertyValue.code)
-                    .value(propertyValue.value)
-                is PropertyValue.Number -> writer.name(propertyValue.code)
-                    .value(propertyValue.value)
-                is PropertyValue.NumberArray -> {
-                    writer.name(propertyValue.code)
-                        .beginArray()
-                    propertyValue.value.forEach { value -> writer.value(value) }
-                    writer.endArray()
-                }
-                is PropertyValue.Nomenclature -> {
-                    // GeoNature mapping: taxon
-                    when (propertyValue.code) {
-                        "ETA_BIO" -> writer.name("id_nomenclature_bio_condition")
-                            .value(propertyValue.value)
-                        "METH_DETERMIN" -> writer.name("id_nomenclature_determination_method")
-                            .value(propertyValue.value)
-                        "METH_OBS" -> writer.name("id_nomenclature_obs_technique")
-                            .value(propertyValue.value)
-                        "NATURALITE" -> writer.name("id_nomenclature_naturalness")
-                            .value(propertyValue.value)
-                        "OCC_COMPORTEMENT" -> writer.name("id_nomenclature_behaviour")
-                            .value(propertyValue.value)
-                        "PREUVE_EXIST" -> writer.name("id_nomenclature_exist_proof")
-                            .value(propertyValue.value)
-                        "STATUT_BIO" -> writer.name("id_nomenclature_bio_status")
-                            .value(propertyValue.value)
-                    }
-                }
-                is PropertyValue.Counting -> {
-                    writer.name(propertyValue.code)
-                        .beginArray()
-                    propertyValue.value.forEach { counting ->
-                        writeCounting(
-                            writer,
-                            counting
-                        )
-                    }
-                    writer.endArray()
-                }
-                else -> {}
-            }
-        }
-
-        writer.endObject()
-    }
-
-    private fun writeCounting(writer: JsonWriter, countingRecord: CountingRecord) {
-        writer.beginObject()
-
-        countingRecord.properties.forEach {
-            when (val propertyValue = it.value) {
-                is PropertyValue.Text -> writer.name(propertyValue.code)
-                    .value(propertyValue.value)
-                is PropertyValue.Number -> writer.name(propertyValue.code)
-                    .value(propertyValue.value)
-                is PropertyValue.NumberArray -> {
-                    writer.name(propertyValue.code)
-                        .beginArray()
-                    propertyValue.value.forEach { value -> writer.value(value) }
-                    writer.endArray()
-                }
-                is PropertyValue.Nomenclature -> {
-                    // GeoNature mapping: counting
-                    when (propertyValue.code) {
-                        "OBJ_DENBR" -> writer.name("id_nomenclature_obj_count")
-                            .value(propertyValue.value)
-                        "SEXE" -> writer.name("id_nomenclature_sex")
-                            .value(propertyValue.value)
-                        "STADE_VIE" -> writer.name("id_nomenclature_life_stage")
-                            .value(propertyValue.value)
-                        "TYP_DENBR" -> writer.name("id_nomenclature_type_count")
-                            .value(propertyValue.value)
-                    }
-                }
-                else -> {}
-            }
-        }
-
-        writer.endObject()
     }
 }

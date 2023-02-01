@@ -31,6 +31,7 @@
         "nom_cite": "taxon_01",
         "regne": "Animalia",
         "group2_inpn": "Ascidies",
+        "additional_fields": {},
         "id_nomenclature_bio_condition": 29,
         "id_nomenclature_determination_method": 445,
         "id_nomenclature_obs_technique": 41,

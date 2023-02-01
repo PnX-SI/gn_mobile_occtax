@@ -1,5 +1,6 @@
 package fr.geonature.occtax.features.record.repository
 
+import fr.geonature.commons.features.taxon.data.ITaxonLocalDataSource
 import fr.geonature.occtax.features.record.data.IObservationRecordDataSource
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.settings.AppSettings
@@ -9,15 +10,22 @@ import fr.geonature.occtax.settings.AppSettings
  *
  * @author S. Grimault
  */
-class ObservationRecordRepositoryImpl(private val observationRecordDataSource: IObservationRecordDataSource) :
-    IObservationRecordRepository {
+class ObservationRecordRepositoryImpl(
+    private val observationRecordDataSource: IObservationRecordDataSource,
+    private val taxonLocalDataSource: ITaxonLocalDataSource
+) : IObservationRecordRepository {
 
     override suspend fun readAll(): Result<List<ObservationRecord>> {
-        return runCatching { observationRecordDataSource.readAll() }
+        return runCatching {
+            observationRecordDataSource.readAll()
+                .map { loadTaxa(it) }
+        }
     }
 
     override suspend fun read(id: Long): Result<ObservationRecord> {
-        return runCatching { observationRecordDataSource.read(id) }
+        return runCatching {
+            loadTaxa(observationRecordDataSource.read(id))
+        }
     }
 
     override suspend fun save(
@@ -54,6 +62,22 @@ class ObservationRecordRepositoryImpl(private val observationRecordDataSource: I
                 observationRecord,
                 settings
             )
+        }
+    }
+
+    /**
+     * Loads all taxa added to the given [ObservationRecord] from local datasource.
+     */
+    private suspend fun loadTaxa(observationRecord: ObservationRecord): ObservationRecord {
+        val taxaFoundFromLocalDataSource =
+            taxonLocalDataSource.findTaxaByIds(*observationRecord.taxa.taxa.map { it.taxon.id }
+                .toLongArray())
+
+        return observationRecord.apply {
+            taxa.taxa = taxa.taxa.map {
+                it.copy(taxon = taxaFoundFromLocalDataSource.firstOrNull { taxon -> taxon.id == it.taxon.id }
+                    ?: it.taxon)
+            }
         }
     }
 }

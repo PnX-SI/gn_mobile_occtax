@@ -33,6 +33,21 @@ sealed class ObservationRecordException(
     data class WriteException(val id: Long) :
         ObservationRecordException("I/O Exception while writing observation record with ID '$id'")
 
+    /**
+     * Thrown if no nomenclature values was found for this [ObservationRecord].
+     */
     data class NoDefaultNomenclatureValuesFoundException(val id: Long) :
         ObservationRecordException("no default nomenclature values found for observation record with ID '$id'")
+
+    /**
+     * Thrown if the [ObservationRecord]'s status is not [ObservationRecord.Status.TO_SYNC].
+     */
+    data class InvalidStatusException(val id: Long) :
+        ObservationRecordException("wrong status for observation record with ID '$id' to synchronize")
+
+    /**
+     * Thrown if the [ObservationRecord] synchronization finished with errors.
+     */
+    data class SynchronizeException(val id: Long) :
+        ObservationRecordException("failed to synchronize observation record with ID '$id'")
 }
