@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.4.1-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.1-rc1) (2023-02-04, pre-release)
+
+### 🚀 Nouveautés
+
+* Refonte de la synchronisation des relevés en consommant les nouvelles APIs du module "Occtax".
+
+### ⚠️ Notes de version
+
+* Code de version : 3119
+
 ## [2.4.1-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.1-rc0) (2023-01-25, pre-release)
 
 ### 🚀 Nouveautés
