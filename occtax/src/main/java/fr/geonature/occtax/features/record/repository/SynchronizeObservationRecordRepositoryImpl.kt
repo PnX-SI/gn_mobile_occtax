@@ -77,6 +77,12 @@ class SynchronizeObservationRecordRepositoryImpl(
                 return Result.failure(it)
             }
 
+        Logger.info { "observation record '$recordId' successfully synchronized" }
+
+        runCatching { observationRecordDataSource.delete(recordId) }.onFailure {
+            Logger.warn { "failed to delete a fully synchronized observation record '$recordId'" }
+        }
+
         return Result.success(Unit)
     }
 }
