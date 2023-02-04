@@ -1,9 +1,13 @@
 package fr.geonature.occtax.features.record.repository
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import fr.geonature.commons.data.entity.Taxon
+import fr.geonature.commons.data.entity.Taxonomy
+import fr.geonature.commons.features.taxon.data.ITaxonLocalDataSource
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.record.data.IObservationRecordDataSource
 import fr.geonature.occtax.features.record.domain.ObservationRecord
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.error.ObservationRecordException
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
@@ -35,13 +39,44 @@ class ObservationRecordRepositoryTest {
     @MockK
     private lateinit var observationRecordDataSource: IObservationRecordDataSource
 
+    @MockK
+    private lateinit var taxonLocalDataSource: ITaxonLocalDataSource
+
     private lateinit var observationRecordRepository: IObservationRecordRepository
+
+    private val taxaFromLocalDataSource = listOf(
+        Taxon(
+            84L,
+            "Salamandra fusca",
+            Taxonomy(
+                kingdom = "Animalia",
+                group = "Amphibiens"
+            ),
+            null,
+            "Salamandra atra atra (Laurenti, 1768)",
+            "ES - 84"
+        ),
+        Taxon(
+            324L,
+            "Rana alpina",
+            Taxonomy(
+                kingdom = "Animalia",
+                group = "Amphibiens"
+            ),
+            "Grenouille rousse (La)",
+            "Rana temporaria Linnaeus, 1758",
+            "ES - 324"
+        )
+    )
 
     @Before
     fun setUp() {
         init(this)
 
-        observationRecordRepository = ObservationRecordRepositoryImpl(observationRecordDataSource)
+        observationRecordRepository = ObservationRecordRepositoryImpl(
+            observationRecordDataSource,
+            taxonLocalDataSource
+        )
     }
 
     @Test
@@ -49,6 +84,7 @@ class ObservationRecordRepositoryTest {
         runTest {
             // given an empty list from data source
             coEvery { observationRecordDataSource.readAll() } returns emptyList()
+            coEvery { taxonLocalDataSource.findTaxaByIds(any()) } returns taxaFromLocalDataSource
 
             // when reading non existing observation records
             val result = observationRecordRepository.readAll()
@@ -71,6 +107,7 @@ class ObservationRecordRepositoryTest {
                 ObservationRecord(internalId = 1236),
             )
             coEvery { observationRecordDataSource.readAll() } returns observationRecords
+            coEvery { taxonLocalDataSource.findTaxaByIds() } returns emptyList()
 
             // when reading these observation records from repository
             val result = observationRecordRepository.readAll()
@@ -90,6 +127,7 @@ class ObservationRecordRepositoryTest {
         runTest {
             val observationRecord = ObservationRecord(internalId = 1234)
             coEvery { observationRecordDataSource.read(observationRecord.internalId) } returns observationRecord
+            coEvery { taxonLocalDataSource.findTaxaByIds() } returns emptyList()
 
             // when reading existing observation record from repository
             val result = observationRecordRepository.read(observationRecord.internalId)
@@ -98,6 +136,55 @@ class ObservationRecordRepositoryTest {
             assertTrue(result.isSuccess)
             assertEquals(
                 observationRecord,
+                result.getOrNull()
+            )
+        }
+
+    @Test
+    fun `should read existing observation record with some taxa`() =
+        runTest {
+            val observationRecord = ObservationRecord(internalId = 1234).apply {
+                taxa.add(
+                    Taxon(
+                        84L,
+                        "Salamandra fusca",
+                        Taxonomy(
+                            kingdom = Taxonomy.ANY,
+                            group = Taxonomy.ANY
+                        ),
+                        null,
+                        null,
+                        null
+                    )
+                )
+                    .apply {
+                        listOf(
+                            PropertyValue.Text(
+                                "comment",
+                                "Some comment"
+                            )
+                        ).map { it.toPair() }
+                            .forEach {
+                                properties[it.first] = it.second
+                            }
+                    }
+            }
+            coEvery { observationRecordDataSource.read(observationRecord.internalId) } returns observationRecord
+            coEvery { taxonLocalDataSource.findTaxaByIds(any()) } returns taxaFromLocalDataSource
+
+            // when reading existing observation record from repository
+            val result = observationRecordRepository.read(observationRecord.internalId)
+
+            // then
+            assertTrue(result.isSuccess)
+            assertEquals(
+                observationRecord.copy()
+                    .apply {
+                        taxa.taxa = taxa.taxa.map {
+                            it.copy(taxon = taxaFromLocalDataSource.firstOrNull { taxon -> taxon.id == it.taxon.id }
+                                ?: it.taxon)
+                        }
+                    },
                 result.getOrNull()
             )
         }

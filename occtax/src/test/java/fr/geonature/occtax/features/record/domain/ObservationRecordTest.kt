@@ -812,6 +812,48 @@ class ObservationRecordTest {
     }
 
     @Test
+    fun `should copy an observation record without taxa`() {
+        // given an observation record with some taxa
+        val observationRecord = ObservationRecord(internalId = 1234L).apply {
+            comment.comment = "some comment"
+            taxa.add(
+                Taxon(
+                    8L,
+                    "taxon_02",
+                    Taxonomy(
+                        "Animalia",
+                        "Ascidies"
+                    )
+                )
+            )
+                .apply {
+                    PropertyValue.Text(
+                        "some_code",
+                        "some_value"
+                    )
+                        .also {
+                            properties[it.code] = it
+                        }
+                }
+        }
+
+        // when creating a copy
+        val copy = observationRecord.copy()
+            .apply {
+                taxa.taxa = emptyList()
+            }
+
+        // then
+        assertEquals(
+            ObservationRecord(internalId = 1234L).apply {
+                comment.comment = "some comment"
+                taxa.taxa = emptyList()
+            },
+            copy
+        )
+    }
+
+    @Test
     fun `should be the same`() {
         assertEquals(
             ObservationRecord(

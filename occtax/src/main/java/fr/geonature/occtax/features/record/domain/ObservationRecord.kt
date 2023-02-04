@@ -372,6 +372,7 @@ class TaxaRecord(
                 .also {
                     properties[it.code] = it
                 }
+            selectedTaxonRecord = null
         }
 
     /**

@@ -2,6 +2,7 @@ package fr.geonature.occtax.features.record.io
 
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
+import fr.geonature.commons.util.set
 import fr.geonature.commons.util.toDate
 import fr.geonature.occtax.FixtureHelper.getFixture
 import fr.geonature.occtax.features.record.domain.ObservationRecord
@@ -14,6 +15,7 @@ import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
 import org.robolectric.RobolectricTestRunner
 import java.io.IOException
+import java.util.Calendar
 
 /**
  * Unit tests about [ObservationRecordJsonReader].
@@ -383,6 +385,140 @@ class ObservationRecordJsonReaderTest {
                 )
             },
             observationRecord
+        )
+    }
+
+    @Test
+    fun `should read an observation record read from GeoNature APIs with an empty taxon`() {
+        // given an observation record with an empty taxon to read from GeoNature APIs
+        val json = getFixture("observation_record_no_taxa_sent.json")
+
+        // when parsing this file as ObservationRecord
+        val observationRecord = ObservationRecordJsonReader().read(json)
+
+        // then
+        assertEquals(
+            ObservationRecord(
+                internalId = 492L,
+                id = 492L,
+                geometry = gf.createPoint(
+                    Coordinate(
+                        -1.554476,
+                        47.225782
+                    )
+                ),
+                status = ObservationRecord.Status.DRAFT
+            ).apply {
+                comment.comment = "Global comment"
+                dataset.datasetId = 1L
+                dates.start = toDate("2016-10-28")!!.set(
+                    Calendar.HOUR_OF_DAY,
+                    0
+                )
+                    .set(
+                        Calendar.MINUTE,
+                        0
+                    )
+                    .set(
+                        Calendar.SECOND,
+                        0
+                    )
+                    .set(
+                        Calendar.MILLISECOND,
+                        0
+                    )
+                dates.end = toDate("2016-10-29")!!.set(
+                    Calendar.HOUR_OF_DAY,
+                    0
+                )
+                    .set(
+                        Calendar.MINUTE,
+                        0
+                    )
+                    .set(
+                        Calendar.SECOND,
+                        0
+                    )
+                    .set(
+                        Calendar.MILLISECOND,
+                        0
+                    )
+
+                PropertyValue.Nomenclature(
+                    "TYP_GRP",
+                    label = null,
+                    129L
+                )
+                    .toPair()
+                    .also {
+                        properties[it.first] = it.second
+                    }
+                listOf(
+                    PropertyValue.Number(
+                        "altitude_min",
+                        507L
+                    ),
+                    PropertyValue.Number(
+                        "altitude_max",
+                        507L
+                    ),
+                    PropertyValue.Number(
+                        "id_module",
+                        4L
+                    ),
+                    PropertyValue.Number(
+                        "id_releve_occtax",
+                        492L
+                    ),
+                    PropertyValue.Text(
+                        "unique_id_sinp_grp",
+                        "a6ce0b6e-2927-4859-b612-e7cc7c4d0f68"
+                    )
+                ).map { it.toPair() }
+                    .forEach {
+                        properties[it.first] = it.second
+                    }
+
+                with(observers) {
+                    addObserverId(57L)
+                    addObserverId(81L)
+                }
+            },
+            observationRecord.copy()
+                .apply {
+                    dates.start = dates.start.set(
+                        Calendar.HOUR_OF_DAY,
+                        0
+                    )
+                        .set(
+                            Calendar.MINUTE,
+                            0
+                        )
+                        .set(
+                            Calendar.SECOND,
+                            0
+                        )
+                        .set(
+                            Calendar.MILLISECOND,
+                            0
+                        )
+                    dates.end = dates.end.set(
+                        Calendar.HOUR_OF_DAY,
+                        0
+                    )
+                        .set(
+                            Calendar.MINUTE,
+                            0
+                        )
+                        .set(
+                            Calendar.SECOND,
+                            0
+                        )
+                        .set(
+                            Calendar.MILLISECOND,
+                            0
+                        )
+                }
         )
     }
 
