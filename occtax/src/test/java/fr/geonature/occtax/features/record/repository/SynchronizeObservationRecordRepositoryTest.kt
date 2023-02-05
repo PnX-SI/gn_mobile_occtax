@@ -312,6 +312,7 @@ class SynchronizeObservationRecordRepositoryTest {
             )
         } answers { firstArg() }
         coEvery { observationRecordRemoteDataSource.deleteObservationRecord(any()) } returns Unit
+        coEvery { observationRecordDataSource.delete(expectedObservationRecordToSend.internalId) } returns expectedObservationRecordToSend
 
         // when trying to synchronize an observation record from ID
         val result = synchronizeObservationRecordRepository(1240L)
@@ -320,6 +321,7 @@ class SynchronizeObservationRecordRepositoryTest {
         assertTrue(result.isSuccess)
         coVerifySequence {
             observationRecordRemoteDataSource.setBaseUrl(appSettings.dataSyncSettings?.geoNatureServerUrl!!)
+            observationRecordDataSource.read(expectedObservationRecordToSend.internalId)
             observationRecordRemoteDataSource.sendObservationRecord(
                 expectedObservationRecordToSend,
                 appSettings
@@ -328,10 +330,12 @@ class SynchronizeObservationRecordRepositoryTest {
                 expectedObservationRecordToSend.copy(id = 1234L),
                 appSettings
             )
+            observationRecordDataSource.delete(expectedObservationRecordToSend.internalId)
         }
         coVerify(inverse = true) {
             observationRecordRemoteDataSource.deleteObservationRecord(any())
         }
+        confirmVerified(observationRecordDataSource)
         confirmVerified(observationRecordRemoteDataSource)
     }
 
@@ -432,6 +436,7 @@ class SynchronizeObservationRecordRepositoryTest {
         )
         coVerifySequence {
             observationRecordRemoteDataSource.setBaseUrl(appSettings.dataSyncSettings?.geoNatureServerUrl!!)
+            observationRecordDataSource.read(expectedObservationRecordToSend.internalId)
             observationRecordRemoteDataSource.sendObservationRecord(
                 expectedObservationRecordToSend,
                 appSettings
@@ -442,6 +447,10 @@ class SynchronizeObservationRecordRepositoryTest {
             )
             observationRecordRemoteDataSource.deleteObservationRecord(expectedObservationRecordToSend.copy(id = 1234L))
         }
+        coVerify(inverse = true) {
+            observationRecordDataSource.delete(expectedObservationRecordToSend.internalId)
+        }
+        confirmVerified(observationRecordDataSource)
         confirmVerified(observationRecordRemoteDataSource)
     }
 }
