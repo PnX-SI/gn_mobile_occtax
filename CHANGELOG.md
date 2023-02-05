@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.4.1-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.1-rc2) (2023-02-05, pre-release)
+
+### 🐛 Corrections
+
+* Suppression locale des relevés synchronisés avec succès.
+
+### ⚠️ Notes de version
+
+* Code de version : 3121
+
 ## [2.4.1-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.1-rc1) (2023-02-04, pre-release)
 
 ### 🚀 Nouveautés
