@@ -33,10 +33,10 @@
     <string name="home_input_status_draft">Draft</string>
     <string name="home_input_status_to_sync">Ready to sync</string>
     <plurals name="home_input_taxa_count">
-        <item quantity="one">%d taxon added</item>
-        <item quantity="other">%d taxa added</item>
+        <item quantity="one">%d taxon</item>
+        <item quantity="other">%d taxa</item>
     </plurals>
-    <string name="home_input_taxa_count_empty">No taxon added</string>
+    <string name="home_input_taxa_count_empty">No taxon</string>
     <string name="home_snackbar_input_deleted">Input deleted</string>
     <string name="home_snackbar_input_undo">Undo</string>
 

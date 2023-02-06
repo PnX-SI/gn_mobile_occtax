@@ -1,13 +1,14 @@
 package fr.geonature.occtax.ui.home
 
 import android.text.format.DateFormat
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
-import fr.geonature.commons.util.ThemeUtils
+import fr.geonature.commons.util.ThemeUtils.getColor
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 
@@ -84,6 +85,11 @@ class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<O
                         false
                     ) as Chip
             ) {
+                chipMinHeight = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    24F,
+                    resources.displayMetrics
+                )
                 text = itemView.resources.getIdentifier(
                     "home_input_status_${item.status.name.lowercase()}",
                     "string",
@@ -103,7 +109,7 @@ class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<O
                         .takeIf { it > 0 } ?: R.color.input_status_draft
                 )
                 setTextColor(
-                    ThemeUtils.getColor(
+                    getColor(
                         context,
                         R.attr.colorOnPrimary
                     )

@@ -30,11 +30,11 @@
     <string name="home_input_status_draft">En cours</string>
     <string name="home_input_status_to_sync">Terminé</string>
     <plurals name="home_input_taxa_count">
-        <item quantity="one">%d taxon ajouté</item>
-        <item quantity="other">%d taxons ajoutés</item>
-        <item quantity="many">%d taxons ajoutés</item>
+        <item quantity="one">%d taxon</item>
+        <item quantity="other">%d taxons</item>
+        <item quantity="many">%d taxons</item>
     </plurals>
-    <string name="home_input_taxa_count_empty">Aucun taxon ajouté</string>
+    <string name="home_input_taxa_count_empty">Aucun taxon</string>
     <string name="home_snackbar_input_deleted">Relevé supprimé</string>
     <string name="home_snackbar_input_undo">Annuler</string>
 
