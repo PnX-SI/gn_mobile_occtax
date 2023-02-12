@@ -459,7 +459,10 @@ class TaxonRecordTest {
         }
 
         // when deleting an existing counting
-        val countingDeleted = taxonRecord.counting.delete(1)
+        val countingDeleted = taxonRecord.counting.delete(
+            application,
+            1
+        )
 
         // then
         assertEquals(

@@ -10,11 +10,11 @@ import fr.geonature.commons.features.nomenclature.error.NomenclatureException
 import fr.geonature.commons.fp.Either.Left
 import fr.geonature.commons.fp.Either.Right
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
 import fr.geonature.occtax.features.nomenclature.usecase.GetEditableNomenclaturesUseCase
 import fr.geonature.occtax.features.nomenclature.usecase.GetNomenclatureValuesByTypeAndTaxonomyUseCase
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
 import io.mockk.confirmVerified
@@ -101,7 +101,7 @@ class NomenclatureViewModelTest {
                     EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                     label = "Statut biologique",
                     visible = false,
-                    value = PropertyValue(
+                    value = PropertyValue.Nomenclature(
                         code = "STATUT_BIO",
                         label = "Non renseigné",
                         value = 29L

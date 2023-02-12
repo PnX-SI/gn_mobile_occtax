@@ -17,11 +17,13 @@ sealed class PropertyValue : Parcelable {
         when (this) {
             is Text -> value.isNullOrEmpty()
             is Date -> value == null
+            is StringArray -> value.isEmpty()
             is Number -> value == null
             is NumberArray -> value.isEmpty()
             is Nomenclature -> value == null
             is Taxa -> value.all { taxon -> taxon.properties.all { it.value.isEmpty() } }
             is Counting -> value.all { counting -> counting.properties.all { it.value.isEmpty() } }
+            is Media -> value.isEmpty()
         }
     }
 
@@ -31,11 +33,13 @@ sealed class PropertyValue : Parcelable {
     fun toPair(): Pair<String, PropertyValue> = (when (this) {
         is Text -> code
         is Date -> code
+        is StringArray -> code
         is Number -> code
         is NumberArray -> code
         is Nomenclature -> code
         is Taxa -> code
         is Counting -> code
+        is Media -> code
     } to this)
 
     /**
@@ -51,6 +55,31 @@ sealed class PropertyValue : Parcelable {
     data class Date(val code: String, val value: java.util.Date?) : PropertyValue()
 
     /**
+     * As array of strings.
+     */
+    @Parcelize
+    data class StringArray(val code: String, val value: Array<String> = emptyArray()) :
+        PropertyValue() {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as StringArray
+
+            if (code != other.code) return false
+            if (!value.contentEquals(other.value)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = code.hashCode()
+            result = 31 * result + value.contentHashCode()
+            return result
+        }
+    }
+
+    /**
      * As number.
      */
     @Parcelize
@@ -60,7 +89,8 @@ sealed class PropertyValue : Parcelable {
      * As array of numbers.
      */
     @Parcelize
-    data class NumberArray(val code: String, val value: Array<kotlin.Number>) : PropertyValue() {
+    data class NumberArray(val code: String, val value: Array<kotlin.Number> = emptyArray()) :
+        PropertyValue() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -121,6 +151,31 @@ sealed class PropertyValue : Parcelable {
             if (javaClass != other?.javaClass) return false
 
             other as Counting
+
+            if (code != other.code) return false
+            if (!value.contentEquals(other.value)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = code.hashCode()
+            result = 31 * result + value.contentHashCode()
+            return result
+        }
+    }
+
+    /**
+     * As array of [MediaRecord].
+     */
+    @Parcelize
+    data class Media(val code: String, val value: Array<MediaRecord> = emptyArray()) :
+        PropertyValue() {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Media
 
             if (code != other.code) return false
             if (!value.contentEquals(other.value)) return false

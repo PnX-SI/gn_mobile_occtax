@@ -67,7 +67,7 @@ class SetDefaultNomenclatureValuesUseCaseTest {
                         "TYP_GRP",
                         EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
                     ).apply {
-                        value = fr.geonature.occtax.features.input.domain.PropertyValue(
+                        value = PropertyValue.Nomenclature(
                             "TYP_GRP",
                             "NSP",
                             129L
@@ -152,7 +152,7 @@ class SetDefaultNomenclatureValuesUseCaseTest {
                         "TYP_GRP",
                         EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
                     ).apply {
-                        value = fr.geonature.occtax.features.input.domain.PropertyValue(
+                        value = PropertyValue.Nomenclature(
                             "TYP_GRP",
                             "NSP",
                             129L

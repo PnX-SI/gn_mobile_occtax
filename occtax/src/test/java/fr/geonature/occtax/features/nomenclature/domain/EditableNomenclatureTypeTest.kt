@@ -2,7 +2,8 @@ package fr.geonature.occtax.features.nomenclature.domain
 
 import android.os.Bundle
 import android.os.Parcel
-import fr.geonature.occtax.features.input.domain.PropertyValue
+import fr.geonature.occtax.features.record.domain.PropertyValue
+import kotlinx.parcelize.parcelableCreator
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -82,7 +83,7 @@ class EditableNomenclatureTypeTest {
         // then
         assertEquals(
             editableNomenclatureType,
-            EditableNomenclatureType.CREATOR.createFromParcel(parcel)
+            parcelableCreator<EditableNomenclatureType>().createFromParcel(parcel)
         )
     }
 
@@ -104,7 +105,7 @@ class EditableNomenclatureTypeTest {
                 label = "Statut biologique",
                 visible = false,
                 default = false,
-                value = PropertyValue(
+                value = PropertyValue.Nomenclature(
                     code = "STATUT_BIO",
                     label = "Non renseigné",
                     value = 29L

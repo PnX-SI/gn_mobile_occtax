@@ -10,6 +10,7 @@ import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.usecase.DeleteObservationRecordUseCase
 import fr.geonature.occtax.features.record.usecase.ExportObservationRecordUseCase
 import fr.geonature.occtax.features.record.usecase.GetAllObservationRecordsUseCase
+import fr.geonature.occtax.features.record.usecase.LoadAllMediaRecordUseCase
 import fr.geonature.occtax.features.record.usecase.SaveObservationRecordUseCase
 import fr.geonature.occtax.features.record.usecase.SetDefaultNomenclatureValuesUseCase
 import fr.geonature.occtax.settings.AppSettings
@@ -26,6 +27,7 @@ class ObservationRecordViewModel @Inject constructor(
     private val getAllObservationRecordsUseCase: GetAllObservationRecordsUseCase,
     private val saveObservationRecordUseCase: SaveObservationRecordUseCase,
     private val setDefaultNomenclatureValuesUseCase: SetDefaultNomenclatureValuesUseCase,
+    private val loadAllMediaRecordUseCase: LoadAllMediaRecordUseCase,
     private val deleteObservationRecordUseCase: DeleteObservationRecordUseCase,
     private val exportObservationRecordUseCase: ExportObservationRecordUseCase
 ) : BaseViewModel() {
@@ -78,10 +80,28 @@ class ObservationRecordViewModel @Inject constructor(
             viewModelScope
         ) {
             it.fold(
-                onSuccess = {
-                    Logger.info { "default nomenclature values successfully loaded for record '${observationRecord.internalId}'" }
+                onSuccess = { observationRecordUpdated ->
+                    Logger.info { "default nomenclature values successfully loaded for record '${observationRecordUpdated.internalId}'" }
 
-                    _observationRecord.value = it
+                    _observationRecord.value = observationRecordUpdated
+                },
+                ::handleError
+            )
+        }
+    }
+
+    fun loadAllMedias(observationRecord: ObservationRecord) {
+        Logger.info { "loading all local medias from record '${observationRecord.internalId}'..." }
+
+        loadAllMediaRecordUseCase(
+            LoadAllMediaRecordUseCase.Params(observationRecord),
+            viewModelScope
+        ) {
+            it.fold(
+                onSuccess = { observationRecordUpdated ->
+                    Logger.info { "all medias successfully loaded for record '${observationRecordUpdated.internalId}'" }
+
+                    _observationRecord.value = observationRecordUpdated
                 },
                 ::handleError
             )

@@ -1,6 +1,7 @@
 package fr.geonature.occtax.features.record.domain
 
 import android.os.Parcelable
+import fr.geonature.datasync.api.model.Media
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.util.SortedMap
@@ -67,6 +68,12 @@ data class CountingRecord(
         }
 
     /**
+     * All [MediaRecord] added to this taxon counting record.
+     */
+    @IgnoredOnParcel
+    val medias = AllMediaRecord(properties)
+
+    /**
      * Whether this counting is considered empty or not.
      */
     @IgnoredOnParcel
@@ -78,4 +85,83 @@ data class CountingRecord(
         const val MIN_KEY = "count_min"
         const val MAX_KEY = "count_max"
     }
+}
+
+/**
+ * Convenient class to manage all medias of a [CountingRecord].
+ *
+ * @author S. Grimault
+ */
+class AllMediaRecord(private val properties: SortedMap<String, PropertyValue>) {
+
+    /**
+     * All [MediaRecord.Media] added to this taxon counting record.
+     */
+    var medias: List<Media>
+        get() = properties[MEDIAS_KEY]?.takeIf { it is PropertyValue.Media }
+            ?.let { it as PropertyValue.Media }?.value?.filterIsInstance<MediaRecord.Media>()
+            ?.map { it.media }
+            ?.toList() ?: emptyList()
+        set(value) {
+            PropertyValue.Media(
+                MEDIAS_KEY,
+                value.distinctBy { it.id }
+                    .map { MediaRecord.Media(it) }
+                    .toTypedArray()
+            )
+                .also {
+                    properties[it.code] = it
+                }
+        }
+
+    /**
+     * All [MediaRecord.File] added to this taxon counting record.
+     */
+    var files: List<String>
+        get() = properties[MEDIAS_KEY]?.takeIf { it is PropertyValue.Media }
+            ?.let { it as PropertyValue.Media }?.value?.filterIsInstance<MediaRecord.File>()
+            ?.map { it.path }
+            ?.toList() ?: emptyList()
+        set(value) {
+            PropertyValue.Media(
+                MEDIAS_KEY,
+                value.distinct()
+                    .map { MediaRecord.File(it) }
+                    .toTypedArray()
+            )
+                .also {
+                    properties[it.code] = it
+                }
+        }
+
+    /**
+     * Adds given local file as media.
+     */
+    fun addFile(path: String) {
+        files = files + listOf(path)
+    }
+
+    companion object {
+        const val MEDIAS_KEY = "medias"
+    }
+}
+
+/**
+ * Describes a media record, either as [Media] or as local file.
+ *
+ * @author S. Grimault
+ */
+sealed class MediaRecord : Parcelable {
+
+    /**
+     * As [Media] (i.e. already synchronized media from _GeoNature_).
+     */
+    @Parcelize
+    data class Media(val media: fr.geonature.datasync.api.model.Media) : MediaRecord()
+
+    /**
+     * As local file.
+     */
+    @Parcelize
+    data class File(val path: String) : MediaRecord()
 }

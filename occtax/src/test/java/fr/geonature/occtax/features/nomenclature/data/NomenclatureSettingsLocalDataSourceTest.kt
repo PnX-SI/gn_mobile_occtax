@@ -2,9 +2,10 @@ package fr.geonature.occtax.features.nomenclature.data
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
+import fr.geonature.occtax.features.record.domain.AllMediaRecord
 import fr.geonature.occtax.features.record.domain.CountingRecord
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.settings.PropertySettings
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -131,7 +132,7 @@ class NomenclatureSettingsLocalDataSourceTest {
                     CountingRecord.MIN_KEY,
                     EditableNomenclatureType.ViewType.MIN_MAX
                 ).apply {
-                    value = PropertyValue.fromValue(
+                    value = PropertyValue.Number(
                         code,
                         1
                     )
@@ -141,10 +142,17 @@ class NomenclatureSettingsLocalDataSourceTest {
                     CountingRecord.MAX_KEY,
                     EditableNomenclatureType.ViewType.MIN_MAX
                 ).apply {
-                    value = PropertyValue.fromValue(
+                    value = PropertyValue.Number(
                         code,
                         1
                     )
+                },
+                EditableNomenclatureType(
+                    EditableNomenclatureType.Type.COUNTING,
+                    AllMediaRecord.MEDIAS_KEY,
+                    EditableNomenclatureType.ViewType.MEDIA
+                ).apply {
+                    value = PropertyValue.Media(code)
                 }
             ),
             nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.COUNTING)

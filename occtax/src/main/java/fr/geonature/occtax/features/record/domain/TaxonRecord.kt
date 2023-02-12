@@ -118,13 +118,19 @@ class AllCountingRecord(
             }
     }
 
-    fun delete(index: Int): CountingRecord? {
+    fun delete(context: Context, index: Int): CountingRecord? {
         val existingCounting = counting
 
         this.counting = existingCounting.filterNot { it.index == index }
             .sortedBy { it.index }
 
-        return existingCounting.find { it.index == index }
+        return existingCounting.firstOrNull { it.index == index }
+            ?.also {
+                mediaBasePath(
+                    context,
+                    it
+                ).deleteRecursively()
+            }
     }
 
     companion object {

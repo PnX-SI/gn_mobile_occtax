@@ -9,7 +9,7 @@ import fr.geonature.occtax.settings.AppSettings
  *
  * @author S. Grimault
  */
-interface IObservationRecordDataSource {
+interface IObservationRecordLocalDataSource {
 
     /**
      * Reads all [ObservationRecord]s, both those in progress and those ready to be synchronized.

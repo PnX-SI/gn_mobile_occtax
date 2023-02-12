@@ -16,7 +16,7 @@ Based on [datasync module](https://github.com/PnX-SI/gn_mobile_core) to synchron
 ## Launcher icons
 
 | Name    | Flavor    | Launcher icon                                                                                                                                                                                                                                                    |
-|---------|-----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Default | _generic_ | ![PNX](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/main/res/mipmap-xxxhdpi/ic_launcher.png) ![PNX_debug](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/debug/res/mipmap-xxxhdpi/ic_launcher.png) |
 
 ## Settings
@@ -58,15 +58,15 @@ Example:
         "label": "IGN ortho"
       },
       {
-      "label": "OpenStreetMap",
-      "source": "https://a.tile.openstreetmap.org/",
-      "properties": {
-        "attribution": "© OSM contributors"
+        "label": "OpenStreetMap",
+        "source": "https://a.tile.openstreetmap.org/",
+        "properties": {
+          "attribution": "© OSM contributors"
         }
       },
       {
-      "label": "Mailles 5x5",
-      "source": "mailles.geojson"
+        "label": "Mailles 5x5",
+        "source": "mailles.geojson"
       }
     ]
   },
@@ -82,7 +82,7 @@ Example:
 ### Parameters description
 
 | Parameter                          | UI      | Description                                                                                        | Default value |
-|------------------------------------|---------|----------------------------------------------------------------------------------------------------|---------------|
+| ---------------------------------- | ------- | -------------------------------------------------------------------------------------------------- | ------------- |
 | `area_observation_duration`        | &#9744; | Area observation duration period (in days)                                                         | 365           |
 | `sync`                             | &#9744; | Data synchronization settings (cf. https://github.com/PnX-SI/gn_mobile_core/tree/develop/datasync) |               |
 | `map`                              | &#9744; | Maps settings (cf. https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps)                     |               |
@@ -102,7 +102,7 @@ Allows to configure settings related to user input.
 How the user can set the start and end date of the input:
 
 | Parameter         | Description                                                                  | Default value |
-|-------------------|------------------------------------------------------------------------------|---------------|
+| ----------------- | ---------------------------------------------------------------------------- | ------------- |
 | `enable_end_date` | Whether to edit as well the end date of the input                            | `false`       |
 | `enable_hours`    | Whether to edit as well the hour part of the start and end date (if enabled) | `false`       |
 
@@ -127,28 +127,29 @@ All these settings may not be defined and the default values will then be used i
 
 **Information settings**
 
-| Nomenclature     | Label                | Displayed by default | Editable (visible) |
-|------------------|----------------------|----------------------|--------------------|
-| METH_OBS         | Observation methods  | `true`               | `true`             |
-| ETA_BIO          | Biological state     | `true`               | `true`             |
-| METH_DETERMIN    | Determination method | `false`              | `true`             |
-| DETERMINER       | Determiner           | `false`              | `true`             |
-| STATUT_BIO       | Biological status    | `false`              | `true`             |
-| OCC_COMPORTEMENT | Behaviour            | `false`              | `true`             |
-| NATURALITE       | Level of naturalness | `false`              | `true`             |
-| PREUVE_EXIST     | Proof of existence   | `false`              | `true`             |
-| COMMENT          | Comment              | `false`              | `true`             |
+| Nomenclature       | Label                | Displayed by default | Editable (visible) |
+| ------------------ | -------------------- | -------------------- | ------------------ |
+| `METH_OBS`         | Observation methods  | `true`               | `true`             |
+| `ETA_BIO`          | Biological state     | `true`               | `true`             |
+| `METH_DETERMIN`    | Determination method | `false`              | `true`             |
+| `determiner`       | Determiner           | `false`              | `true`             |
+| `STATUT_BIO`       | Biological status    | `false`              | `true`             |
+| `OCC_COMPORTEMENT` | Behaviour            | `false`              | `true`             |
+| `NATURALITE`       | Level of naturalness | `false`              | `true`             |
+| `PREUVE_EXIST`     | Proof of existence   | `false`              | `true`             |
+| `comment`          | Comment              | `false`              | `true`             |
 
 **Counting settings**
 
 | Nomenclature | Label                      | Displayed by default | Editable (visible) |
-|--------------|----------------------------|----------------------|--------------------|
-| STADE_VIE    | Life stage                 | `true`               | `true`             |
-| SEXE         | Sex                        | `true`               | `true`             |
-| OBJ_DENBR    | Purpose of the enumeration | `true`               | `true`             |
-| TYP_DENBR    | Type of enumeration        | `true`               | `true`             |
-| MIN          | Min                        | `true`               | `true`             |
-| MAX          | Max                        | `true`               | `true`             |
+| ------------ | -------------------------- | -------------------- | ------------------ |
+| `STADE_VIE`  | Life stage                 | `true`               | `true`             |
+| `SEXE`       | Sex                        | `true`               | `true`             |
+| `OBJ_DENBR`  | Purpose of the enumeration | `true`               | `true`             |
+| `TYP_DENBR`  | Type of enumeration        | `true`               | `true`             |
+| `count_min`  | Min                        | `true`               | `true`             |
+| `count_max`  | Max                        | `true`               | `true`             |
+| `medias`     | Medias                     | `true`               | `true`             |
 
 **Note:** Any unknown nomenclature attribute added will be simply ignored at startup.
 
@@ -197,7 +198,7 @@ You can override these default settings by adding a property for each nomenclatu
 Each property may be a simple string representing the nomenclature attribute to show or an object with the following properties:
 
 | Property  | Description                                                           | Mandatory |
-|-----------|-----------------------------------------------------------------------|-----------|
+| --------- | --------------------------------------------------------------------- | --------- |
 | `key`     | The nomenclature attribute                                            | &#9745;   |
 | `visible` | If this attribute is visible (thus editable) or not (default: `true`) | &#9744;   |
 | `default` | If this attribute is shown by default (default: `true`)               | &#9744;   |

@@ -12,6 +12,7 @@
     <string name="activity_taxa_filter_title">Taxa filters</string>
     <string name="activity_counting_add_title">Add counting</string>
     <string name="activity_counting_edit_title">Edit counting</string>
+    <string name="activity_counting_media_title">Manage media</string>
 
     <string name="channel_name_check_inputs_to_synchronize">New inputs</string>
     <string name="channel_description_check_inputs_to_synchronize">Inputs to synchronize</string>
@@ -51,6 +52,7 @@
     <string name="action_new_counting">counting</string>
     <string name="action_add">Add</string>
     <string name="action_add_taxon">taxon</string>
+    <string name="action_add_media">Add media</string>
     <string name="action_set">Set</string>
     <string name="action_edit">Edit</string>
     <plurals name="action_title_item_count_selected">
@@ -152,9 +154,22 @@
     <string name="information_no_data">⚠ No nomenclature found.\nPlease start a data synchronization.</string>
 
     <string name="counting_no_data">No counting.\nCreate a new one by tapping the + button.</string>
+    <string name="counting_not_found">No counting found.</string>
+    <string name="counting_media_no_data">No media.\nAdd one by tapping the + button.</string>
     <string name="counting_main_label">Counting #%d</string>
+    <plurals name="counting_media">
+        <item quantity="one">%d media</item>
+        <item quantity="other">%d media</item>
+    </plurals>
     <string name="counting_description_separator"><![CDATA[<b>%1$s:</b>]]> <![CDATA[<i>%2$s</i>]]></string>
     <string name="counting_toast_empty">Empty counting: Nothing to save</string>
+    <string name="counting_bottom_sheet_photo_title">Add photo</string>
+    <string name="counting_bottom_sheet_photo_camera">From camera</string>
+    <string name="counting_bottom_sheet_photo_gallery">From gallery</string>
+    <string name="counting_media_deleted">Media deleted</string>
+    <string name="counting_media_action_undo">Undo</string>
+    <string name="counting_media_title">\'%1$s\' observed on %2$s</string>
+    <string name="counting_media_description">\'%1$s\' observed on %2$s</string>
 
     <plurals name="summary_taxa_subtitle">
         <item quantity="one">%d taxon</item>

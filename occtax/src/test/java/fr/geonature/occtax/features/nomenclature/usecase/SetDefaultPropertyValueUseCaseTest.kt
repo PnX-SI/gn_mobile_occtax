@@ -8,7 +8,7 @@ import fr.geonature.commons.fp.identity
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.nomenclature.error.PropertyValueFailure
 import fr.geonature.occtax.features.nomenclature.repository.IDefaultPropertyValueRepository
-import fr.geonature.occtax.features.input.domain.PropertyValue
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
@@ -55,7 +55,7 @@ class SetDefaultPropertyValueUseCaseTest {
                     kingdom = "Animalia",
                     group = "Oiseaux"
                 ),
-                PropertyValue(
+                PropertyValue.Nomenclature(
                     code = "STATUT_BIO",
                     label = "Hibernation",
                     value = 33L
@@ -70,7 +70,7 @@ class SetDefaultPropertyValueUseCaseTest {
                     kingdom = "Animalia",
                     group = "Oiseaux"
                 ),
-                propertyValue = PropertyValue(
+                propertyValue = PropertyValue.Nomenclature(
                     code = "STATUT_BIO",
                     label = "Hibernation",
                     value = 33L
@@ -90,7 +90,7 @@ class SetDefaultPropertyValueUseCaseTest {
                     kingdom = "Animalia",
                     group = "Oiseaux"
                 ),
-                PropertyValue(
+                PropertyValue.Nomenclature(
                     code = "STATUT_BIO",
                     label = "Hibernation",
                     value = 33L
@@ -105,7 +105,7 @@ class SetDefaultPropertyValueUseCaseTest {
                     kingdom = "Animalia",
                     group = "Oiseaux"
                 ),
-                propertyValue = PropertyValue(
+                propertyValue = PropertyValue.Nomenclature(
                     code = "STATUT_BIO",
                     label = "Hibernation",
                     value = 33L

@@ -1,7 +1,7 @@
 package fr.geonature.occtax.features.nomenclature.data
 
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.occtax.features.input.domain.PropertyValue
+import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
  * In memory implementation of [IPropertyValueLocalDataSource].
@@ -17,13 +17,19 @@ class InMemoryPropertyValueLocalDataSourceImpl : IPropertyValueLocalDataSource {
 
     override suspend fun setPropertyValue(taxonomy: Taxonomy, vararg propertyValue: PropertyValue) {
         propertyValues[taxonomy] =
-            getPropertyValues(taxonomy).filter { existingPropertyValue -> propertyValue.none { it.code == existingPropertyValue.code } }
+            getPropertyValues(taxonomy)
+                .map { it.toPair() }
+                .filter { existingPropertyValue -> propertyValue.map { it.toPair() }.none { it.first == existingPropertyValue.first } }
+                .map { it.second }
                 .toSet() + propertyValue.toSet()
     }
 
     override suspend fun clearPropertyValue(taxonomy: Taxonomy, vararg code: String) {
         propertyValues[taxonomy] =
-            getPropertyValues(taxonomy).filter { propertyValue -> code.none { it == propertyValue.code } }
+            getPropertyValues(taxonomy)
+                .map { it.toPair() }
+                .filter { propertyValue -> code.none { it == propertyValue.first } }
+                .map { it.second }
                 .toSet()
     }
 

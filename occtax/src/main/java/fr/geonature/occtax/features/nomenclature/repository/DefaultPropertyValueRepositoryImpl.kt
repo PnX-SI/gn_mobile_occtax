@@ -6,9 +6,9 @@ import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSou
 import fr.geonature.commons.fp.Either
 import fr.geonature.commons.fp.Either.Left
 import fr.geonature.commons.fp.Either.Right
-import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.data.IPropertyValueLocalDataSource
 import fr.geonature.occtax.features.nomenclature.error.PropertyValueFailure
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
@@ -37,11 +37,15 @@ class DefaultPropertyValueRepositoryImpl(
             .filter { propertyValue ->
                 runCatching {
                     nomenclatureLocalDataSource.getNomenclatureValuesByTypeAndTaxonomy(
-                        propertyValue.code,
+                        propertyValue.toPair().first,
                         taxonomy
                     )
-                }.getOrElse { emptyList() }.takeIf { it.isNotEmpty() }
-                    ?.any { it.id == propertyValue.value } ?: true
+                }.getOrElse { emptyList() }
+                    .takeIf { it.isNotEmpty() }
+                    ?.any {
+                        propertyValue.takeIf { propertyValue is PropertyValue.Nomenclature }
+                            ?.let { propertyValue as PropertyValue.Nomenclature }?.value == it.id
+                    } ?: true
             }
             .toList())
     }
@@ -57,7 +61,7 @@ class DefaultPropertyValueRepositoryImpl(
             )
         }.fold(
             onSuccess = { Right(Unit) },
-            onFailure = { Left(PropertyValueFailure(propertyValue.code)) }
+            onFailure = { Left(PropertyValueFailure(propertyValue.toPair().first)) }
         )
     }
 
@@ -78,7 +82,7 @@ class DefaultPropertyValueRepositoryImpl(
 
     override suspend fun clearAllPropertyValues(): Either<Failure, Unit> {
         propertyValueLocalDataSource.clearAllPropertyValues()
-        
+
         return Right(Unit)
     }
 }
