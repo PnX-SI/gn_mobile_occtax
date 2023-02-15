@@ -714,7 +714,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
 
             override fun getItemViewType(position: Int): Int {
                 return if ((itemCount - 1) == position) R.layout.list_item_media_add
-                else R.layout.list_item_media
+                else R.layout.list_item_media_thumbnail
             }
 
             fun setItems(items: List<File>) {
@@ -773,6 +773,11 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                     itemView.findViewById<ShapeableImageView>(R.id.image)
                         .apply {
                             setImageURI(file?.toUri())
+                            setOnClickListener {
+                                file?.absolutePath?.also {
+                                    listener.onMediaSelected(MediaRecord.File(it))
+                                }
+                            }
                             setOnLongClickListener {
                                 val currentPosition = items.indexOf(file)
 
@@ -858,5 +863,10 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
          * Called when we want to add media.
          */
         fun onAddMedia(nomenclatureTypeMnemonic: String)
+
+        /**
+         * Called when we want to show given media.
+         */
+        fun onMediaSelected(mediaRecord: MediaRecord.File)
     }
 }

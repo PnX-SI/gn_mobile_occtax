@@ -155,18 +155,21 @@
 
     <string name="counting_no_data">No counting.\nCreate a new one by tapping the + button.</string>
     <string name="counting_not_found">No counting found.</string>
-    <string name="counting_media_no_data">No media.\nAdd one by tapping the + button.</string>
     <string name="counting_main_label">Counting #%d</string>
-    <plurals name="counting_media">
-        <item quantity="one">%d media</item>
-        <item quantity="other">%d media</item>
-    </plurals>
     <string name="counting_description_separator"><![CDATA[<b>%1$s:</b>]]> <![CDATA[<i>%2$s</i>]]></string>
     <string name="counting_toast_empty">Empty counting: Nothing to save</string>
     <string name="counting_bottom_sheet_photo_title">Add photo</string>
     <string name="counting_bottom_sheet_photo_camera">From camera</string>
     <string name="counting_bottom_sheet_photo_gallery">From gallery</string>
+    <plurals name="counting_media">
+        <item quantity="one">%d media</item>
+        <item quantity="other">%d media</item>
+    </plurals>
+    <string name="counting_media_no_data">No media.\nAdd one by tapping the + button.</string>
     <string name="counting_media_deleted">Media deleted</string>
+    <string name="counting_media_action_add_hint">Add media</string>
+    <string name="counting_media_action_add_from_photo_hint">From camera</string>
+    <string name="counting_media_action_add_from_gallery_hint">From gallery</string>
     <string name="counting_media_action_undo">Undo</string>
     <string name="counting_media_title">\'%1$s\' observed on %2$s</string>
     <string name="counting_media_description">\'%1$s\' observed on %2$s</string>

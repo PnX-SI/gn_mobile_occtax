@@ -5,9 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
@@ -95,10 +92,22 @@ class EditCountingMetadataFragment : Fragment() {
         }
 
         mediaResultLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                if ((it.resultCode != Activity.RESULT_OK) || (it.data == null)) {
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
+                if ((activityResult.resultCode != Activity.RESULT_OK) || (activityResult.data == null)) {
                     return@registerForActivityResult
                 }
+
+                activityResult.data?.getParcelableExtra<CountingRecord>(MediaListActivity.EXTRA_COUNTING_RECORD)
+                    ?.also { countingRecord ->
+                        this.countingRecord = countingRecord
+
+                        adapter?.setPropertyValues(
+                            *(countingRecord.properties.values
+                                .filterNotNull()
+                                .filterNot { it.isEmpty() }
+                                .toTypedArray())
+                        )
+                    }
             }
     }
 
@@ -118,9 +127,6 @@ class EditCountingMetadataFragment : Fragment() {
         view: View,
         savedInstanceState: Bundle?
     ) {
-        // we have a menu item to show in action bar
-        setHasOptionsMenu(true)
-
         content = view.findViewById(android.R.id.content)
 
         val recyclerView = view.findViewById<RecyclerView>(android.R.id.list)
@@ -208,16 +214,16 @@ class EditCountingMetadataFragment : Fragment() {
                 val countingRecord = countingRecord ?: return
 
                 val updated = ((editableNomenclatureType.value?.takeIf { it is PropertyValue.Media }
-                        ?.let {
-                            it as PropertyValue.Media
-                        }?.value?.mapNotNull {
-                            when (it) {
-                                is MediaRecord.File -> it.path
-                                else -> null
-                            }
-                        } ?: emptyList()).toImmutableList()
-                        .sorted() != countingRecord.medias.files.sorted()
-                )
+                    ?.let {
+                        it as PropertyValue.Media
+                    }?.value?.mapNotNull {
+                        when (it) {
+                            is MediaRecord.File -> it.path
+                            else -> null
+                        }
+                    } ?: emptyList()).toImmutableList()
+                    .sorted() != countingRecord.medias.files.sorted()
+                    )
 
                 editableNomenclatureType.value?.toPair()
                     .also {
@@ -300,6 +306,10 @@ class EditCountingMetadataFragment : Fragment() {
                         ADD_PHOTO_DIALOG_FRAGMENT
                     )
             }
+
+            override fun onMediaSelected(mediaRecord: MediaRecord.File) {
+                launchMediaActivity(mediaRecord)
+            }
         })
 
         with(recyclerView) {
@@ -308,33 +318,6 @@ class EditCountingMetadataFragment : Fragment() {
         }
 
         loadNomenclatureTypes()
-    }
-
-    override fun onCreateOptionsMenu(
-        menu: Menu,
-        inflater: MenuInflater
-    ) {
-        super.onCreateOptionsMenu(
-            menu,
-            inflater
-        )
-
-        with(inflater) {
-            inflate(
-                R.menu.media,
-                menu
-            )
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu_media -> {
-                launchMediaActivity()
-                return true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
     }
 
     override fun onAttach(context: Context) {
@@ -386,9 +369,9 @@ class EditCountingMetadataFragment : Fragment() {
         )
     }
 
-    private fun launchMediaActivity() {
+    private fun launchMediaActivity(selectedMedia: MediaRecord? = null) {
         val context = context ?: run {
-            Logger.warn { "missing context to launch activity '${MediaActivity::class.java.simpleName}': abort" }
+            Logger.warn { "missing context to launch activity '${MediaListActivity::class.java.simpleName}': abort" }
             null
         } ?: return
         val taxonRecord = taxonRecord ?: run {
@@ -401,12 +384,16 @@ class EditCountingMetadataFragment : Fragment() {
         } ?: return
 
         mediaResultLauncher.launch(
-            MediaActivity.newIntent(
+            MediaListActivity.newIntent(
                 context,
-                taxonRecord.counting.mediaBasePath(
-                    context,
-                    countingRecord
-                ).absolutePath
+                taxonRecord,
+                countingRecord,
+                selectedMedia?.let {
+                    when (it) {
+                        is MediaRecord.File -> it.path
+                        else -> null
+                    }
+                }
             )
         )
     }

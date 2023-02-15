@@ -2,14 +2,14 @@ package fr.geonature.occtax.ui.input.counting
 
 import android.net.Uri
 import android.view.View
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.imageview.ShapeableImageView
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
 import java.io.File
 
 /**
- * Default RecyclerView Adapter used by [MediaFragment].
+ * Default RecyclerView Adapter used by [MediaListActivity].
  *
  * @author S. Grimault
  */
@@ -91,7 +91,7 @@ class MediaRecyclerViewAdapter(listener: OnMediaRecyclerViewAdapterListener) :
     inner class ViewHolder(itemView: View) :
         AbstractListItemRecyclerViewAdapter<File>.AbstractViewHolder(itemView) {
         override fun onBind(item: File) {
-            itemView.findViewById<ShapeableImageView>(R.id.image).setImageURI(Uri.fromFile(item))
+            itemView.findViewById<ImageView>(R.id.image).setImageURI(Uri.fromFile(item))
         }
     }
 

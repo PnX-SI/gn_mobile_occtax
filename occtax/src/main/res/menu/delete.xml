@@ -4,8 +4,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/menu_media"
-        android:icon="@drawable/ic_action_photo_library"
+        android:id="@+id/menu_delete"
+        android:icon="@drawable/ic_delete"
+        app:iconTint="@color/actionbar_icon_tint"
         android:title="@string/action_add_media"
         app:showAsAction="always" />
+
 </menu>

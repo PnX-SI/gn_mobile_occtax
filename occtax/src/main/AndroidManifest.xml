@@ -57,8 +57,9 @@
             android:label="@string/activity_taxa_filter_title" />
         <activity android:name=".ui.input.counting.EditCountingMetadataActivity" />
         <activity
-            android:name=".ui.input.counting.MediaActivity"
-            android:label="@string/activity_counting_media_title" />
+            android:name=".ui.input.counting.MediaListActivity"
+            android:label="@string/activity_counting_media_title"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <!--+
            | remove the default initializer

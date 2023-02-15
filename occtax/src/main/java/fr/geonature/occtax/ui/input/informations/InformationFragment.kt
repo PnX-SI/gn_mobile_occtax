@@ -23,6 +23,7 @@ import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.presentation.EditableNomenclatureTypeAdapter
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
+import fr.geonature.occtax.features.record.domain.MediaRecord
 import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
@@ -164,6 +165,10 @@ class InformationFragment : AbstractInputFragment() {
             }
 
             override fun onAddMedia(nomenclatureTypeMnemonic: String) {
+                // nothing to do…
+            }
+
+            override fun onMediaSelected(mediaRecord: MediaRecord.File) {
                 // nothing to do…
             }
         })
