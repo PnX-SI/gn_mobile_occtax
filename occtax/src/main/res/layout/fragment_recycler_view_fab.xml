@@ -23,6 +23,13 @@
             android:text="@string/no_data"
             android:visibility="gone" />
 
+        <ProgressBar
+            android:id="@android:id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
     </FrameLayout>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

@@ -46,9 +46,9 @@ class GetEditableNomenclaturesUseCase @Inject constructor(
 
         return Right(editableNomenclatures.map { editableNomenclature ->
             editableNomenclature.copy(
-                value = defaultPropertyValues.firstOrNull { it.code == editableNomenclature.code }
+                value = defaultPropertyValues.firstOrNull { it.toPair().first == editableNomenclature.code }
                     ?: editableNomenclature.value,
-                locked = defaultPropertyValues.any { it.code == editableNomenclature.code }
+                locked = defaultPropertyValues.any { it.toPair().first == editableNomenclature.code }
             )
         })
     }

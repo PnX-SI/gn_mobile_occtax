@@ -7,11 +7,11 @@ import fr.geonature.commons.fp.Either.Right
 import fr.geonature.commons.fp.identity
 import fr.geonature.commons.fp.orNull
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
 import fr.geonature.occtax.features.nomenclature.repository.IDefaultPropertyValueRepository
 import fr.geonature.occtax.features.nomenclature.repository.INomenclatureRepository
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
@@ -79,7 +79,7 @@ class GetEditableNomenclaturesUseCaseTest {
                         EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                         label = "Statut biologique",
                         visible = false,
-                        value = PropertyValue(
+                        value = PropertyValue.Nomenclature(
                             code = "STATUT_BIO",
                             label = "Non renseigné",
                             value = 29L
@@ -115,14 +115,15 @@ class GetEditableNomenclaturesUseCaseTest {
                         EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                         label = "Statut biologique",
                         visible = false,
-                        value = PropertyValue(
+                        value = PropertyValue.Nomenclature(
                             code = "STATUT_BIO",
                             label = "Non renseigné",
                             value = 29L
                         )
                     )
                 ).sortedBy { it.code },
-                response.orNull()?.sortedBy { it.code }
+                response.orNull()
+                    ?.sortedBy { it.code }
             )
         }
 
@@ -157,7 +158,7 @@ class GetEditableNomenclaturesUseCaseTest {
                         EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                         label = "Statut biologique",
                         visible = false,
-                        value = PropertyValue(
+                        value = PropertyValue.Nomenclature(
                             code = "STATUT_BIO",
                             label = "Non renseigné",
                             value = 29L
@@ -175,14 +176,13 @@ class GetEditableNomenclaturesUseCaseTest {
                 )
             } returns Right(
                 listOf(
-                    PropertyValue(
+                    PropertyValue.Nomenclature(
                         code = "STATUT_BIO",
                         label = "Hibernation",
                         value = 33L
                     ),
-                    PropertyValue(
+                    PropertyValue.Text(
                         "DETERMINER",
-                        null,
                         "some_value"
                     )
                 )
@@ -221,9 +221,8 @@ class GetEditableNomenclaturesUseCaseTest {
                         EditableNomenclatureType.ViewType.TEXT_SIMPLE,
                         visible = true,
                         default = false,
-                        value = PropertyValue(
+                        value = PropertyValue.Text(
                             "DETERMINER",
-                            null,
                             "some_value"
                         ),
                         locked = true
@@ -234,7 +233,7 @@ class GetEditableNomenclaturesUseCaseTest {
                         EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
                         label = "Statut biologique",
                         visible = false,
-                        value = PropertyValue(
+                        value = PropertyValue.Nomenclature(
                             code = "STATUT_BIO",
                             label = "Hibernation",
                             value = 33L
@@ -242,7 +241,8 @@ class GetEditableNomenclaturesUseCaseTest {
                         locked = true
                     )
                 ).sortedBy { it.code },
-                response.orNull()?.sortedBy { it.code }
+                response.orNull()
+                    ?.sortedBy { it.code }
             )
         }
 

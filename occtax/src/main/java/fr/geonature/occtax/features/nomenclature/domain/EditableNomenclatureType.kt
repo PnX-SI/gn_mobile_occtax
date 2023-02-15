@@ -1,17 +1,15 @@
 package fr.geonature.occtax.features.nomenclature.domain
 
-import android.os.Parcel
 import android.os.Parcelable
-import androidx.core.os.ParcelCompat.readBoolean
-import androidx.core.os.ParcelCompat.writeBoolean
-import fr.geonature.occtax.features.input.domain.PropertyValue
-
+import fr.geonature.occtax.features.record.domain.PropertyValue
+import kotlinx.parcelize.Parcelize
 
 /**
  * Describes an editable nomenclature type with value.
  *
  * @author S. Grimault
  */
+@Parcelize
 data class EditableNomenclatureType(
     val type: Type,
     val code: String,
@@ -34,59 +32,6 @@ data class EditableNomenclatureType(
      */
     var locked: Boolean = false
 ) : Parcelable {
-
-    private constructor(source: Parcel) : this(
-        source.readSerializable() as Type,
-        source.readString()!!,
-        source.readSerializable() as ViewType,
-        readBoolean(source),
-        readBoolean(source),
-        source.readString(),
-        source.readParcelable(PropertyValue::class.java.classLoader),
-        readBoolean(source)
-    )
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    override fun writeToParcel(
-        dest: Parcel?,
-        flags: Int
-    ) {
-        dest?.also {
-            it.writeSerializable(type)
-            it.writeString(code)
-            it.writeSerializable(viewType)
-            writeBoolean(
-                it,
-                visible
-            )
-            writeBoolean(
-                it,
-                default
-            )
-            it.writeString(label)
-            it.writeParcelable(
-                value,
-                flags
-            )
-            writeBoolean(
-                it,
-                locked
-            )
-        }
-    }
-
-    companion object CREATOR : Parcelable.Creator<EditableNomenclatureType> {
-        override fun createFromParcel(parcel: Parcel): EditableNomenclatureType {
-            return EditableNomenclatureType(parcel)
-        }
-
-        override fun newArray(size: Int): Array<EditableNomenclatureType?> {
-            return arrayOfNulls(size)
-        }
-    }
 
     /**
      * Describes main editable nomenclature type.
@@ -135,6 +80,11 @@ data class EditableNomenclatureType(
         /**
          * As a bounded numerical value.
          */
-        MIN_MAX
+        MIN_MAX,
+
+        /**
+         * As media file.
+         */
+        MEDIA
     }
 }

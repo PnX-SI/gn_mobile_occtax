@@ -10,7 +10,7 @@ import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
- * Default RecyclerView Adapter used by [CountingFragment].
+ * Default RecyclerView Adapter used by [CountingFragment]. Shows a list of [CountingRecord].
  *
  * @author S. Grimault
  */
@@ -54,6 +54,7 @@ class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListene
         private val title: TextView = itemView.findViewById(android.R.id.title)
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
         private val text2: TextView = itemView.findViewById(android.R.id.text2)
+        private val summary: TextView = itemView.findViewById(android.R.id.summary)
 
         override fun onBind(item: CountingRecord) {
             title.text = itemView.context.getString(
@@ -61,8 +62,9 @@ class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListene
                 item.index
             )
             text1.text = buildCountingDescription(item)
-            text2.text = buildDescription(item)
-            text2.isSelected = true
+            text2.text = buildMediaDescription(item)
+            summary.text = buildDescription(item)
+            summary.isSelected = true
         }
 
         private fun buildCountingDescription(countingRecord: CountingRecord): Spanned {
@@ -83,6 +85,16 @@ class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListene
                 }
                 .joinToString(", "),
                 HtmlCompat.FROM_HTML_MODE_LEGACY)
+        }
+
+        private fun buildMediaDescription(countingRecord: CountingRecord): CharSequence {
+            return countingRecord.medias.files.size.let {
+                itemView.resources.getQuantityString(
+                    R.plurals.counting_media,
+                    it,
+                    it
+                )
+            }
         }
 
         private fun buildDescription(countingRecord: CountingRecord): Spanned {

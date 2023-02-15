@@ -9,6 +9,7 @@
     <string name="activity_taxa_filter_title">Filtres sur les taxons</string>
     <string name="activity_counting_add_title">Ajouter un dénombrement</string>
     <string name="activity_counting_edit_title">Editer le dénombrement</string>
+    <string name="activity_counting_media_title">Gérer les médias</string>
 
     <string name="channel_name_check_inputs_to_synchronize">Nouveaux relevés</string>
     <string name="channel_description_check_inputs_to_synchronize">Relevés à synchroniser</string>
@@ -49,6 +50,7 @@
     <string name="action_new_counting">dénombrement</string>
     <string name="action_add">Ajouter</string>
     <string name="action_add_taxon">taxon</string>
+    <string name="action_add_media">Ajouter un média</string>
     <string name="action_set">Modifier</string>
     <string name="action_edit">Modifier</string>
     <plurals name="action_title_item_count_selected">
@@ -156,9 +158,26 @@
     <string name="information_no_data">⚠ Aucune nomenclature trouvée.\nUne synchronisation des données est nécessaire avant tout relevé.</string>
 
     <string name="counting_no_data">Aucun dénombrement effectué.\nCréer un nouveau dénombrement via le bouton +</string>
+    <string name="counting_not_found">Dénombrement non trouvé.</string>
     <string name="counting_main_label">Dénombrement #%d</string>
     <string name="counting_description_separator"><![CDATA[<b>%1$s :</b>]]> <![CDATA[<i>%2$s</i>]]></string>
     <string name="counting_toast_empty">Aucune information à sauvegarder</string>
+    <string name="counting_bottom_sheet_photo_title">Ajouter une photo</string>
+    <string name="counting_bottom_sheet_photo_camera">Depuis l\'appareil photo</string>
+    <string name="counting_bottom_sheet_photo_gallery">Depuis la galerie d\'images</string>
+    <plurals name="counting_media">
+        <item quantity="one">%d média</item>
+        <item quantity="other">%d médias</item>
+        <item quantity="many">%d médias</item>
+    </plurals>
+    <string name="counting_media_no_data">Aucun média.\nAjouter en un via le bouton +</string>
+    <string name="counting_media_deleted">Media supprimé</string>
+    <string name="counting_media_action_add_hint">Ajouter un média</string>
+    <string name="counting_media_action_add_from_photo_hint">Depuis l\'appareil photo</string>
+    <string name="counting_media_action_add_from_gallery_hint">Depuis la galerie d\'images</string>
+    <string name="counting_media_action_undo">Annuler</string>
+    <string name="counting_media_title">\'%1$s\' observé le %2$s</string>
+    <string name="counting_media_description">\'%1$s\' observé le %2$s</string>
 
     <plurals name="summary_taxa_subtitle">
         <item quantity="one">%d taxon</item>

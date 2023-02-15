@@ -1,7 +1,7 @@
 package fr.geonature.occtax.features.record.repository
 
 import fr.geonature.commons.features.taxon.data.ITaxonLocalDataSource
-import fr.geonature.occtax.features.record.data.IObservationRecordDataSource
+import fr.geonature.occtax.features.record.data.IObservationRecordLocalDataSource
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.settings.AppSettings
 
@@ -11,20 +11,20 @@ import fr.geonature.occtax.settings.AppSettings
  * @author S. Grimault
  */
 class ObservationRecordRepositoryImpl(
-    private val observationRecordDataSource: IObservationRecordDataSource,
+    private val observationRecordLocalDataSource: IObservationRecordLocalDataSource,
     private val taxonLocalDataSource: ITaxonLocalDataSource
 ) : IObservationRecordRepository {
 
     override suspend fun readAll(): Result<List<ObservationRecord>> {
         return runCatching {
-            observationRecordDataSource.readAll()
+            observationRecordLocalDataSource.readAll()
                 .map { loadTaxa(it) }
         }
     }
 
     override suspend fun read(id: Long): Result<ObservationRecord> {
         return runCatching {
-            loadTaxa(observationRecordDataSource.read(id))
+            loadTaxa(observationRecordLocalDataSource.read(id))
         }
     }
 
@@ -33,7 +33,7 @@ class ObservationRecordRepositoryImpl(
         status: ObservationRecord.Status
     ): Result<ObservationRecord> {
         return runCatching {
-            observationRecordDataSource.save(
+            observationRecordLocalDataSource.save(
                 observationRecord,
                 status
             )
@@ -41,12 +41,12 @@ class ObservationRecordRepositoryImpl(
     }
 
     override suspend fun delete(id: Long): Result<ObservationRecord> {
-        return runCatching { observationRecordDataSource.delete(id) }
+        return runCatching { observationRecordLocalDataSource.delete(id) }
     }
 
     override suspend fun export(id: Long, settings: AppSettings?): Result<ObservationRecord> {
         return runCatching {
-            observationRecordDataSource.export(
+            observationRecordLocalDataSource.export(
                 id,
                 settings
             )
@@ -58,7 +58,7 @@ class ObservationRecordRepositoryImpl(
         settings: AppSettings?
     ): Result<ObservationRecord> {
         return runCatching {
-            observationRecordDataSource.export(
+            observationRecordLocalDataSource.export(
                 observationRecord,
                 settings
             )

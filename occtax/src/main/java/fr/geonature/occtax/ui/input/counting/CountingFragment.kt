@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.CountingRecord
@@ -117,7 +116,10 @@ class CountingFragment : AbstractInputFragment() {
                             R.string.alert_dialog_ok
                         ) { dialog, _ ->
                             adapter?.remove(item)
-                            observationRecord?.taxa?.selectedTaxonRecord?.counting?.delete(item.index)
+                            observationRecord?.taxa?.selectedTaxonRecord?.counting?.delete(
+                                this,
+                                item.index
+                            )
                             listener.validateCurrentPage()
 
                             dialog.dismiss()
@@ -199,25 +201,24 @@ class CountingFragment : AbstractInputFragment() {
         }
     }
 
-    private fun launchEditCountingMetadataActivity(countingMetadata: CountingRecord? = null) {
+    private fun launchEditCountingMetadataActivity(countingRecord: CountingRecord? = null) {
         val context = context ?: return
+        val taxonRecord = observationRecord?.taxa?.selectedTaxonRecord ?: return
 
         editCountingResultLauncher.launch(EditCountingMetadataActivity.newIntent(
             context,
-            observationRecord?.taxa?.selectedTaxonRecord?.taxon?.taxonomy
-                ?: Taxonomy(
-                    Taxonomy.ANY,
-                    Taxonomy.ANY
-                ),
-            countingMetadata,
+            taxonRecord,
+            countingRecord,
             *(arguments?.getParcelableArray(ARG_PROPERTIES)
                 ?.map { it as PropertySettings }
                 ?.toTypedArray() ?: emptyArray())
         ))
     }
 
-    private fun updateCountingMetadata(countingMetadata: CountingRecord?) {
-        if (countingMetadata == null) {
+    private fun updateCountingMetadata(countingRecord: CountingRecord?) {
+        val context = context ?: return
+
+        if (countingRecord == null) {
             Toast.makeText(
                 context,
                 R.string.counting_toast_empty,
@@ -228,9 +229,10 @@ class CountingFragment : AbstractInputFragment() {
             return
         }
 
-        if (countingMetadata.isEmpty()) {
+        if (countingRecord.isEmpty()) {
             observationRecord?.taxa?.selectedTaxonRecord?.counting?.delete(
-                countingMetadata.index
+                context,
+                countingRecord.index
             )
             Toast.makeText(
                 context,
@@ -242,12 +244,31 @@ class CountingFragment : AbstractInputFragment() {
             return
         }
 
-        observationRecord?.taxa?.selectedTaxonRecord?.counting?.addOrUpdate(countingMetadata)
+        // keep only selected media from updated CountingMetadata
+        val selectedMedia = countingRecord.medias.files
+        observationRecord?.taxa?.selectedTaxonRecord?.counting?.mediaBasePath?.let {
+            it(
+                context,
+                countingRecord
+            )
+        }
+            ?.walkTopDown()
+            ?.asSequence()
+            ?.filter { file ->
+                file.isFile && file.canWrite()
+            }
+            ?.filter { file ->
+                selectedMedia.none { path -> path == file.absolutePath }
+            }
+            ?.forEach { file ->
+                file.delete()
+            }
 
-        val counting =
+        observationRecord?.taxa?.selectedTaxonRecord?.counting?.addOrUpdate(countingRecord)
+
+        adapter?.setItems(
             observationRecord?.taxa?.selectedTaxonRecord?.counting?.counting ?: emptyList()
-
-        adapter?.setItems(counting)
+        )
     }
 
     companion object {

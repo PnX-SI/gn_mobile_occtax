@@ -25,7 +25,7 @@ import org.robolectric.RobolectricTestRunner
 import java.io.File
 
 /**
- * Unit tests about [IObservationRecordDataSource].
+ * Unit tests about [IObservationRecordLocalDataSource].
  *
  * @author S. Grimault
  */
@@ -40,7 +40,7 @@ class ObservationRecordDataSourceTest {
     val coroutineTestRule = CoroutineTestRule()
 
     private lateinit var application: Application
-    private lateinit var observationRecordDataSource: IObservationRecordDataSource
+    private lateinit var observationRecordLocalDataSource: IObservationRecordLocalDataSource
 
     private val geoNatureModuleName = "occtax"
 
@@ -49,7 +49,7 @@ class ObservationRecordDataSourceTest {
         init(this)
 
         application = ApplicationProvider.getApplicationContext()
-        observationRecordDataSource = ObservationRecordDataSourceImpl(
+        observationRecordLocalDataSource = ObservationRecordLocalDataSourceImpl(
             application,
             geoNatureModuleName,
             coroutineTestRule.testDispatcher
@@ -60,7 +60,7 @@ class ObservationRecordDataSourceTest {
     fun `should return an empty list when reading undefined observation records`() =
         runTest {
             // when reading non existing observation records
-            val noSuchObservationRecords = observationRecordDataSource.readAll()
+            val noSuchObservationRecords = observationRecordLocalDataSource.readAll()
 
             // then
             assertTrue(noSuchObservationRecords.isEmpty())
@@ -74,9 +74,9 @@ class ObservationRecordDataSourceTest {
             val record2 = ObservationRecord(internalId = 1235)
             val record3 = ObservationRecord(internalId = 1237)
 
-            observationRecordDataSource.save(record1)
-            observationRecordDataSource.save(record2)
-            observationRecordDataSource.save(record3)
+            observationRecordLocalDataSource.save(record1)
+            observationRecordLocalDataSource.save(record2)
+            observationRecordLocalDataSource.save(record3)
 
             // and some observation records ready to synchronize
             val record4 = ObservationRecord(
@@ -97,7 +97,7 @@ class ObservationRecordDataSourceTest {
                 }
 
             // when reading these observation records from local data source
-            val observationRecords = observationRecordDataSource.readAll()
+            val observationRecords = observationRecordLocalDataSource.readAll()
 
             // then
             assertArrayEquals(
@@ -115,7 +115,7 @@ class ObservationRecordDataSourceTest {
     @Test
     fun `should throw NotFoundException if trying to read undefined observation record`() =
         runTest {
-            val exception = runCatching { observationRecordDataSource.read(1234) }.exceptionOrNull()
+            val exception = runCatching { observationRecordLocalDataSource.read(1234) }.exceptionOrNull()
 
             assertTrue(exception is ObservationRecordException.NotFoundException)
             assertEquals(
@@ -147,11 +147,11 @@ class ObservationRecordDataSourceTest {
             }
 
             // when saving this observation record
-            val savedObservationRecord = observationRecordDataSource.save(observationRecord)
+            val savedObservationRecord = observationRecordLocalDataSource.save(observationRecord)
 
             // when reading this observation record from local data source
             val observationRecordFromLocalDataSource =
-                observationRecordDataSource.read(observationRecord.internalId)
+                observationRecordLocalDataSource.read(observationRecord.internalId)
 
             // then
             assertEquals(
@@ -177,11 +177,11 @@ class ObservationRecordDataSourceTest {
             }
 
             // when saving this Input
-            observationRecordDataSource.save(observationRecord)
+            observationRecordLocalDataSource.save(observationRecord)
 
             // when reading this Input from local data source
             val observationRecordFromLocalDataSource =
-                observationRecordDataSource.read(observationRecord.internalId)
+                observationRecordLocalDataSource.read(observationRecord.internalId)
 
             // then
             assertEquals(
@@ -191,7 +191,7 @@ class ObservationRecordDataSourceTest {
 
             // when deleting this Input from local data source
             val deletedObservationRecord =
-                observationRecordDataSource.delete(observationRecord.internalId)
+                observationRecordLocalDataSource.delete(observationRecord.internalId)
 
             // then
             assertEquals(
@@ -200,7 +200,7 @@ class ObservationRecordDataSourceTest {
             )
 
             val exception =
-                runCatching { observationRecordDataSource.read(observationRecord.internalId) }.exceptionOrNull()
+                runCatching { observationRecordLocalDataSource.read(observationRecord.internalId) }.exceptionOrNull()
 
             assertTrue(exception is ObservationRecordException.NotFoundException)
             assertEquals(
@@ -222,14 +222,14 @@ class ObservationRecordDataSourceTest {
             }
 
             // when saving this observation record
-            observationRecordDataSource.save(observationRecord)
+            observationRecordLocalDataSource.save(observationRecord)
             // and exporting this observation record
             val exportedObservationRecord =
-                observationRecordDataSource.export(observationRecord.internalId)
+                observationRecordLocalDataSource.export(observationRecord.internalId)
 
             // when reading this observation record from local data source
             val observationRecordFromLocalDataSource =
-                observationRecordDataSource.read(observationRecord.internalId)
+                observationRecordLocalDataSource.read(observationRecord.internalId)
 
             // then
             assertEquals(
@@ -273,14 +273,14 @@ class ObservationRecordDataSourceTest {
             }
 
             // when saving this observation record
-            observationRecordDataSource.save(observationRecord)
+            observationRecordLocalDataSource.save(observationRecord)
             // and exporting this observation record
             val exportedObservationRecord =
-                observationRecordDataSource.export(observationRecord.internalId)
+                observationRecordLocalDataSource.export(observationRecord.internalId)
 
             // when reading this observation record from local data source
             var observationRecordFromLocalDataSource =
-                observationRecordDataSource.read(observationRecord.internalId)
+                observationRecordLocalDataSource.read(observationRecord.internalId)
 
             // then
             assertEquals(
@@ -303,11 +303,11 @@ class ObservationRecordDataSourceTest {
             assertTrue(exportedJsonFile.exists())
 
             // when editing again this exported observation record
-            val savedObservationRecord = observationRecordDataSource.save(exportedObservationRecord)
+            val savedObservationRecord = observationRecordLocalDataSource.save(exportedObservationRecord)
 
             // and reading this observation record from local data source
             observationRecordFromLocalDataSource =
-                observationRecordDataSource.read(observationRecord.internalId)
+                observationRecordLocalDataSource.read(observationRecord.internalId)
 
             // then
             assertEquals(
@@ -339,14 +339,14 @@ class ObservationRecordDataSourceTest {
             }
 
             // when saving this observation record
-            observationRecordDataSource.save(observationRecord)
+            observationRecordLocalDataSource.save(observationRecord)
             // and exporting this observation record
             val exportedObservationRecord =
-                observationRecordDataSource.export(observationRecord.internalId)
+                observationRecordLocalDataSource.export(observationRecord.internalId)
 
             // when reading this observation record from local data source
             val observationRecordFromLocalDataSource =
-                observationRecordDataSource.read(observationRecord.internalId)
+                observationRecordLocalDataSource.read(observationRecord.internalId)
 
             // then
             assertEquals(
@@ -365,11 +365,11 @@ class ObservationRecordDataSourceTest {
             )
 
             // when deleting this observation record from local data source
-            observationRecordDataSource.delete(observationRecord.internalId)
+            observationRecordLocalDataSource.delete(observationRecord.internalId)
 
             // then
             val exception =
-                runCatching { observationRecordDataSource.read(observationRecord.internalId) }
+                runCatching { observationRecordLocalDataSource.read(observationRecord.internalId) }
                     .exceptionOrNull()
 
             assertTrue(exception is ObservationRecordException.NotFoundException)
@@ -390,7 +390,7 @@ class ObservationRecordDataSourceTest {
     fun `should throw NotFoundException if trying to export an undefined observation record`() =
         runTest {
             val exception =
-                runCatching { observationRecordDataSource.export(1234) }.exceptionOrNull()
+                runCatching { observationRecordLocalDataSource.export(1234) }.exceptionOrNull()
 
             assertTrue(exception is ObservationRecordException.NotFoundException)
             assertEquals(

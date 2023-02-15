@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
@@ -22,7 +23,7 @@ import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.presentation.EditableNomenclatureTypeAdapter
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
-import fr.geonature.occtax.features.record.domain.PropertyValue
+import fr.geonature.occtax.features.record.domain.MediaRecord
 import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
@@ -87,6 +88,10 @@ class InformationFragment : AbstractInputFragment() {
                 return this@InformationFragment
             }
 
+            override fun getCoordinatorLayout(): CoordinatorLayout? {
+                return null
+            }
+
             override fun showEmptyTextView(show: Boolean) {
                 progressBar?.visibility = View.GONE
 
@@ -132,15 +137,13 @@ class InformationFragment : AbstractInputFragment() {
             }
 
             override fun onUpdate(editableNomenclatureType: EditableNomenclatureType) {
-                toPropertyValue(editableNomenclatureType)
-                    ?.toPair()
-                    .also {
-                        if (it == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(editableNomenclatureType.code)
-                        else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
-                            it.first,
-                            it.second
-                        )
-                    }
+                editableNomenclatureType.value?.toPair().also {
+                    if (it == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(editableNomenclatureType.code)
+                    else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
+                        it.first,
+                        it.second
+                    )
+                }
 
                 val propertyValue = editableNomenclatureType.value
 
@@ -159,6 +162,14 @@ class InformationFragment : AbstractInputFragment() {
                         ),
                     editableNomenclatureType.code
                 )
+            }
+
+            override fun onAddMedia(nomenclatureTypeMnemonic: String) {
+                // nothing to do…
+            }
+
+            override fun onMediaSelected(mediaRecord: MediaRecord.File) {
+                // nothing to do…
             }
         })
 
@@ -210,67 +221,22 @@ class InformationFragment : AbstractInputFragment() {
             .forEach {
                 if (observationRecord?.taxa?.selectedTaxonRecord?.properties?.containsKey(it.code) == true) return@forEach
 
-                toPropertyValue(it)?.toPair()
-                    .also { pair ->
-                        if (pair == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(it.code)
-                        else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
-                            pair.first,
-                            pair.second
-                        )
-                    }
+                it.value?.toPair().also {pair ->
+                    if (pair == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(it.code)
+                    else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
+                        pair.first,
+                        pair.second
+                    )
+                }
             }
 
         adapter?.bind(
             editableNomenclatureTypes,
-            *(observationRecord?.taxa?.selectedTaxonRecord?.properties?.values?.filterNotNull()
-                ?.map {
-                    it.toPair()
-                }
-                ?.mapNotNull {
-                    when (it.second) {
-                        is PropertyValue.Number -> fr.geonature.occtax.features.input.domain.PropertyValue.fromValue(
-                            it.first,
-                            (it.second as PropertyValue.Number).value
-                        )
-                        is PropertyValue.Text -> fr.geonature.occtax.features.input.domain.PropertyValue.fromValue(
-                            it.first,
-                            (it.second as PropertyValue.Text).value
-                        )
-                        is PropertyValue.Nomenclature -> fr.geonature.occtax.features.input.domain.PropertyValue(
-                            it.first,
-                            (it.second as PropertyValue.Nomenclature).label,
-                            (it.second as PropertyValue.Nomenclature).value
-                        )
-                        else -> null
-                    }
-                }
-                ?.toTypedArray()
-                ?: emptyArray())
+            *(observationRecord?.taxa?.selectedTaxonRecord?.properties?.values
+                ?.filterNotNull()
+                ?.filterNot { it.isEmpty() }
+                ?.toTypedArray() ?: emptyArray())
         )
-    }
-
-    private fun toPropertyValue(editableNomenclatureType: EditableNomenclatureType): PropertyValue? {
-        return editableNomenclatureType.value?.let {
-            when (it.value) {
-                is Long -> if (it.label.isNullOrEmpty()) PropertyValue.Number(
-                    editableNomenclatureType.code,
-                    it.value
-                ) else PropertyValue.Nomenclature(
-                    editableNomenclatureType.code,
-                    it.label,
-                    it.value
-                )
-                is Number -> PropertyValue.Number(
-                    editableNomenclatureType.code,
-                    it.value
-                )
-                is String -> PropertyValue.Text(
-                    editableNomenclatureType.code,
-                    it.value
-                )
-                else -> null
-            }
-        }
     }
 
     companion object {

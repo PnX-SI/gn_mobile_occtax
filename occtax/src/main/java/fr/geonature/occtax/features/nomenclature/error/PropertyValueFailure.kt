@@ -1,7 +1,7 @@
 package fr.geonature.occtax.features.nomenclature.error
 
 import fr.geonature.commons.error.Failure
-import fr.geonature.occtax.features.input.domain.PropertyValue
+import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
  * Failure about [PropertyValue].

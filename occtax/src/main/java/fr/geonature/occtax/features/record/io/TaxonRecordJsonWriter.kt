@@ -1,13 +1,17 @@
 package fr.geonature.occtax.features.record.io
 
 import android.util.JsonWriter
+import fr.geonature.commons.util.format
+import fr.geonature.datasync.api.model.Media
 import fr.geonature.occtax.features.record.domain.CountingRecord
+import fr.geonature.occtax.features.record.domain.MediaRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.settings.AppSettings
 import java.io.IOException
 import java.io.StringWriter
 import java.io.Writer
+import java.util.TimeZone
 
 /**
  * Default `JsonWriter` about writing an [TaxonRecord] as `JSON`.
@@ -182,9 +186,61 @@ class TaxonRecordJsonWriter {
                             .value(propertyValue.value)
                     }
                 }
+                is PropertyValue.Media -> {
+                    writer.name(propertyValue.code)
+                        .beginArray()
+                    propertyValue.value.filterIsInstance<MediaRecord.Media>()
+                        .map { mediaRecord -> mediaRecord.media }
+                        .forEach { media ->
+                            writeMedia(
+                                writer,
+                                media
+                            )
+                        }
+                    writer.endArray()
+                }
                 else -> {}
             }
         }
+
+        writer.endObject()
+    }
+
+    private fun writeMedia(writer: JsonWriter, media: Media) {
+        writer.beginObject()
+
+        writer.name("id_media")
+            .value(media.id)
+        writer.name("unique_id_media")
+            .value(media.uuid.toString())
+        writer.name("id_nomenclature_media_type")
+            .value(media.mediaType)
+        writer.name("id_table_location")
+            .value(media.idTableLocation)
+        writer.name("media_path")
+            .value(media.path)
+        writer.name("author")
+            .value(media.author)
+        writer.name("title_en")
+            .value(media.titleEn)
+        writer.name("title_fr")
+            .value(media.titleFr)
+        writer.name("description_en")
+            .value(media.descriptionEn)
+        writer.name("meta_create_date")
+            .value(
+                media.createdAt.format(
+                    "yyyy-MM-dd HH:mm:ss",
+                    TimeZone.getDefault()
+                )
+            )
+        writer.name("meta_update_date")
+            .value(
+                media.updatedAt.format(
+                    "yyyy-MM-dd HH:mm:ss",
+                    TimeZone.getDefault()
+                )
+            )
 
         writer.endObject()
     }

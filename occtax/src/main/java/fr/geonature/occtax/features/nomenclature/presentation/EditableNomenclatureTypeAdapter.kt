@@ -10,20 +10,29 @@ import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.NumberPicker
 import android.widget.TextView
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.lifecycle.observeOnce
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.record.domain.CountingRecord
+import fr.geonature.occtax.features.record.domain.MediaRecord
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.ui.shared.view.setOnValueChangedListener
+import java.io.File
 import kotlin.math.ceil
 
 /**
@@ -91,12 +100,25 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
             EditableNomenclatureType.ViewType.TEXT_SIMPLE.ordinal -> TextSimpleViewHolder(parent)
             EditableNomenclatureType.ViewType.TEXT_MULTIPLE.ordinal -> TextMultipleViewHolder(parent)
             EditableNomenclatureType.ViewType.MIN_MAX.ordinal -> MinMaxViewHolder(parent)
+            EditableNomenclatureType.ViewType.MEDIA.ordinal -> MediaViewHolder(parent)
             else -> NomenclatureTypeViewHolder(parent)
         }
     }
 
     override fun onBindViewHolder(holder: AbstractViewHolder, position: Int) {
-        selectedNomenclatureTypes[position].also {
+        selectedNomenclatureTypes.fold(listOf<EditableNomenclatureType>()) { acc, editableNomenclatureType ->
+            acc + if (editableNomenclatureType.viewType == EditableNomenclatureType.ViewType.MIN_MAX && acc.any { it.viewType == EditableNomenclatureType.ViewType.MIN_MAX }) listOf() else listOf(editableNomenclatureType)
+        }
+            .sortedWith { o1, o2 ->
+                val i1 = selectedNomenclatureTypes.indexOfFirst { it == o1 }
+                val i2 = selectedNomenclatureTypes.indexOfFirst { it == o2 }
+
+                when {
+                    i1 == -1 -> 1
+                    i2 == -1 -> -1
+                    else -> i1 - i2
+                }
+            }[position].also {
             holder.bind(it)
         }
     }
@@ -107,7 +129,19 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
     }
 
     override fun getItemViewType(position: Int): Int {
-        return selectedNomenclatureTypes[position].viewType.ordinal
+        return selectedNomenclatureTypes.fold(listOf<EditableNomenclatureType>()) { acc, editableNomenclatureType ->
+            acc + if (editableNomenclatureType.viewType == EditableNomenclatureType.ViewType.MIN_MAX && acc.any { it.viewType == EditableNomenclatureType.ViewType.MIN_MAX }) listOf() else listOf(editableNomenclatureType)
+        }
+            .sortedWith { o1, o2 ->
+                val i1 = selectedNomenclatureTypes.indexOfFirst { it == o1 }
+                val i2 = selectedNomenclatureTypes.indexOfFirst { it == o2 }
+
+                when {
+                    i1 == -1 -> 1
+                    i2 == -1 -> -1
+                    else -> i1 - i2
+                }
+            }[position].viewType.ordinal
     }
 
     fun bind(
@@ -116,10 +150,11 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
     ) {
         availableNomenclatureTypes.clear()
         availableNomenclatureTypes.addAll(
-            nomenclatureTypes.filter { it.visible }.map {
-                it.copy(value = propertyValue.firstOrNull { propertyValue -> propertyValue.code == it.code }
-                    ?: it.value)
-            }
+            nomenclatureTypes.filter { it.visible }
+                .map {
+                    it.copy(value = propertyValue.firstOrNull { propertyValue -> propertyValue.toPair().first == it.code }
+                        ?: it.value)
+                }
         )
 
         if (showAllNomenclatureTypes) showAllNomenclatureTypes(notify = true) else showDefaultNomenclatureTypes(notify = true)
@@ -130,24 +165,25 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
 
         if (availableNomenclatureTypes.isEmpty()) return
 
-        availableNomenclatureTypes.filter { it.default }.run {
-            if (isEmpty()) {
-                // nothing to show by default: show everything
-                showAllNomenclatureTypes(notify)
-            } else {
-                setSelectedNomenclatureTypes(
-                    // show 'MORE' button only if we have some other editable nomenclatures to show
-                    this + if (this.size < availableNomenclatureTypes.size) listOf(
-                        EditableNomenclatureType(
-                            EditableNomenclatureType.Type.INFORMATION,
-                            "MORE",
-                            EditableNomenclatureType.ViewType.NONE,
-                            true
-                        )
-                    ) else emptyList()
-                )
+        availableNomenclatureTypes.filter { it.default }
+            .run {
+                if (isEmpty()) {
+                    // nothing to show by default: show everything
+                    showAllNomenclatureTypes(notify)
+                } else {
+                    setSelectedNomenclatureTypes(
+                        // show 'MORE' button only if we have some other editable nomenclatures to show
+                        this + if (this.size < availableNomenclatureTypes.size) listOf(
+                            EditableNomenclatureType(
+                                EditableNomenclatureType.Type.INFORMATION,
+                                "MORE",
+                                EditableNomenclatureType.ViewType.NONE,
+                                true
+                            )
+                        ) else emptyList()
+                    )
+                }
             }
-        }
     }
 
     fun showAllNomenclatureTypes(notify: Boolean = false) {
@@ -160,6 +196,19 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
 
     fun lockDefaultValues(lock: Boolean = false) {
         lockDefaultValues = lock
+    }
+
+    fun setPropertyValues(vararg propertyValue: PropertyValue) {
+        availableNomenclatureTypes.map {
+            it.copy(value = propertyValue.firstOrNull { propertyValue -> propertyValue.toPair().first == it.code }
+                ?: it.value)
+        }
+            .also {
+                availableNomenclatureTypes.clear()
+                availableNomenclatureTypes.addAll(it)
+            }
+
+        if (showAllNomenclatureTypes) showAllNomenclatureTypes(notify = true) else showDefaultNomenclatureTypes(notify = true)
     }
 
     private fun setSelectedNomenclatureTypes(
@@ -175,6 +224,9 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
             return
         }
 
+        val checkMedia =
+            selectedNomenclatureTypes.firstOrNull { it.viewType == EditableNomenclatureType.ViewType.MEDIA }?.value == nomenclatureTypes.firstOrNull { it.viewType == EditableNomenclatureType.ViewType.MEDIA }?.value
+
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun getOldListSize(): Int = oldKeys.size
 
@@ -189,11 +241,12 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                 oldItemPosition: Int,
                 newItemPosition: Int
             ) =
-                oldKeys.elementAtOrNull(oldItemPosition)
-                    ?.let { code -> selectedNomenclatureTypes.firstOrNull { it.code == code } }
-                    ?.value?.value == newKeys.elementAtOrNull(newItemPosition)
-                    ?.let { code -> nomenclatureTypes.firstOrNull { it.code == code } }
-                    ?.value?.value
+                checkMedia &&
+                    (oldKeys.elementAtOrNull(oldItemPosition)
+                        ?.let { code -> selectedNomenclatureTypes.firstOrNull { it.code == code } }
+                        ?.value?.toPair()?.second == newKeys.elementAtOrNull(newItemPosition)
+                        ?.let { code -> nomenclatureTypes.firstOrNull { it.code == code } }
+                        ?.value?.toPair()?.second)
         })
 
         selectedNomenclatureTypes.clear()
@@ -202,6 +255,9 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
         diffResult.dispatchUpdatesTo(this)
     }
 
+    /**
+     * Base [ViewHolder][RecyclerView.ViewHolder] used by this adapter.
+     */
     abstract inner class AbstractViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal var nomenclatureType: EditableNomenclatureType? = null
 
@@ -221,16 +277,19 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                 "nomenclature_${mnemonic.lowercase()}",
                 "string",
                 itemView.context.packageName
-            ).takeIf { it > 0 }?.let { itemView.context.getString(it) } ?: mnemonic
+            )
+                .takeIf { it > 0 }
+                ?.let { itemView.context.getString(it) } ?: mnemonic
         }
     }
 
     inner class NomenclatureTypeViewHolder(parent: ViewGroup) : AbstractViewHolder(
-        LayoutInflater.from(parent.context).inflate(
-            R.layout.view_action_nomenclature_type_select,
-            parent,
-            false
-        )
+        LayoutInflater.from(parent.context)
+            .inflate(
+                R.layout.view_action_nomenclature_type_select,
+                parent,
+                false
+            )
     ) {
         private var edit: TextInputLayout = itemView.findViewById(android.R.id.edit)
         private var nomenclatureAdapter = NomenclatureValueAdapter(parent.context)
@@ -242,10 +301,14 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                 it.setOnItemClickListener { _, _, position, _ ->
                     showDropdown = false
                     nomenclatureType?.run {
-                        value = PropertyValue.fromNomenclature(
-                            code,
-                            nomenclatureAdapter.getNomenclatureValue(position)
-                        )
+                        value = nomenclatureAdapter.getNomenclatureValue(position)
+                            .let { nomenclature ->
+                                PropertyValue.Nomenclature(
+                                    nomenclature.code,
+                                    nomenclature.defaultLabel,
+                                    nomenclature.id
+                                )
+                            }
                         listener.onUpdate(this)
                     }
                 }
@@ -278,11 +341,14 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                 setEndIconOnClickListener { setNomenclatureValues(nomenclatureType) }
                 (editText as? AutoCompleteTextView)?.apply {
                     setOnClickListener { setNomenclatureValues(nomenclatureType) }
-                    text = nomenclatureType.value?.let {
-                        Editable.Factory
-                            .getInstance()
-                            .newEditable(it.label ?: it.code)
-                    }
+                    text = nomenclatureType.value
+                        ?.takeIf { it is PropertyValue.Nomenclature }
+                        ?.let { it as PropertyValue.Nomenclature }
+                        ?.let {
+                            Editable.Factory
+                                .getInstance()
+                                .newEditable(it.label ?: it.code)
+                        }
                 }
             }
         }
@@ -304,11 +370,12 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
     }
 
     inner class MoreViewHolder(parent: ViewGroup) : AbstractViewHolder(
-        LayoutInflater.from(parent.context).inflate(
-            R.layout.view_action_more,
-            parent,
-            false
-        )
+        LayoutInflater.from(parent.context)
+            .inflate(
+                R.layout.view_action_more,
+                parent,
+                false
+            )
     ) {
         private var button1: Button = itemView.findViewById(android.R.id.button1)
 
@@ -324,11 +391,12 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
     }
 
     open inner class TextSimpleViewHolder(parent: ViewGroup) : AbstractViewHolder(
-        LayoutInflater.from(parent.context).inflate(
-            R.layout.view_action_edit_text,
-            parent,
-            false
-        )
+        LayoutInflater.from(parent.context)
+            .inflate(
+                R.layout.view_action_edit_text,
+                parent,
+                false
+            )
     ) {
         internal var edit: TextInputLayout = itemView.findViewById(android.R.id.edit)
         private val textWatcher = object : TextWatcher {
@@ -350,9 +418,11 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
 
             override fun afterTextChanged(s: Editable?) {
                 nomenclatureType?.run {
-                    value = PropertyValue.fromValue(
+                    value = PropertyValue.Text(
                         code,
-                        s?.toString()?.ifEmpty { null }?.ifBlank { null }
+                        s?.toString()
+                            ?.ifEmpty { null }
+                            ?.ifBlank { null }
                     )
                     listener.onUpdate(this)
                 }
@@ -396,13 +466,15 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                 hint = getNomenclatureTypeLabel(nomenclatureType.code)
             }
 
-            if (nomenclatureType.value?.value is String? && !(nomenclatureType.value?.value as String?).isNullOrEmpty()) {
-                edit.editText?.removeTextChangedListener(textWatcher)
-                edit.editText?.text = (nomenclatureType.value?.value as String?)?.let {
-                    Editable.Factory.getInstance().newEditable(it)
+            nomenclatureType.value
+                .takeIf { it is PropertyValue.Text && !it.isEmpty() }
+                ?.let { it as PropertyValue.Text }
+                ?.also {
+                    edit.editText?.removeTextChangedListener(textWatcher)
+                    edit.editText?.text = Editable.Factory.getInstance()
+                        .newEditable(it.value)
+                    edit.editText?.addTextChangedListener(textWatcher)
                 }
-                edit.editText?.addTextChangedListener(textWatcher)
-            }
         }
     }
 
@@ -419,11 +491,12 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
     }
 
     inner class MinMaxViewHolder(parent: ViewGroup) : AbstractViewHolder(
-        LayoutInflater.from(parent.context).inflate(
-            R.layout.view_action_min_max,
-            parent,
-            false
-        )
+        LayoutInflater.from(parent.context)
+            .inflate(
+                R.layout.view_action_min_max,
+                parent,
+                false
+            )
     ) {
         private val defaultMaxValueOffset = 50
         private var editMinLabel: TextView = itemView.findViewById(R.id.editMinLabel)
@@ -449,14 +522,14 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                     }
 
                     minNomenclatureType?.also { nomenclatureType ->
-                        nomenclatureType.value = PropertyValue.fromValue(
+                        nomenclatureType.value = PropertyValue.Number(
                             nomenclatureType.code,
                             newValue
                         )
                         listener.onUpdate(nomenclatureType)
                     }
                     maxNomenclatureType?.also { nomenclatureType ->
-                        nomenclatureType.value = PropertyValue.fromValue(
+                        nomenclatureType.value = PropertyValue.Number(
                             nomenclatureType.code,
                             editMaxPicker.value
                         )
@@ -474,14 +547,14 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                     if (editMinPicker.value > newValue) editMinPicker.value = newValue
 
                     minNomenclatureType?.also { nomenclatureType ->
-                        nomenclatureType.value = PropertyValue.fromValue(
+                        nomenclatureType.value = PropertyValue.Number(
                             nomenclatureType.code,
                             editMinPicker.value
                         )
                         listener.onUpdate(nomenclatureType)
                     }
                     maxNomenclatureType?.also { nomenclatureType ->
-                        nomenclatureType.value = PropertyValue.fromValue(
+                        nomenclatureType.value = PropertyValue.Number(
                             nomenclatureType.code,
                             newValue
                         )
@@ -495,7 +568,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
             minNomenclatureType =
                 selectedNomenclatureTypes.firstOrNull { it.viewType == EditableNomenclatureType.ViewType.MIN_MAX && it.code == CountingRecord.MIN_KEY }
             maxNomenclatureType =
-                selectedNomenclatureTypes.firstOrNull { it.viewType == EditableNomenclatureType.ViewType.MIN_MAX && it.code ==  CountingRecord.MAX_KEY }
+                selectedNomenclatureTypes.firstOrNull { it.viewType == EditableNomenclatureType.ViewType.MIN_MAX && it.code == CountingRecord.MAX_KEY }
 
             with(if (minNomenclatureType != null) View.VISIBLE else View.GONE) {
                 editMinLabel.visibility = this
@@ -507,25 +580,251 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                 editMaxPicker.visibility = this
             }
 
-            (minNomenclatureType?.value?.value as Number?)?.toInt()?.also {
-                if (it > editMinPicker.maxValue) {
-                    editMinPicker.maxValue =
-                        (ceil((it.toDouble() / defaultMaxValueOffset)) * defaultMaxValueOffset).toInt()
-                    editMaxPicker.maxValue = editMinPicker.maxValue
+            minNomenclatureType?.value?.takeIf { it is PropertyValue.Number }
+                ?.let { it as PropertyValue.Number }?.value?.toInt()
+                ?.also {
+                    if (it > editMinPicker.maxValue) {
+                        editMinPicker.maxValue =
+                            (ceil((it.toDouble() / defaultMaxValueOffset)) * defaultMaxValueOffset).toInt()
+                        editMaxPicker.maxValue = editMinPicker.maxValue
+                    }
+
+                    editMinPicker.value = it
                 }
 
-                editMinPicker.value = it
+            maxNomenclatureType?.value?.takeIf { it is PropertyValue.Number }
+                ?.let { it as PropertyValue.Number }?.value?.toInt()
+                ?.also {
+                    if (it > editMaxPicker.maxValue) {
+                        editMaxPicker.maxValue =
+                            (ceil((it.toDouble() / defaultMaxValueOffset)) * defaultMaxValueOffset).toInt()
+                        editMinPicker.maxValue = editMaxPicker.maxValue
+                    }
+
+                    editMaxPicker.value = it
+                }
+        }
+    }
+
+    inner class MediaViewHolder(parent: ViewGroup) : AbstractViewHolder(
+        LayoutInflater.from(parent.context)
+            .inflate(
+                R.layout.view_action_media,
+                parent,
+                false
+            )
+    ) {
+        private var title: TextView = itemView.findViewById(android.R.id.title)
+        private var recyclerView: RecyclerView = itemView.findViewById(android.R.id.list)
+        private var adapter: MediaAdapter = MediaAdapter()
+
+        init {
+            with(recyclerView) {
+                layoutManager = GridLayoutManager(
+                    context,
+                    2
+                )
+                adapter = this@MediaViewHolder.adapter
+            }
+        }
+
+        override fun onBind(nomenclatureType: EditableNomenclatureType) {
+            title.text = nomenclatureType.label ?: getNomenclatureTypeLabel(nomenclatureType.code)
+            adapter.setItems(nomenclatureType.value
+                .takeIf { it is PropertyValue.Media }
+                ?.let { it as PropertyValue.Media }?.value
+                ?.filterIsInstance<MediaRecord.File>()
+                ?.map { it.path }
+                ?.mapNotNull { runCatching { File(it) }.getOrNull() }
+                ?: emptyList())
+        }
+
+        private inner class MediaAdapter :
+            RecyclerView.Adapter<MediaAdapter.AbstractViewHolder>() {
+
+            private val items = mutableListOf<File>()
+
+            init {
+                this.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                    override fun onChanged() {
+                        super.onChanged()
+
+                        onUpdate()
+                    }
+
+                    override fun onItemRangeChanged(
+                        positionStart: Int,
+                        itemCount: Int
+                    ) {
+                        super.onItemRangeChanged(
+                            positionStart,
+                            itemCount
+                        )
+
+                        onUpdate()
+                    }
+
+                    override fun onItemRangeInserted(
+                        positionStart: Int,
+                        itemCount: Int
+                    ) {
+                        super.onItemRangeInserted(
+                            positionStart,
+                            itemCount
+                        )
+
+                        onUpdate()
+                    }
+
+                    override fun onItemRangeRemoved(
+                        positionStart: Int,
+                        itemCount: Int
+                    ) {
+                        super.onItemRangeRemoved(
+                            positionStart,
+                            itemCount
+                        )
+
+                        onUpdate()
+                    }
+                })
             }
 
-            (maxNomenclatureType?.value?.value as Number?)?.toInt()?.also {
-                if (it > editMaxPicker.maxValue) {
-                    editMaxPicker.maxValue =
-                        (ceil((it.toDouble() / defaultMaxValueOffset)) * defaultMaxValueOffset).toInt()
-                    editMinPicker.maxValue = editMaxPicker.maxValue
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AbstractViewHolder {
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(
+                        viewType,
+                        parent,
+                        false
+                    )
+
+                return when (viewType) {
+                    R.layout.list_item_media_add -> AddImageViewHolder(view)
+                    else -> ImageViewHolder(view)
+                }
+            }
+
+            override fun onBindViewHolder(holder: AbstractViewHolder, position: Int) {
+                holder.onBind(if ((itemCount - 1) == position) null else items[position])
+            }
+
+            override fun getItemCount(): Int {
+                return items.size + 1
+            }
+
+            override fun getItemViewType(position: Int): Int {
+                return if ((itemCount - 1) == position) R.layout.list_item_media_add
+                else R.layout.list_item_media_thumbnail
+            }
+
+            fun setItems(items: List<File>) {
+                val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+                    override fun getOldListSize(): Int {
+                        return this@MediaAdapter.items.size
+                    }
+
+                    override fun getNewListSize(): Int {
+                        return items.size
+                    }
+
+                    override fun areItemsTheSame(
+                        oldItemPosition: Int,
+                        newItemPosition: Int
+                    ): Boolean {
+                        return this@MediaAdapter.items[oldItemPosition] == items[newItemPosition]
+                    }
+
+                    override fun areContentsTheSame(
+                        oldItemPosition: Int,
+                        newItemPosition: Int
+                    ): Boolean {
+                        return this@MediaAdapter.items[oldItemPosition] == items[newItemPosition]
+                    }
+                })
+
+                with(this.items) {
+                    clear()
+                    addAll(items)
                 }
 
-                editMaxPicker.value = it
+                diffResult.dispatchUpdatesTo(this)
             }
+
+            fun onUpdate() {
+                nomenclatureType?.also {
+                    listener.onUpdate(it.apply {
+                        value = PropertyValue.Media(
+                            it.code,
+                            items.map { file -> MediaRecord.File(file.absolutePath) }
+                                .toTypedArray()
+                        )
+                    })
+                }
+            }
+
+            abstract inner class AbstractViewHolder(itemView: View) :
+                RecyclerView.ViewHolder(itemView) {
+
+                abstract fun onBind(file: File?)
+            }
+
+            inner class ImageViewHolder(itemView: View) : AbstractViewHolder(itemView) {
+                override fun onBind(file: File?) {
+                    itemView.findViewById<ShapeableImageView>(R.id.image)
+                        .apply {
+                            setImageURI(file?.toUri())
+                            setOnClickListener {
+                                file?.absolutePath?.also {
+                                    listener.onMediaSelected(MediaRecord.File(it))
+                                }
+                            }
+                            setOnLongClickListener {
+                                val currentPosition = items.indexOf(file)
+
+                                this@MediaAdapter.setItems(items.filter { it.absolutePath != file?.absolutePath })
+
+                                makeSnackbar(itemView.context.getString(R.string.counting_media_deleted))?.setAction(R.string.counting_media_action_undo) {
+                                    file?.also {
+                                        this@MediaAdapter.setItems(
+                                            items.toMutableList()
+                                                .apply {
+                                                    add(
+                                                        currentPosition,
+                                                        it
+                                                    )
+                                                })
+                                    }
+                                }
+                                    ?.show()
+
+                                true
+                            }
+                        }
+                }
+            }
+
+            inner class AddImageViewHolder(itemView: View) : AbstractViewHolder(itemView) {
+                override fun onBind(file: File?) {
+                    itemView.findViewById<MaterialButton>(android.R.id.button1)
+                        .setOnClickListener {
+                            nomenclatureType?.code?.also {
+                                listener.onAddMedia(it)
+                            }
+                        }
+                }
+            }
+        }
+
+        private fun makeSnackbar(
+            text: CharSequence,
+        ): Snackbar? {
+            val view = listener.getCoordinatorLayout() ?: return null
+
+            return Snackbar.make(
+                view,
+                text,
+                BaseTransientBottomBar.LENGTH_LONG
+            )
         }
     }
 
@@ -535,6 +834,8 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
     interface OnEditableNomenclatureTypeAdapter {
 
         fun getLifecycleOwner(): LifecycleOwner
+
+        fun getCoordinatorLayout(): CoordinatorLayout?
 
         /**
          * Whether to show an empty text view when data changed.
@@ -557,5 +858,15 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
          * @param editableNomenclatureType the [EditableNomenclatureType] updated
          */
         fun onUpdate(editableNomenclatureType: EditableNomenclatureType)
+
+        /**
+         * Called when we want to add media.
+         */
+        fun onAddMedia(nomenclatureTypeMnemonic: String)
+
+        /**
+         * Called when we want to show given media.
+         */
+        fun onMediaSelected(mediaRecord: MediaRecord.File)
     }
 }

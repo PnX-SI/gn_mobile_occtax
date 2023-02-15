@@ -97,7 +97,9 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
             intent.getParcelableExtra(EXTRA_OBSERVATION_RECORD) ?: ObservationRecord()
 
         Logger.info { "loading observation record: ${observationRecord.id}" }
+
         observationRecordViewModel.loadDefaultNomenclatureValues(observationRecord)
+        observationRecordViewModel.loadAllMedias(observationRecord)
 
         pageFragmentViewModel.set(
             R.string.pager_fragment_observers_and_date_input_title to ObserversAndDateInputFragment.newInstance(

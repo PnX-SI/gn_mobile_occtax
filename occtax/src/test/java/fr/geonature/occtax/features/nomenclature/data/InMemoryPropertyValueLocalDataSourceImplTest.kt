@@ -3,7 +3,7 @@ package fr.geonature.occtax.features.nomenclature.data
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.input.domain.PropertyValue
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -34,7 +34,10 @@ class InMemoryPropertyValueLocalDataSourceImplTest {
 
     @Test
     fun `should return an empty list if no property values was set`() = runTest {
-        assertTrue(propertyValueLocalDataSource.getPropertyValues().isEmpty())
+        assertTrue(
+            propertyValueLocalDataSource.getPropertyValues()
+                .isEmpty()
+        )
     }
 
     @Test
@@ -44,7 +47,7 @@ class InMemoryPropertyValueLocalDataSourceImplTest {
                 kingdom = Taxonomy.ANY,
                 group = Taxonomy.ANY
             ),
-            PropertyValue(
+            PropertyValue.Nomenclature(
                 code = "STATUT_BIO",
                 label = "Non renseigné",
                 value = 29L
@@ -55,7 +58,7 @@ class InMemoryPropertyValueLocalDataSourceImplTest {
                 kingdom = "Animalia",
                 group = "Oiseaux"
             ),
-            PropertyValue(
+            PropertyValue.Nomenclature(
                 code = "STATUT_BIO",
                 label = "Hibernation",
                 value = 33L
@@ -66,16 +69,15 @@ class InMemoryPropertyValueLocalDataSourceImplTest {
                 kingdom = "Animalia",
                 group = "Oiseaux"
             ),
-            PropertyValue(
+            PropertyValue.Text(
                 code = "DETERMINER",
-                label = null,
                 value = "some value"
             )
         )
 
         assertEquals(
             listOf(
-                PropertyValue(
+                PropertyValue.Nomenclature(
                     code = "STATUT_BIO",
                     label = "Non renseigné",
                     value = 29L
@@ -85,14 +87,13 @@ class InMemoryPropertyValueLocalDataSourceImplTest {
         )
         assertEquals(
             listOf(
-                PropertyValue(
+                PropertyValue.Nomenclature(
                     code = "STATUT_BIO",
                     label = "Hibernation",
                     value = 33L
                 ),
-                PropertyValue(
+                PropertyValue.Text(
                     code = "DETERMINER",
-                    label = null,
                     value = "some value"
                 )
             ),
@@ -112,7 +113,7 @@ class InMemoryPropertyValueLocalDataSourceImplTest {
                 kingdom = Taxonomy.ANY,
                 group = Taxonomy.ANY
             ),
-            PropertyValue(
+            PropertyValue.Nomenclature(
                 code = "STATUT_BIO",
                 label = "Non renseigné",
                 value = 29L
@@ -135,7 +136,7 @@ class InMemoryPropertyValueLocalDataSourceImplTest {
 
         assertEquals(
             listOf(
-                PropertyValue(
+                PropertyValue.Nomenclature(
                     code = "STATUT_BIO",
                     label = "Non renseigné",
                     value = 29L
@@ -152,14 +153,13 @@ class InMemoryPropertyValueLocalDataSourceImplTest {
                 kingdom = Taxonomy.ANY,
                 group = Taxonomy.ANY
             ),
-            PropertyValue(
+            PropertyValue.Nomenclature(
                 code = "STATUT_BIO",
                 label = "Non renseigné",
                 value = 29L
             ),
-            PropertyValue(
+            PropertyValue.Text(
                 "DETERMINER",
-                null,
                 "some_value"
             )
         )
@@ -173,7 +173,7 @@ class InMemoryPropertyValueLocalDataSourceImplTest {
 
         assertEquals(
             listOf(
-                PropertyValue(
+                PropertyValue.Nomenclature(
                     code = "STATUT_BIO",
                     label = "Non renseigné",
                     value = 29L
@@ -190,14 +190,13 @@ class InMemoryPropertyValueLocalDataSourceImplTest {
                 kingdom = Taxonomy.ANY,
                 group = Taxonomy.ANY
             ),
-            PropertyValue(
+            PropertyValue.Nomenclature(
                 code = "STATUT_BIO",
                 label = "Non renseigné",
                 value = 29L
             ),
-            PropertyValue(
+            PropertyValue.Text(
                 "DETERMINER",
-                null,
                 "some_value"
             )
         )
@@ -206,7 +205,7 @@ class InMemoryPropertyValueLocalDataSourceImplTest {
                 kingdom = "Animalia",
                 group = "Oiseaux"
             ),
-            PropertyValue(
+            PropertyValue.Nomenclature(
                 code = "STATUT_BIO",
                 label = "Hibernation",
                 value = 33L
@@ -214,6 +213,9 @@ class InMemoryPropertyValueLocalDataSourceImplTest {
         )
         propertyValueLocalDataSource.clearAllPropertyValues()
 
-        assertTrue(propertyValueLocalDataSource.getPropertyValues().isEmpty())
+        assertTrue(
+            propertyValueLocalDataSource.getPropertyValues()
+                .isEmpty()
+        )
     }
 }

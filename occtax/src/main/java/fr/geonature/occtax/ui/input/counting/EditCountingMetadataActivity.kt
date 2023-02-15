@@ -8,9 +8,9 @@ import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
-import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.CountingRecord
+import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.settings.PropertySettings
 
 /**
@@ -39,7 +39,13 @@ class EditCountingMetadataActivity : AppCompatActivity(),
             setDisplayHomeAsUpEnabled(true)
         }
 
-        countingRecord = intent.getParcelableExtra(EXTRA_COUNTING_RECORD) ?: CountingRecord()
+        val taxonRecord = intent.getParcelableExtra<TaxonRecord>(EXTRA_TAXON_RECORD) ?: run {
+            // TODO: show a toast message about missing taxon record
+            finish()
+            return
+        }
+
+        countingRecord = intent.getParcelableExtra(EXTRA_COUNTING_RECORD) ?: taxonRecord.counting.create()
 
         isNew = countingRecord.isEmpty()
         setTitle(if (countingRecord.isEmpty()) R.string.activity_counting_add_title else R.string.activity_counting_edit_title)
@@ -49,10 +55,7 @@ class EditCountingMetadataActivity : AppCompatActivity(),
                 .replace(
                     android.R.id.content,
                     EditCountingMetadataFragment.newInstance(
-                        intent.getParcelableExtra(EXTRA_TAXONOMY) ?: Taxonomy(
-                            Taxonomy.ANY,
-                            Taxonomy.ANY
-                        ),
+                        taxonRecord,
                         countingRecord,
                         *(intent.getParcelableArrayExtra(EXTRA_PROPERTIES)
                             ?.map { it as PropertySettings }
@@ -120,13 +123,13 @@ class EditCountingMetadataActivity : AppCompatActivity(),
 
     companion object {
 
-        const val EXTRA_TAXONOMY = "extra_taxonomy"
+        const val EXTRA_TAXON_RECORD = "extra_taxon_record"
         const val EXTRA_COUNTING_RECORD = "extra_counting_record"
         const val EXTRA_PROPERTIES = "extra_properties"
 
         fun newIntent(
             context: Context,
-            taxonomy: Taxonomy,
+            taxonRecord: TaxonRecord,
             countingRecord: CountingRecord? = null,
             vararg propertySettings: PropertySettings
         ): Intent {
@@ -135,8 +138,8 @@ class EditCountingMetadataActivity : AppCompatActivity(),
                 EditCountingMetadataActivity::class.java
             ).apply {
                 putExtra(
-                    EXTRA_TAXONOMY,
-                    taxonomy
+                    EXTRA_TAXON_RECORD,
+                    taxonRecord
                 )
                 countingRecord?.also {
                     putExtra(

@@ -6,10 +6,10 @@ import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSou
 import fr.geonature.commons.fp.Either
 import fr.geonature.commons.fp.Either.Left
 import fr.geonature.commons.fp.Either.Right
-import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureSettingsLocalDataSource
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.settings.PropertySettings
 import org.tinylog.Logger
 import fr.geonature.commons.features.nomenclature.repository.NomenclatureRepositoryImpl as BaseNomenclatureRepositoryImpl
@@ -68,9 +68,10 @@ class NomenclatureRepositoryImpl(
                 .map { editableNomenclature ->
                     editableNomenclature.copy(value = defaultNomenclatureValues.firstOrNull { it.type?.mnemonic == editableNomenclature.code }
                         ?.let {
-                            PropertyValue.fromNomenclature(
+                            PropertyValue.Nomenclature(
                                 editableNomenclature.code,
-                                it
+                                it.defaultLabel,
+                                it.id
                             )
                         } ?: editableNomenclature.value)
                 }

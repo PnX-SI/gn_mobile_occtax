@@ -7,10 +7,10 @@ import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSou
 import fr.geonature.commons.fp.identity
 import fr.geonature.commons.fp.orNull
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureSettingsLocalDataSource
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
@@ -156,7 +156,7 @@ class NomenclatureRepositoryTest {
                     label = "Statut biologique",
                     visible = false,
                     default = false,
-                    value = PropertyValue(
+                    value = PropertyValue.Nomenclature(
                         code = "STATUT_BIO",
                         label = "Non renseigné",
                         value = 29L

@@ -1,6 +1,8 @@
 package fr.geonature.occtax.ui.input.counting
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,10 +10,14 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -26,9 +32,13 @@ import fr.geonature.occtax.features.nomenclature.presentation.EditableNomenclatu
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
 import fr.geonature.occtax.features.record.domain.CountingRecord
+import fr.geonature.occtax.features.record.domain.MediaRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.settings.PropertySettings
+import kotlinx.coroutines.launch
+import okhttp3.internal.toImmutableList
+import org.tinylog.Logger
 
 /**
  * [Fragment] to let the user to edit additional counting information for the given [TaxonRecord].
@@ -41,10 +51,14 @@ class EditCountingMetadataFragment : Fragment() {
     private val nomenclatureViewModel: NomenclatureViewModel by viewModels()
     private val propertyValueModel: PropertyValueModel by viewModels()
 
-    private lateinit var taxonomy: Taxonomy
-    private lateinit var countingRecord: CountingRecord
     private lateinit var savedState: Bundle
+    private var taxonRecord: TaxonRecord? = null
+    private var countingRecord: CountingRecord? = null
 
+    private lateinit var mediaResultLauncher: ActivityResultLauncher<Intent>
+
+    private var takePhotoLifecycleObserver: TakePhotoLifecycleObserver? = null
+    private var content: CoordinatorLayout? = null
     private var fab: ExtendedFloatingActionButton? = null
 
     private var listener: OnEditCountingMetadataFragmentListener? = null
@@ -56,11 +70,9 @@ class EditCountingMetadataFragment : Fragment() {
         savedState = savedInstanceState ?: Bundle()
 
         arguments?.also {
-            taxonomy = it.getParcelable(ARG_TAXONOMY) ?: Taxonomy(
-                Taxonomy.ANY,
-                Taxonomy.ANY
-            )
-            countingRecord = it.getParcelable(ARG_COUNTING_RECORD) ?: CountingRecord()
+            taxonRecord = it.getParcelable(ARG_TAXON_RECORD)
+            countingRecord =
+                it.getParcelable(ARG_COUNTING_RECORD) ?: taxonRecord?.counting?.create()
         }
 
         with(nomenclatureViewModel) {
@@ -69,6 +81,34 @@ class EditCountingMetadataFragment : Fragment() {
                 ::handleEditableNomenclatureTypes
             )
         }
+
+        activity?.also {
+            takePhotoLifecycleObserver = TakePhotoLifecycleObserver(
+                it.applicationContext,
+                it.activityResultRegistry
+            ).apply {
+                lifecycle.addObserver(this)
+            }
+        }
+
+        mediaResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
+                if ((activityResult.resultCode != Activity.RESULT_OK) || (activityResult.data == null)) {
+                    return@registerForActivityResult
+                }
+
+                activityResult.data?.getParcelableExtra<CountingRecord>(MediaListActivity.EXTRA_COUNTING_RECORD)
+                    ?.also { countingRecord ->
+                        this.countingRecord = countingRecord
+
+                        adapter?.setPropertyValues(
+                            *(countingRecord.properties.values
+                                .filterNotNull()
+                                .filterNot { it.isEmpty() }
+                                .toTypedArray())
+                        )
+                    }
+            }
     }
 
     override fun onCreateView(
@@ -77,7 +117,7 @@ class EditCountingMetadataFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         return inflater.inflate(
-            R.layout.fragment_counting_edit,
+            R.layout.fragment_recycler_view_fab,
             container,
             false
         )
@@ -87,17 +127,31 @@ class EditCountingMetadataFragment : Fragment() {
         view: View,
         savedInstanceState: Bundle?
     ) {
+        content = view.findViewById(android.R.id.content)
+
         val recyclerView = view.findViewById<RecyclerView>(android.R.id.list)
         val emptyTextView = view.findViewById<TextView>(android.R.id.empty)
+            .apply {
+                setText(if (countingRecord == null) R.string.counting_not_found else R.string.information_no_data)
+            }
         val progressBar = view.findViewById<ProgressBar>(android.R.id.progress)
             .apply { visibility = View.VISIBLE }
 
-        fab = view.findViewById(R.id.fab)
-        fab?.apply {
-            setOnClickListener {
-                listener?.onSave(countingRecord)
+        fab = view.findViewById<ExtendedFloatingActionButton?>(R.id.fab)
+            ?.apply {
+                text = getString(R.string.action_save)
+                extend()
+
+                if (countingRecord == null) {
+                    hide()
+                }
+
+                setOnClickListener {
+                    countingRecord?.also {
+                        listener?.onSave(it)
+                    }
+                }
             }
-        }
 
         // Set the adapter
         adapter = EditableNomenclatureTypeAdapter(object :
@@ -105,6 +159,10 @@ class EditCountingMetadataFragment : Fragment() {
 
             override fun getLifecycleOwner(): LifecycleOwner {
                 return this@EditCountingMetadataFragment
+            }
+
+            override fun getCoordinatorLayout(): CoordinatorLayout? {
+                return this@EditCountingMetadataFragment.content
             }
 
             override fun showEmptyTextView(show: Boolean) {
@@ -148,20 +206,39 @@ class EditCountingMetadataFragment : Fragment() {
 
                 return nomenclatureViewModel.getNomenclatureValuesByTypeAndTaxonomy(
                     nomenclatureTypeMnemonic,
-                    taxonomy
+                    taxonRecord?.taxon?.taxonomy
                 )
             }
 
             override fun onUpdate(editableNomenclatureType: EditableNomenclatureType) {
-                toPropertyValue(editableNomenclatureType)
-                    ?.toPair()
+                val countingRecord = countingRecord ?: return
+
+                val updated = ((editableNomenclatureType.value?.takeIf { it is PropertyValue.Media }
+                    ?.let {
+                        it as PropertyValue.Media
+                    }?.value?.mapNotNull {
+                        when (it) {
+                            is MediaRecord.File -> it.path
+                            else -> null
+                        }
+                    } ?: emptyList()).toImmutableList()
+                    .sorted() != countingRecord.medias.files.sorted()
+                    )
+
+                editableNomenclatureType.value?.toPair()
                     .also {
                         if (it == null) countingRecord.properties.remove(editableNomenclatureType.code)
                         else countingRecord.properties[it.first] = it.second
                     }
 
-                listener?.onCountingRecord(countingRecord)
+                if (updated) {
+                    listener?.onCountingRecord(countingRecord)
+                }
 
+                val taxonomy = taxonRecord?.taxon?.taxonomy ?: Taxonomy(
+                    Taxonomy.ANY,
+                    Taxonomy.ANY
+                )
                 val propertyValue = editableNomenclatureType.value
 
                 if (propertyValue !== null && editableNomenclatureType.locked) propertyValueModel.setPropertyValue(
@@ -171,6 +248,67 @@ class EditCountingMetadataFragment : Fragment() {
                     taxonomy,
                     editableNomenclatureType.code
                 )
+            }
+
+            override fun onAddMedia(nomenclatureTypeMnemonic: String) {
+                val context = context ?: run {
+                    Logger.warn { "missing context to pick media: abort" }
+                    null
+                } ?: return
+                val taxonRecord = taxonRecord ?: run {
+                    Logger.warn { "missing taxon record argument: abort" }
+                    null
+                } ?: return
+                val countingRecord = countingRecord ?: run {
+                    Logger.warn { "missing counting record: abort" }
+                    null
+                } ?: return
+
+                // workaround to force hide the soft keyboard
+                view.rootView?.also {
+                    hideSoftKeyboard(it)
+                }
+
+                AddPhotoBottomSheetDialogFragment().apply {
+                    setOnAddPhotoBottomSheetDialogFragmentListener(object :
+                        AddPhotoBottomSheetDialogFragment.OnAddPhotoBottomSheetDialogFragmentListener {
+                        override fun onSelectMenuItem(menuItem: AddPhotoBottomSheetDialogFragment.MenuItem) {
+                            lifecycleScope.launch {
+                                val imageFile =
+                                    takePhotoLifecycleObserver?.invoke(
+                                        if (menuItem.iconResourceId == R.drawable.ic_add_photo) TakePhotoLifecycleObserver.ImagePicker.CAMERA else TakePhotoLifecycleObserver.ImagePicker.GALLERY,
+                                        taxonRecord.counting.mediaBasePath(
+                                            context,
+                                            countingRecord
+                                        ).absolutePath
+                                    )
+
+                                if (imageFile != null) {
+                                    Logger.info { "add image from file '${imageFile.absolutePath}'" }
+
+                                    countingRecord.medias.addFile(imageFile.absolutePath)
+
+                                    adapter?.setPropertyValues(
+                                        *(countingRecord.properties.values
+                                            .filterNotNull()
+                                            .filterNot { it.isEmpty() }
+                                            .toTypedArray())
+                                    )
+                                }
+
+                                dismiss()
+                            }
+                        }
+                    })
+                }
+                    .show(
+                        childFragmentManager,
+                        ADD_PHOTO_DIALOG_FRAGMENT
+                    )
+            }
+
+            override fun onMediaSelected(mediaRecord: MediaRecord.File) {
+                launchMediaActivity(mediaRecord)
             }
         })
 
@@ -193,77 +331,71 @@ class EditCountingMetadataFragment : Fragment() {
     }
 
     private fun loadNomenclatureTypes() {
+        val taxonRecord = taxonRecord ?: run {
+            Logger.warn { "missing taxon record argument: abort" }
+            null
+        } ?: return
+
         nomenclatureViewModel.getEditableNomenclatures(
             EditableNomenclatureType.Type.COUNTING,
             (arguments?.getParcelableArray(ARG_PROPERTIES)
                 ?.map { it as PropertySettings }
                 ?.toList() ?: emptyList()),
-            taxonomy
+            taxonRecord.taxon.taxonomy
         )
     }
 
     private fun handleEditableNomenclatureTypes(editableNomenclatureTypes: List<EditableNomenclatureType>) {
         editableNomenclatureTypes.filter { it.value != null }
             .forEach {
-                if (countingRecord.properties.containsKey(it.code)) return@forEach
+                if (countingRecord?.properties?.containsKey(it.code) == true) return@forEach
 
-                toPropertyValue(it)?.toPair()
+                it.value?.toPair()
                     .also { pair ->
-                        if (pair == null) countingRecord.properties.remove(it.code)
-                        else countingRecord.properties[pair.first] = pair.second
+                        if (pair == null) countingRecord?.properties?.remove(it.code)
+                        else countingRecord?.properties?.set(
+                            pair.first,
+                            pair.second
+                        )
                     }
             }
 
         adapter?.bind(
             editableNomenclatureTypes,
-            *(countingRecord.properties.values.filterNotNull()
-                .map {
-                    it.toPair()
-                }
-                .mapNotNull {
-                    when (it.second) {
-                        is PropertyValue.Number -> fr.geonature.occtax.features.input.domain.PropertyValue.fromValue(
-                            it.first,
-                            (it.second as PropertyValue.Number).value
-                        )
-                        is PropertyValue.Text -> fr.geonature.occtax.features.input.domain.PropertyValue.fromValue(
-                            it.first,
-                            (it.second as PropertyValue.Text).value
-                        )
-                        is PropertyValue.Nomenclature -> fr.geonature.occtax.features.input.domain.PropertyValue(
-                            it.first,
-                            (it.second as PropertyValue.Nomenclature).label,
-                            (it.second as PropertyValue.Nomenclature).value
-                        )
-                        else -> null
-                    }
-                }
-                .toTypedArray())
+            *(countingRecord?.properties?.values
+                ?.filterNotNull()
+                ?.filterNot { it.isEmpty() }
+                ?.toTypedArray() ?: emptyArray())
         )
     }
 
-    private fun toPropertyValue(editableNomenclatureType: EditableNomenclatureType): PropertyValue? {
-        return editableNomenclatureType.value?.let {
-            when (it.value) {
-                is Long -> if (it.label.isNullOrEmpty()) PropertyValue.Number(
-                    editableNomenclatureType.code,
-                    it.value
-                ) else PropertyValue.Nomenclature(
-                    editableNomenclatureType.code,
-                    it.label,
-                    it.value
-                )
-                is Number -> PropertyValue.Number(
-                    editableNomenclatureType.code,
-                    it.value
-                )
-                is String -> PropertyValue.Text(
-                    editableNomenclatureType.code,
-                    it.value
-                )
-                else -> null
-            }
-        }
+    private fun launchMediaActivity(selectedMedia: MediaRecord? = null) {
+        val context = context ?: run {
+            Logger.warn { "missing context to launch activity '${MediaListActivity::class.java.simpleName}': abort" }
+            null
+        } ?: return
+        val taxonRecord = taxonRecord ?: run {
+            Logger.warn { "missing taxon record argument: abort" }
+            null
+        } ?: return
+        val countingRecord = countingRecord ?: run {
+            Logger.warn { "missing counting record: abort" }
+            null
+        } ?: return
+
+        mediaResultLauncher.launch(
+            MediaListActivity.newIntent(
+                context,
+                taxonRecord,
+                countingRecord,
+                selectedMedia?.let {
+                    when (it) {
+                        is MediaRecord.File -> it.path
+                        else -> null
+                    }
+                }
+            )
+        )
     }
 
     /**
@@ -276,10 +408,11 @@ class EditCountingMetadataFragment : Fragment() {
 
     companion object {
 
-        const val ARG_TAXONOMY = "arg_taxonomy"
+        const val ARG_TAXON_RECORD = "arg_taxon_record"
         const val ARG_COUNTING_RECORD = "arg_counting_record"
         const val ARG_PROPERTIES = "arg_properties"
 
+        private const val ADD_PHOTO_DIALOG_FRAGMENT = "add_photo_dialog_fragment"
         private const val KEY_SHOW_ALL_NOMENCLATURE_TYPES = "show_all_nomenclature_types"
 
         /**
@@ -289,14 +422,14 @@ class EditCountingMetadataFragment : Fragment() {
          */
         @JvmStatic
         fun newInstance(
-            taxonomy: Taxonomy,
+            taxonRecord: TaxonRecord,
             countingRecord: CountingRecord? = null,
             vararg propertySettings: PropertySettings
         ) = EditCountingMetadataFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(
-                    ARG_TAXONOMY,
-                    taxonomy
+                    ARG_TAXON_RECORD,
+                    taxonRecord
                 )
                 countingRecord?.also {
                     putParcelable(

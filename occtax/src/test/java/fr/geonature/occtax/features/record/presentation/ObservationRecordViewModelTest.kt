@@ -9,6 +9,7 @@ import fr.geonature.occtax.features.record.error.ObservationRecordException
 import fr.geonature.occtax.features.record.usecase.DeleteObservationRecordUseCase
 import fr.geonature.occtax.features.record.usecase.ExportObservationRecordUseCase
 import fr.geonature.occtax.features.record.usecase.GetAllObservationRecordsUseCase
+import fr.geonature.occtax.features.record.usecase.LoadAllMediaRecordUseCase
 import fr.geonature.occtax.features.record.usecase.SaveObservationRecordUseCase
 import fr.geonature.occtax.features.record.usecase.SetDefaultNomenclatureValuesUseCase
 import io.mockk.MockKAnnotations.init
@@ -52,6 +53,9 @@ class ObservationRecordViewModelTest {
     private lateinit var setDefaultNomenclatureValuesUseCase: SetDefaultNomenclatureValuesUseCase
 
     @RelaxedMockK
+    private lateinit var allMediaRecordUseCase: LoadAllMediaRecordUseCase
+
+    @RelaxedMockK
     private lateinit var deleteObservationRecordUseCase: DeleteObservationRecordUseCase
 
     @RelaxedMockK
@@ -76,6 +80,7 @@ class ObservationRecordViewModelTest {
             getAllObservationRecordsUseCase,
             saveObservationRecordUseCase,
             setDefaultNomenclatureValuesUseCase,
+            allMediaRecordUseCase,
             deleteObservationRecordUseCase,
             exportObservationRecordUseCase
         )

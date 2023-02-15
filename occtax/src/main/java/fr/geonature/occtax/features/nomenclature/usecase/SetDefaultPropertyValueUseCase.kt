@@ -5,7 +5,7 @@ import fr.geonature.commons.error.Failure
 import fr.geonature.commons.fp.Either
 import fr.geonature.commons.interactor.BaseUseCase
 import fr.geonature.occtax.features.nomenclature.repository.IDefaultPropertyValueRepository
-import fr.geonature.occtax.features.input.domain.PropertyValue
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import javax.inject.Inject
 
 /**

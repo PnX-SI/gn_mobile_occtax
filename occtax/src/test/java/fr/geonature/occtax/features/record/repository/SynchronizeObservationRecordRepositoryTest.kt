@@ -1,11 +1,14 @@
 package fr.geonature.occtax.features.record.repository
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.core.app.ApplicationProvider
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
+import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSource
 import fr.geonature.commons.settings.IAppSettingsManager
 import fr.geonature.commons.settings.error.AppSettingsException
 import fr.geonature.commons.util.add
+import fr.geonature.datasync.api.IGeoNatureAPIClient
 import fr.geonature.datasync.api.model.AuthLogin
 import fr.geonature.datasync.api.model.AuthUser
 import fr.geonature.datasync.auth.IAuthManager
@@ -14,7 +17,8 @@ import fr.geonature.datasync.packageinfo.ISynchronizeObservationRecordRepository
 import fr.geonature.datasync.settings.DataSyncSettings
 import fr.geonature.datasync.settings.error.DataSyncSettingsNotFoundException
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.record.data.IObservationRecordDataSource
+import fr.geonature.occtax.features.record.data.IMediaRecordLocalDataSource
+import fr.geonature.occtax.features.record.data.IObservationRecordLocalDataSource
 import fr.geonature.occtax.features.record.data.IObservationRecordRemoteDataSource
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
@@ -35,6 +39,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 import java.util.Calendar
 import java.util.Date
 
@@ -44,6 +50,7 @@ import java.util.Date
  * @author S. Grimault
  */
 @ExperimentalCoroutinesApi
+@RunWith(RobolectricTestRunner::class)
 class SynchronizeObservationRecordRepositoryTest {
 
     @get:Rule
@@ -56,13 +63,22 @@ class SynchronizeObservationRecordRepositoryTest {
     private lateinit var authManager: IAuthManager
 
     @MockK
+    private lateinit var geoNatureAPIClient: IGeoNatureAPIClient
+
+    @MockK
     private lateinit var appSettingsManager: IAppSettingsManager<AppSettings>
 
     @MockK
-    private lateinit var observationRecordDataSource: IObservationRecordDataSource
+    private lateinit var nomenclatureLocalDataSource: INomenclatureLocalDataSource
+
+    @MockK
+    private lateinit var observationRecordLocalDataSource: IObservationRecordLocalDataSource
 
     @MockK
     private lateinit var observationRecordRemoteDataSource: IObservationRecordRemoteDataSource
+
+    @MockK
+    private lateinit var mediaRecordLocalDataSource: IMediaRecordLocalDataSource
 
     private lateinit var synchronizeObservationRecordRepository: ISynchronizeObservationRecordRepository
 
@@ -71,10 +87,14 @@ class SynchronizeObservationRecordRepositoryTest {
         init(this)
 
         synchronizeObservationRecordRepository = SynchronizeObservationRecordRepositoryImpl(
+            ApplicationProvider.getApplicationContext(),
+            geoNatureAPIClient,
             authManager,
             appSettingsManager,
-            observationRecordDataSource,
-            observationRecordRemoteDataSource
+            nomenclatureLocalDataSource,
+            observationRecordLocalDataSource,
+            observationRecordRemoteDataSource,
+            mediaRecordLocalDataSource
         )
     }
 
@@ -201,7 +221,7 @@ class SynchronizeObservationRecordRepositoryTest {
             } returns Unit
 
             // and an existing observation record with wrong status
-            coEvery { observationRecordDataSource.read(1240L) } returns ObservationRecord(internalId = 1240L).apply {
+            coEvery { observationRecordLocalDataSource.read(1240L) } returns ObservationRecord(internalId = 1240L).apply {
                 comment.comment = "some comment"
                 taxa.add(
                     Taxon(
@@ -298,7 +318,7 @@ class SynchronizeObservationRecordRepositoryTest {
                         }
                 }
         }
-        coEvery { observationRecordDataSource.read(1240L) } returns expectedObservationRecordToSend
+        coEvery { observationRecordLocalDataSource.read(1240L) } returns expectedObservationRecordToSend
         coEvery {
             observationRecordRemoteDataSource.sendObservationRecord(
                 any(),
@@ -312,7 +332,7 @@ class SynchronizeObservationRecordRepositoryTest {
             )
         } answers { firstArg() }
         coEvery { observationRecordRemoteDataSource.deleteObservationRecord(any()) } returns Unit
-        coEvery { observationRecordDataSource.delete(expectedObservationRecordToSend.internalId) } returns expectedObservationRecordToSend
+        coEvery { observationRecordLocalDataSource.delete(expectedObservationRecordToSend.internalId) } returns expectedObservationRecordToSend
 
         // when trying to synchronize an observation record from ID
         val result = synchronizeObservationRecordRepository(1240L)
@@ -321,7 +341,7 @@ class SynchronizeObservationRecordRepositoryTest {
         assertTrue(result.isSuccess)
         coVerifySequence {
             observationRecordRemoteDataSource.setBaseUrl(appSettings.dataSyncSettings?.geoNatureServerUrl!!)
-            observationRecordDataSource.read(expectedObservationRecordToSend.internalId)
+            observationRecordLocalDataSource.read(expectedObservationRecordToSend.internalId)
             observationRecordRemoteDataSource.sendObservationRecord(
                 expectedObservationRecordToSend,
                 appSettings
@@ -330,12 +350,12 @@ class SynchronizeObservationRecordRepositoryTest {
                 expectedObservationRecordToSend.copy(id = 1234L),
                 appSettings
             )
-            observationRecordDataSource.delete(expectedObservationRecordToSend.internalId)
+            observationRecordLocalDataSource.delete(expectedObservationRecordToSend.internalId)
         }
         coVerify(inverse = true) {
             observationRecordRemoteDataSource.deleteObservationRecord(any())
         }
-        confirmVerified(observationRecordDataSource)
+        confirmVerified(observationRecordLocalDataSource)
         confirmVerified(observationRecordRemoteDataSource)
     }
 
@@ -406,7 +426,7 @@ class SynchronizeObservationRecordRepositoryTest {
                 }
         }
 
-        coEvery { observationRecordDataSource.read(1240L) } returns expectedObservationRecordToSend
+        coEvery { observationRecordLocalDataSource.read(1240L) } returns expectedObservationRecordToSend
         coEvery {
             observationRecordRemoteDataSource.sendObservationRecord(
                 any(),
@@ -436,7 +456,7 @@ class SynchronizeObservationRecordRepositoryTest {
         )
         coVerifySequence {
             observationRecordRemoteDataSource.setBaseUrl(appSettings.dataSyncSettings?.geoNatureServerUrl!!)
-            observationRecordDataSource.read(expectedObservationRecordToSend.internalId)
+            observationRecordLocalDataSource.read(expectedObservationRecordToSend.internalId)
             observationRecordRemoteDataSource.sendObservationRecord(
                 expectedObservationRecordToSend,
                 appSettings
@@ -448,9 +468,9 @@ class SynchronizeObservationRecordRepositoryTest {
             observationRecordRemoteDataSource.deleteObservationRecord(expectedObservationRecordToSend.copy(id = 1234L))
         }
         coVerify(inverse = true) {
-            observationRecordDataSource.delete(expectedObservationRecordToSend.internalId)
+            observationRecordLocalDataSource.delete(expectedObservationRecordToSend.internalId)
         }
-        confirmVerified(observationRecordDataSource)
+        confirmVerified(observationRecordLocalDataSource)
         confirmVerified(observationRecordRemoteDataSource)
     }
 }

@@ -3,7 +3,7 @@ package fr.geonature.occtax.features.nomenclature.repository
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.error.Failure
 import fr.geonature.commons.fp.Either
-import fr.geonature.occtax.features.input.domain.PropertyValue
+import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
  * Default [PropertyValue] repository.

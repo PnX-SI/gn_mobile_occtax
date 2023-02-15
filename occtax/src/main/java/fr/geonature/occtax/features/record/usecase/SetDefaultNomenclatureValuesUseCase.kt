@@ -26,17 +26,7 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
         val defaultNomenclatureValues =
             nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.DEFAULT)
                 .getOrElse { emptyList() }
-                .mapNotNull { editableNomenclatureType ->
-                    editableNomenclatureType.value?.let {
-                        if (it.label.isNullOrEmpty() || it.value == null) return@let null
-
-                        PropertyValue.Nomenclature(
-                            code = editableNomenclatureType.code,
-                            label = it.label,
-                            value = it.value as Long
-                        )
-                    }
-                }
+                .mapNotNull { it.value }
 
         defaultNomenclatureValues.map { it.toPair() }
             .forEach {
