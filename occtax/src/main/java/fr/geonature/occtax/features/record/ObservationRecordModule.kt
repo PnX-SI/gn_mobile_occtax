@@ -7,16 +7,22 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import fr.geonature.commons.data.GeoNatureModuleName
+import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSource
 import fr.geonature.commons.features.taxon.data.ITaxonLocalDataSource
 import fr.geonature.commons.settings.IAppSettingsManager
+import fr.geonature.datasync.api.IGeoNatureAPIClient
 import fr.geonature.datasync.auth.IAuthManager
 import fr.geonature.datasync.packageinfo.ISynchronizeObservationRecordRepository
 import fr.geonature.occtax.api.IOcctaxAPIClient
-import fr.geonature.occtax.features.record.data.IObservationRecordDataSource
+import fr.geonature.occtax.features.record.data.IMediaRecordLocalDataSource
+import fr.geonature.occtax.features.record.data.IObservationRecordLocalDataSource
 import fr.geonature.occtax.features.record.data.IObservationRecordRemoteDataSource
-import fr.geonature.occtax.features.record.data.ObservationRecordDataSourceImpl
+import fr.geonature.occtax.features.record.data.MediaRecordLocalDataSourceImpl
+import fr.geonature.occtax.features.record.data.ObservationRecordLocalDataSourceImpl
 import fr.geonature.occtax.features.record.data.ObservationRecordRemoteDataSourceImpl
+import fr.geonature.occtax.features.record.repository.IMediaRecordRepository
 import fr.geonature.occtax.features.record.repository.IObservationRecordRepository
+import fr.geonature.occtax.features.record.repository.MediaRecordRepositoryImpl
 import fr.geonature.occtax.features.record.repository.ObservationRecordRepositoryImpl
 import fr.geonature.occtax.features.record.repository.SynchronizeObservationRecordRepositoryImpl
 import fr.geonature.occtax.settings.AppSettings
@@ -36,8 +42,8 @@ object ObservationRecordModule {
     fun provideObservationRecordLocalDataSource(
         @ApplicationContext appContext: Context,
         @GeoNatureModuleName moduleName: String
-    ): IObservationRecordDataSource {
-        return ObservationRecordDataSourceImpl(
+    ): IObservationRecordLocalDataSource {
+        return ObservationRecordLocalDataSourceImpl(
             appContext,
             moduleName
         )
@@ -51,29 +57,49 @@ object ObservationRecordModule {
 
     @Singleton
     @Provides
+    fun provideMediaRecordLocalDataSource(@ApplicationContext appContext: Context): IMediaRecordLocalDataSource {
+        return MediaRecordLocalDataSourceImpl(appContext)
+    }
+
+    @Singleton
+    @Provides
     fun provideObservationRecordRepository(
-        observationRecordDataSource: IObservationRecordDataSource,
+        observationRecordLocalDataSource: IObservationRecordLocalDataSource,
         taxonLocalDataSource: ITaxonLocalDataSource
     ): IObservationRecordRepository {
         return ObservationRecordRepositoryImpl(
-            observationRecordDataSource,
+            observationRecordLocalDataSource,
             taxonLocalDataSource
         )
     }
 
     @Singleton
     @Provides
+    fun provideMediaRecordRepository(mediaRecordLocalDataSource: IMediaRecordLocalDataSource): IMediaRecordRepository {
+        return MediaRecordRepositoryImpl(mediaRecordLocalDataSource)
+    }
+
+    @Singleton
+    @Provides
     fun provideSynchronizeObservationRecordRepository(
+        @ApplicationContext appContext: Context,
+        geoNatureAPIClient: IGeoNatureAPIClient,
         authManager: IAuthManager,
         appSettingsManager: IAppSettingsManager<AppSettings>,
-        observationRecordDataSource: IObservationRecordDataSource,
-        observationRecordRemoteDataSource: IObservationRecordRemoteDataSource
+        nomenclatureLocalDataSource: INomenclatureLocalDataSource,
+        observationRecordLocalDataSource: IObservationRecordLocalDataSource,
+        observationRecordRemoteDataSource: IObservationRecordRemoteDataSource,
+        mediaRecordLocalDataSource: IMediaRecordLocalDataSource
     ): ISynchronizeObservationRecordRepository {
         return SynchronizeObservationRecordRepositoryImpl(
+            appContext,
+            geoNatureAPIClient,
             authManager,
             appSettingsManager,
-            observationRecordDataSource,
-            observationRecordRemoteDataSource
+            nomenclatureLocalDataSource,
+            observationRecordLocalDataSource,
+            observationRecordRemoteDataSource,
+            mediaRecordLocalDataSource
         )
     }
 }

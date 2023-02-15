@@ -6,7 +6,7 @@ import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.lifecycle.BaseViewModel
 import fr.geonature.occtax.features.nomenclature.usecase.ClearDefaultPropertyValueUseCase
 import fr.geonature.occtax.features.nomenclature.usecase.SetDefaultPropertyValueUseCase
-import fr.geonature.occtax.features.input.domain.PropertyValue
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import javax.inject.Inject
 
 /**

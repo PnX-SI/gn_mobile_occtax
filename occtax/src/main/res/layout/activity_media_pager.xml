@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+        <fr.geonature.viewpager.ui.UnderlinePagerIndicator
+            android:id="@+id/indicator"
+            android:layout_width="match_parent"
+            android:layout_height="4dp" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal" />
+
+            <TextView
+                android:id="@android:id/empty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/counting_media_no_data"
+                android:textAlignment="center"
+                android:visibility="gone" />
+
+            <ProgressBar
+                android:id="@android:id/progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/fabs_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:orientation="vertical"
+        app:layout_dodgeInsetEdges="bottom">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_photo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginHorizontal="@dimen/padding_default"
+            android:layout_marginBottom="@dimen/padding_default"
+            android:clickable="true"
+            android:contentDescription="@string/counting_media_action_add_from_photo_hint"
+            android:focusable="true"
+            android:tooltipText="@string/counting_media_action_add_from_photo_hint"
+            android:visibility="invisible"
+            app:backgroundTint="?attr/colorOnPrimarySurface"
+            app:elevation="@dimen/fab_elevation"
+            app:fabSize="mini"
+            app:srcCompat="@drawable/ic_add_photo"
+            app:tint="?attr/editTextColor" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_gallery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginHorizontal="@dimen/padding_default"
+            android:layout_marginBottom="@dimen/padding_default"
+            android:clickable="true"
+            android:contentDescription="@string/counting_media_action_add_from_gallery_hint"
+            android:focusable="true"
+            android:tooltipText="@string/counting_media_action_add_from_gallery_hint"
+            android:visibility="invisible"
+            app:backgroundTint="?attr/colorOnPrimarySurface"
+            app:elevation="@dimen/fab_elevation"
+            app:fabSize="mini"
+            app:srcCompat="@drawable/ic_image"
+            app:tint="?attr/editTextColor" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/padding_default"
+            android:layout_marginBottom="@dimen/padding_default"
+            android:clickable="true"
+            android:contentDescription="@string/counting_media_action_add_hint"
+            android:focusable="true"
+            app:elevation="@dimen/fab_elevation"
+            app:srcCompat="@drawable/ic_add" />
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

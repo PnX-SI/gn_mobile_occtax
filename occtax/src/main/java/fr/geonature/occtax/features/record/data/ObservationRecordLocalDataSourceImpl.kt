@@ -22,15 +22,15 @@ import org.tinylog.Logger
 import java.io.File
 
 /**
- * Default implementation of [IObservationRecordDataSource] using [SharedPreferences].
+ * Default implementation of [IObservationRecordLocalDataSource] using [SharedPreferences].
  *
  * @author S. Grimault
  */
-class ObservationRecordDataSourceImpl(
+class ObservationRecordLocalDataSourceImpl(
     private val context: Context,
     private val geoNatureModuleName: String,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
-) : IObservationRecordDataSource {
+) : IObservationRecordLocalDataSource {
 
     private val preferenceManager: SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(context)
@@ -142,6 +142,11 @@ class ObservationRecordDataSourceImpl(
             )
                 .takeIf { it.exists() }
                 ?.delete()
+            File(
+                FileUtils.getInputsFolder(context),
+                "$id"
+            ).takeIf { it.exists() }
+                ?.deleteRecursively()
 
             if (preferenceManager.contains(buildInputPreferenceKey(id))) {
                 val deleted = preferenceManager

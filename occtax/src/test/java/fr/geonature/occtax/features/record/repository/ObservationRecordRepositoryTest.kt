@@ -5,7 +5,7 @@ import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.features.taxon.data.ITaxonLocalDataSource
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.record.data.IObservationRecordDataSource
+import fr.geonature.occtax.features.record.data.IObservationRecordLocalDataSource
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.error.ObservationRecordException
@@ -37,7 +37,7 @@ class ObservationRecordRepositoryTest {
     val coroutineTestRule = CoroutineTestRule()
 
     @MockK
-    private lateinit var observationRecordDataSource: IObservationRecordDataSource
+    private lateinit var observationRecordLocalDataSource: IObservationRecordLocalDataSource
 
     @MockK
     private lateinit var taxonLocalDataSource: ITaxonLocalDataSource
@@ -74,7 +74,7 @@ class ObservationRecordRepositoryTest {
         init(this)
 
         observationRecordRepository = ObservationRecordRepositoryImpl(
-            observationRecordDataSource,
+            observationRecordLocalDataSource,
             taxonLocalDataSource
         )
     }
@@ -83,7 +83,7 @@ class ObservationRecordRepositoryTest {
     fun `should return an empty list when reading undefined observation records`() =
         runTest {
             // given an empty list from data source
-            coEvery { observationRecordDataSource.readAll() } returns emptyList()
+            coEvery { observationRecordLocalDataSource.readAll() } returns emptyList()
             coEvery { taxonLocalDataSource.findTaxaByIds(any()) } returns taxaFromLocalDataSource
 
             // when reading non existing observation records
@@ -106,7 +106,7 @@ class ObservationRecordRepositoryTest {
                 ObservationRecord(internalId = 1235),
                 ObservationRecord(internalId = 1236),
             )
-            coEvery { observationRecordDataSource.readAll() } returns observationRecords
+            coEvery { observationRecordLocalDataSource.readAll() } returns observationRecords
             coEvery { taxonLocalDataSource.findTaxaByIds() } returns emptyList()
 
             // when reading these observation records from repository
@@ -126,7 +126,7 @@ class ObservationRecordRepositoryTest {
     fun `should read existing observation record`() =
         runTest {
             val observationRecord = ObservationRecord(internalId = 1234)
-            coEvery { observationRecordDataSource.read(observationRecord.internalId) } returns observationRecord
+            coEvery { observationRecordLocalDataSource.read(observationRecord.internalId) } returns observationRecord
             coEvery { taxonLocalDataSource.findTaxaByIds() } returns emptyList()
 
             // when reading existing observation record from repository
@@ -169,7 +169,7 @@ class ObservationRecordRepositoryTest {
                             }
                     }
             }
-            coEvery { observationRecordDataSource.read(observationRecord.internalId) } returns observationRecord
+            coEvery { observationRecordLocalDataSource.read(observationRecord.internalId) } returns observationRecord
             coEvery { taxonLocalDataSource.findTaxaByIds(any()) } returns taxaFromLocalDataSource
 
             // when reading existing observation record from repository
@@ -192,7 +192,7 @@ class ObservationRecordRepositoryTest {
     @Test
     fun `should return a NotFoundException failure if trying to read an undefined observation record`() =
         runTest {
-            coEvery { observationRecordDataSource.read(any()) } answers { throw ObservationRecordException.NotFoundException(firstArg()) }
+            coEvery { observationRecordLocalDataSource.read(any()) } answers { throw ObservationRecordException.NotFoundException(firstArg()) }
 
             // when reading a non existing observation record from repository
             val result = observationRecordRepository.read(1234)
@@ -205,7 +205,7 @@ class ObservationRecordRepositoryTest {
     @Test
     fun `should return a ReadException failure if failed to read an existing observation record`() =
         runTest {
-            coEvery { observationRecordDataSource.read(any()) } answers { throw ObservationRecordException.ReadException(firstArg()) }
+            coEvery { observationRecordLocalDataSource.read(any()) } answers { throw ObservationRecordException.ReadException(firstArg()) }
 
             // when reading a non existing observation record from repository
             val result = observationRecordRepository.read(1234)
@@ -218,7 +218,7 @@ class ObservationRecordRepositoryTest {
     @Test
     fun `should save an observation record`() =
         runTest {
-            coEvery { observationRecordDataSource.save(any()) } answers { firstArg() }
+            coEvery { observationRecordLocalDataSource.save(any()) } answers { firstArg() }
 
             // when saving an observation record
             val observationRecordToSave = ObservationRecord(internalId = 1234)
@@ -226,7 +226,7 @@ class ObservationRecordRepositoryTest {
 
             // then
             assertTrue(result.isSuccess)
-            coVerify { observationRecordDataSource.save(observationRecordToSave) }
+            coVerify { observationRecordLocalDataSource.save(observationRecordToSave) }
             assertEquals(
                 observationRecordToSave,
                 result.getOrNull()
@@ -236,7 +236,7 @@ class ObservationRecordRepositoryTest {
     @Test
     fun `should return a ReadException failure if failed to save an observation record`() =
         runTest {
-            coEvery { observationRecordDataSource.save(any()) } answers { throw ObservationRecordException.ReadException(firstArg<ObservationRecord>().internalId) }
+            coEvery { observationRecordLocalDataSource.save(any()) } answers { throw ObservationRecordException.ReadException(firstArg<ObservationRecord>().internalId) }
 
             // when saving an observation record
             val result = observationRecordRepository.save(ObservationRecord(internalId = 1234))
@@ -250,14 +250,14 @@ class ObservationRecordRepositoryTest {
     fun `should delete an existing observation record`() =
         runTest {
             val observationRecordToDelete = ObservationRecord(internalId = 1234)
-            coEvery { observationRecordDataSource.delete(any()) } returns observationRecordToDelete
+            coEvery { observationRecordLocalDataSource.delete(any()) } returns observationRecordToDelete
 
             // when deleting existing an observation record from repository
             val result = observationRecordRepository.delete(observationRecordToDelete.internalId)
 
             // then
             assertTrue(result.isSuccess)
-            coVerify { observationRecordDataSource.delete(1234) }
+            coVerify { observationRecordLocalDataSource.delete(1234) }
             assertEquals(
                 observationRecordToDelete,
                 result.getOrNull()
@@ -267,7 +267,7 @@ class ObservationRecordRepositoryTest {
     @Test
     fun `should return a WriteException failure if failed to delete an observation record`() =
         runTest {
-            coEvery { observationRecordDataSource.delete(any()) } answers { throw ObservationRecordException.WriteException(firstArg()) }
+            coEvery { observationRecordLocalDataSource.delete(any()) } answers { throw ObservationRecordException.WriteException(firstArg()) }
 
             // when saving an observation record
             val result = observationRecordRepository.delete(1234)
@@ -284,7 +284,7 @@ class ObservationRecordRepositoryTest {
                 internalId = 1234,
                 status = ObservationRecord.Status.TO_SYNC
             )
-            coEvery { observationRecordDataSource.export(any<Long>()) } answers { exportedObservationRecord }
+            coEvery { observationRecordLocalDataSource.export(any<Long>()) } answers { exportedObservationRecord }
 
             // when exporting an observation record
             val observationRecordToExport = ObservationRecord(internalId = 1234)
@@ -292,7 +292,7 @@ class ObservationRecordRepositoryTest {
 
             // then
             assertTrue(result.isSuccess)
-            coVerify { observationRecordDataSource.export(observationRecordToExport.internalId) }
+            coVerify { observationRecordLocalDataSource.export(observationRecordToExport.internalId) }
             assertEquals(
                 exportedObservationRecord,
                 result.getOrNull()
@@ -302,7 +302,7 @@ class ObservationRecordRepositoryTest {
     @Test
     fun `should export an existing observation record`() =
         runTest {
-            coEvery { observationRecordDataSource.export(any<ObservationRecord>()) } answers {
+            coEvery { observationRecordLocalDataSource.export(any<ObservationRecord>()) } answers {
                 firstArg<ObservationRecord>().copy(status = ObservationRecord.Status.TO_SYNC)
             }
 
@@ -312,7 +312,7 @@ class ObservationRecordRepositoryTest {
 
             // then
             assertTrue(result.isSuccess)
-            coVerify { observationRecordDataSource.export(observationRecordToExport) }
+            coVerify { observationRecordLocalDataSource.export(observationRecordToExport) }
             assertEquals(
                 observationRecordToExport.copy(status = ObservationRecord.Status.TO_SYNC),
                 result.getOrNull()
@@ -322,7 +322,7 @@ class ObservationRecordRepositoryTest {
     @Test
     fun `should return a NotFoundException failure if trying to export undefined observation record`() =
         runTest {
-            coEvery { observationRecordDataSource.export(any<Long>()) } answers { throw ObservationRecordException.NotFoundException(firstArg()) }
+            coEvery { observationRecordLocalDataSource.export(any<Long>()) } answers { throw ObservationRecordException.NotFoundException(firstArg()) }
 
             // when exporting a non existing observation record
             val result = observationRecordRepository.export(1234)

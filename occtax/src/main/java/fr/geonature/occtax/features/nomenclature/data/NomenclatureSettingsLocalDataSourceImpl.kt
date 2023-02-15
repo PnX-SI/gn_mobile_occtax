@@ -1,8 +1,9 @@
 package fr.geonature.occtax.features.nomenclature.data
 
-import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
+import fr.geonature.occtax.features.record.domain.AllMediaRecord
 import fr.geonature.occtax.features.record.domain.CountingRecord
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.settings.PropertySettings
 
 /**
@@ -96,7 +97,7 @@ class NomenclatureSettingsLocalDataSourceImpl :
             CountingRecord.MIN_KEY,
             EditableNomenclatureType.ViewType.MIN_MAX
         ).apply {
-            value = PropertyValue.fromValue(
+            value = PropertyValue.Number(
                 code,
                 1
             )
@@ -106,10 +107,17 @@ class NomenclatureSettingsLocalDataSourceImpl :
             CountingRecord.MAX_KEY,
             EditableNomenclatureType.ViewType.MIN_MAX
         ).apply {
-            value = PropertyValue.fromValue(
+            value = PropertyValue.Number(
                 code,
                 1
             )
+        },
+        EditableNomenclatureType(
+            EditableNomenclatureType.Type.COUNTING,
+            AllMediaRecord.MEDIAS_KEY,
+            EditableNomenclatureType.ViewType.MEDIA
+        ).apply {
+            value = PropertyValue.Media(code)
         }
     )
 
@@ -123,15 +131,16 @@ class NomenclatureSettingsLocalDataSourceImpl :
 
         return defaultPropertySettings
             .mapNotNull { property ->
-                defaultNomenclatureTypes.find { it.code == property.key }?.let {
-                    EditableNomenclatureType(
-                        it.type,
-                        it.code,
-                        it.viewType,
-                        property.visible,
-                        property.default
-                    )
-                }
+                defaultNomenclatureTypes.find { it.code == property.key }
+                    ?.let {
+                        EditableNomenclatureType(
+                            it.type,
+                            it.code,
+                            it.viewType,
+                            property.visible,
+                            property.default
+                        )
+                    }
             }
     }
 }

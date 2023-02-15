@@ -6,8 +6,8 @@ import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSource
 import fr.geonature.commons.fp.orNull
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.input.domain.PropertyValue
 import fr.geonature.occtax.features.nomenclature.data.IPropertyValueLocalDataSource
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -78,14 +78,13 @@ class DefaultPropertyValueRepositoryTest {
     fun `should return a list of property values added`() = runTest {
         // given some property values added
         val expectedPropertyValues = listOf(
-            PropertyValue(
+            PropertyValue.Nomenclature(
                 code = "STATUT_BIO",
                 label = "Non renseigné",
                 value = 29L
             ),
-            PropertyValue(
+            PropertyValue.Text(
                 "DETERMINER",
-                null,
                 "some_value"
             )
         )
@@ -108,14 +107,13 @@ class DefaultPropertyValueRepositoryTest {
     fun `should return a list of property values added matching given taxonomy rank`() = runTest {
         // given some property values added
         val expectedPropertyValues = listOf(
-            PropertyValue(
+            PropertyValue.Nomenclature(
                 code = "STATUT_BIO",
                 label = "Hibernation",
                 value = 33L
             ),
-            PropertyValue(
+            PropertyValue.Text(
                 "DETERMINER",
-                null,
                 "some_value"
             )
         )
@@ -192,7 +190,7 @@ class DefaultPropertyValueRepositoryTest {
                 kingdom = "Animalia",
                 group = "Oiseaux"
             ),
-            PropertyValue(
+            PropertyValue.Nomenclature(
                 code = "STATUT_BIO",
                 label = "Hibernation",
                 value = 33L
@@ -207,7 +205,7 @@ class DefaultPropertyValueRepositoryTest {
                     kingdom = "Animalia",
                     group = "Oiseaux"
                 ),
-                PropertyValue(
+                PropertyValue.Nomenclature(
                     code = "STATUT_BIO",
                     label = "Hibernation",
                     value = 33L
