@@ -33,11 +33,9 @@ import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewMo
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.MediaRecord
-import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.settings.PropertySettings
 import kotlinx.coroutines.launch
-import okhttp3.internal.toImmutableList
 import org.tinylog.Logger
 
 /**
@@ -213,27 +211,13 @@ class EditCountingMetadataFragment : Fragment() {
             override fun onUpdate(editableNomenclatureType: EditableNomenclatureType) {
                 val countingRecord = countingRecord ?: return
 
-                val updated = ((editableNomenclatureType.value?.takeIf { it is PropertyValue.Media }
-                    ?.let {
-                        it as PropertyValue.Media
-                    }?.value?.mapNotNull {
-                        when (it) {
-                            is MediaRecord.File -> it.path
-                            else -> null
-                        }
-                    } ?: emptyList()).toImmutableList()
-                    .sorted() != countingRecord.medias.files.sorted()
-                    )
-
                 editableNomenclatureType.value?.toPair()
                     .also {
                         if (it == null) countingRecord.properties.remove(editableNomenclatureType.code)
-                        else countingRecord.properties[it.first] = it.second
+                        else countingRecord.properties[editableNomenclatureType.code] = it.second
                     }
 
-                if (updated) {
-                    listener?.onCountingRecord(countingRecord)
-                }
+                listener?.onCountingRecord(countingRecord)
 
                 val taxonomy = taxonRecord?.taxon?.taxonomy ?: Taxonomy(
                     Taxonomy.ANY,
@@ -311,6 +295,8 @@ class EditCountingMetadataFragment : Fragment() {
                 launchMediaActivity(mediaRecord)
             }
         })
+
+        adapter?.lockDefaultValues(arguments?.getBoolean(ARG_SAVE_DEFAULT_VALUES) == true)
 
         with(recyclerView) {
             layoutManager = LinearLayoutManager(context)
@@ -408,9 +394,10 @@ class EditCountingMetadataFragment : Fragment() {
 
     companion object {
 
-        const val ARG_TAXON_RECORD = "arg_taxon_record"
-        const val ARG_COUNTING_RECORD = "arg_counting_record"
-        const val ARG_PROPERTIES = "arg_properties"
+        private const val ARG_TAXON_RECORD = "arg_taxon_record"
+        private const val ARG_COUNTING_RECORD = "arg_counting_record"
+        private const val ARG_SAVE_DEFAULT_VALUES = "arg_save_default_values"
+        private const val ARG_PROPERTIES = "arg_properties"
 
         private const val ADD_PHOTO_DIALOG_FRAGMENT = "add_photo_dialog_fragment"
         private const val KEY_SHOW_ALL_NOMENCLATURE_TYPES = "show_all_nomenclature_types"
@@ -424,6 +411,7 @@ class EditCountingMetadataFragment : Fragment() {
         fun newInstance(
             taxonRecord: TaxonRecord,
             countingRecord: CountingRecord? = null,
+            saveDefaultValues: Boolean = false,
             vararg propertySettings: PropertySettings
         ) = EditCountingMetadataFragment().apply {
             arguments = Bundle().apply {
@@ -437,6 +425,10 @@ class EditCountingMetadataFragment : Fragment() {
                         countingRecord
                     )
                 }
+                putBoolean(
+                    ARG_SAVE_DEFAULT_VALUES,
+                    saveDefaultValues
+                )
                 putParcelableArray(
                     ARG_PROPERTIES,
                     propertySettings

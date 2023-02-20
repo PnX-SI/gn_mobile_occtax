@@ -45,23 +45,30 @@ class EditCountingMetadataActivity : AppCompatActivity(),
             return
         }
 
-        countingRecord = intent.getParcelableExtra(EXTRA_COUNTING_RECORD) ?: taxonRecord.counting.create()
+        countingRecord =
+            intent.getParcelableExtra(EXTRA_COUNTING_RECORD) ?: taxonRecord.counting.create()
 
         isNew = countingRecord.isEmpty()
         setTitle(if (countingRecord.isEmpty()) R.string.activity_counting_add_title else R.string.activity_counting_edit_title)
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(
-                    android.R.id.content,
-                    EditCountingMetadataFragment.newInstance(
-                        taxonRecord,
-                        countingRecord,
-                        *(intent.getParcelableArrayExtra(EXTRA_PROPERTIES)
-                            ?.map { it as PropertySettings }
-                            ?.toTypedArray() ?: emptyArray())
+                .apply {
+                    replace(
+                        android.R.id.content,
+                        EditCountingMetadataFragment.newInstance(
+                            taxonRecord,
+                            countingRecord,
+                            intent.getBooleanExtra(
+                                EXTRA_SAVE_DEFAULT_VALUES,
+                                false
+                            ),
+                            *(intent.getParcelableArrayExtra(EXTRA_PROPERTIES)
+                                ?.map { it as PropertySettings }
+                                ?.toTypedArray() ?: emptyArray())
+                        )
                     )
-                )
+                }
                 .commit()
         }
     }
@@ -125,12 +132,14 @@ class EditCountingMetadataActivity : AppCompatActivity(),
 
         const val EXTRA_TAXON_RECORD = "extra_taxon_record"
         const val EXTRA_COUNTING_RECORD = "extra_counting_record"
+        const val EXTRA_SAVE_DEFAULT_VALUES = "extra_save_default_values"
         const val EXTRA_PROPERTIES = "extra_properties"
 
         fun newIntent(
             context: Context,
             taxonRecord: TaxonRecord,
             countingRecord: CountingRecord? = null,
+            saveDefaultValues: Boolean = false,
             vararg propertySettings: PropertySettings
         ): Intent {
             return Intent(
@@ -147,6 +156,10 @@ class EditCountingMetadataActivity : AppCompatActivity(),
                         countingRecord
                     )
                 }
+                putExtra(
+                    EXTRA_SAVE_DEFAULT_VALUES,
+                    saveDefaultValues
+                )
                 putExtra(
                     EXTRA_PROPERTIES,
                     propertySettings
