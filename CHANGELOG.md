@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.4.1-rc4](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.1-rc4) (2023-02-21, pre-release)
+
+### 🚀 Corrections
+
+* Gestion des médias sur la partie dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/84)
+* Accélérer la saisie en permettant de mémoriser les dernières nomenclatures saisies sur la partie
+  dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
+
+### ⚠️ Notes de version
+
+* Code de version : 3163
+
 ## [2.4.1-rc3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.1-rc3) (2023-02-15, pre-release)
 
 ### 🚀 Nouveautés
