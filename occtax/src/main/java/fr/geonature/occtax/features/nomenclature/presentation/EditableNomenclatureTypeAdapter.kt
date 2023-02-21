@@ -304,7 +304,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                         value = nomenclatureAdapter.getNomenclatureValue(position)
                             .let { nomenclature ->
                                 PropertyValue.Nomenclature(
-                                    nomenclature.code,
+                                    code,
                                     nomenclature.defaultLabel,
                                     nomenclature.id
                                 )

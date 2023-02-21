@@ -1,11 +1,13 @@
 package fr.geonature.occtax.features.record.data
 
 import android.content.Context
+import android.webkit.MimeTypeMap
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.TaxonRecord
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
+import org.tinylog.Logger
 import java.io.File
 
 /**
@@ -23,13 +25,25 @@ class MediaRecordLocalDataSourceImpl(private val context: Context) : IMediaRecor
             context,
             countingRecord
         )
+            .also {
+                Logger.debug { "load all medias from '$it'..." }
+            }
             .walkTopDown()
             .asFlow()
+            .filter { file -> file.isFile && file.canWrite() }
             .filter { file ->
-                file.isFile && file.canWrite() && file.toURI()
+                val mimetype = file.toURI()
                     .toURL()
                     .run { openConnection().contentType }
-                    ?.startsWith("image/") == true
+                    ?: file.extension.takeIf { it.isNotEmpty() }
+                        ?.let {
+                            MimeTypeMap.getSingleton()
+                                .getMimeTypeFromExtension(it)
+                        }
+
+                Logger.debug { "loading file '${file.name}' (mime-type: $mimetype)" }
+
+                file.isFile && file.canWrite() && mimetype?.startsWith("image/") == true
             }
             .toList()
     }

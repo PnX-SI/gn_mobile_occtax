@@ -7,11 +7,10 @@ import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.error.ObservationRecordException
 import fr.geonature.occtax.features.record.usecase.DeleteObservationRecordUseCase
+import fr.geonature.occtax.features.record.usecase.EditObservationRecordUseCase
 import fr.geonature.occtax.features.record.usecase.ExportObservationRecordUseCase
 import fr.geonature.occtax.features.record.usecase.GetAllObservationRecordsUseCase
-import fr.geonature.occtax.features.record.usecase.LoadAllMediaRecordUseCase
 import fr.geonature.occtax.features.record.usecase.SaveObservationRecordUseCase
-import fr.geonature.occtax.features.record.usecase.SetDefaultNomenclatureValuesUseCase
 import io.mockk.MockKAnnotations.init
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
@@ -50,10 +49,7 @@ class ObservationRecordViewModelTest {
     private lateinit var saveObservationRecordUseCase: SaveObservationRecordUseCase
 
     @RelaxedMockK
-    private lateinit var setDefaultNomenclatureValuesUseCase: SetDefaultNomenclatureValuesUseCase
-
-    @RelaxedMockK
-    private lateinit var allMediaRecordUseCase: LoadAllMediaRecordUseCase
+    private lateinit var editObservationRecordUseCase: EditObservationRecordUseCase
 
     @RelaxedMockK
     private lateinit var deleteObservationRecordUseCase: DeleteObservationRecordUseCase
@@ -79,8 +75,7 @@ class ObservationRecordViewModelTest {
         observationRecordViewModel = ObservationRecordViewModel(
             getAllObservationRecordsUseCase,
             saveObservationRecordUseCase,
-            setDefaultNomenclatureValuesUseCase,
-            allMediaRecordUseCase,
+            editObservationRecordUseCase,
             deleteObservationRecordUseCase,
             exportObservationRecordUseCase
         )
@@ -108,7 +103,7 @@ class ObservationRecordViewModelTest {
             callOriginal()
         }
         every {
-            setDefaultNomenclatureValuesUseCase(
+            editObservationRecordUseCase(
                 any(),
                 any(),
                 any()
@@ -182,13 +177,13 @@ class ObservationRecordViewModelTest {
         }
 
     @Test
-    fun `should loads and set all default nomenclature values`() = runTest {
+    fun `should start editing an observation record`() = runTest {
         // given some observation record
         val observationRecord = ObservationRecord(internalId = 1234)
         coEvery {
-            setDefaultNomenclatureValuesUseCase.run(any())
+            editObservationRecordUseCase.run(any())
         } answers {
-            Result.success(firstArg<SetDefaultNomenclatureValuesUseCase.Params>().observationRecord.apply {
+            Result.success(firstArg<EditObservationRecordUseCase.Params>().observationRecord.apply {
                 listOf(
                     PropertyValue.Nomenclature(
                         "TYP_GRP",
@@ -203,7 +198,7 @@ class ObservationRecordViewModelTest {
         }
 
         // when loading all default nomenclature values
-        observationRecordViewModel.loadDefaultNomenclatureValues(observationRecord)
+        observationRecordViewModel.startEdit(observationRecord)
         advanceUntilIdle()
 
         // then

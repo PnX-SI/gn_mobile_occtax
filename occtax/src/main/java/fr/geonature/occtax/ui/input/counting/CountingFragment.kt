@@ -40,6 +40,7 @@ class CountingFragment : AbstractInputFragment() {
     private var recyclerView: RecyclerView? = null
     private var emptyTextView: TextView? = null
     private var fab: ExtendedFloatingActionButton? = null
+    private var redirectToEditCountingMetadataActivity = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -196,7 +197,8 @@ class CountingFragment : AbstractInputFragment() {
 
         adapter?.setItems(counting)
 
-        if (counting.isEmpty()) {
+        if (counting.isEmpty() && redirectToEditCountingMetadataActivity) {
+            redirectToEditCountingMetadataActivity = false
             launchEditCountingMetadataActivity()
         }
     }
@@ -209,6 +211,10 @@ class CountingFragment : AbstractInputFragment() {
             context,
             taxonRecord,
             countingRecord,
+            arguments?.getBoolean(
+                ARG_SAVE_DEFAULT_VALUES,
+                false
+            ) ?: false,
             *(arguments?.getParcelableArray(ARG_PROPERTIES)
                 ?.map { it as PropertySettings }
                 ?.toTypedArray() ?: emptyArray())
@@ -273,6 +279,7 @@ class CountingFragment : AbstractInputFragment() {
 
     companion object {
 
+        private const val ARG_SAVE_DEFAULT_VALUES = "arg_save_default_values"
         private const val ARG_PROPERTIES = "arg_properties"
 
         /**
@@ -281,8 +288,15 @@ class CountingFragment : AbstractInputFragment() {
          * @return A new instance of [CountingFragment]
          */
         @JvmStatic
-        fun newInstance(vararg propertySettings: PropertySettings) = CountingFragment().apply {
+        fun newInstance(
+            saveDefaultValues: Boolean = false,
+            vararg propertySettings: PropertySettings
+        ) = CountingFragment().apply {
             arguments = Bundle().apply {
+                putBoolean(
+                    ARG_SAVE_DEFAULT_VALUES,
+                    saveDefaultValues
+                )
                 putParcelableArray(
                     ARG_PROPERTIES,
                     propertySettings

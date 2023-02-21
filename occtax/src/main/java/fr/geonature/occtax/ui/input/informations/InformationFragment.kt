@@ -137,13 +137,14 @@ class InformationFragment : AbstractInputFragment() {
             }
 
             override fun onUpdate(editableNomenclatureType: EditableNomenclatureType) {
-                editableNomenclatureType.value?.toPair().also {
-                    if (it == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(editableNomenclatureType.code)
-                    else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
-                        it.first,
-                        it.second
-                    )
-                }
+                editableNomenclatureType.value?.toPair()
+                    .also {
+                        if (it == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(editableNomenclatureType.code)
+                        else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
+                            editableNomenclatureType.code,
+                            it.second
+                        )
+                    }
 
                 val propertyValue = editableNomenclatureType.value
 
@@ -221,13 +222,14 @@ class InformationFragment : AbstractInputFragment() {
             .forEach {
                 if (observationRecord?.taxa?.selectedTaxonRecord?.properties?.containsKey(it.code) == true) return@forEach
 
-                it.value?.toPair().also {pair ->
-                    if (pair == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(it.code)
-                    else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
-                        pair.first,
-                        pair.second
-                    )
-                }
+                it.value?.toPair()
+                    .also { pair ->
+                        if (pair == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(it.code)
+                        else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
+                            pair.first,
+                            pair.second
+                        )
+                    }
             }
 
         adapter?.bind(

@@ -98,8 +98,7 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
 
         Logger.info { "loading observation record: ${observationRecord.id}" }
 
-        observationRecordViewModel.loadDefaultNomenclatureValues(observationRecord)
-        observationRecordViewModel.loadAllMedias(observationRecord)
+        observationRecordViewModel.startEdit(observationRecord)
 
         pageFragmentViewModel.set(
             R.string.pager_fragment_observers_and_date_input_title to ObserversAndDateInputFragment.newInstance(
@@ -188,6 +187,7 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
                     ?: emptyArray()
             ),
             R.string.pager_fragment_counting_title to CountingFragment.newInstance(
+                saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues ?: false,
                 *appSettings.nomenclatureSettings?.counting?.toTypedArray()
                     ?: emptyArray()
             ),

@@ -178,7 +178,12 @@ class ObservationRecordLocalDataSourceImpl(
             observationRecord.copy(status = ObservationRecord.Status.TO_SYNC)
                 .apply { module.module = geoNatureModuleName }
 
-        delete(observationRecord.internalId)
+        if (preferenceManager.contains(buildInputPreferenceKey(observationRecord.internalId))) {
+            preferenceManager
+                .edit()
+                .remove(buildInputPreferenceKey(observationRecord.internalId))
+                .apply()
+        }
 
         return withContext(dispatcher) {
             val inputAsJson =
