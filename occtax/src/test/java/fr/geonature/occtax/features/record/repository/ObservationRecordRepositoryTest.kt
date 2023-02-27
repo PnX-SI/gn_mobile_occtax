@@ -28,7 +28,7 @@ import org.junit.Test
  * @author S. Grimault
  */
 @ExperimentalCoroutinesApi
-class ObservationRecordRepositoryTest {
+internal class ObservationRecordRepositoryTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -38,6 +38,9 @@ class ObservationRecordRepositoryTest {
 
     @MockK
     private lateinit var observationRecordLocalDataSource: IObservationRecordLocalDataSource
+
+    @MockK
+    private lateinit var observationRecordFileDataSource: IObservationRecordLocalDataSource
 
     @MockK
     private lateinit var taxonLocalDataSource: ITaxonLocalDataSource
@@ -75,6 +78,7 @@ class ObservationRecordRepositoryTest {
 
         observationRecordRepository = ObservationRecordRepositoryImpl(
             observationRecordLocalDataSource,
+            observationRecordFileDataSource,
             taxonLocalDataSource
         )
     }
@@ -82,8 +86,9 @@ class ObservationRecordRepositoryTest {
     @Test
     fun `should return an empty list when reading undefined observation records`() =
         runTest {
-            // given an empty list from data source
+            // given an empty list from data sources
             coEvery { observationRecordLocalDataSource.readAll() } returns emptyList()
+            coEvery { observationRecordFileDataSource.readAll() } returns emptyList()
             coEvery { taxonLocalDataSource.findTaxaByIds(any()) } returns taxaFromLocalDataSource
 
             // when reading non existing observation records
@@ -100,13 +105,24 @@ class ObservationRecordRepositoryTest {
     @Test
     fun `should read existing observation records`() =
         runTest {
-            // given some observation records from data source
-            val observationRecords = listOf(
+            // given some observation records from data sources
+            val observationRecordsFromLocalDataSource = listOf(
                 ObservationRecord(internalId = 1234),
                 ObservationRecord(internalId = 1235),
-                ObservationRecord(internalId = 1236),
+                ObservationRecord(internalId = 1238)
             )
-            coEvery { observationRecordLocalDataSource.readAll() } returns observationRecords
+            val observationRecordsFromFileDataSource = listOf(
+                ObservationRecord(
+                    internalId = 1236,
+                    status = ObservationRecord.Status.TO_SYNC
+                ),
+                ObservationRecord(
+                    internalId = 1237,
+                    status = ObservationRecord.Status.TO_SYNC
+                )
+            )
+            coEvery { observationRecordLocalDataSource.readAll() } returns observationRecordsFromLocalDataSource
+            coEvery { observationRecordFileDataSource.readAll() } returns observationRecordsFromFileDataSource
             coEvery { taxonLocalDataSource.findTaxaByIds() } returns emptyList()
 
             // when reading these observation records from repository
@@ -115,7 +131,8 @@ class ObservationRecordRepositoryTest {
             // then
             assertTrue(result.isSuccess)
             assertArrayEquals(
-                observationRecords.toTypedArray(),
+                (observationRecordsFromLocalDataSource + observationRecordsFromFileDataSource).sortedBy { it.internalId }
+                    .toTypedArray(),
                 result
                     .getOrNull()
                     ?.toTypedArray()
@@ -123,10 +140,30 @@ class ObservationRecordRepositoryTest {
         }
 
     @Test
-    fun `should read existing observation record`() =
+    fun `should read existing observation record from local data source`() =
         runTest {
             val observationRecord = ObservationRecord(internalId = 1234)
-            coEvery { observationRecordLocalDataSource.read(observationRecord.internalId) } returns observationRecord
+            coEvery { observationRecordFileDataSource.read(any()) } answers { throw ObservationRecordException.NotFoundException(firstArg()) }
+            coEvery { observationRecordLocalDataSource.read(any()) } returns observationRecord
+            coEvery { taxonLocalDataSource.findTaxaByIds() } returns emptyList()
+
+            // when reading existing observation record from repository
+            val result = observationRecordRepository.read(observationRecord.internalId)
+
+            // then
+            assertTrue(result.isSuccess)
+            assertEquals(
+                observationRecord,
+                result.getOrNull()
+            )
+        }
+
+    @Test
+    fun `should read existing observation record from file data source`() =
+        runTest {
+            val observationRecord = ObservationRecord(internalId = 1234)
+            coEvery { observationRecordFileDataSource.read(any()) } returns observationRecord
+            coEvery { observationRecordLocalDataSource.read(any()) } answers { throw ObservationRecordException.NotFoundException(firstArg()) }
             coEvery { taxonLocalDataSource.findTaxaByIds() } returns emptyList()
 
             // when reading existing observation record from repository
@@ -169,7 +206,8 @@ class ObservationRecordRepositoryTest {
                             }
                     }
             }
-            coEvery { observationRecordLocalDataSource.read(observationRecord.internalId) } returns observationRecord
+            coEvery { observationRecordFileDataSource.read(any()) } answers { throw ObservationRecordException.NotFoundException(firstArg()) }
+            coEvery { observationRecordLocalDataSource.read(any()) } returns observationRecord
             coEvery { taxonLocalDataSource.findTaxaByIds(any()) } returns taxaFromLocalDataSource
 
             // when reading existing observation record from repository
@@ -192,6 +230,7 @@ class ObservationRecordRepositoryTest {
     @Test
     fun `should return a NotFoundException failure if trying to read an undefined observation record`() =
         runTest {
+            coEvery { observationRecordFileDataSource.read(any()) } answers { throw ObservationRecordException.NotFoundException(firstArg()) }
             coEvery { observationRecordLocalDataSource.read(any()) } answers { throw ObservationRecordException.NotFoundException(firstArg()) }
 
             // when reading a non existing observation record from repository
@@ -205,6 +244,7 @@ class ObservationRecordRepositoryTest {
     @Test
     fun `should return a ReadException failure if failed to read an existing observation record`() =
         runTest {
+            coEvery { observationRecordFileDataSource.read(any()) } answers { throw ObservationRecordException.NotFoundException(firstArg()) }
             coEvery { observationRecordLocalDataSource.read(any()) } answers { throw ObservationRecordException.ReadException(firstArg()) }
 
             // when reading a non existing observation record from repository
@@ -219,6 +259,7 @@ class ObservationRecordRepositoryTest {
     fun `should save an observation record`() =
         runTest {
             coEvery { observationRecordLocalDataSource.save(any()) } answers { firstArg() }
+            coEvery { observationRecordFileDataSource.save(any()) } answers { firstArg() }
 
             // when saving an observation record
             val observationRecordToSave = ObservationRecord(internalId = 1234)
@@ -227,6 +268,7 @@ class ObservationRecordRepositoryTest {
             // then
             assertTrue(result.isSuccess)
             coVerify { observationRecordLocalDataSource.save(observationRecordToSave) }
+            coVerify(inverse = true) { observationRecordFileDataSource.save(observationRecordToSave) }
             assertEquals(
                 observationRecordToSave,
                 result.getOrNull()
@@ -247,10 +289,11 @@ class ObservationRecordRepositoryTest {
         }
 
     @Test
-    fun `should delete an existing observation record`() =
+    fun `should delete an existing observation record from local data source`() =
         runTest {
             val observationRecordToDelete = ObservationRecord(internalId = 1234)
             coEvery { observationRecordLocalDataSource.delete(any()) } returns observationRecordToDelete
+            coEvery { observationRecordFileDataSource.delete(any()) } answers { throw ObservationRecordException.NotFoundException(firstArg()) }
 
             // when deleting existing an observation record from repository
             val result = observationRecordRepository.delete(observationRecordToDelete.internalId)
@@ -258,6 +301,27 @@ class ObservationRecordRepositoryTest {
             // then
             assertTrue(result.isSuccess)
             coVerify { observationRecordLocalDataSource.delete(1234) }
+            coVerify { observationRecordFileDataSource.delete(1234) }
+            assertEquals(
+                observationRecordToDelete,
+                result.getOrNull()
+            )
+        }
+
+    @Test
+    fun `should delete an existing observation record from file data source`() =
+        runTest {
+            val observationRecordToDelete = ObservationRecord(internalId = 1234)
+            coEvery { observationRecordLocalDataSource.delete(any()) } answers { throw ObservationRecordException.NotFoundException(firstArg()) }
+            coEvery { observationRecordFileDataSource.delete(any()) } returns observationRecordToDelete
+
+            // when deleting existing an observation record from repository
+            val result = observationRecordRepository.delete(observationRecordToDelete.internalId)
+
+            // then
+            assertTrue(result.isSuccess)
+            coVerify { observationRecordLocalDataSource.delete(1234) }
+            coVerify { observationRecordFileDataSource.delete(1234) }
             assertEquals(
                 observationRecordToDelete,
                 result.getOrNull()
@@ -268,6 +332,7 @@ class ObservationRecordRepositoryTest {
     fun `should return a WriteException failure if failed to delete an observation record`() =
         runTest {
             coEvery { observationRecordLocalDataSource.delete(any()) } answers { throw ObservationRecordException.WriteException(firstArg()) }
+            coEvery { observationRecordFileDataSource.delete(any()) } answers { throw ObservationRecordException.NotFoundException(firstArg()) }
 
             // when saving an observation record
             val result = observationRecordRepository.delete(1234)
@@ -284,7 +349,7 @@ class ObservationRecordRepositoryTest {
                 internalId = 1234,
                 status = ObservationRecord.Status.TO_SYNC
             )
-            coEvery { observationRecordLocalDataSource.export(any<Long>()) } answers { exportedObservationRecord }
+            coEvery { observationRecordFileDataSource.export(any<Long>()) } answers { exportedObservationRecord }
 
             // when exporting an observation record
             val observationRecordToExport = ObservationRecord(internalId = 1234)
@@ -292,7 +357,7 @@ class ObservationRecordRepositoryTest {
 
             // then
             assertTrue(result.isSuccess)
-            coVerify { observationRecordLocalDataSource.export(observationRecordToExport.internalId) }
+            coVerify { observationRecordFileDataSource.export(observationRecordToExport.internalId) }
             assertEquals(
                 exportedObservationRecord,
                 result.getOrNull()
@@ -302,7 +367,7 @@ class ObservationRecordRepositoryTest {
     @Test
     fun `should export an existing observation record`() =
         runTest {
-            coEvery { observationRecordLocalDataSource.export(any<ObservationRecord>()) } answers {
+            coEvery { observationRecordFileDataSource.export(any<ObservationRecord>()) } answers {
                 firstArg<ObservationRecord>().copy(status = ObservationRecord.Status.TO_SYNC)
             }
 
@@ -312,7 +377,7 @@ class ObservationRecordRepositoryTest {
 
             // then
             assertTrue(result.isSuccess)
-            coVerify { observationRecordLocalDataSource.export(observationRecordToExport) }
+            coVerify { observationRecordFileDataSource.export(observationRecordToExport) }
             assertEquals(
                 observationRecordToExport.copy(status = ObservationRecord.Status.TO_SYNC),
                 result.getOrNull()
@@ -322,7 +387,7 @@ class ObservationRecordRepositoryTest {
     @Test
     fun `should return a NotFoundException failure if trying to export undefined observation record`() =
         runTest {
-            coEvery { observationRecordLocalDataSource.export(any<Long>()) } answers { throw ObservationRecordException.NotFoundException(firstArg()) }
+            coEvery { observationRecordFileDataSource.export(any<Long>()) } answers { throw ObservationRecordException.NotFoundException(firstArg()) }
 
             // when exporting a non existing observation record
             val result = observationRecordRepository.export(1234)

@@ -19,4 +19,14 @@ interface IMediaRecordRepository {
         taxonRecord: TaxonRecord,
         countingRecord: CountingRecord
     ): Result<List<File>>
+
+    /**
+     * Synchronizes all medias for each [CountingRecord] added to the given [TaxonRecord].
+     */
+    suspend fun synchronizeMediaFiles(taxonRecord: TaxonRecord): Result<TaxonRecord>
+
+    /**
+     * Deletes already uploaded media files from given [TaxonRecord].
+     */
+    suspend fun deleteAllMediaFiles(taxonRecord: TaxonRecord): Result<Unit>
 }

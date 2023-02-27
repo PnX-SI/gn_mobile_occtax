@@ -12,20 +12,25 @@ import fr.geonature.occtax.settings.AppSettings
  */
 class ObservationRecordRepositoryImpl(
     private val observationRecordLocalDataSource: IObservationRecordLocalDataSource,
+    private val observationRecordFileDataSource: IObservationRecordLocalDataSource,
     private val taxonLocalDataSource: ITaxonLocalDataSource
 ) : IObservationRecordRepository {
 
     override suspend fun readAll(): Result<List<ObservationRecord>> {
         return runCatching {
-            observationRecordLocalDataSource.readAll()
-                .map { loadTaxa(it) }
+            val observationRecords = observationRecordLocalDataSource.readAll()
+            val observationRecordsFromFiles = observationRecordFileDataSource.readAll()
+                .filter { observationRecord -> observationRecords.none { it.internalId == observationRecord.internalId } }
+
+            (observationRecords + observationRecordsFromFiles).map { loadTaxa(it) }
+                .sortedBy { it.internalId }
         }
     }
 
     override suspend fun read(id: Long): Result<ObservationRecord> {
-        return runCatching {
-            loadTaxa(observationRecordLocalDataSource.read(id))
-        }
+        return runCatching { observationRecordFileDataSource.read(id) }
+            .recoverCatching { observationRecordLocalDataSource.read(id) }
+            .mapCatching { loadTaxa(it) }
     }
 
     override suspend fun save(
@@ -41,16 +46,25 @@ class ObservationRecordRepositoryImpl(
     }
 
     override suspend fun delete(id: Long): Result<ObservationRecord> {
-        return runCatching { observationRecordLocalDataSource.delete(id) }
+        val observationRecordDeleted = runCatching { observationRecordLocalDataSource.delete(id) }
+        val observationRecordAsFileDeleted =
+            runCatching { observationRecordFileDataSource.delete(id) }
+
+        if (observationRecordDeleted.isSuccess) {
+            return observationRecordDeleted
+        }
+
+        return if (observationRecordAsFileDeleted.isFailure) observationRecordDeleted
+        else observationRecordAsFileDeleted
     }
 
     override suspend fun export(id: Long, settings: AppSettings?): Result<ObservationRecord> {
         return runCatching {
-            observationRecordLocalDataSource.export(
+            observationRecordFileDataSource.export(
                 id,
                 settings
             )
-        }
+        }.onSuccess { runCatching { observationRecordLocalDataSource.delete(id) } }
     }
 
     override suspend fun export(
@@ -58,11 +72,11 @@ class ObservationRecordRepositoryImpl(
         settings: AppSettings?
     ): Result<ObservationRecord> {
         return runCatching {
-            observationRecordLocalDataSource.export(
+            observationRecordFileDataSource.export(
                 observationRecord,
                 settings
             )
-        }
+        }.onSuccess { runCatching { observationRecordLocalDataSource.delete(observationRecord.internalId) } }
     }
 
     /**

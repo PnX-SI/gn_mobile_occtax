@@ -12,11 +12,13 @@ import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.error.ObservationRecordException
 import fr.geonature.occtax.features.record.io.ObservationRecordJsonReader
-import fr.geonature.occtax.features.record.io.ObservationRecordJsonWriter
 import io.mockk.MockKAnnotations.init
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -25,13 +27,13 @@ import org.robolectric.RobolectricTestRunner
 import java.io.File
 
 /**
- * Unit tests about [IObservationRecordLocalDataSource].
+ * Unit tests about file based implementation of [IObservationRecordLocalDataSource].
  *
  * @author S. Grimault
  */
 @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
-class ObservationRecordDataSourceTest {
+internal class ObservationRecordFileDataSourceTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -49,7 +51,7 @@ class ObservationRecordDataSourceTest {
         init(this)
 
         application = ApplicationProvider.getApplicationContext()
-        observationRecordLocalDataSource = ObservationRecordLocalDataSourceImpl(
+        observationRecordLocalDataSource = ObservationRecordFileDataSourceImpl(
             application,
             geoNatureModuleName,
             coroutineTestRule.testDispatcher
@@ -78,24 +80,6 @@ class ObservationRecordDataSourceTest {
             observationRecordLocalDataSource.save(record2)
             observationRecordLocalDataSource.save(record3)
 
-            // and some observation records ready to synchronize
-            val record4 = ObservationRecord(
-                internalId = 1236,
-                status = ObservationRecord.Status.TO_SYNC
-            )
-            File(
-                FileUtils
-                    .getInputsFolder(application)
-                    .also { it.mkdirs() },
-                "input_${record4.id}.json"
-            )
-                .bufferedWriter()
-                .use { out ->
-                    out.write(ObservationRecordJsonWriter().write(record4))
-                    out.flush()
-                    out.close()
-                }
-
             // when reading these observation records from local data source
             val observationRecords = observationRecordLocalDataSource.readAll()
 
@@ -104,7 +88,6 @@ class ObservationRecordDataSourceTest {
                 arrayOf(
                     record1.internalId to record1.status,
                     record2.internalId to record2.status,
-                    record4.internalId to record4.status,
                     record3.internalId to record3.status,
                 ),
                 observationRecords.map { it.internalId to it.status }
@@ -115,7 +98,8 @@ class ObservationRecordDataSourceTest {
     @Test
     fun `should throw NotFoundException if trying to read undefined observation record`() =
         runTest {
-            val exception = runCatching { observationRecordLocalDataSource.read(1234) }.exceptionOrNull()
+            val exception =
+                runCatching { observationRecordLocalDataSource.read(1234) }.exceptionOrNull()
 
             assertTrue(exception is ObservationRecordException.NotFoundException)
             assertEquals(
@@ -162,6 +146,12 @@ class ObservationRecordDataSourceTest {
                 savedObservationRecord,
                 observationRecordFromLocalDataSource
             )
+            assertTrue(
+                File(
+                    FileUtils.getInputsFolder(application),
+                    "input_${observationRecord.internalId}.json"
+                ).exists()
+            )
         }
 
     @Test
@@ -197,6 +187,12 @@ class ObservationRecordDataSourceTest {
             assertEquals(
                 observationRecord,
                 deletedObservationRecord
+            )
+            assertFalse(
+                File(
+                    FileUtils.getInputsFolder(application),
+                    "input_${observationRecord.internalId}.json"
+                ).exists()
             )
 
             val exception =
@@ -296,14 +292,16 @@ class ObservationRecordDataSourceTest {
                 exportedObservationRecord.module.module
             )
 
-            var exportedJsonFile = File(
-                FileUtils.getInputsFolder(application),
-                "input_${observationRecord.id}.json"
+            assertTrue(
+                File(
+                    FileUtils.getInputsFolder(application),
+                    "input_${observationRecord.id}.json"
+                ).exists()
             )
-            assertTrue(exportedJsonFile.exists())
 
             // when editing again this exported observation record
-            val savedObservationRecord = observationRecordLocalDataSource.save(exportedObservationRecord)
+            val savedObservationRecord =
+                observationRecordLocalDataSource.save(exportedObservationRecord)
 
             // and reading this observation record from local data source
             observationRecordFromLocalDataSource =
@@ -318,12 +316,6 @@ class ObservationRecordDataSourceTest {
                 exportedObservationRecord.copy(status = ObservationRecord.Status.DRAFT),
                 observationRecordFromLocalDataSource
             )
-
-            exportedJsonFile = File(
-                FileUtils.getInputsFolder(application),
-                "input_${observationRecord.id}.json"
-            )
-            assertFalse(exportedJsonFile.exists())
         }
 
     @Test

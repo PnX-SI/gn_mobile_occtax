@@ -15,9 +15,12 @@ import fr.geonature.datasync.auth.IAuthManager
 import fr.geonature.datasync.packageinfo.ISynchronizeObservationRecordRepository
 import fr.geonature.occtax.api.IOcctaxAPIClient
 import fr.geonature.occtax.features.record.data.IMediaRecordLocalDataSource
+import fr.geonature.occtax.features.record.data.IMediaRecordRemoteDataSource
 import fr.geonature.occtax.features.record.data.IObservationRecordLocalDataSource
 import fr.geonature.occtax.features.record.data.IObservationRecordRemoteDataSource
 import fr.geonature.occtax.features.record.data.MediaRecordLocalDataSourceImpl
+import fr.geonature.occtax.features.record.data.MediaRecordRemoteDataSourceImpl
+import fr.geonature.occtax.features.record.data.ObservationRecordFileDataSourceImpl
 import fr.geonature.occtax.features.record.data.ObservationRecordLocalDataSourceImpl
 import fr.geonature.occtax.features.record.data.ObservationRecordRemoteDataSourceImpl
 import fr.geonature.occtax.features.record.repository.IMediaRecordRepository
@@ -26,7 +29,14 @@ import fr.geonature.occtax.features.record.repository.MediaRecordRepositoryImpl
 import fr.geonature.occtax.features.record.repository.ObservationRecordRepositoryImpl
 import fr.geonature.occtax.features.record.repository.SynchronizeObservationRecordRepositoryImpl
 import fr.geonature.occtax.settings.AppSettings
+import javax.inject.Qualifier
 import javax.inject.Singleton
+
+@Qualifier
+annotation class ObservationRecordLocalDataSource
+
+@Qualifier
+annotation class ObservationRecordFileDataSource
 
 /**
  * Observation record module.
@@ -39,11 +49,25 @@ object ObservationRecordModule {
 
     @Singleton
     @Provides
+    @ObservationRecordLocalDataSource
     fun provideObservationRecordLocalDataSource(
         @ApplicationContext appContext: Context,
         @GeoNatureModuleName moduleName: String
     ): IObservationRecordLocalDataSource {
         return ObservationRecordLocalDataSourceImpl(
+            appContext,
+            moduleName
+        )
+    }
+
+    @Singleton
+    @Provides
+    @ObservationRecordFileDataSource
+    fun provideObservationRecordFileDataSource(
+        @ApplicationContext appContext: Context,
+        @GeoNatureModuleName moduleName: String
+    ): IObservationRecordLocalDataSource {
+        return ObservationRecordFileDataSourceImpl(
             appContext,
             moduleName
         )
@@ -63,20 +87,44 @@ object ObservationRecordModule {
 
     @Singleton
     @Provides
+    fun provideMediaRecordRemoteDataSource(
+        geoNatureAPIClient: IGeoNatureAPIClient,
+        nomenclatureLocalDataSource: INomenclatureLocalDataSource,
+    ): IMediaRecordRemoteDataSource {
+        return MediaRecordRemoteDataSourceImpl(
+            geoNatureAPIClient,
+            nomenclatureLocalDataSource
+        )
+    }
+
+    @Singleton
+    @Provides
     fun provideObservationRecordRepository(
-        observationRecordLocalDataSource: IObservationRecordLocalDataSource,
+        @ObservationRecordLocalDataSource observationRecordLocalDataSource: IObservationRecordLocalDataSource,
+        @ObservationRecordFileDataSource observationRecordFileDataSource: IObservationRecordLocalDataSource,
         taxonLocalDataSource: ITaxonLocalDataSource
     ): IObservationRecordRepository {
         return ObservationRecordRepositoryImpl(
             observationRecordLocalDataSource,
+            observationRecordFileDataSource,
             taxonLocalDataSource
         )
     }
 
     @Singleton
     @Provides
-    fun provideMediaRecordRepository(mediaRecordLocalDataSource: IMediaRecordLocalDataSource): IMediaRecordRepository {
-        return MediaRecordRepositoryImpl(mediaRecordLocalDataSource)
+    fun provideMediaRecordRepository(
+        @ApplicationContext appContext: Context,
+        authManager: IAuthManager,
+        mediaRecordLocalDataSource: IMediaRecordLocalDataSource,
+        mediaRecordRemoteDataSource: IMediaRecordRemoteDataSource
+    ): IMediaRecordRepository {
+        return MediaRecordRepositoryImpl(
+            appContext,
+            authManager,
+            mediaRecordLocalDataSource,
+            mediaRecordRemoteDataSource
+        )
     }
 
     @Singleton
@@ -87,7 +135,7 @@ object ObservationRecordModule {
         authManager: IAuthManager,
         appSettingsManager: IAppSettingsManager<AppSettings>,
         nomenclatureLocalDataSource: INomenclatureLocalDataSource,
-        observationRecordLocalDataSource: IObservationRecordLocalDataSource,
+        @ObservationRecordLocalDataSource observationRecordLocalDataSource: IObservationRecordLocalDataSource,
         observationRecordRemoteDataSource: IObservationRecordRemoteDataSource,
         mediaRecordLocalDataSource: IMediaRecordLocalDataSource
     ): ISynchronizeObservationRecordRepository {
