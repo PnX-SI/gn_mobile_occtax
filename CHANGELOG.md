@@ -1,5 +1,29 @@
 # Changelog
 
+## [2.5.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.5.0) (2023-03-21, release)
+
+### 🚀 Nouveautés
+
+* Gestion des médias sur la partie dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/84)
+* Refonte de la synchronisation des relevés en consommant les nouvelles APIs du module "Occtax".
+* Refonte de la gestion des relevés.
+* Accélérer la saisie en permettant de mémoriser les dernières nomenclatures saisies sur la partie
+  dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
+* Possibilité de reprendre en édition un relevé terminé prêt à être synchronisé (https://github.com/PnX-SI/gn_mobile_occtax/issues/78).
+
+### 🚀 Corrections
+
+* Valeur par défaut des champs "Min"et "Max" dans la partie dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/209, https://github.com/PnX-SI/gn_mobile_occtax/issues/210)
+* Quelques petits ajustements sur la documentation de l'installation, notamment sur la récupération
+  des fichiers de logs (https://github.com/PnX-SI/gn_mobile_occtax/issues/203)
+
+### ⚠️ Notes de version
+
+* Code de version : 3170
+* Suite à la refonte sur la partie gestion des relevés, le paramétrage de la nomenclature en
+  configuration avancée a évolué aussi (cf. [README.md](https://github.com/PnX-SI/gn_mobile_occtax#nomenclature-settings)),
+  notamment sur le nommage des attributs et du respect de la casse (Par exemple `MIN` devient `count_min`).
+
 ## [2.4.1-rc4](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.1-rc4) (2023-02-21, pre-release)
 
 ### 🚀 Corrections

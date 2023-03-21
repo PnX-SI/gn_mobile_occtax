@@ -22,8 +22,8 @@ android {
         applicationId "fr.geonature.occtax2"
         minSdkVersion 26
         targetSdkVersion 31
-        versionCode 3163
-        versionName "2.4.1-rc4"
+        versionCode 3170
+        versionName "2.5.0"
         buildConfigField "String", "BUILD_DATE", "\"" + new Date().getTime() + "\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         archivesBaseName = project.name + "-" + versionName
