@@ -134,11 +134,12 @@ class NomenclatureSettingsLocalDataSourceImpl :
                 defaultNomenclatureTypes.find { it.code == property.key }
                     ?.let {
                         EditableNomenclatureType(
-                            it.type,
-                            it.code,
-                            it.viewType,
-                            property.visible,
-                            property.default
+                            type = it.type,
+                            code = it.code,
+                            viewType = it.viewType,
+                            visible = property.visible,
+                            default = property.default,
+                            value = it.value
                         )
                     }
             }
