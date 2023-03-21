@@ -274,7 +274,10 @@ Vous pouvez aussi utiliser les fichiers d'exemple de fond de carte et d'unités 
 
 == Logs
 
-Pour obtenir des logs de l'application mobile, on peut soit utiliser l'utilitaire `adb` (https://developer.android.com/studio/command-line/adb[Android Debug Bridge], il est intégré au kit de développement d'https://developer.android.com/studio#downloads[Android Studio] mais peut aussi être installé à part) ou les récupérer directement sur l'appareil mobile, dans le répertoire des logs de l'application.
+Pour obtenir des logs de l'application mobile, on peut :
+
+- les récupérer directement sur l'appareil mobile, dans le répertoire des logs de l'application (`Android/data/fr.geonature.occtax2/logs`)
+- utiliser l'utilitaire `adb` (https://developer.android.com/studio/command-line/adb[Android Debug Bridge] est intégré au kit de développement d'https://developer.android.com/studio#downloads[Android Studio] mais peut aussi être installé à part).
 
 === adb
 
