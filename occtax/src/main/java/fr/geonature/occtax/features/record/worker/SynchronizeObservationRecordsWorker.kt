@@ -19,6 +19,7 @@ import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.SynchronizationStatus
 import fr.geonature.occtax.features.record.repository.IObservationRecordRepository
 import fr.geonature.occtax.features.record.repository.ISynchronizeObservationRecordRepository
+import kotlinx.coroutines.delay
 import org.tinylog.Logger
 import java.util.Date
 import java.util.UUID
@@ -54,11 +55,11 @@ class SynchronizeObservationRecordsWorker @AssistedInject constructor(
             return Result.retry()
         }
 
-        val observationRecordToSynchronize = observationRecordRepository.readAll()
+        val observationRecordsToSynchronize = observationRecordRepository.readAll()
             .getOrDefault(emptyList())
             .filter { it.status == ObservationRecord.Status.TO_SYNC }
 
-        if (observationRecordToSynchronize.isEmpty()) {
+        if (observationRecordsToSynchronize.isEmpty()) {
             Logger.info { "no observation records to synchronize" }
 
             return Result.success(workData(state = WorkInfo.State.SUCCEEDED))
@@ -66,7 +67,7 @@ class SynchronizeObservationRecordsWorker @AssistedInject constructor(
 
         val observationRecordsSynchronized = mutableListOf<ObservationRecord>()
 
-        observationRecordToSynchronize.forEach { observationRecordToSync ->
+        observationRecordsToSynchronize.forEach { observationRecordToSync ->
             setProgress(
                 workData(
                     WorkInfo.State.RUNNING,
@@ -74,6 +75,8 @@ class SynchronizeObservationRecordsWorker @AssistedInject constructor(
                     ObservationRecord.Status.SYNC_IN_PROGRESS
                 )
             )
+
+            delay(500)
 
             synchronizeObservationRecordRepository.synchronize(observationRecordToSync)
                 .fold(
@@ -100,10 +103,10 @@ class SynchronizeObservationRecordsWorker @AssistedInject constructor(
         }
 
         Logger.info {
-            "observation records synchronization ${if (observationRecordsSynchronized.size == observationRecordToSynchronize.size) "successfully finished" else "finished with errors"} in ${Date().time - startTime.time}ms"
+            "observation records synchronization ${if (observationRecordsSynchronized.size == observationRecordsToSynchronize.size) "successfully finished" else "finished with errors"} in ${Date().time - startTime.time}ms"
         }
 
-        return if (observationRecordsSynchronized.size == observationRecordToSynchronize.size) {
+        return if (observationRecordsSynchronized.size == observationRecordsToSynchronize.size) {
             Result.success(
                 workData(state = WorkInfo.State.SUCCEEDED)
             )
