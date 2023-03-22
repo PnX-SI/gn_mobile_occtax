@@ -61,7 +61,7 @@ Example:
         "label": "OpenStreetMap",
         "source": "https://a.tile.openstreetmap.org/",
         "properties": {
-          "attribution": "© OSM contributors"
+          "attribution": "© OpenStreetMap contributors"
         }
       },
       {
