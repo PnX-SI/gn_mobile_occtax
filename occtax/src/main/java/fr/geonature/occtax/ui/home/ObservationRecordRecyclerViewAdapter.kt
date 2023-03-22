@@ -1,12 +1,10 @@
 package fr.geonature.occtax.ui.home
 
 import android.text.format.DateFormat
-import android.util.TypedValue
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.commons.util.ThemeUtils.getColor
 import fr.geonature.occtax.R
@@ -14,11 +12,15 @@ import fr.geonature.occtax.features.record.domain.ObservationRecord
 
 /**
  * Default RecyclerView Adapter used by [HomeActivity].
+ * Default RecyclerView Adapter about [ObservationRecord].
  *
  * @author S. Grimault
+ *
+ * @see LastObservationRecordsFragment
  */
-class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<ObservationRecord>) :
+class ObservationRecordRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<ObservationRecord>) :
     AbstractListItemRecyclerViewAdapter<ObservationRecord>(listener) {
+
     override fun getViewHolder(
         view: View,
         viewType: Int
@@ -55,9 +57,10 @@ class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<O
         AbstractListItemRecyclerViewAdapter<ObservationRecord>.AbstractViewHolder(itemView) {
         private val text1: TextView = itemView.findViewById(android.R.id.text1)
         private val text2: TextView = itemView.findViewById(android.R.id.text2)
-        private val chipGroup: ChipGroup = itemView.findViewById(R.id.chip_group_status)
+        private val chip: Chip = itemView.findViewById(R.id.chip_status)
 
         override fun onBind(item: ObservationRecord) {
+            itemView.isEnabled = item.status != ObservationRecord.Status.SYNC_SUCCESSFUL
             text1.text = itemView.context.getString(
                 R.string.home_input_created_at,
                 DateFormat.format(
@@ -75,21 +78,8 @@ class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<O
         }
 
         private fun buildChipStatus(item: ObservationRecord) {
-            chipGroup.removeAllViews()
-
-            with(
-                LayoutInflater.from(itemView.context)
-                    .inflate(
-                        R.layout.chip,
-                        chipGroup,
-                        false
-                    ) as Chip
-            ) {
-                chipMinHeight = TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP,
-                    24F,
-                    resources.displayMetrics
-                )
+            with(chip) {
+                isDuplicateParentStateEnabled = true
                 text = itemView.resources.getIdentifier(
                     "home_input_status_${item.status.name.lowercase()}",
                     "string",
@@ -108,13 +98,28 @@ class InputRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<O
                     )
                         .takeIf { it > 0 } ?: R.color.input_status_draft
                 )
+                chipIcon =
+                    if (item.status == ObservationRecord.Status.SYNC_IN_PROGRESS) CircularProgressIndicator(context).apply {
+                        isIndeterminate = true
+                        indicatorSize = 44
+                        trackThickness = 4
+                        indicatorInset = 4
+                        setIndicatorColor(
+                            getColor(
+                                context,
+                                R.attr.colorOnPrimary
+                            )
+                        )
+                    }.indeterminateDrawable?.apply {
+                        start()
+                    } else null
+
                 setTextColor(
                     getColor(
                         context,
                         R.attr.colorOnPrimary
                     )
                 )
-                chipGroup.addView(this)
             }
         }
     }

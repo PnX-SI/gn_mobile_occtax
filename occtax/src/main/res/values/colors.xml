@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- https://material.io/resources/color/#!/?primary.color=43a047&secondary.color=f4511e -->
+    <!-- https://m2.material.io/resources/color/#!/?primary.color=43a047&secondary.color=f4511e -->
     <color name="primary">#43a047</color>
     <color name="primary_dark">#00701a</color>
     <color name="accent">#f4511e</color>
@@ -18,7 +18,10 @@
     <color name="datasync_status_unknown">#CCC</color>
 
     <color name="input_status_draft">#FFA000</color>
-    <color name="input_status_to_sync">#689F38</color>
+    <color name="input_status_to_sync">#6EA03C</color>
+    <color name="input_status_sync_in_progress">#B4B432</color>
+    <color name="input_status_sync_error">#E6501E</color>
+    <color name="input_status_sync_successful">#6EA03C</color>
 
     <color name="area_observation_more_than_duration">#f00</color>
     <color name="area_observation_less_than_duration">#808080</color>

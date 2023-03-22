@@ -1,18 +1,15 @@
 package fr.geonature.occtax.ui.settings
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import android.widget.ListView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.core.os.bundleOf
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
@@ -53,8 +50,6 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
     private lateinit var datasetResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var observerResultLauncher: ActivityResultLauncher<Intent>
-
-    private var listener: OnPreferencesFragmentListener? = null
 
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(
@@ -161,17 +156,11 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         loadDefaultObserver()
         configurePermissionsPreference()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            configureNotificationsPreferences()
-        }
+        configureNotificationsPreferences()
 
         setServerUrlsPreferences(arguments?.getParcelable(ARG_SERVER_URLS))
         setMapSettingsPreferences(arguments?.getParcelable(ARG_MAP_SETTINGS))
         setMountPointsPreferences(preferenceScreen)
-
-        (preferenceScreen.findPreference(getString(R.string.preference_category_about_app_version_key)) as Preference?)?.also {
-            it.summary = listener?.getAppVersion()
-        }
     }
 
     override fun onCreatePreferences(
@@ -183,29 +172,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         addPreferencesFromResource(R.xml.preferences_observers)
         addPreferencesFromResource(R.xml.map_preferences)
         addPreferencesFromResource(R.xml.preferences_permissions)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            addPreferencesFromResource(R.xml.preferences_notifications)
-        }
-
+        addPreferencesFromResource(R.xml.preferences_notifications)
         addPreferencesFromResource(R.xml.preferences_storage)
-        addPreferencesFromResource(R.xml.preferences_about)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
-        if (context is OnPreferencesFragmentListener) {
-            listener = context
-        } else {
-            throw RuntimeException("$context must implement OnPreferencesFragmentListener")
-        }
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-
-        listener = null
     }
 
     private fun loadDefaultDataset() {
@@ -456,7 +424,6 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun configureNotificationsPreferences() {
         preferenceScreen
             .findPreference<Preference>(getString(R.string.preference_category_notifications_configure_key))
@@ -471,13 +438,6 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                     true
                 }
             }
-    }
-
-    /**
-     * Callback used by [PreferencesFragment].
-     */
-    interface OnPreferencesFragmentListener {
-        fun getAppVersion(): String
     }
 
     companion object {

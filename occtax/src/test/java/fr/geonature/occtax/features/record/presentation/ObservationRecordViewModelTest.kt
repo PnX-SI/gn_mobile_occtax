@@ -1,7 +1,13 @@
 package fr.geonature.occtax.features.record.presentation
 
+import android.app.Application
+import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
+import androidx.test.core.app.ApplicationProvider
+import androidx.work.Configuration
+import androidx.work.testing.SynchronousExecutor
+import androidx.work.testing.WorkManagerTestInitHelper.initializeTestWorkManager
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
@@ -27,6 +33,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
 /**
  * Unit tests about [ObservationRecordViewModel].
@@ -34,6 +42,7 @@ import org.junit.Test
  * @author S. Grimault
  */
 @ExperimentalCoroutinesApi
+@RunWith(RobolectricTestRunner::class)
 class ObservationRecordViewModelTest {
 
     @get:Rule
@@ -41,6 +50,8 @@ class ObservationRecordViewModelTest {
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
+
+    private lateinit var application: Application
 
     @RelaxedMockK
     private lateinit var getAllObservationRecordsUseCase: GetAllObservationRecordsUseCase
@@ -72,7 +83,18 @@ class ObservationRecordViewModelTest {
     fun setUp() {
         init(this)
 
+        application = ApplicationProvider.getApplicationContext()
+
+        initializeTestWorkManager(
+            application,
+            Configuration.Builder()
+                .setMinimumLoggingLevel(Log.DEBUG)
+                .setExecutor(SynchronousExecutor())
+                .build()
+        )
+
         observationRecordViewModel = ObservationRecordViewModel(
+            application,
             getAllObservationRecordsUseCase,
             saveObservationRecordUseCase,
             editObservationRecordUseCase,

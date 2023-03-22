@@ -9,7 +9,6 @@ import fr.geonature.datasync.api.IGeoNatureAPIClient
 import fr.geonature.datasync.api.model.AuthUser
 import fr.geonature.datasync.auth.IAuthManager
 import fr.geonature.datasync.auth.error.AuthException
-import fr.geonature.datasync.packageinfo.ISynchronizeObservationRecordRepository
 import fr.geonature.datasync.settings.error.DataSyncSettingsNotFoundException
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.data.IMediaRecordLocalDataSource
@@ -42,8 +41,10 @@ class SynchronizeObservationRecordRepositoryImpl(
     private val mediaRecordLocalDataSource: IMediaRecordLocalDataSource
 ) : ISynchronizeObservationRecordRepository {
 
-    override suspend fun invoke(recordId: Long): Result<Unit> {
-        Logger.info { "synchronize observation record '$recordId'..." }
+    override suspend fun synchronize(observationRecord: ObservationRecord): Result<ObservationRecord> {
+        Logger.info {
+            "synchronize observation record '${observationRecord.internalId}'..."
+        }
 
         val authUser = authManager.getAuthLogin()?.user
             ?: return Result.failure(AuthException.NotConnectedException)
@@ -56,13 +57,10 @@ class SynchronizeObservationRecordRepositoryImpl(
 
         observationRecordRemoteDataSource.setBaseUrl(dataSyncSettings.geoNatureServerUrl)
 
-        val observationRecord =
-            runCatching { observationRecordLocalDataSource.read(recordId) }.getOrElse {
-                return Result.failure(it)
-            }
-
         if (observationRecord.status != ObservationRecord.Status.TO_SYNC) {
-            return Result.failure(ObservationRecordException.InvalidStatusException(observationRecord.internalId))
+            return Result.failure(
+                ObservationRecordException.InvalidStatusException(observationRecord.internalId)
+            )
         }
 
         val nomenclatureForImage = getNomenclatureForImage()
@@ -72,7 +70,9 @@ class SynchronizeObservationRecordRepositoryImpl(
                 geoNatureAPIClient.getIdTableLocation()
                     .await()
             }.onFailure {
-                Logger.warn { "failed to fetch ID table location" }
+                Logger.warn {
+                    "failed to fetch ID table location"
+                }
             }
                 .getOrNull()
 
@@ -81,13 +81,21 @@ class SynchronizeObservationRecordRepositoryImpl(
                 observationRecord,
                 appSettings
             )
-        }.onFailure { Logger.error { "failed to synchronize observation record '$recordId'" } }
+        }.onFailure {
+            Logger.error {
+                "failed to synchronize observation record '${observationRecord.internalId}'"
+            }
+        }
             .getOrElse {
                 return Result.failure(it)
             }
 
-        Logger.info { "observation record created from GeoNature: '${observationRecordSent.id}'" }
-        Logger.info { "synchronize ${observationRecordSent.taxa.taxa.size} taxa from observation record '$recordId'..." }
+        Logger.info {
+            "observation record created from GeoNature: '${observationRecordSent.id}'"
+        }
+        Logger.info {
+            "synchronize ${observationRecordSent.taxa.taxa.size} taxa from observation record '${observationRecord.internalId}'..."
+        }
 
         if (nomenclatureForImage != null && idTableLocation != null) {
             observationRecord.taxa.taxa.forEach {
@@ -106,28 +114,38 @@ class SynchronizeObservationRecordRepositoryImpl(
                 appSettings
             )
         }.onFailure {
-            Logger.error { "failed to synchronize all taxa from observation record '$recordId'" }
-            Logger.info { "deleting observation record '${observationRecordSent.id}' from GeoNature..." }
+            Logger.error {
+                "failed to synchronize all taxa from observation record '${observationRecord.internalId}'"
+            }
+            Logger.info {
+                "deleting observation record '${observationRecordSent.id}' from GeoNature..."
+            }
 
             deleteAllSynchronizedMediaFiles(observationRecordSent)
 
             runCatching {
                 observationRecordRemoteDataSource.deleteObservationRecord(observationRecordSent)
             }.onFailure {
-                Logger.warn { "failed to delete observation record '${observationRecordSent.id}' from GeoNature" }
+                Logger.warn {
+                    "failed to delete observation record '${observationRecordSent.id}' from GeoNature"
+                }
             }
         }
             .getOrElse {
                 return Result.failure(it)
             }
 
-        Logger.info { "observation record '$recordId' successfully synchronized" }
-
-        runCatching { observationRecordLocalDataSource.delete(recordId) }.onFailure {
-            Logger.warn { "failed to delete a fully synchronized observation record '$recordId'" }
+        Logger.info {
+            "observation record '${observationRecord.internalId}' successfully synchronized"
         }
 
-        return Result.success(Unit)
+        runCatching { observationRecordLocalDataSource.delete(observationRecord.internalId) }.onFailure {
+            Logger.warn {
+                "failed to delete a fully synchronized observation record '${observationRecord.internalId}'"
+            }
+        }
+
+        return Result.success(observationRecordSent)
     }
 
     private suspend fun getNomenclatureForImage(): Nomenclature? {
@@ -136,7 +154,10 @@ class SynchronizeObservationRecordRepositoryImpl(
         }.getOrNull()
 
         if (nomenclatures == null) {
-            Logger.warn { "'TYPE_MEDIA' nomenclature type not found" }
+            Logger.warn {
+                "'TYPE_MEDIA' nomenclature type not found"
+            }
+
             return null
         }
 
@@ -146,7 +167,10 @@ class SynchronizeObservationRecordRepositoryImpl(
         }
 
         if (nomenclatureForImage == null) {
-            Logger.warn { "no nomenclature found matching media type 'image/*'" }
+            Logger.warn {
+                "no nomenclature found matching media type 'image/*'"
+            }
+
             return null
         }
 
@@ -196,10 +220,14 @@ class SynchronizeObservationRecordRepositoryImpl(
                         )
                             .await()
                     }.onSuccess {
-                        Logger.info { "media file '${file.absolutePath}' successfully synchronized" }
+                        Logger.info {
+                            "media file '${file.absolutePath}' successfully synchronized"
+                        }
                     }
                         .onFailure {
-                            Logger.warn(it) { "failed to send media file '${file.absolutePath}'..." }
+                            Logger.warn(it) {
+                                "failed to send media file '${file.absolutePath}'..."
+                            }
                         }
                         .getOrNull()
                 }
@@ -207,7 +235,9 @@ class SynchronizeObservationRecordRepositoryImpl(
     }
 
     private suspend fun deleteAllSynchronizedMediaFiles(observationRecord: ObservationRecord) {
-        Logger.info { "deleting already uploaded media files…" }
+        Logger.info {
+            "deleting already uploaded media files..."
+        }
 
         observationRecord.taxa.taxa.forEach { taxonRecord ->
             taxonRecord.counting.counting.forEach { countingRecord ->
@@ -216,7 +246,9 @@ class SynchronizeObservationRecordRepositoryImpl(
                         geoNatureAPIClient.deleteMediaFile(media.id)
                             .awaitResponse()
                     }.onFailure {
-                        Logger.warn(it) { "failed to delete media file ${media.id}..." }
+                        Logger.warn(it) {
+                            "failed to delete media file ${media.id}..."
+                        }
                     }
                 }
             }

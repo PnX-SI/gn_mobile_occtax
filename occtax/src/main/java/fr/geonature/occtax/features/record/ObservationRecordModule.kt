@@ -12,7 +12,6 @@ import fr.geonature.commons.features.taxon.data.ITaxonLocalDataSource
 import fr.geonature.commons.settings.IAppSettingsManager
 import fr.geonature.datasync.api.IGeoNatureAPIClient
 import fr.geonature.datasync.auth.IAuthManager
-import fr.geonature.datasync.packageinfo.ISynchronizeObservationRecordRepository
 import fr.geonature.occtax.api.IOcctaxAPIClient
 import fr.geonature.occtax.features.record.data.IMediaRecordLocalDataSource
 import fr.geonature.occtax.features.record.data.IObservationRecordLocalDataSource
@@ -22,6 +21,7 @@ import fr.geonature.occtax.features.record.data.ObservationRecordLocalDataSource
 import fr.geonature.occtax.features.record.data.ObservationRecordRemoteDataSourceImpl
 import fr.geonature.occtax.features.record.repository.IMediaRecordRepository
 import fr.geonature.occtax.features.record.repository.IObservationRecordRepository
+import fr.geonature.occtax.features.record.repository.ISynchronizeObservationRecordRepository
 import fr.geonature.occtax.features.record.repository.MediaRecordRepositoryImpl
 import fr.geonature.occtax.features.record.repository.ObservationRecordRepositoryImpl
 import fr.geonature.occtax.features.record.repository.SynchronizeObservationRecordRepositoryImpl

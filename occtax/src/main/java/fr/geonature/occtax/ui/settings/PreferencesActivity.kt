@@ -10,11 +10,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.fp.orNull
 import fr.geonature.datasync.api.IGeoNatureAPIClient
 import fr.geonature.datasync.settings.DataSyncSettingsViewModel
-import fr.geonature.occtax.BuildConfig
-import fr.geonature.occtax.R
 import fr.geonature.occtax.settings.AppSettings
-import java.text.DateFormat
-import java.util.Date
 
 /**
  * Global settings.
@@ -24,8 +20,7 @@ import java.util.Date
  * @author S. Grimault
  */
 @AndroidEntryPoint
-class PreferencesActivity : AppCompatActivity(),
-    PreferencesFragment.OnPreferencesFragmentListener {
+class PreferencesActivity : AppCompatActivity() {
 
     private val dataSyncSettingsViewModel: DataSyncSettingsViewModel by viewModels()
 
@@ -44,13 +39,15 @@ class PreferencesActivity : AppCompatActivity(),
 
         // Display the fragment as the main content.
         supportFragmentManager.beginTransaction()
-            .replace(
-                android.R.id.content,
-                PreferencesFragment.newInstance(
-                    serverUrls,
-                    appSettings?.mapSettings
+            .apply {
+                replace(
+                    android.R.id.content,
+                    PreferencesFragment.newInstance(
+                        serverUrls,
+                        appSettings?.mapSettings
+                    )
                 )
-            )
+            }
             .commit()
     }
 
@@ -84,16 +81,6 @@ class PreferencesActivity : AppCompatActivity(),
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    override fun getAppVersion(): String {
-        return getString(
-            R.string.app_version,
-            BuildConfig.VERSION_NAME,
-            BuildConfig.VERSION_CODE,
-            DateFormat.getDateTimeInstance()
-                .format(Date(BuildConfig.BUILD_DATE.toLong()))
-        )
     }
 
     companion object {

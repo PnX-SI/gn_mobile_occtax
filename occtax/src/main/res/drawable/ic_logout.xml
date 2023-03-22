@@ -1,14 +1,12 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
-    android:tint="?attr/colorControlNormal"
-    android:tintMode="multiply"
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path
-        android:fillColor="@color/action_drawable_color"
+        android:fillColor="@android:color/black"
         android:pathData="m12,3 l5,8.6603H7Z"/>
     <path
-        android:fillColor="@color/action_drawable_color"
+        android:fillColor="@android:color/black"
         android:pathData="m12,20.9997c-4.9587,0 -9,-4.0413 -9,-9C3,9.2392 4.2529,6.7639 6.2188,5.111L7.2324,6.8669C5.8581,8.1434 5,9.9675 5,11.9997c0,3.8778 3.1222,7 7,7 3.8778,0 7,-3.1222 7,-7C19,9.9675 18.1419,8.1434 16.7676,6.8669L17.7813,5.111C19.7471,6.7639 21,9.2392 21,11.9997c0,4.9587 -4.0413,9 -9,9z"/>
 </vector>
