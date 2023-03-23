@@ -13,7 +13,7 @@ Nécessite la version 2.10 (ou plus) de GeoNature.
   dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 * Possibilité de reprendre en édition un relevé terminé prêt à être synchronisé (https://github.com/PnX-SI/gn_mobile_occtax/issues/78).
 
-### 🚀 Corrections
+### 🐛 Corrections
 
 * Valeur par défaut des champs "Min"et "Max" dans la partie dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/209, https://github.com/PnX-SI/gn_mobile_occtax/issues/210)
 * Quelques petits ajustements sur la documentation de l'installation, notamment sur la récupération
@@ -28,7 +28,7 @@ Nécessite la version 2.10 (ou plus) de GeoNature.
 
 ## [2.4.1-rc4](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.1-rc4) (2023-02-21, pre-release)
 
-### 🚀 Corrections
+### 🐛 Corrections
 
 * Gestion des médias sur la partie dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/84)
 * Accélérer la saisie en permettant de mémoriser les dernières nomenclatures saisies sur la partie
