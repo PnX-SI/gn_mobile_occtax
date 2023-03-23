@@ -2,10 +2,12 @@
 
 ## [2.5.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.5.0) (2023-03-21, release)
 
+Nécessite la version 2.10 (ou plus) de GeoNature.
+
 ### 🚀 Nouveautés
 
 * Gestion des médias sur la partie dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/84)
-* Refonte de la synchronisation des relevés en consommant les nouvelles APIs du module "Occtax".
+* Refonte de la synchronisation des relevés en consommant les APIs v2 du module "Occtax".
 * Refonte de la gestion des relevés.
 * Accélérer la saisie en permettant de mémoriser les dernières nomenclatures saisies sur la partie
   dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
