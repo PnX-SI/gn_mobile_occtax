@@ -1,8 +1,22 @@
 # Changelog
 
-## [2.5.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.5.0) (2023-03-21, release)
+## [2.6.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.0-rc0) (2023-03-25, pre-release)
 
-Nécessite la version 2.10 (ou plus) de GeoNature.
+### 🚀 Nouveautés
+
+* La synchronisation des données est maintenant décoléré de la synchronisation des relevés (https://github.com/PnX-SI/gn_mobile_occtax/issues/133). 
+* La synchronisation des relevés se fait à la demande de l'utilisateur (https://github.com/PnX-SI/gn_mobile_occtax/issues/137).
+* La synchronisation des données s'exécute mantenant dans un contexte transactionnel afin de
+  toujours garantir une cohérence des données présentes localement.
+* Refonte de l'écran d'accueil pour mettre en valeur les relevés en cours ou prêt à être
+  synchronisés. La partie paramétrage et synchronisation des données sont déportées dans le menu
+  latéral.
+
+### ⚠️ Notes de version
+
+* Code de version : 3181
+
+## [2.5.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.5.0) (2023-03-21, release)
 
 ### 🚀 Nouveautés
 
@@ -22,6 +36,7 @@ Nécessite la version 2.10 (ou plus) de GeoNature.
 ### ⚠️ Notes de version
 
 * Code de version : 3170
+* Nécessite la version 2.10 (ou plus) de GeoNature.
 * Suite à la refonte sur la partie gestion des relevés, le paramétrage de la nomenclature en
   configuration avancée a évolué aussi (cf. [README.md](https://github.com/PnX-SI/gn_mobile_occtax#nomenclature-settings)),
   notamment sur le nommage des attributs et du respect de la casse (Par exemple `MIN` devient `count_min`).
