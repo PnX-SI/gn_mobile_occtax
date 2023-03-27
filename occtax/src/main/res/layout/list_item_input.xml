@@ -17,17 +17,16 @@
         android:singleLine="true"
         android:textAppearance="?attr/textAppearanceListItem"
         app:layout_constraintBottom_toBottomOf="@android:id/text2"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/chip_status"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="@tools:sample/last_names" />
+        tools:text="@tools:sample/lorem/random" />
 
     <com.google.android.material.chip.Chip
         android:id="@+id/chip_status"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:duplicateParentState="true"
-        android:gravity="center_vertical"
         android:maxLines="1"
         android:padding="0dp"
         app:chipIconSize="20dp"
@@ -47,6 +46,6 @@
         app:layout_constraintEnd_toStartOf="@id/chip_status"
         app:layout_constraintStart_toStartOf="@android:id/text1"
         app:layout_constraintTop_toBottomOf="@android:id/text1"
-        tools:text="@tools:sample/first_names" />
+        tools:text="@tools:sample/lorem/random" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -100,6 +100,8 @@ class SynchronizeObservationRecordsWorker @AssistedInject constructor(
                         )
                     }
                 )
+
+            delay(500)
         }
 
         Logger.info {

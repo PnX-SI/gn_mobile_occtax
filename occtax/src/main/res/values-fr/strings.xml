@@ -29,7 +29,7 @@
     <string name="home_input_created_at">Relevé du %s</string>
     <string name="home_input_status_draft">En cours</string>
     <string name="home_input_status_to_sync">Terminé</string>
-    <string name="home_input_status_sync_in_progress">En cours…</string>
+    <string name="home_input_status_sync_in_progress">Synchronisation…</string>
     <string name="home_input_status_sync_error">Échec</string>
     <string name="home_input_status_sync_successful">Terminé</string>
     <plurals name="home_input_taxa_count">

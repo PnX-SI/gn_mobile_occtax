@@ -70,9 +70,15 @@ class ObservationRecordDataSourceTest {
     fun `should save and read observation records`() =
         runTest {
             // given some observation records to save and read
-            val record1 = ObservationRecord(internalId = 1234)
-            val record2 = ObservationRecord(internalId = 1235)
-            val record3 = ObservationRecord(internalId = 1237)
+            val record1 = ObservationRecord(internalId = 1234).apply {
+                dates.start = toDate("2016-10-28T08:15:00Z")!!
+            }
+            val record2 = ObservationRecord(internalId = 1235).apply {
+                dates.start = toDate("2016-10-28T10:15:00Z")!!
+            }
+            val record3 = ObservationRecord(internalId = 1237).apply {
+                dates.start = toDate("2016-10-28T09:15:00Z")!!
+            }
 
             observationRecordLocalDataSource.save(record1)
             observationRecordLocalDataSource.save(record2)
@@ -82,12 +88,14 @@ class ObservationRecordDataSourceTest {
             val record4 = ObservationRecord(
                 internalId = 1236,
                 status = ObservationRecord.Status.TO_SYNC
-            )
+            ).apply {
+                dates.start = toDate("2016-10-28T07:15:00Z")!!
+            }
             File(
                 FileUtils
                     .getInputsFolder(application)
                     .also { it.mkdirs() },
-                "input_${record4.id}.json"
+                "input_${record4.internalId}.json"
             )
                 .bufferedWriter()
                 .use { out ->
@@ -102,10 +110,10 @@ class ObservationRecordDataSourceTest {
             // then
             assertArrayEquals(
                 arrayOf(
-                    record1.internalId to record1.status,
                     record2.internalId to record2.status,
-                    record4.internalId to record4.status,
                     record3.internalId to record3.status,
+                    record1.internalId to record1.status,
+                    record4.internalId to record4.status
                 ),
                 observationRecords.map { it.internalId to it.status }
                     .toTypedArray()

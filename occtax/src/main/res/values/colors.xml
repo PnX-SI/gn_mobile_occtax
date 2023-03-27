@@ -12,16 +12,11 @@
     <color name="grey_200">#eeeeee</color>
     <color name="grey_300">#e0e0e0</color>
 
-    <color name="datasync_status_ok">#689F38</color>
-    <color name="datasync_status_ko">#D32F2F</color>
-    <color name="datasync_status_pending">#FFA000</color>
-    <color name="datasync_status_unknown">#CCC</color>
-
     <color name="input_status_draft">#FFA000</color>
-    <color name="input_status_to_sync">#6EA03C</color>
-    <color name="input_status_sync_in_progress">#B4B432</color>
+    <color name="input_status_to_sync">#3C963C</color>
+    <color name="input_status_sync_in_progress">#6EA03C</color>
     <color name="input_status_sync_error">#E6501E</color>
-    <color name="input_status_sync_successful">#6EA03C</color>
+    <color name="input_status_sync_successful">#3C963C</color>
 
     <color name="area_observation_more_than_duration">#f00</color>
     <color name="area_observation_less_than_duration">#808080</color>

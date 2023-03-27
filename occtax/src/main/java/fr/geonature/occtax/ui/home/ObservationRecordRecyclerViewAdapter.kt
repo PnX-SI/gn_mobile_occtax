@@ -112,6 +112,7 @@ class ObservationRecordRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapt
                         )
                     }.indeterminateDrawable?.apply {
                         start()
+                        chip.invalidate()
                     } else null
 
                 setTextColor(

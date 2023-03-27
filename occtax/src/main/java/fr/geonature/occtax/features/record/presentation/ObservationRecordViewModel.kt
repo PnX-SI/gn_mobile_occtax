@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations.map
+import androidx.lifecycle.liveData
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -21,7 +23,6 @@ import fr.geonature.occtax.features.record.usecase.SaveObservationRecordUseCase
 import fr.geonature.occtax.features.record.worker.SynchronizeObservationRecordsWorker
 import fr.geonature.occtax.settings.AppSettings
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.tinylog.kotlin.Logger
 import java.util.UUID
 import javax.inject.Inject
@@ -44,7 +45,6 @@ class ObservationRecordViewModel @Inject constructor(
     private val workManager: WorkManager = WorkManager.getInstance(getApplication())
 
     private val _observationRecords = MutableLiveData<List<ObservationRecord>>()
-
     private val _observationRecord = MutableLiveData<ObservationRecord>()
 
     /**
@@ -62,7 +62,11 @@ class ObservationRecordViewModel @Inject constructor(
     val isSyncRunning: LiveData<Boolean> = _isSyncRunning
 
     private val _observeSynchronizationStatus: LiveData<SynchronizationStatus?> =
-        map(workManager.getWorkInfosByTagLiveData(SynchronizeObservationRecordsWorker.OBSERVATION_RECORDS_SYNC_WORKER_TAG)) { workInfoList ->
+        map(
+            workManager.getWorkInfosByTagLiveData(
+                SynchronizeObservationRecordsWorker.OBSERVATION_RECORDS_SYNC_WORKER_TAG
+            )
+        ) { workInfoList ->
             if (workInfoList == null || workInfoList.isEmpty()) {
                 currentSyncWorkerId = null
                 return@map null
@@ -97,26 +101,43 @@ class ObservationRecordViewModel @Inject constructor(
      */
     val observationRecords: LiveData<List<ObservationRecord>> =
         MediatorLiveData<List<ObservationRecord>>().apply {
-            addSource(_observationRecords) { value = it }
-            addSource(_observeSynchronizationStatus) { synchronizationStatus ->
-                if (synchronizationStatus == null) return@addSource
+            addSource(_observationRecords) {
+                value = it.map { observationRecord ->
+                    if (observationRecord.status == ObservationRecord.Status.DRAFT) return@map observationRecord
 
-                value = (value ?: emptyList()).map { observationRecord ->
-                    synchronizationStatus.takeIf { it is SynchronizationStatus.ObservationRecordStatus }
-                        ?.let { it as SynchronizationStatus.ObservationRecordStatus }
-                        ?.let {
-                            if (it.internalId == observationRecord.internalId) {
-                                observationRecord.copy(status = it.status)
-                            } else observationRecord
+                    (value
+                        ?: emptyList()).firstOrNull { existingObservationRecord ->
+                        existingObservationRecord.internalId == observationRecord.internalId
+                    }
+                        ?.let { existingObservationRecord ->
+                            observationRecord.copy(status = existingObservationRecord.status.takeIf { status ->
+                                status.ordinal > observationRecord.status.ordinal
+                            }
+                                ?: observationRecord.status)
                         }
                         ?: observationRecord
                 }
-                viewModelScope.launch {
-                    if (synchronizationStatus is SynchronizationStatus.ObservationRecordStatus && synchronizationStatus.status == ObservationRecord.Status.SYNC_SUCCESSFUL) {
+            }
+            addSource(_observeSynchronizationStatus.switchMap { synchronizationStatus ->
+                liveData {
+                    if (synchronizationStatus == null) return@liveData
+                    if (synchronizationStatus !is SynchronizationStatus.ObservationRecordStatus) return@liveData
+
+                    emit(synchronizationStatus)
+
+                    if (synchronizationStatus.status == ObservationRecord.Status.SYNC_SUCCESSFUL) {
                         delay(500)
-                        value = (value
-                            ?: emptyList()).filter { it.internalId != synchronizationStatus.internalId }
+                        value =
+                            (value ?: emptyList()).filter {
+                                it.internalId != synchronizationStatus.internalId
+                            }
                     }
+                }
+            }) { synchronizationStatus ->
+                value = (value ?: emptyList()).map { observationRecord ->
+                    if (synchronizationStatus.internalId == observationRecord.internalId) {
+                        observationRecord.copy(status = synchronizationStatus.status)
+                    } else observationRecord
                 }
             }
         }
@@ -125,7 +146,7 @@ class ObservationRecordViewModel @Inject constructor(
      * Whether some [ObservationRecord]s are ready to synchronize according to their current status.
      */
     val hasObservationRecordsReadyToSynchronize =
-        map(_observationRecords) { observationRecords ->
+        map(observationRecords) { observationRecords ->
             observationRecords.any {
                 it.status == ObservationRecord.Status.TO_SYNC
             }
