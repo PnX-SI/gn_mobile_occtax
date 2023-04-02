@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.6.0] (unreleased)
+
+### 🚀 Nouveautés
+
+### ⚠️ Notes de version
+
+* Code de version : 
+* Depuis sa version 2.12.0, GeoNature permet de gérer le contenu de la table `gn_commons.t_mobile_apps` directement dans le backoffice du module "Admin" de GeoNature (https://github.com/PnX-SI/gn_mobile_occtax/issues/214)
+* Dans cette même version, les médias (incluant le dossier `mobile/` comprenant les fichiers APK et le fichier `settings.json` d'Occtax-mobile) ont été déplacés du dossier `~/geonature/backend/static/` à `~/geonature/backend/media/` (https://github.com/PnX-SI/gn_mobile_occtax/issues/214)
+
 ## [2.6.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.0-rc0) (2023-03-25, pre-release)
 
 ### 🚀 Nouveautés
