@@ -8,6 +8,7 @@ import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.entity.InputObserver
+import fr.geonature.compat.content.getParcelableArrayExtraCompat
 import fr.geonature.occtax.R
 
 /**
@@ -38,7 +39,8 @@ class InputObserverListActivity : AppCompatActivity(),
                         EXTRA_CHOICE_MODE,
                         ListView.CHOICE_MODE_SINGLE
                     ),
-                    intent.getParcelableArrayListExtra(EXTRA_SELECTED_INPUT_OBSERVERS)
+                    intent.getParcelableArrayExtraCompat<InputObserver>(EXTRA_SELECTED_INPUT_OBSERVERS)
+                        ?.toList()
                         ?: emptyList()
                 )
             )
@@ -47,9 +49,9 @@ class InputObserverListActivity : AppCompatActivity(),
 
     override fun onSelectedInputObservers(inputObservers: List<InputObserver>) {
         val intent = Intent().apply {
-            putParcelableArrayListExtra(
+            putExtra(
                 EXTRA_SELECTED_INPUT_OBSERVERS,
-                ArrayList(inputObservers)
+                inputObservers.toTypedArray()
             )
         }
 
@@ -79,9 +81,9 @@ class InputObserverListActivity : AppCompatActivity(),
                     EXTRA_CHOICE_MODE,
                     choiceMode
                 )
-                putParcelableArrayListExtra(
+                putExtra(
                     EXTRA_SELECTED_INPUT_OBSERVERS,
-                    ArrayList(selectedObservers)
+                    selectedObservers.toTypedArray()
                 )
             }
         }

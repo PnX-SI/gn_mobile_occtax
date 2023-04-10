@@ -150,7 +150,6 @@ class HomeActivity : AppCompatActivity(),
                         MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                     )
                 }
-                drawerLayout.close()
             }
         }
         navMenuLogout = findViewById<DrawerMenuEntryView>(R.id.nav_menu_logout)?.also {

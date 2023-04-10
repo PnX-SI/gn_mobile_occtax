@@ -1,6 +1,7 @@
 package fr.geonature.occtax.settings
 
 import android.os.Parcel
+import kotlinx.parcelize.parcelableCreator
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -88,7 +89,7 @@ class NomenclatureSettingsTest {
         // then
         assertEquals(
             nomenclatureSettings,
-            NomenclatureSettings.CREATOR.createFromParcel(parcel)
+            parcelableCreator<NomenclatureSettings>().createFromParcel(parcel)
         )
     }
 }

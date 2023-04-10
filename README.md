@@ -59,10 +59,11 @@ Example:
       },
       {
         "label": "OpenStreetMap",
-        "source": "https://a.tile.openstreetmap.org/",
-        "properties": {
-          "attribution": "© OSM contributors"
-        }
+        "source": [
+          "https://a.tile.openstreetmap.org",
+          "https://b.tile.openstreetmap.org",
+          "https://c.tile.openstreetmap.org"
+        ]
       },
       {
         "label": "Mailles 5x5",
@@ -252,10 +253,11 @@ Each property may be a simple string representing the nomenclature attribute to 
 
 ## Upgrade git sub modules
 
-Do **NOT** modify directly any git sub modules (e.g. `commons`, `mountpoint`, `viewpager` and `maps`).
-Any changes should be made from each underlying git repository:
+Do **NOT** modify directly any git sub modules (e.g. `commons`, `compat`, `mountpoint`, `viewpager`
+and `maps`). Any changes should be made from each underlying git repository:
 
 - `commons`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
+- `compat`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
 - `datasync`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
 - `mountpoint`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
 - `viewpager`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository

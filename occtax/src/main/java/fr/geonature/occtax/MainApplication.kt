@@ -61,7 +61,8 @@ class MainApplication : Application(), Configuration.Provider {
                 MountPoint.StorageType.INTERNAL,
             ),
             "logs"
-        ).also { it.mkdirs() }
+        )
+            .also { it.mkdirs() }
 
         System.setProperty(
             "tinylog.directory",
@@ -81,43 +82,35 @@ class MainApplication : Application(), Configuration.Provider {
         )
     }
 
-    private fun configureCheckInputsToSynchronizeChannel(notificationManager: NotificationManagerCompat): NotificationChannel? {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_CHECK_INPUTS_TO_SYNCHRONIZE,
-                getText(R.string.channel_name_check_inputs_to_synchronize),
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = getString(R.string.channel_description_check_inputs_to_synchronize)
-                setShowBadge(true)
-            }
-
-            // register this channel with the system
-            notificationManager.createNotificationChannel(channel)
-
-            return channel
+    private fun configureCheckInputsToSynchronizeChannel(notificationManager: NotificationManagerCompat): NotificationChannel {
+        val channel = NotificationChannel(
+            CHANNEL_CHECK_INPUTS_TO_SYNCHRONIZE,
+            getText(R.string.channel_name_check_inputs_to_synchronize),
+            NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            description = getString(R.string.channel_description_check_inputs_to_synchronize)
+            setShowBadge(true)
         }
 
-        return null
+        // register this channel with the system
+        notificationManager.createNotificationChannel(channel)
+
+        return channel
     }
 
-    private fun configureSynchronizeDataChannel(notificationManager: NotificationManagerCompat): NotificationChannel? {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_DATA_SYNCHRONIZATION,
-                getText(R.string.channel_name_data_synchronization),
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = getString(R.string.channel_description_data_synchronization)
-            }
-
-            // register this channel with the system
-            notificationManager.createNotificationChannel(channel)
-
-            return channel
+    private fun configureSynchronizeDataChannel(notificationManager: NotificationManagerCompat): NotificationChannel {
+        val channel = NotificationChannel(
+            CHANNEL_DATA_SYNCHRONIZATION,
+            getText(R.string.channel_name_data_synchronization),
+            NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            description = getString(R.string.channel_description_data_synchronization)
         }
 
-        return null
+        // register this channel with the system
+        notificationManager.createNotificationChannel(channel)
+
+        return channel
     }
 
     private class TinylogUncaughtExceptionHandler : Thread.UncaughtExceptionHandler {

@@ -4,8 +4,8 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations.map
 import androidx.lifecycle.liveData
+import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
@@ -62,39 +62,38 @@ class ObservationRecordViewModel @Inject constructor(
     val isSyncRunning: LiveData<Boolean> = _isSyncRunning
 
     private val _observeSynchronizationStatus: LiveData<SynchronizationStatus?> =
-        map(
-            workManager.getWorkInfosByTagLiveData(
-                SynchronizeObservationRecordsWorker.OBSERVATION_RECORDS_SYNC_WORKER_TAG
-            )
-        ) { workInfoList ->
-            if (workInfoList == null || workInfoList.isEmpty()) {
-                currentSyncWorkerId = null
-                return@map null
-            }
-
-            val workInfo = workInfoList.firstOrNull { it.id == currentSyncWorkerId }
-                ?: workInfoList.firstOrNull { it.state == WorkInfo.State.RUNNING }
-
-            // no work info is running: abort
-            if (workInfo == null) {
-                currentSyncWorkerId = null
-                return@map null
-            }
-
-            // this is a new work info: set the current worker
-            if (workInfo.id != currentSyncWorkerId) {
-                currentSyncWorkerId = workInfo.id
-            }
-
-            workInfoList.firstOrNull()
-                ?.let {
-                    SynchronizeObservationRecordsWorker.toSynchronizationStatus(it)
+        workManager.getWorkInfosByTagLiveData(
+            SynchronizeObservationRecordsWorker.OBSERVATION_RECORDS_SYNC_WORKER_TAG
+        )
+            .map { workInfoList ->
+                if (workInfoList == null || workInfoList.isEmpty()) {
+                    currentSyncWorkerId = null
+                    return@map null
                 }
-                ?.also {
-                    if (it.state.isFinished) currentSyncWorkerId = null
+
+                val workInfo = workInfoList.firstOrNull { it.id == currentSyncWorkerId }
+                    ?: workInfoList.firstOrNull { it.state == WorkInfo.State.RUNNING }
+
+                // no work info is running: abort
+                if (workInfo == null) {
+                    currentSyncWorkerId = null
+                    return@map null
                 }
-                ?: return@map null
-        }
+
+                // this is a new work info: set the current worker
+                if (workInfo.id != currentSyncWorkerId) {
+                    currentSyncWorkerId = workInfo.id
+                }
+
+                workInfoList.firstOrNull()
+                    ?.let {
+                        SynchronizeObservationRecordsWorker.toSynchronizationStatus(it)
+                    }
+                    ?.also {
+                        if (it.state.isFinished) currentSyncWorkerId = null
+                    }
+                    ?: return@map null
+            }
 
     /**
      * All [ObservationRecord]s loaded.
@@ -146,7 +145,7 @@ class ObservationRecordViewModel @Inject constructor(
      * Whether some [ObservationRecord]s are ready to synchronize according to their current status.
      */
     val hasObservationRecordsReadyToSynchronize =
-        map(observationRecords) { observationRecords ->
+        observationRecords.map { observationRecords ->
             observationRecords.any {
                 it.status == ObservationRecord.Status.TO_SYNC
             }

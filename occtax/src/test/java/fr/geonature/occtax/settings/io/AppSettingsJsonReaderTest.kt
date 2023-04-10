@@ -50,7 +50,7 @@ class AppSettingsJsonReaderTest {
                     arrayListOf(
                         LayerSettings(
                             "Nantes",
-                            "nantes.mbtiles"
+                            listOf("nantes.mbtiles")
                         )
                     ),
                     null,

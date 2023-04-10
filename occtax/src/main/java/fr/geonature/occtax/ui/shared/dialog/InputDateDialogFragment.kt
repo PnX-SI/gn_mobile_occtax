@@ -8,6 +8,8 @@ import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
+import fr.geonature.compat.os.getParcelableCompat
+import fr.geonature.compat.os.getSerializableCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.settings.InputDateSettings
 import fr.geonature.occtax.ui.shared.view.InputDateView
@@ -38,13 +40,13 @@ class InputDateDialogFragment : DialogFragment() {
         )
 
         // restore the previous state if any
-        dateSettings = (savedInstanceState?.getParcelable(KEY_DATE_SETTINGS)
-            ?: arguments?.getParcelable(KEY_DATE_SETTINGS)
+        dateSettings = (savedInstanceState?.getParcelableCompat(KEY_DATE_SETTINGS)
+            ?: arguments?.getParcelableCompat(KEY_DATE_SETTINGS)
             ?: InputDateSettings(endDateSettings = InputDateSettings.DateSettings.DATE))
-        startDate = (savedInstanceState?.getSerializable(KEY_DATE_START) as Date?)
-            ?: (arguments?.getSerializable(KEY_DATE_START) as Date?) ?: Date()
-        endDate = (savedInstanceState?.getSerializable(KEY_DATE_END) as Date?)
-            ?: (arguments?.getSerializable(KEY_DATE_END) as Date?) ?: startDate
+        startDate = savedInstanceState?.getSerializableCompat(KEY_DATE_START)
+            ?: arguments?.getSerializableCompat(KEY_DATE_START) ?: Date()
+        endDate = savedInstanceState?.getSerializableCompat(KEY_DATE_END)
+            ?: arguments?.getSerializableCompat(KEY_DATE_END) ?: startDate
 
         view.findViewById<InputDateView>(R.id.input_date)?.also {
             it.setInputDateSettings(dateSettings)

@@ -1,5 +1,6 @@
 package fr.geonature.occtax.ui.home
 
+import android.annotation.SuppressLint
 import android.text.format.DateFormat
 import android.view.View
 import android.widget.TextView
@@ -77,6 +78,7 @@ class ObservationRecordRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapt
             buildChipStatus(item)
         }
 
+        @SuppressLint("DiscouragedApi")
         private fun buildChipStatus(item: ObservationRecord) {
             with(chip) {
                 isDuplicateParentStateEnabled = true

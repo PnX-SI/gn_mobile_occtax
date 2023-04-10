@@ -23,6 +23,7 @@ import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.GeoNatureModuleName
 import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
+import fr.geonature.compat.os.getParcelableCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.R.layout.fast_scroll_recycler_view
 import javax.inject.Inject
@@ -141,7 +142,7 @@ class DatasetListFragment : Fragment() {
                     view.smoothScrollToPosition(position)
                 }
             })
-            adapter?.setSelectedDataset(arguments?.getParcelable(ARG_SELECTED_DATASET))
+            adapter?.setSelectedDataset(arguments?.getParcelableCompat(ARG_SELECTED_DATASET))
                 .also { updateActionMode(adapter?.getSelectedDataset()) }
 
             with(view) {

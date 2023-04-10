@@ -15,6 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.lifecycle.onError
 import fr.geonature.commons.util.KeyboardUtils.hideKeyboard
 import fr.geonature.commons.util.ThemeUtils
+import fr.geonature.compat.content.getParcelableExtraCompat
 import fr.geonature.maps.settings.MapSettings
 import fr.geonature.maps.ui.MapFragment
 import fr.geonature.maps.util.CheckPermissionLifecycleObserver
@@ -92,9 +93,9 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
             Manifest.permission.ACCESS_FINE_LOCATION
         )
 
-        appSettings = intent.getParcelableExtra(EXTRA_APP_SETTINGS)!!
+        appSettings = intent.getParcelableExtraCompat(EXTRA_APP_SETTINGS)!!
         observationRecord =
-            intent.getParcelableExtra(EXTRA_OBSERVATION_RECORD) ?: ObservationRecord()
+            intent.getParcelableExtraCompat(EXTRA_OBSERVATION_RECORD) ?: ObservationRecord()
 
         Logger.info { "loading observation record: ${observationRecord.id}" }
 
@@ -206,7 +207,7 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
     }
 
     override suspend fun onStoragePermissionsGranted() =
-        suspendCancellableCoroutine<Boolean> { continuation ->
+        suspendCancellableCoroutine { continuation ->
             lifecycleScope.launch {
                 continuation.resume(
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -219,7 +220,7 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
         }
 
     override suspend fun onLocationPermissionGranted() =
-        suspendCancellableCoroutine<Boolean> { continuation ->
+        suspendCancellableCoroutine { continuation ->
             lifecycleScope.launch {
                 continuation.resume(
                     locationPermissionLifecycleObserver?.invoke(this@InputPagerFragmentActivity)

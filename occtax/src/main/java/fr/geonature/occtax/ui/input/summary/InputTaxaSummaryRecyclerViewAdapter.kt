@@ -1,5 +1,6 @@
 package fr.geonature.occtax.ui.input.summary
 
+import android.annotation.SuppressLint
 import android.text.Spanned
 import android.text.SpannedString
 import android.view.View
@@ -97,6 +98,7 @@ class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapte
             )
         }
 
+        @SuppressLint("DiscouragedApi")
         private fun getNomenclatureTypeLabel(mnemonic: String): String {
             val resourceId = itemView.resources.getIdentifier(
                 "nomenclature_${mnemonic.lowercase()}",

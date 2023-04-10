@@ -23,6 +23,9 @@ import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.entity.InputObserver
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
+import fr.geonature.compat.content.getParcelableArrayExtraCompat
+import fr.geonature.compat.content.getParcelableExtraCompat
+import fr.geonature.compat.os.getParcelableCompat
 import fr.geonature.datasync.api.IGeoNatureAPIClient
 import fr.geonature.datasync.features.settings.presentation.ConfigureServerSettingsDialogFragment
 import fr.geonature.maps.settings.MapSettings
@@ -64,7 +67,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                         authority,
                         Dataset.TABLE_NAME,
                         "occtax",
-                        args!!.getLong(KEY_SELECTED_DATASET).toString()
+                        args!!.getLong(KEY_SELECTED_DATASET)
+                            .toString()
                     ),
                     null,
                     null,
@@ -76,7 +80,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                     buildUri(
                         authority,
                         InputObserver.TABLE_NAME,
-                        args?.getLongArray(KEY_SELECTED_OBSERVER_IDS)?.joinToString(",")
+                        args?.getLongArray(KEY_SELECTED_OBSERVER_IDS)
+                            ?.joinToString(",")
                             ?: ""
                     ),
                     null,
@@ -103,9 +108,10 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                         mutableListOf<InputObserver>().let {
                             if (cursor.moveToFirst()) {
                                 while (!cursor.isAfterLast) {
-                                    InputObserver.fromCursor(cursor)?.run {
-                                        it.add(this)
-                                    }
+                                    InputObserver.fromCursor(cursor)
+                                        ?.run {
+                                            it.add(this)
+                                        }
 
                                     cursor.moveToNext()
                                 }
@@ -135,7 +141,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 }
 
                 updateDefaultDatasetPreference(
-                    it.data?.getParcelableExtra(
+                    it.data?.getParcelableExtraCompat(
                         DatasetListActivity.EXTRA_SELECTED_DATASET
                     )
                 )
@@ -147,8 +153,9 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 }
 
                 updateDefaultObserversPreference(
-                    it.data?.getParcelableArrayListExtra(InputObserverListActivity.EXTRA_SELECTED_INPUT_OBSERVERS)
-                        ?: ArrayList()
+                    it.data?.getParcelableArrayExtraCompat<InputObserver>(InputObserverListActivity.EXTRA_SELECTED_INPUT_OBSERVERS)
+                        ?.toList()
+                        ?: emptyList()
                 )
             }
 
@@ -158,8 +165,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
         configureNotificationsPreferences()
 
-        setServerUrlsPreferences(arguments?.getParcelable(ARG_SERVER_URLS))
-        setMapSettingsPreferences(arguments?.getParcelable(ARG_MAP_SETTINGS))
+        setServerUrlsPreferences(arguments?.getParcelableCompat(ARG_SERVER_URLS))
+        setMapSettingsPreferences(arguments?.getParcelableCompat(ARG_MAP_SETTINGS))
         setMountPointsPreferences(preferenceScreen)
     }
 
@@ -225,7 +232,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 bundleOf(
                     Pair(
                         KEY_SELECTED_OBSERVER_IDS,
-                        defaultObserversId.toTypedArray().toLongArray()
+                        defaultObserversId.toTypedArray()
+                            .toLongArray()
                     )
                 ),
                 loaderCallbacks
@@ -248,34 +256,37 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             val supportFragmentManager =
                 activity?.supportFragmentManager ?: return@OnPreferenceClickListener false
 
-            ConfigureServerSettingsDialogFragment.newInstance(serverUrl).apply {
-                setOnConfigureServerSettingsDialogFragmentListener(object :
-                    ConfigureServerSettingsDialogFragment.OnConfigureServerSettingsDialogFragmentListener {
-                    override fun onChanged(url: String) {
-                        PreferenceManager.getDefaultSharedPreferences(serverSettingsPreference.context)
-                            .edit().also {
-                                it.putString(
-                                    getString(R.string.preference_category_server_geonature_url_key),
-                                    url
-                                )
+            ConfigureServerSettingsDialogFragment.newInstance(serverUrl)
+                .apply {
+                    setOnConfigureServerSettingsDialogFragmentListener(object :
+                        ConfigureServerSettingsDialogFragment.OnConfigureServerSettingsDialogFragmentListener {
+                        override fun onChanged(url: String) {
+                            PreferenceManager.getDefaultSharedPreferences(serverSettingsPreference.context)
+                                .edit()
+                                .also {
+                                    it.putString(
+                                        getString(R.string.preference_category_server_geonature_url_key),
+                                        url
+                                    )
 
-                                serverSettingsPreference.summary = url
+                                    serverSettingsPreference.summary = url
 
-                                it.apply()
-                            }
-                    }
-                })
-                show(
-                    supportFragmentManager,
-                    SERVER_SETTINGS_DIALOG_FRAGMENT
-                )
-            }
+                                    it.apply()
+                                }
+                        }
+                    })
+                    show(
+                        supportFragmentManager,
+                        SERVER_SETTINGS_DIALOG_FRAGMENT
+                    )
+                }
 
             true
         }
 
         PreferenceManager.getDefaultSharedPreferences(serverSettingsPreference.context)
-            .edit().also {
+            .edit()
+            .also {
                 if (serverUrl.isNullOrBlank()) {
                     it.remove(getString(R.string.preference_category_server_geonature_url_key))
                     serverSettingsPreference.setSummary(R.string.preference_category_server_geonature_url_not_set)
@@ -296,7 +307,9 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
         MapSettingsPreferencesUtils.setDefaultPreferences(
             context,
-            MapSettings.Builder.newInstance().from(mapSettings).build(),
+            MapSettings.Builder.newInstance()
+                .from(mapSettings)
+                .build(),
             preferenceScreen
         )
     }
@@ -389,7 +402,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         } else {
             editor.putStringSet(
                 getString(R.string.preference_category_observers_default_key),
-                defaultObservers.map { it.id.toString() }.toSet()
+                defaultObservers.map { it.id.toString() }
+                    .toSet()
             )
             defaultObserverPreference.summary =
                 if (defaultObservers.size < 3) defaultObservers.joinToString(", ") {

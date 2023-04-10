@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.fp.orNull
+import fr.geonature.compat.content.getParcelableExtraCompat
 import fr.geonature.datasync.api.IGeoNatureAPIClient
 import fr.geonature.datasync.settings.DataSyncSettingsViewModel
 import fr.geonature.occtax.settings.AppSettings
@@ -31,7 +32,7 @@ class PreferencesActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val appSettings: AppSettings? = intent.getParcelableExtra(EXTRA_APP_SETTINGS)
+        val appSettings: AppSettings? = intent.getParcelableExtraCompat(EXTRA_APP_SETTINGS)
 
         serverUrls = dataSyncSettingsViewModel
             .getServerBaseUrls()

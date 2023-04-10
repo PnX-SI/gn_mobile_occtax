@@ -26,6 +26,9 @@ import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.lifecycle.observe
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
+import fr.geonature.compat.content.getParcelableExtraCompat
+import fr.geonature.compat.os.getParcelableArrayCompat
+import fr.geonature.compat.os.getParcelableCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.presentation.EditableNomenclatureTypeAdapter
@@ -68,9 +71,9 @@ class EditCountingMetadataFragment : Fragment() {
         savedState = savedInstanceState ?: Bundle()
 
         arguments?.also {
-            taxonRecord = it.getParcelable(ARG_TAXON_RECORD)
+            taxonRecord = it.getParcelableCompat(ARG_TAXON_RECORD)
             countingRecord =
-                it.getParcelable(ARG_COUNTING_RECORD) ?: taxonRecord?.counting?.create()
+                it.getParcelableCompat(ARG_COUNTING_RECORD) ?: taxonRecord?.counting?.create()
         }
 
         with(nomenclatureViewModel) {
@@ -95,7 +98,7 @@ class EditCountingMetadataFragment : Fragment() {
                     return@registerForActivityResult
                 }
 
-                activityResult.data?.getParcelableExtra<CountingRecord>(MediaListActivity.EXTRA_COUNTING_RECORD)
+                activityResult.data?.getParcelableExtraCompat<CountingRecord>(MediaListActivity.EXTRA_COUNTING_RECORD)
                     ?.also { countingRecord ->
                         this.countingRecord = countingRecord
 
@@ -324,8 +327,7 @@ class EditCountingMetadataFragment : Fragment() {
 
         nomenclatureViewModel.getEditableNomenclatures(
             EditableNomenclatureType.Type.COUNTING,
-            (arguments?.getParcelableArray(ARG_PROPERTIES)
-                ?.map { it as PropertySettings }
+            (arguments?.getParcelableArrayCompat<PropertySettings>(ARG_PROPERTIES)
                 ?.toList() ?: emptyList()),
             taxonRecord.taxon.taxonomy
         )

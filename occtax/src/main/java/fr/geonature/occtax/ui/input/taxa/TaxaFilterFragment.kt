@@ -18,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
+import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.settings.AppSettings
 import org.tinylog.kotlin.Logger
@@ -77,9 +78,10 @@ class TaxaFilterFragment : Fragment() {
                     val filterTaxonomyList = mutableListOf<FilterTaxonomy>()
 
                     while (!data.isAfterLast) {
-                        Taxonomy.fromCursor(data)?.also {
-                            filterTaxonomyList.add(FilterTaxonomy(it))
-                        }
+                        Taxonomy.fromCursor(data)
+                            ?.also {
+                                filterTaxonomyList.add(FilterTaxonomy(it))
+                            }
 
                         data.moveToNext()
                     }
@@ -121,9 +123,10 @@ class TaxaFilterFragment : Fragment() {
             }
         })
 
-        arguments?.getParcelableArray(ARG_FILTERS)?.map { it as Filter<*> }?.toTypedArray()?.also {
-            adapter?.setSelectedFilters(*it)
-        }
+        arguments?.getParcelableArrayCompat<Filter<*>>(ARG_FILTERS)
+            ?.also {
+                adapter?.setSelectedFilters(*it)
+            }
 
         with(recyclerView) {
             val layoutManager = LinearLayoutManager(context)

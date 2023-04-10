@@ -68,7 +68,7 @@ class TakePhotoLifecycleObserver(
      * found
      */
     suspend operator fun invoke(from: ImagePicker, basePath: String) =
-        suspendCancellableCoroutine<File?> { continuation ->
+        suspendCancellableCoroutine { continuation ->
             Logger.info { "choose image from ${from.name.lowercase()}…" }
 
             chosenImageContinuation = continuation

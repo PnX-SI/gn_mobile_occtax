@@ -28,6 +28,9 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
+import fr.geonature.compat.content.getParcelableArrayExtraCompat
+import fr.geonature.compat.os.getParcelableArrayCompat
+import fr.geonature.compat.os.getParcelableCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.settings.InputDateSettings
@@ -69,7 +72,8 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
         super.onCreate(savedInstanceState)
 
         savedState = savedInstanceState ?: Bundle()
-        dateSettings = arguments?.getParcelable(ARG_DATE_SETTINGS) ?: InputDateSettings.DEFAULT
+        dateSettings =
+            arguments?.getParcelableCompat(ARG_DATE_SETTINGS) ?: InputDateSettings.DEFAULT
 
         val supportFragmentManager = activity?.supportFragmentManager ?: return
 
@@ -84,8 +88,8 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
                 }
 
                 val selectedFilters =
-                    activityResult.data?.getParcelableArrayExtra(TaxaFilterActivity.EXTRA_SELECTED_FILTERS)
-                        ?.map { it as Filter<*> }?.toTypedArray() ?: emptyArray()
+                    activityResult.data?.getParcelableArrayExtraCompat<Filter<*>>(TaxaFilterActivity.EXTRA_SELECTED_FILTERS)
+                        ?: emptyArray()
                 applyFilters(*selectedFilters)
             }
     }
@@ -119,13 +123,14 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
         emptyTextView = view.findViewById(android.R.id.empty)
         filterChipGroup = view.findViewById(R.id.chip_group_filter)
 
-        view.findViewById<ExtendedFloatingActionButton>(R.id.fab).apply {
-            setOnClickListener {
-                startEditTaxon = true
-                observationRecord?.taxa?.selectedTaxonRecord = null
-                listener.startEditTaxon()
+        view.findViewById<ExtendedFloatingActionButton>(R.id.fab)
+            .apply {
+                setOnClickListener {
+                    startEditTaxon = true
+                    observationRecord?.taxa?.selectedTaxonRecord = null
+                    listener.startEditTaxon()
+                }
             }
-        }
 
         adapter = InputTaxaSummaryRecyclerViewAdapter(object :
             AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<TaxonRecord> {
@@ -329,7 +334,7 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
         if ((adapter?.itemCount ?: 0) > 0) adapter?.clear()
 
         val selectedFilters =
-            savedState.getParcelableArray(KEY_SELECTED_FILTERS)?.map { it as Filter<*> }
+            savedState.getParcelableArrayCompat<Filter<*>>(KEY_SELECTED_FILTERS)
                 ?.toList() ?: emptyList()
         val filterByTaxonomy =
             selectedFilters.find { filter -> filter.type == Filter.FilterType.TAXONOMY }?.value as Taxonomy?
@@ -384,11 +389,12 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
 
             // build kingdom taxonomy filter chip
             with(
-                LayoutInflater.from(context).inflate(
-                    R.layout.chip,
-                    filterChipGroup,
-                    false
-                ) as Chip
+                LayoutInflater.from(context)
+                    .inflate(
+                        R.layout.chip,
+                        filterChipGroup,
+                        false
+                    ) as Chip
             ) {
                 tag = Taxonomy(selectedTaxonomy.kingdom)
                 text = selectedTaxonomy.kingdom
@@ -407,11 +413,12 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
             // build group taxonomy filter chip
             if (selectedTaxonomy.group != Taxonomy.ANY) {
                 with(
-                    LayoutInflater.from(context).inflate(
-                        R.layout.chip,
-                        filterChipGroup,
-                        false
-                    ) as Chip
+                    LayoutInflater.from(context)
+                        .inflate(
+                            R.layout.chip,
+                            filterChipGroup,
+                            false
+                        ) as Chip
                 ) {
                     tag = selectedTaxonomy
                     text = selectedTaxonomy.group
@@ -431,7 +438,7 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
     }
 
     private fun getSelectedFilters(): List<Filter<*>> {
-        return savedState.getParcelableArray(KEY_SELECTED_FILTERS)?.map { it as Filter<*> }
+        return savedState.getParcelableArrayCompat<Filter<*>>(KEY_SELECTED_FILTERS)
             ?.toList() ?: emptyList()
     }
 
