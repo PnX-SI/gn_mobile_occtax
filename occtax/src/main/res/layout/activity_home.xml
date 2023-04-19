@@ -23,8 +23,9 @@
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:popupTheme="@style/AppTheme.PopupOverlay"/>
+                android:layout_height="wrap_content"
+                android:minHeight="?android:actionBarSize"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -57,21 +58,21 @@
                 android:id="@+id/nav_menu_settings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/padding_default"
-                android:clickable="true"
                 android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:padding="@dimen/padding_default"
                 app:icon="@drawable/ic_settings"
-                app:text1="@string/action_settings"/>
+                app:text1="@string/action_settings" />
 
             <fr.geonature.occtax.ui.home.DrawerMenuEntryView
                 android:id="@+id/nav_menu_sync"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/padding_default"
-                android:clickable="true"
                 android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:padding="@dimen/padding_default"
                 app:icon="@drawable/ic_sync"
-                app:text1="@string/action_data_sync"/>
+                app:text1="@string/action_data_sync" />
 
             <Space
                 android:layout_width="match_parent"
@@ -82,11 +83,11 @@
                 android:id="@+id/nav_menu_logout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/padding_default"
-                android:clickable="true"
                 android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:padding="@dimen/padding_default"
                 app:icon="@drawable/ic_logout"
-                app:text1="@string/action_logout"/>
+                app:text1="@string/action_logout" />
 
             <fr.geonature.occtax.ui.home.DrawerMenuEntryView
                 android:id="@+id/nav_menu_about"
@@ -94,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:padding="@dimen/padding_default"
                 app:icon="@drawable/ic_info"
-                app:text1="@string/action_about"/>
+                app:text1="@string/action_about" />
 
         </LinearLayout>
 
