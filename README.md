@@ -50,12 +50,12 @@ Example:
     "base_path": "Offline_maps",
     "layers": [
       {
-        "source": "plan.mbtiles",
-        "label": "IGN plan"
+        "label": "IGN: plan v2",
+        "source": "https://wxs.ign.fr/essentiels/geoportail/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image/png&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2"
       },
       {
-        "source": "ortho.mbtiles",
-        "label": "IGN ortho"
+        "label": "IGN: ortho",
+        "source": "https://wxs.ign.fr/ortho/geoportail/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image/jpeg&LAYER=ORTHOIMAGERY.ORTHOPHOTOS"
       },
       {
         "label": "OpenStreetMap",
@@ -64,6 +64,22 @@ Example:
           "https://b.tile.openstreetmap.org",
           "https://c.tile.openstreetmap.org"
         ]
+      },
+      {
+        "label": "OpenTopoMap",
+        "source": [
+          "https://a.tile.opentopomap.org",
+          "https://b.tile.opentopomap.org",
+          "https://c.tile.opentopomap.org"
+        ]
+      },
+      {
+        "label": "IGN plan",
+        "source": "plan.mbtiles"
+      },
+      {
+        "label": "IGN ortho",
+        "source": "ortho.mbtiles"
       },
       {
         "label": "Mailles 5x5",

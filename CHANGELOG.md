@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.6.0] (unreleased)
+## 2.6.0 (unreleased)
 
 ### 🚀 Nouveautés
 
@@ -9,6 +9,30 @@
 * Code de version : 
 * Depuis sa version 2.12.0, GeoNature permet de gérer le contenu de la table `gn_commons.t_mobile_apps` directement dans le backoffice du module "Admin" de GeoNature (https://github.com/PnX-SI/gn_mobile_occtax/issues/214)
 * Dans cette même version, les médias (incluant le dossier `mobile/` comprenant les fichiers APK et le fichier `settings.json` d'Occtax-mobile) ont été déplacés du dossier `~/geonature/backend/static/` à `~/geonature/backend/media/` (https://github.com/PnX-SI/gn_mobile_occtax/issues/214)
+
+## [2.6.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.0-rc1) (2023-04-19, pre-release)
+
+### 🚀 Nouveautés
+
+* Support Android 13 (API 33).
+* Support des fonds Geoportail (https://github.com/PnX-SI/gn_mobile_maps/issues/8).
+  Le module ["maps"](https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps) supporte officiellement les fonds suivants :
+  * [Geoportail WMTS](https://www.geoportail.gouv.fr)
+  * [OpenTopoMap](https://www.opentopomap.org)
+  * [OpenStreetMap](https://www.openstreetmap.org)
+  * [Wikimedia Maps](https://maps.wikimedia.org)
+* Gestion automatique des attributions sur les fonds en ligne (https://github.com/PnX-SI/gn_mobile_occtax/issues/191).
+  L'attribution est définie automatiquement selon la nature de la source si aucune n'a été précisée dans la configuration.
+  L'attribution n'est valable que pour les fonds en ligne.
+* Petites améliorations sur la documentation, notamment sur la gestion des couches coté module ["maps"](https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps) (https://github.com/PnX-SI/gn_mobile_occtax/issues/192).
+
+### 🐛 Corrections
+
+* Mise à jour de la liste des relevés et de leurs statuts pendant la synchronisation.
+
+### ⚠️ Notes de version
+
+* Code de version : 3187
 
 ## [2.6.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.0-rc0) (2023-03-25, pre-release)
 

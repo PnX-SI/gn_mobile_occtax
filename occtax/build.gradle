@@ -22,8 +22,8 @@ android {
         applicationId "fr.geonature.occtax2"
         minSdkVersion 26
         targetSdkVersion 33
-        versionCode 3181
-        versionName "2.6.0-rc0"
+        versionCode 3187
+        versionName "2.6.0-rc1"
         buildConfigField "String", "BUILD_DATE", "\"" + new Date().getTime() + "\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         archivesBaseName = project.name + "-" + versionName
@@ -98,4 +98,5 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
     testImplementation 'org.robolectric:robolectric:4.9.2'
+    testImplementation "org.tinylog:slf4j-tinylog:$tinylog_version"
 }
