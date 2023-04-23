@@ -25,6 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.lifecycle.observe
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.commons.util.ThemeUtils.getColor
+import fr.geonature.datasync.sync.DataSyncViewModel
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.presentation.ObservationRecordViewModel
@@ -41,8 +42,10 @@ import org.tinylog.Logger
 class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_fab) {
 
     private val appSettingsViewModel: AppSettingsViewModel by activityViewModels()
+    private val dataSyncViewModel: DataSyncViewModel by activityViewModels()
     private val observationRecordViewModel: ObservationRecordViewModel by viewModels()
 
+    private var emptyTextView: TextView? = null
     private var fab: ExtendedFloatingActionButton? = null
     private var listener: OnLastObservationRecordsFragmentListener? = null
     private var adapter: ObservationRecordRecyclerViewAdapter? = null
@@ -64,7 +67,7 @@ class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_
         setHasOptionsMenu(true)
 
         val recyclerView = view.findViewById<RecyclerView>(android.R.id.list)
-        val emptyTextView = view.findViewById<TextView>(android.R.id.empty)
+        emptyTextView = view.findViewById<TextView>(android.R.id.empty)
             .apply {
                 text = getString(R.string.home_no_input)
             }
@@ -157,6 +160,7 @@ class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_
         }
 
         configureAppSettingsViewModel()
+        configureDataSyncViewModel()
         configureObservationRecordViewModel()
     }
 
@@ -231,9 +235,10 @@ class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_
             ?.apply {
                 isChecked = statusesFilter.contains(ObservationRecord.Status.DRAFT)
             }
-        menu.findItem(R.id.menu_status_to_sync)?.apply {
-            isChecked = statusesFilter.contains(ObservationRecord.Status.TO_SYNC)
-        }
+        menu.findItem(R.id.menu_status_to_sync)
+            ?.apply {
+                isChecked = statusesFilter.contains(ObservationRecord.Status.TO_SYNC)
+            }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -242,6 +247,7 @@ class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_
                 observationRecordViewModel.synchronizeObservationRecords()
                 true
             }
+
             R.id.menu_status_draft -> {
                 item.isChecked = !item.isChecked
 
@@ -251,6 +257,7 @@ class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_
                 loadObservationRecords()
                 true
             }
+
             R.id.menu_status_to_sync -> {
                 item.isChecked = !item.isChecked
 
@@ -260,6 +267,7 @@ class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_
                 loadObservationRecords()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -277,6 +285,28 @@ class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_
 
             fab?.show()
             loadObservationRecords()
+        }
+    }
+
+    private fun configureDataSyncViewModel() {
+        with(dataSyncViewModel) {
+            observe(isSyncRunning) {
+                emptyTextView?.text =
+                    getString(
+                        if (it && dataSyncViewModel.lastSynchronizedDate.value?.second == null) R.string.home_first_sync
+                        else R.string.home_no_input
+                    )
+                if (it && dataSyncViewModel.lastSynchronizedDate.value?.second == null) {
+                    fab?.hide()
+                    adapter?.clear()
+                } else if (appSettings != null) {
+                    fab?.show()
+
+                    if (adapter?.items?.isEmpty() == true) {
+                        loadObservationRecords()
+                    }
+                }
+            }
         }
     }
 
@@ -299,7 +329,12 @@ class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_
 
     private fun loadObservationRecords() {
         if (statusesFilter.isEmpty()) {
-            statusesFilter.addAll(listOf(ObservationRecord.Status.DRAFT, ObservationRecord.Status.TO_SYNC))
+            statusesFilter.addAll(
+                listOf(
+                    ObservationRecord.Status.DRAFT,
+                    ObservationRecord.Status.TO_SYNC
+                )
+            )
         }
 
         observationRecordViewModel.getAll { input -> statusesFilter.any { input.status == it } }
