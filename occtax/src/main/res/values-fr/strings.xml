@@ -47,7 +47,8 @@
     <string name="action_settings">Paramètres</string>
     <string name="action_data_sync">Rafraîchir les données</string>
     <string name="action_data_sync_in_progress">Synchronisation en cours…</string>
-    <string name="action_sync">Synchroniser les relevés</string>
+    <string name="action_input_sync">Envoyer</string>
+    <string name="action_input_sync_hint">Envoyer les relevés</string>
     <string name="action_sync_in_progress">Relevés en cours de synchronisation…</string>
     <string name="action_login">Se connecter</string>
     <string name="action_logout">Se déconnecter</string>
