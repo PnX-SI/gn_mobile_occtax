@@ -7,8 +7,35 @@
 ### ⚠️ Notes de version
 
 * Code de version : 
-* Depuis sa version 2.12.0, GeoNature permet de gérer le contenu de la table `gn_commons.t_mobile_apps` directement dans le backoffice du module "Admin" de GeoNature (https://github.com/PnX-SI/gn_mobile_occtax/issues/214)
-* Dans cette même version, les médias (incluant le dossier `mobile/` comprenant les fichiers APK et le fichier `settings.json` d'Occtax-mobile) ont été déplacés du dossier `~/geonature/backend/static/` à `~/geonature/backend/media/` (https://github.com/PnX-SI/gn_mobile_occtax/issues/214)
+* Depuis sa version 2.12.0, GeoNature permet de gérer le contenu de la table
+  `gn_commons.t_mobile_apps` directement dans le backoffice du module "Admin" de GeoNature (https://github.com/PnX-SI/gn_mobile_occtax/issues/214)
+* Dans cette même version, les médias (incluant le dossier `mobile/` comprenant les fichiers APK et
+  le fichier `settings.json` d'Occtax-mobile) ont été déplacés du dossier `~/geonature/backend/static/`
+  à `~/geonature/backend/media/` (https://github.com/PnX-SI/gn_mobile_occtax/issues/214)
+
+## [2.6.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.0-rc2) (2023-04-29, pre-release)
+
+### 🚀 Nouveautés
+
+* La synchronisation périodique de l'ensemble des données issues de GeoNature est configuré par
+  défaut à 7 jours. Cette configuration n'est active uniquement que si la synchronisation périodique
+  n'est pas configurée (les paramètres `sync_periodicity_data` et `sync_periodicity_data_essential`
+  ne sont pas renseignés).
+
+### 🐛 Corrections
+
+* Meilleur support de la taille des textes de l'interface selon la densité et la configuration
+  d'affichage du terminal (https://github.com/PnX-SI/gn_mobile_occtax/issues/217).
+* Le bouton "Envoyer les relevés" présenté sous forme de bouton icône dans la barre de menu en page
+  d'accueil est affiché sous forme de texte simple "Envoyer" et non plus sous forme d'icône pour
+  plus de clarté. 
+* Petites améliorations sur la documentation, notamment sur la gestion, la configuration et
+  l'ordonnancement des couches coté module ["maps"](https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps)
+  (https://github.com/PnX-SI/gn_mobile_occtax/issues/192).
+
+### ⚠️ Notes de version
+
+* Code de version : 3191
 
 ## [2.6.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.0-rc1) (2023-04-19, pre-release)
 
@@ -16,15 +43,17 @@
 
 * Support Android 13 (API 33).
 * Support des fonds Geoportail (https://github.com/PnX-SI/gn_mobile_maps/issues/8).
-  Le module ["maps"](https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps) supporte officiellement les fonds suivants :
+  Le module ["maps"](https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps) supporte
+  officiellement les fonds suivants :
   * [Geoportail WMTS](https://www.geoportail.gouv.fr)
   * [OpenTopoMap](https://www.opentopomap.org)
   * [OpenStreetMap](https://www.openstreetmap.org)
   * [Wikimedia Maps](https://maps.wikimedia.org)
 * Gestion automatique des attributions sur les fonds en ligne (https://github.com/PnX-SI/gn_mobile_occtax/issues/191).
-  L'attribution est définie automatiquement selon la nature de la source si aucune n'a été précisée dans la configuration.
-  L'attribution n'est valable que pour les fonds en ligne.
-* Petites améliorations sur la documentation, notamment sur la gestion des couches coté module ["maps"](https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps) (https://github.com/PnX-SI/gn_mobile_occtax/issues/192).
+  L'attribution est définie automatiquement selon la nature de la source si aucune n'a été précisée
+  dans la configuration. L'attribution n'est valable que pour les fonds en ligne.
+* Petites améliorations sur la documentation, notamment sur la gestion des couches coté module
+  ["maps"](https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps) (https://github.com/PnX-SI/gn_mobile_occtax/issues/192).
 
 ### 🐛 Corrections
 
