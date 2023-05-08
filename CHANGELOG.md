@@ -24,7 +24,7 @@
     ne sont pas renseignés).
 * La synchronisation des données est maintenant décoléré de la synchronisation des relevés (https://github.com/PnX-SI/gn_mobile_occtax/issues/133).
 * La synchronisation des relevés se fait à la demande de l'utilisateur (https://github.com/PnX-SI/gn_mobile_occtax/issues/137).
-* La synchronisation des données s'exécute mantenant dans un contexte transactionnel afin de
+* La synchronisation des données s'exécute maintenant dans un contexte transactionnel afin de
   toujours garantir une cohérence des données présentes localement.
 * Refonte de l'écran d'accueil pour mettre en valeur les relevés en cours ou prêt à être
   synchronisés. La partie paramétrage et synchronisation des données sont déportées dans le menu
@@ -39,7 +39,7 @@
 
 * Code de version : 3200
 * Depuis sa version 2.12.0, GeoNature permet de gérer le contenu de la table
-  `gn_commons.t_mobile_apps` directement dans le backoffice du module "Admin" de GeoNature (https://github.com/PnX-SI/gn_mobile_occtax/issues/214)
+  `gn_commons.t_mobile_apps` directement dans le back-office du module "Admin" de GeoNature (https://github.com/PnX-SI/gn_mobile_occtax/issues/214)
 * Dans cette même version, les médias (incluant le dossier `mobile/` comprenant les fichiers APK et
   le fichier `settings.json` d'Occtax-mobile) ont été déplacés du dossier `~/geonature/backend/static/`
   à `~/geonature/backend/media/` (https://github.com/PnX-SI/gn_mobile_occtax/issues/214)
@@ -100,7 +100,7 @@
 
 * La synchronisation des données est maintenant décoléré de la synchronisation des relevés (https://github.com/PnX-SI/gn_mobile_occtax/issues/133). 
 * La synchronisation des relevés se fait à la demande de l'utilisateur (https://github.com/PnX-SI/gn_mobile_occtax/issues/137).
-* La synchronisation des données s'exécute mantenant dans un contexte transactionnel afin de
+* La synchronisation des données s'exécute maintenant dans un contexte transactionnel afin de
   toujours garantir une cohérence des données présentes localement.
 * Refonte de l'écran d'accueil pour mettre en valeur les relevés en cours ou prêt à être
   synchronisés. La partie paramétrage et synchronisation des données sont déportées dans le menu
