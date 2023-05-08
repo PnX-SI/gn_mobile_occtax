@@ -2,6 +2,7 @@ package fr.geonature.occtax.features.nomenclature.domain
 
 import android.os.Bundle
 import android.os.Parcel
+import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import kotlinx.parcelize.parcelableCreator
 import org.junit.Assert.assertArrayEquals
@@ -125,7 +126,7 @@ class EditableNomenclatureTypeTest {
         // then
         assertArrayEquals(
             expectedEditableNomenclatureTypes.toTypedArray(),
-            bundle.getParcelableArray("editable_nomenclature_types")
+            bundle.getParcelableArrayCompat("editable_nomenclature_types")
         )
     }
 }

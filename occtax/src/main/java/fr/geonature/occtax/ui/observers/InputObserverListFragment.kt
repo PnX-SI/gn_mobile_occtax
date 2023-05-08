@@ -25,6 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.entity.InputObserver
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
+import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.R.layout.fast_scroll_recycler_view
 import javax.inject.Inject
@@ -54,7 +55,9 @@ class InputObserverListFragment : Fragment() {
             return when (id) {
                 LOADER_OBSERVERS -> {
                     val observersFilter =
-                        InputObserver.Filter().byName(args?.getString(KEY_FILTER)).build()
+                        InputObserver.Filter()
+                            .byName(args?.getString(KEY_FILTER))
+                            .build()
 
                     CursorLoader(
                         requireContext(),
@@ -64,8 +67,11 @@ class InputObserverListFragment : Fragment() {
                         ),
                         null,
                         observersFilter.first,
-                        observersFilter.second.map { it.toString() }.toTypedArray(),
-                        InputObserver.OrderBy().byName(args?.getString(KEY_FILTER)).build()
+                        observersFilter.second.map { it.toString() }
+                            .toTypedArray(),
+                        InputObserver.OrderBy()
+                            .byName(args?.getString(KEY_FILTER))
+                            .build()
                     )
                 }
 
@@ -123,7 +129,7 @@ class InputObserverListFragment : Fragment() {
                     false
                 )
             }
-            
+
             return !searchCriterion.isNullOrEmpty()
         }
 
@@ -179,8 +185,9 @@ class InputObserverListFragment : Fragment() {
                     ?: ListView.CHOICE_MODE_SINGLE
             )
             adapter?.setSelectedInputObservers(
-                arguments?.getParcelableArrayList(ARG_SELECTED_INPUT_OBSERVERS)
-                    ?: listOf()
+                arguments?.getParcelableArrayCompat<InputObserver>(ARG_SELECTED_INPUT_OBSERVERS)
+                    ?.toList()
+                    ?: emptyList()
             )
                 .also { updateActionMode(adapter?.getSelectedInputObservers() ?: listOf()) }
 
@@ -353,9 +360,9 @@ class InputObserverListFragment : Fragment() {
                     ARG_CHOICE_MODE,
                     choiceMode
                 )
-                putParcelableArrayList(
+                putParcelableArray(
                     ARG_SELECTED_INPUT_OBSERVERS,
-                    ArrayList(selectedObservers)
+                    selectedObservers.toTypedArray()
                 )
             }
         }

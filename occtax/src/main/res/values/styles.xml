@@ -17,6 +17,8 @@
         <item name="underlinePageIndicatorStyle">@style/UnderlinePageIndicator</item>
 
         <item name="materialThemeOverlay">@style/ButtonThemeOverlay</item>
+        <item name="textAppearanceHeadline6">@style/TextAppearance.App.Headline6</item>
+        <item name="textAppearanceSubtitle1">@style/TextAppearance.App.Subtitle1</item>
 
     </style>
 
@@ -43,6 +45,13 @@
         <item name="android:colorControlActivated">?attr/colorAccent</item>
         <item name="android:colorControlHighlight">?attr/colorAccent</item>
 
+    </style>
+
+    <style name="TextAppearance.App.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textSize">18sp</item>
+    </style>
+    <style name="TextAppearance.App.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="ActionBar.Login" parent="Widget.AppCompat.ActionBar.Solid">

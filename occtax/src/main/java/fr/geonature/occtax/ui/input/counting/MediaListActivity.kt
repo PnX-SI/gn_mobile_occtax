@@ -18,6 +18,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import fr.geonature.compat.content.getParcelableExtraCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.TaxonRecord
@@ -137,13 +138,13 @@ class MediaListActivity : AppCompatActivity() {
             }
         })
 
-        taxonRecord = intent.getParcelableExtra(EXTRA_TAXON_RECORD) ?: run {
+        taxonRecord = intent.getParcelableExtraCompat(EXTRA_TAXON_RECORD) ?: run {
             // TODO: show a toast message about missing taxon record
             finish()
             return
         }
 
-        countingRecord = intent.getParcelableExtra(EXTRA_COUNTING_RECORD) ?: run {
+        countingRecord = intent.getParcelableExtraCompat(EXTRA_COUNTING_RECORD) ?: run {
             // TODO: show a toast message about missing counting record
             finish()
             return

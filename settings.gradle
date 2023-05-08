@@ -1,1 +1,1 @@
-include ':commons', ':datasync', ':mountpoint', ':viewpager', ':maps', ':occtax'
+include ':commons', ':compat', ':datasync', ':maps', ':mountpoint', ':viewpager', ':occtax'

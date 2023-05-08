@@ -6,7 +6,7 @@ import android.os.Parcelable
 /**
  * Describes a filter entry.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 open class Filter<T : Parcelable>(
     val type: FilterType,
@@ -40,10 +40,10 @@ open class Filter<T : Parcelable>(
     }
 
     override fun writeToParcel(
-        dest: Parcel?,
+        dest: Parcel,
         flags: Int
     ) {
-        dest?.also {
+        dest.also {
             it.writeInt(type.ordinal)
             it.writeParcelable(
                 value,
@@ -55,7 +55,7 @@ open class Filter<T : Parcelable>(
     /**
      * Describes a filter type.
      *
-     * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+     * @author S. Grimault
      */
     enum class FilterType {
         AREA_OBSERVATION,

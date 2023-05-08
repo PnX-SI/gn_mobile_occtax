@@ -8,6 +8,8 @@ import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
+import fr.geonature.compat.content.getParcelableArrayExtraCompat
+import fr.geonature.compat.content.getParcelableExtraCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.TaxonRecord
@@ -39,14 +41,14 @@ class EditCountingMetadataActivity : AppCompatActivity(),
             setDisplayHomeAsUpEnabled(true)
         }
 
-        val taxonRecord = intent.getParcelableExtra<TaxonRecord>(EXTRA_TAXON_RECORD) ?: run {
+        val taxonRecord = intent.getParcelableExtraCompat<TaxonRecord>(EXTRA_TAXON_RECORD) ?: run {
             // TODO: show a toast message about missing taxon record
             finish()
             return
         }
 
         countingRecord =
-            intent.getParcelableExtra(EXTRA_COUNTING_RECORD) ?: taxonRecord.counting.create()
+            intent.getParcelableExtraCompat(EXTRA_COUNTING_RECORD) ?: taxonRecord.counting.create()
 
         isNew = countingRecord.isEmpty()
         setTitle(if (countingRecord.isEmpty()) R.string.activity_counting_add_title else R.string.activity_counting_edit_title)
@@ -63,9 +65,8 @@ class EditCountingMetadataActivity : AppCompatActivity(),
                                 EXTRA_SAVE_DEFAULT_VALUES,
                                 false
                             ),
-                            *(intent.getParcelableArrayExtra(EXTRA_PROPERTIES)
-                                ?.map { it as PropertySettings }
-                                ?.toTypedArray() ?: emptyArray())
+                            *(intent.getParcelableArrayExtraCompat(EXTRA_PROPERTIES)
+                                ?: emptyArray())
                         )
                     )
                 }

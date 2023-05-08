@@ -1,18 +1,15 @@
 package fr.geonature.occtax.ui.settings
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import android.widget.ListView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.core.os.bundleOf
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
@@ -26,6 +23,9 @@ import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.entity.InputObserver
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
+import fr.geonature.compat.content.getParcelableArrayExtraCompat
+import fr.geonature.compat.content.getParcelableExtraCompat
+import fr.geonature.compat.os.getParcelableCompat
 import fr.geonature.datasync.api.IGeoNatureAPIClient
 import fr.geonature.datasync.features.settings.presentation.ConfigureServerSettingsDialogFragment
 import fr.geonature.maps.settings.MapSettings
@@ -54,8 +54,6 @@ class PreferencesFragment : PreferenceFragmentCompat() {
     private lateinit var datasetResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var observerResultLauncher: ActivityResultLauncher<Intent>
 
-    private var listener: OnPreferencesFragmentListener? = null
-
     private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(
             id: Int,
@@ -69,7 +67,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                         authority,
                         Dataset.TABLE_NAME,
                         "occtax",
-                        args!!.getLong(KEY_SELECTED_DATASET).toString()
+                        args!!.getLong(KEY_SELECTED_DATASET)
+                            .toString()
                     ),
                     null,
                     null,
@@ -81,7 +80,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                     buildUri(
                         authority,
                         InputObserver.TABLE_NAME,
-                        args?.getLongArray(KEY_SELECTED_OBSERVER_IDS)?.joinToString(",")
+                        args?.getLongArray(KEY_SELECTED_OBSERVER_IDS)
+                            ?.joinToString(",")
                             ?: ""
                     ),
                     null,
@@ -108,9 +108,10 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                         mutableListOf<InputObserver>().let {
                             if (cursor.moveToFirst()) {
                                 while (!cursor.isAfterLast) {
-                                    InputObserver.fromCursor(cursor)?.run {
-                                        it.add(this)
-                                    }
+                                    InputObserver.fromCursor(cursor)
+                                        ?.run {
+                                            it.add(this)
+                                        }
 
                                     cursor.moveToNext()
                                 }
@@ -140,7 +141,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 }
 
                 updateDefaultDatasetPreference(
-                    it.data?.getParcelableExtra(
+                    it.data?.getParcelableExtraCompat(
                         DatasetListActivity.EXTRA_SELECTED_DATASET
                     )
                 )
@@ -152,8 +153,9 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 }
 
                 updateDefaultObserversPreference(
-                    it.data?.getParcelableArrayListExtra(InputObserverListActivity.EXTRA_SELECTED_INPUT_OBSERVERS)
-                        ?: ArrayList()
+                    it.data?.getParcelableArrayExtraCompat<InputObserver>(InputObserverListActivity.EXTRA_SELECTED_INPUT_OBSERVERS)
+                        ?.toList()
+                        ?: emptyList()
                 )
             }
 
@@ -161,17 +163,11 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         loadDefaultObserver()
         configurePermissionsPreference()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            configureNotificationsPreferences()
-        }
+        configureNotificationsPreferences()
 
-        setServerUrlsPreferences(arguments?.getParcelable(ARG_SERVER_URLS))
-        setMapSettingsPreferences(arguments?.getParcelable(ARG_MAP_SETTINGS))
+        setServerUrlsPreferences(arguments?.getParcelableCompat(ARG_SERVER_URLS))
+        setMapSettingsPreferences(arguments?.getParcelableCompat(ARG_MAP_SETTINGS))
         setMountPointsPreferences(preferenceScreen)
-
-        (preferenceScreen.findPreference(getString(R.string.preference_category_about_app_version_key)) as Preference?)?.also {
-            it.summary = listener?.getAppVersion()
-        }
     }
 
     override fun onCreatePreferences(
@@ -183,29 +179,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         addPreferencesFromResource(R.xml.preferences_observers)
         addPreferencesFromResource(R.xml.map_preferences)
         addPreferencesFromResource(R.xml.preferences_permissions)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            addPreferencesFromResource(R.xml.preferences_notifications)
-        }
-
+        addPreferencesFromResource(R.xml.preferences_notifications)
         addPreferencesFromResource(R.xml.preferences_storage)
-        addPreferencesFromResource(R.xml.preferences_about)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
-        if (context is OnPreferencesFragmentListener) {
-            listener = context
-        } else {
-            throw RuntimeException("$context must implement OnPreferencesFragmentListener")
-        }
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-
-        listener = null
     }
 
     private fun loadDefaultDataset() {
@@ -257,7 +232,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                 bundleOf(
                     Pair(
                         KEY_SELECTED_OBSERVER_IDS,
-                        defaultObserversId.toTypedArray().toLongArray()
+                        defaultObserversId.toTypedArray()
+                            .toLongArray()
                     )
                 ),
                 loaderCallbacks
@@ -280,34 +256,37 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             val supportFragmentManager =
                 activity?.supportFragmentManager ?: return@OnPreferenceClickListener false
 
-            ConfigureServerSettingsDialogFragment.newInstance(serverUrl).apply {
-                setOnConfigureServerSettingsDialogFragmentListener(object :
-                    ConfigureServerSettingsDialogFragment.OnConfigureServerSettingsDialogFragmentListener {
-                    override fun onChanged(url: String) {
-                        PreferenceManager.getDefaultSharedPreferences(serverSettingsPreference.context)
-                            .edit().also {
-                                it.putString(
-                                    getString(R.string.preference_category_server_geonature_url_key),
-                                    url
-                                )
+            ConfigureServerSettingsDialogFragment.newInstance(serverUrl)
+                .apply {
+                    setOnConfigureServerSettingsDialogFragmentListener(object :
+                        ConfigureServerSettingsDialogFragment.OnConfigureServerSettingsDialogFragmentListener {
+                        override fun onChanged(url: String) {
+                            PreferenceManager.getDefaultSharedPreferences(serverSettingsPreference.context)
+                                .edit()
+                                .also {
+                                    it.putString(
+                                        getString(R.string.preference_category_server_geonature_url_key),
+                                        url
+                                    )
 
-                                serverSettingsPreference.summary = url
+                                    serverSettingsPreference.summary = url
 
-                                it.apply()
-                            }
-                    }
-                })
-                show(
-                    supportFragmentManager,
-                    SERVER_SETTINGS_DIALOG_FRAGMENT
-                )
-            }
+                                    it.apply()
+                                }
+                        }
+                    })
+                    show(
+                        supportFragmentManager,
+                        SERVER_SETTINGS_DIALOG_FRAGMENT
+                    )
+                }
 
             true
         }
 
         PreferenceManager.getDefaultSharedPreferences(serverSettingsPreference.context)
-            .edit().also {
+            .edit()
+            .also {
                 if (serverUrl.isNullOrBlank()) {
                     it.remove(getString(R.string.preference_category_server_geonature_url_key))
                     serverSettingsPreference.setSummary(R.string.preference_category_server_geonature_url_not_set)
@@ -328,7 +307,9 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
         MapSettingsPreferencesUtils.setDefaultPreferences(
             context,
-            MapSettings.Builder.newInstance().from(mapSettings).build(),
+            MapSettings.Builder.newInstance()
+                .from(mapSettings)
+                .build(),
             preferenceScreen
         )
     }
@@ -421,7 +402,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         } else {
             editor.putStringSet(
                 getString(R.string.preference_category_observers_default_key),
-                defaultObservers.map { it.id.toString() }.toSet()
+                defaultObservers.map { it.id.toString() }
+                    .toSet()
             )
             defaultObserverPreference.summary =
                 if (defaultObservers.size < 3) defaultObservers.joinToString(", ") {
@@ -456,7 +438,6 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun configureNotificationsPreferences() {
         preferenceScreen
             .findPreference<Preference>(getString(R.string.preference_category_notifications_configure_key))
@@ -471,13 +452,6 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                     true
                 }
             }
-    }
-
-    /**
-     * Callback used by [PreferencesFragment].
-     */
-    interface OnPreferencesFragmentListener {
-        fun getAppVersion(): String
     }
 
     companion object {

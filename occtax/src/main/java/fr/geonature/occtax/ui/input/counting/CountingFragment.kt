@@ -21,6 +21,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
+import fr.geonature.compat.content.getParcelableExtraCompat
+import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.TaxonRecord
@@ -51,7 +53,7 @@ class CountingFragment : AbstractInputFragment() {
                     return@registerForActivityResult
                 }
 
-                updateCountingMetadata(it.data?.getParcelableExtra(EditCountingMetadataActivity.EXTRA_COUNTING_RECORD))
+                updateCountingMetadata(it.data?.getParcelableExtraCompat(EditCountingMetadataActivity.EXTRA_COUNTING_RECORD))
             }
     }
 
@@ -207,18 +209,18 @@ class CountingFragment : AbstractInputFragment() {
         val context = context ?: return
         val taxonRecord = observationRecord?.taxa?.selectedTaxonRecord ?: return
 
-        editCountingResultLauncher.launch(EditCountingMetadataActivity.newIntent(
-            context,
-            taxonRecord,
-            countingRecord,
-            arguments?.getBoolean(
-                ARG_SAVE_DEFAULT_VALUES,
-                false
-            ) ?: false,
-            *(arguments?.getParcelableArray(ARG_PROPERTIES)
-                ?.map { it as PropertySettings }
-                ?.toTypedArray() ?: emptyArray())
-        ))
+        editCountingResultLauncher.launch(
+            EditCountingMetadataActivity.newIntent(
+                context,
+                taxonRecord,
+                countingRecord,
+                arguments?.getBoolean(
+                    ARG_SAVE_DEFAULT_VALUES,
+                    false
+                ) ?: false,
+                *(arguments?.getParcelableArrayCompat(ARG_PROPERTIES) ?: emptyArray())
+            )
+        )
     }
 
     private fun updateCountingMetadata(countingRecord: CountingRecord?) {

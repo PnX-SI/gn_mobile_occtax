@@ -1,5 +1,6 @@
 package fr.geonature.occtax.features.nomenclature.presentation
 
+import android.annotation.SuppressLint
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
@@ -272,6 +273,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
         /**
          * Build the default label for given editable nomenclature type as fallback.
          */
+        @SuppressLint("DiscouragedApi")
         fun getNomenclatureTypeLabel(mnemonic: String): String {
             return itemView.resources.getIdentifier(
                 "nomenclature_${mnemonic.lowercase()}",

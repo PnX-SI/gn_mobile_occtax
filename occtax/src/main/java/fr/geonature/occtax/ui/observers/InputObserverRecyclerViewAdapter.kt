@@ -24,7 +24,7 @@ class InputObserverRecyclerViewAdapter(private val listener: OnInputObserverRecy
     FastScroller.SectionIndexer {
     private var cursor: Cursor? = null
     private var choiceMode: Int = ListView.CHOICE_MODE_SINGLE
-    private val selectedInputObservers: MutableList<InputObserver> = ArrayList()
+    private val selectedInputObservers: MutableList<InputObserver> = mutableListOf()
     private val onClickListener: View.OnClickListener
 
     init {

@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.entity.Dataset
+import fr.geonature.compat.content.getParcelableExtraCompat
 import fr.geonature.occtax.R
 
 /**
@@ -32,7 +33,7 @@ class DatasetListActivity : AppCompatActivity(),
         supportFragmentManager.beginTransaction()
             .replace(
                 R.id.container,
-                DatasetListFragment.newInstance(intent.getParcelableExtra(EXTRA_SELECTED_DATASET))
+                DatasetListFragment.newInstance(intent.getParcelableExtraCompat(EXTRA_SELECTED_DATASET))
             )
             .commit()
     }

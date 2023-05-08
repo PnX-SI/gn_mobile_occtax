@@ -13,7 +13,6 @@ import fr.geonature.datasync.api.model.AuthLogin
 import fr.geonature.datasync.api.model.AuthUser
 import fr.geonature.datasync.auth.IAuthManager
 import fr.geonature.datasync.auth.error.AuthException
-import fr.geonature.datasync.packageinfo.ISynchronizeObservationRecordRepository
 import fr.geonature.datasync.settings.DataSyncSettings
 import fr.geonature.datasync.settings.error.DataSyncSettingsNotFoundException
 import fr.geonature.occtax.CoroutineTestRule
@@ -105,7 +104,30 @@ class SynchronizeObservationRecordRepositoryTest {
             coEvery { authManager.getAuthLogin() } returns null
 
             // when trying to synchronize an observation record from ID
-            val result = synchronizeObservationRecordRepository(1234L)
+            val result = synchronizeObservationRecordRepository.synchronize(
+                ObservationRecord(internalId = 1240L).apply {
+                    comment.comment = "some comment"
+                    taxa.add(
+                        Taxon(
+                            8L,
+                            "taxon_02",
+                            Taxonomy(
+                                "Animalia",
+                                "Ascidies"
+                            )
+                        )
+                    )
+                        .apply {
+                            PropertyValue.Text(
+                                "some_code",
+                                "some_value"
+                            )
+                                .also {
+                                    properties[it.code] = it
+                                }
+                        }
+                }
+            )
 
             // then
             assertTrue(result.isFailure)
@@ -135,7 +157,30 @@ class SynchronizeObservationRecordRepositoryTest {
             coEvery { appSettingsManager.loadAppSettings() } returns null
 
             // when trying to synchronize an observation record from ID
-            val result = synchronizeObservationRecordRepository(1234L)
+            val result = synchronizeObservationRecordRepository.synchronize(
+                ObservationRecord(internalId = 1240L).apply {
+                    comment.comment = "some comment"
+                    taxa.add(
+                        Taxon(
+                            8L,
+                            "taxon_02",
+                            Taxonomy(
+                                "Animalia",
+                                "Ascidies"
+                            )
+                        )
+                    )
+                        .apply {
+                            PropertyValue.Text(
+                                "some_code",
+                                "some_value"
+                            )
+                                .also {
+                                    properties[it.code] = it
+                                }
+                        }
+                }
+            )
 
             // then
             assertTrue(result.isFailure)
@@ -172,7 +217,30 @@ class SynchronizeObservationRecordRepositoryTest {
             )
 
             // when trying to synchronize an observation record from ID
-            val result = synchronizeObservationRecordRepository(1234L)
+            val result = synchronizeObservationRecordRepository.synchronize(
+                ObservationRecord(internalId = 1240L).apply {
+                    comment.comment = "some comment"
+                    taxa.add(
+                        Taxon(
+                            8L,
+                            "taxon_02",
+                            Taxonomy(
+                                "Animalia",
+                                "Ascidies"
+                            )
+                        )
+                    )
+                        .apply {
+                            PropertyValue.Text(
+                                "some_code",
+                                "some_value"
+                            )
+                                .also {
+                                    properties[it.code] = it
+                                }
+                        }
+                }
+            )
 
             // then
             assertTrue(result.isFailure)
@@ -217,11 +285,13 @@ class SynchronizeObservationRecordRepositoryTest {
             )
             coEvery { appSettingsManager.loadAppSettings() } returns appSettings
             coEvery {
-                observationRecordRemoteDataSource.setBaseUrl(appSettings.dataSyncSettings?.geoNatureServerUrl!!)
+                observationRecordRemoteDataSource.setBaseUrl(
+                    appSettings.dataSyncSettings?.geoNatureServerUrl!!
+                )
             } returns Unit
 
             // and an existing observation record with wrong status
-            coEvery { observationRecordLocalDataSource.read(1240L) } returns ObservationRecord(internalId = 1240L).apply {
+            val observationRecord = ObservationRecord(internalId = 1240L).apply {
                 comment.comment = "some comment"
                 taxa.add(
                     Taxon(
@@ -245,7 +315,7 @@ class SynchronizeObservationRecordRepositoryTest {
             }
 
             // when trying to synchronize an observation record from ID
-            val result = synchronizeObservationRecordRepository(1240L)
+            val result = synchronizeObservationRecordRepository.synchronize(observationRecord)
 
             // then
             assertTrue(result.isFailure)
@@ -289,7 +359,9 @@ class SynchronizeObservationRecordRepositoryTest {
         )
         coEvery { appSettingsManager.loadAppSettings() } returns appSettings
         coEvery {
-            observationRecordRemoteDataSource.setBaseUrl(appSettings.dataSyncSettings?.geoNatureServerUrl!!)
+            observationRecordRemoteDataSource.setBaseUrl(
+                appSettings.dataSyncSettings?.geoNatureServerUrl!!
+            )
         } returns Unit
 
         // and an existing observation to synchronize
@@ -318,7 +390,6 @@ class SynchronizeObservationRecordRepositoryTest {
                         }
                 }
         }
-        coEvery { observationRecordLocalDataSource.read(1240L) } returns expectedObservationRecordToSend
         coEvery {
             observationRecordRemoteDataSource.sendObservationRecord(
                 any(),
@@ -332,16 +403,20 @@ class SynchronizeObservationRecordRepositoryTest {
             )
         } answers { firstArg() }
         coEvery { observationRecordRemoteDataSource.deleteObservationRecord(any()) } returns Unit
-        coEvery { observationRecordLocalDataSource.delete(expectedObservationRecordToSend.internalId) } returns expectedObservationRecordToSend
+        coEvery {
+            observationRecordLocalDataSource.delete(expectedObservationRecordToSend.internalId)
+        } returns expectedObservationRecordToSend
 
         // when trying to synchronize an observation record from ID
-        val result = synchronizeObservationRecordRepository(1240L)
+        val result =
+            synchronizeObservationRecordRepository.synchronize(expectedObservationRecordToSend)
 
         // then
         assertTrue(result.isSuccess)
         coVerifySequence {
-            observationRecordRemoteDataSource.setBaseUrl(appSettings.dataSyncSettings?.geoNatureServerUrl!!)
-            observationRecordLocalDataSource.read(expectedObservationRecordToSend.internalId)
+            observationRecordRemoteDataSource.setBaseUrl(
+                appSettings.dataSyncSettings?.geoNatureServerUrl!!
+            )
             observationRecordRemoteDataSource.sendObservationRecord(
                 expectedObservationRecordToSend,
                 appSettings
@@ -396,7 +471,9 @@ class SynchronizeObservationRecordRepositoryTest {
         )
         coEvery { appSettingsManager.loadAppSettings() } returns appSettings
         coEvery {
-            observationRecordRemoteDataSource.setBaseUrl(appSettings.dataSyncSettings?.geoNatureServerUrl!!)
+            observationRecordRemoteDataSource.setBaseUrl(
+                appSettings.dataSyncSettings?.geoNatureServerUrl!!
+            )
         } returns Unit
 
         // and an existing observation to synchronize
@@ -426,7 +503,6 @@ class SynchronizeObservationRecordRepositoryTest {
                 }
         }
 
-        coEvery { observationRecordLocalDataSource.read(1240L) } returns expectedObservationRecordToSend
         coEvery {
             observationRecordRemoteDataSource.sendObservationRecord(
                 any(),
@@ -440,12 +516,16 @@ class SynchronizeObservationRecordRepositoryTest {
                 any()
             )
         } answers {
-            throw ObservationRecordException.SynchronizeException(firstArg<ObservationRecord>().internalId)
+            throw ObservationRecordException.SynchronizeException(
+                firstArg<ObservationRecord>().internalId
+            )
         }
         coEvery { observationRecordRemoteDataSource.deleteObservationRecord(any()) } returns Unit
 
         // when trying to synchronize an observation record from ID
-        val result = synchronizeObservationRecordRepository(1240L)
+        val result = synchronizeObservationRecordRepository.synchronize(
+            expectedObservationRecordToSend
+        )
 
         // then
         assertTrue(result.isFailure)
@@ -455,8 +535,9 @@ class SynchronizeObservationRecordRepositoryTest {
             (result.exceptionOrNull() as ObservationRecordException.SynchronizeException).id
         )
         coVerifySequence {
-            observationRecordRemoteDataSource.setBaseUrl(appSettings.dataSyncSettings?.geoNatureServerUrl!!)
-            observationRecordLocalDataSource.read(expectedObservationRecordToSend.internalId)
+            observationRecordRemoteDataSource.setBaseUrl(
+                appSettings.dataSyncSettings?.geoNatureServerUrl!!
+            )
             observationRecordRemoteDataSource.sendObservationRecord(
                 expectedObservationRecordToSend,
                 appSettings
@@ -465,7 +546,9 @@ class SynchronizeObservationRecordRepositoryTest {
                 expectedObservationRecordToSend.copy(id = 1234L),
                 appSettings
             )
-            observationRecordRemoteDataSource.deleteObservationRecord(expectedObservationRecordToSend.copy(id = 1234L))
+            observationRecordRemoteDataSource.deleteObservationRecord(
+                expectedObservationRecordToSend.copy(id = 1234L)
+            )
         }
         coVerify(inverse = true) {
             observationRecordLocalDataSource.delete(expectedObservationRecordToSend.internalId)

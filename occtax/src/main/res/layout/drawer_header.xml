@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/side_nav_bar"
+    android:elevation="2dp"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/text_margin"
+    android:paddingTop="48dp"
+    android:paddingBottom="@dimen/text_margin"
+    android:theme="@style/AppTheme">
+
+    <TextView
+        android:id="@android:id/text1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLargeInverse"
+        android:visibility="gone"
+        tools:text="@tools:sample/last_names" />
+
+    <TextView
+        android:id="@android:id/text2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMediumInverse"
+        android:visibility="gone"
+        tools:text="@tools:sample/first_names" />
+
+    <Button
+        android:id="@android:id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:text="@string/action_login"
+        app:icon="@drawable/ic_login" />
+
+</LinearLayout>

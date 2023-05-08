@@ -27,6 +27,9 @@ import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.entity.InputObserver
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.commons.util.afterTextChanged
+import fr.geonature.compat.content.getParcelableArrayExtraCompat
+import fr.geonature.compat.content.getParcelableExtraCompat
+import fr.geonature.compat.os.getParcelableCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
 import fr.geonature.occtax.features.record.domain.PropertyValue
@@ -197,9 +200,10 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                 }
 
                 updateSelectedObservers(
-                    it.data?.getParcelableArrayListExtra(
+                    it.data?.getParcelableArrayExtraCompat<InputObserver>(
                         InputObserverListActivity.EXTRA_SELECTED_INPUT_OBSERVERS
-                    ) ?: ArrayList()
+                    )
+                        ?.toList() ?: emptyList()
                 )
             }
         datasetResultLauncher =
@@ -209,12 +213,11 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                 }
 
                 updateSelectedDataset(
-                    it.data?.getParcelableExtra(
-                        DatasetListActivity.EXTRA_SELECTED_DATASET
-                    )
+                    it.data?.getParcelableExtraCompat(DatasetListActivity.EXTRA_SELECTED_DATASET)
                 )
             }
-        dateSettings = arguments?.getParcelable(ARG_DATE_SETTINGS) ?: InputDateSettings.DEFAULT
+        dateSettings =
+            arguments?.getParcelableCompat(ARG_DATE_SETTINGS) ?: InputDateSettings.DEFAULT
     }
 
     override fun onCreateView(

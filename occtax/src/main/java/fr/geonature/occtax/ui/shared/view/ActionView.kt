@@ -76,9 +76,10 @@ class ActionView : ConstraintLayout {
                 params
             )
         } else {
-            contentView?.children?.asSequence()?.filter { it.id != emptyTextView.id }?.forEach {
-                contentView?.removeView(it)
-            }
+            contentView?.children?.filter { it.id != emptyTextView.id }
+                ?.forEach {
+                    contentView?.removeView(it)
+                }
             contentView?.addView(
                 child,
                 index,
@@ -89,7 +90,7 @@ class ActionView : ConstraintLayout {
     }
 
     fun getContentView(): View? {
-        return contentView?.children?.asSequence()?.firstOrNull { it.id != emptyTextView.id }
+        return contentView?.children?.firstOrNull { it.id != emptyTextView.id }
     }
 
     fun setListener(listener: OnActionViewListener) {
@@ -134,7 +135,7 @@ class ActionView : ConstraintLayout {
         contentViewVisibility = visibility
         actionButton.setText(if (visibility == View.VISIBLE) actionText else actionEmptyText.takeIf { it > 0 }
             ?: actionText)
-        contentView?.children?.asSequence()?.forEach {
+        contentView?.children?.forEach {
             if (it.id == emptyTextView.id) it.visibility =
                 if (visibility == View.VISIBLE) View.GONE else View.VISIBLE
             else it.visibility = if (visibility == View.VISIBLE) View.VISIBLE else View.GONE
@@ -165,9 +166,10 @@ class ActionView : ConstraintLayout {
             0
         )
 
-        ta.getString(R.styleable.ActionView_title)?.also {
-            setTitle(it)
-        }
+        ta.getString(R.styleable.ActionView_title)
+            ?.also {
+                setTitle(it)
+            }
         setTitle(
             ta.getResourceId(
                 R.styleable.ActionView_title,

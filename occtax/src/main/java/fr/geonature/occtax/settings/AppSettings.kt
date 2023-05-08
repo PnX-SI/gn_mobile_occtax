@@ -1,16 +1,16 @@
 package fr.geonature.occtax.settings
 
-import android.os.Parcel
-import android.os.Parcelable
 import fr.geonature.commons.settings.IAppSettings
 import fr.geonature.datasync.settings.DataSyncSettings
 import fr.geonature.maps.settings.MapSettings
+import kotlinx.parcelize.Parcelize
 
 /**
  * Global internal settings.
  *
  * @author S. Grimault
  */
+@Parcelize
 data class AppSettings(
     var areaObservationDuration: Int = DEFAULT_AREA_OBSERVATION_DURATION,
     var inputSettings: InputSettings = InputSettings(dateSettings = InputDateSettings.DEFAULT),
@@ -18,44 +18,6 @@ data class AppSettings(
     var mapSettings: MapSettings? = null,
     var nomenclatureSettings: NomenclatureSettings? = null
 ) : IAppSettings {
-
-    private constructor(source: Parcel) : this(
-        source.readInt(),
-        source.readParcelable(InputSettings::class.java.classLoader)
-            ?: InputSettings(dateSettings = InputDateSettings.DEFAULT),
-        source.readParcelable(DataSyncSettings::class.java.classLoader) as DataSyncSettings?,
-        source.readParcelable(MapSettings::class.java.classLoader) as MapSettings?,
-        source.readParcelable(NomenclatureSettings::class.java.classLoader) as NomenclatureSettings?
-    )
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    override fun writeToParcel(
-        dest: Parcel?,
-        flags: Int
-    ) {
-        dest?.also {
-            it.writeInt(areaObservationDuration)
-            it.writeParcelable(
-                inputSettings,
-                0
-            )
-            it.writeParcelable(
-                dataSyncSettings,
-                0
-            )
-            it.writeParcelable(
-                mapSettings,
-                0
-            )
-            it.writeParcelable(
-                nomenclatureSettings,
-                0
-            )
-        }
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -82,16 +44,5 @@ data class AppSettings(
 
     companion object {
         const val DEFAULT_AREA_OBSERVATION_DURATION = 365
-
-        @JvmField
-        val CREATOR: Parcelable.Creator<AppSettings> = object : Parcelable.Creator<AppSettings> {
-            override fun createFromParcel(parcel: Parcel): AppSettings {
-                return AppSettings(parcel)
-            }
-
-            override fun newArray(size: Int): Array<AppSettings?> {
-                return arrayOfNulls(size)
-            }
-        }
     }
 }

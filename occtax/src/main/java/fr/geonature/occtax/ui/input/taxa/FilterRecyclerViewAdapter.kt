@@ -183,9 +183,10 @@ class FilterRecyclerViewAdapter(val listener: FilterRecyclerViewAdapterListener<
 
         return filterTaxonomyRecyclerViewAdapter.items.indexOfFirst {
             it.value.kingdom == currentFilterTaxonomy.value.kingdom && it.value.group == Taxonomy.ANY
-        }.takeIf { it >= 0 }
+        }
+            .takeIf { it >= 0 }
             ?.plus(filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount + filterTitleTaxonomyRecyclerViewAdapter.itemCount)
-            ?: filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount + filterTitleTaxonomyRecyclerViewAdapter.itemCount - 1
+            ?: (filterAreaObservationRecyclerViewAdapter.itemCount + filterTitleAreaObservationRecyclerViewAdapter.itemCount + filterTitleTaxonomyRecyclerViewAdapter.itemCount - 1)
     }
 
     override fun onBindHeaderViewHolder(holder: HeaderViewHolder, headerPosition: Int) {

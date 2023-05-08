@@ -1,17 +1,127 @@
 # Changelog
 
+## [2.6.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.0) (2023-05-08, release)
+
+### 🚀 Nouveautés
+
+* Support Android 13 (API 33).
+* Support des fonds Geoportail (https://github.com/PnX-SI/gn_mobile_maps/issues/8).
+  Le module ["maps"](https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps) supporte
+  officiellement les fonds suivants :
+  * [Geoportail WMTS](https://www.geoportail.gouv.fr)
+  * [OpenTopoMap](https://www.opentopomap.org)
+  * [OpenStreetMap](https://www.openstreetmap.org)
+  * [Wikimedia Maps](https://maps.wikimedia.org)
+* Gestion automatique des attributions sur les fonds en ligne (https://github.com/PnX-SI/gn_mobile_occtax/issues/191).
+  L'attribution est définie automatiquement selon la nature de la source si aucune n'a été précisée
+  dans la configuration. L'attribution n'est valable que pour les fonds en ligne.
+* Petites améliorations sur la documentation, notamment sur la gestion, la configuration et
+    l'ordonnancement des couches coté module ["maps"](https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps)
+    (https://github.com/PnX-SI/gn_mobile_occtax/issues/192)
+* La synchronisation périodique de l'ensemble des données issues de GeoNature est configuré par
+    défaut à 7 jours. Cette configuration n'est active uniquement que si la synchronisation périodique
+    n'est pas configurée (les paramètres `sync_periodicity_data` et `sync_periodicity_data_essential`
+    ne sont pas renseignés).
+* La synchronisation des données est maintenant décoléré de la synchronisation des relevés (https://github.com/PnX-SI/gn_mobile_occtax/issues/133).
+* La synchronisation des relevés se fait à la demande de l'utilisateur (https://github.com/PnX-SI/gn_mobile_occtax/issues/137).
+* La synchronisation des données s'exécute mantenant dans un contexte transactionnel afin de
+  toujours garantir une cohérence des données présentes localement.
+* Refonte de l'écran d'accueil pour mettre en valeur les relevés en cours ou prêt à être
+  synchronisés. La partie paramétrage et synchronisation des données sont déportées dans le menu
+  latéral.
+
+### 🐛 Corrections
+
+* Meilleur support de la taille des textes de l'interface selon la densité et la configuration
+  d'affichage du terminal (https://github.com/PnX-SI/gn_mobile_occtax/issues/217).
+
+### ⚠️ Notes de version
+
+* Code de version : 3200
+* Depuis sa version 2.12.0, GeoNature permet de gérer le contenu de la table
+  `gn_commons.t_mobile_apps` directement dans le backoffice du module "Admin" de GeoNature (https://github.com/PnX-SI/gn_mobile_occtax/issues/214)
+* Dans cette même version, les médias (incluant le dossier `mobile/` comprenant les fichiers APK et
+  le fichier `settings.json` d'Occtax-mobile) ont été déplacés du dossier `~/geonature/backend/static/`
+  à `~/geonature/backend/media/` (https://github.com/PnX-SI/gn_mobile_occtax/issues/214)
+
+## [2.6.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.0-rc2) (2023-04-29, pre-release)
+
+### 🚀 Nouveautés
+
+* La synchronisation périodique de l'ensemble des données issues de GeoNature est configuré par
+  défaut à 7 jours. Cette configuration n'est active uniquement que si la synchronisation périodique
+  n'est pas configurée (les paramètres `sync_periodicity_data` et `sync_periodicity_data_essential`
+  ne sont pas renseignés).
+
+### 🐛 Corrections
+
+* Meilleur support de la taille des textes de l'interface selon la densité et la configuration
+  d'affichage du terminal (https://github.com/PnX-SI/gn_mobile_occtax/issues/217).
+* Le bouton "Envoyer les relevés" présenté sous forme de bouton icône dans la barre de menu en page
+  d'accueil est affiché sous forme de texte simple "Envoyer" et non plus sous forme d'icône pour
+  plus de clarté.
+* Petites améliorations sur la documentation, notamment sur la gestion, la configuration et
+  l'ordonnancement des couches coté module ["maps"](https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps)
+  (https://github.com/PnX-SI/gn_mobile_occtax/issues/192).
+
+### ⚠️ Notes de version
+
+* Code de version : 3191
+
+## [2.6.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.0-rc1) (2023-04-19, pre-release)
+
+### 🚀 Nouveautés
+
+* Support Android 13 (API 33).
+* Support des fonds Geoportail (https://github.com/PnX-SI/gn_mobile_maps/issues/8).
+  Le module ["maps"](https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps) supporte
+  officiellement les fonds suivants :
+  * [Geoportail WMTS](https://www.geoportail.gouv.fr)
+  * [OpenTopoMap](https://www.opentopomap.org)
+  * [OpenStreetMap](https://www.openstreetmap.org)
+  * [Wikimedia Maps](https://maps.wikimedia.org)
+* Gestion automatique des attributions sur les fonds en ligne (https://github.com/PnX-SI/gn_mobile_occtax/issues/191).
+  L'attribution est définie automatiquement selon la nature de la source si aucune n'a été précisée
+  dans la configuration. L'attribution n'est valable que pour les fonds en ligne.
+* Petites améliorations sur la documentation, notamment sur la gestion des couches coté module
+  ["maps"](https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps) (https://github.com/PnX-SI/gn_mobile_occtax/issues/192).
+
+### 🐛 Corrections
+
+* Mise à jour de la liste des relevés et de leurs statuts pendant la synchronisation.
+
+### ⚠️ Notes de version
+
+* Code de version : 3187
+
+## [2.6.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.0-rc0) (2023-03-25, pre-release)
+
+### 🚀 Nouveautés
+
+* La synchronisation des données est maintenant décoléré de la synchronisation des relevés (https://github.com/PnX-SI/gn_mobile_occtax/issues/133). 
+* La synchronisation des relevés se fait à la demande de l'utilisateur (https://github.com/PnX-SI/gn_mobile_occtax/issues/137).
+* La synchronisation des données s'exécute mantenant dans un contexte transactionnel afin de
+  toujours garantir une cohérence des données présentes localement.
+* Refonte de l'écran d'accueil pour mettre en valeur les relevés en cours ou prêt à être
+  synchronisés. La partie paramétrage et synchronisation des données sont déportées dans le menu
+  latéral.
+
+### ⚠️ Notes de version
+
+* Code de version : 3181
+
 ## [2.5.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.5.0) (2023-03-21, release)
 
 ### 🚀 Nouveautés
 
 * Gestion des médias sur la partie dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/84)
-* Refonte de la synchronisation des relevés en consommant les nouvelles APIs du module "Occtax".
+* Refonte de la synchronisation des relevés en consommant les APIs v2 du module "Occtax".
 * Refonte de la gestion des relevés.
 * Accélérer la saisie en permettant de mémoriser les dernières nomenclatures saisies sur la partie
   dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 * Possibilité de reprendre en édition un relevé terminé prêt à être synchronisé (https://github.com/PnX-SI/gn_mobile_occtax/issues/78).
 
-### 🚀 Corrections
+### 🐛 Corrections
 
 * Valeur par défaut des champs "Min"et "Max" dans la partie dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/209, https://github.com/PnX-SI/gn_mobile_occtax/issues/210)
 * Quelques petits ajustements sur la documentation de l'installation, notamment sur la récupération
@@ -20,13 +130,14 @@
 ### ⚠️ Notes de version
 
 * Code de version : 3170
+* Nécessite la version 2.10 (ou plus) de GeoNature.
 * Suite à la refonte sur la partie gestion des relevés, le paramétrage de la nomenclature en
   configuration avancée a évolué aussi (cf. [README.md](https://github.com/PnX-SI/gn_mobile_occtax#nomenclature-settings)),
   notamment sur le nommage des attributs et du respect de la casse (Par exemple `MIN` devient `count_min`).
 
 ## [2.4.1-rc4](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.1-rc4) (2023-02-21, pre-release)
 
-### 🚀 Corrections
+### 🐛 Corrections
 
 * Gestion des médias sur la partie dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/84)
 * Accélérer la saisie en permettant de mémoriser les dernières nomenclatures saisies sur la partie

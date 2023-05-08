@@ -1,5 +1,6 @@
 package fr.geonature.occtax.ui.input.taxa
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -35,6 +36,8 @@ import fr.geonature.commons.data.entity.TaxonWithArea
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.commons.util.ThemeUtils
+import fr.geonature.compat.content.getParcelableArrayExtraCompat
+import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
@@ -69,7 +72,7 @@ class TaxaFragment : AbstractInputFragment() {
         ): Loader<Cursor> {
 
             val selectedFilters =
-                args?.getParcelableArray(KEY_SELECTED_FILTERS)?.map { it as Filter<*> }
+                args?.getParcelableArrayCompat<Filter<*>>(KEY_SELECTED_FILTERS)
                     ?.toList() ?: emptyList()
 
             return when (id) {
@@ -96,7 +99,8 @@ class TaxaFragment : AbstractInputFragment() {
                                                 FilterAreaObservation.AreaObservationType.LESS_THAN_DURATION -> "grey"
                                                 else -> "none"
                                             }
-                                        }.toList()
+                                        }
+                                        .toList()
                                 val filterByTaxonomy =
                                     selectedFilters.find { filter -> filter.type == Filter.FilterType.TAXONOMY }?.value as Taxonomy?
 
@@ -107,7 +111,8 @@ class TaxaFragment : AbstractInputFragment() {
                                 if (filterByTaxonomy != null) {
                                     it.byTaxonomy(filterByTaxonomy)
                                 }
-                            }.build()
+                            }
+                            .build()
 
                     CursorLoader(
                         requireContext(),
@@ -118,8 +123,11 @@ class TaxaFragment : AbstractInputFragment() {
                         ),
                         null,
                         taxonFilter.first,
-                        taxonFilter.second.map { it.toString() }.toTypedArray(),
-                        TaxonWithArea.OrderBy().byName(args?.getString(KEY_FILTER_BY_NAME)).build()
+                        taxonFilter.second.map { it.toString() }
+                            .toTypedArray(),
+                        TaxonWithArea.OrderBy()
+                            .byName(args?.getString(KEY_FILTER_BY_NAME))
+                            .build()
                     )
                 }
                 LOADER_TAXON -> {
@@ -133,7 +141,8 @@ class TaxaFragment : AbstractInputFragment() {
                         buildUri(
                             authority,
                             Taxon.TABLE_NAME,
-                            args?.getLong(KEY_SELECTED_TAXON_ID).toString(),
+                            args?.getLong(KEY_SELECTED_TAXON_ID)
+                                .toString(),
                             if (selectedFeatureId == null) "" else "area/$selectedFeatureId"
                         ),
                         null,
@@ -197,8 +206,8 @@ class TaxaFragment : AbstractInputFragment() {
                 }
 
                 val selectedFilters =
-                    activityResult.data?.getParcelableArrayExtra(TaxaFilterActivity.EXTRA_SELECTED_FILTERS)
-                        ?.map { it as Filter<*> }?.toTypedArray() ?: emptyArray()
+                    activityResult.data?.getParcelableArrayExtraCompat<Filter<*>>(TaxaFilterActivity.EXTRA_SELECTED_FILTERS)
+                        ?: emptyArray()
                 applyFilters(*selectedFilters)
             }
     }
@@ -355,7 +364,8 @@ class TaxaFragment : AbstractInputFragment() {
                 taxaFilterResultLauncher.launch(
                     TaxaFilterActivity.newIntent(
                         context,
-                        !savedState.getString(KEY_SELECTED_FEATURE_ID).isNullOrEmpty(),
+                        !savedState.getString(KEY_SELECTED_FEATURE_ID)
+                            .isNullOrEmpty(),
                         arguments?.getInt(
                             ARG_AREA_OBSERVATION_DURATION,
                             AppSettings.DEFAULT_AREA_OBSERVATION_DURATION
@@ -455,6 +465,7 @@ class TaxaFragment : AbstractInputFragment() {
         loadTaxa()
     }
 
+    @SuppressLint("DiscouragedApi")
     private fun filterByAreaObservation(vararg areaObservation: FilterAreaObservation.AreaObservation) {
         val filterChipGroup = filterChipGroup ?: return
         val context = context ?: return
@@ -486,14 +497,16 @@ class TaxaFragment : AbstractInputFragment() {
 
         filterChipGroup.visibility = View.VISIBLE
 
-        areaObservation.toList().sortedBy { it.type }
+        areaObservation.toList()
+            .sortedBy { it.type }
             .forEachIndexed { index, areaObservationToAdd ->
                 with(
-                    LayoutInflater.from(context).inflate(
-                        R.layout.chip,
-                        filterChipGroup,
-                        false
-                    ) as Chip
+                    LayoutInflater.from(context)
+                        .inflate(
+                            R.layout.chip,
+                            filterChipGroup,
+                            false
+                        ) as Chip
                 ) {
                     tag = areaObservationToAdd
                     text = areaObservationToAdd.short
@@ -502,7 +515,8 @@ class TaxaFragment : AbstractInputFragment() {
                         "area_observation_${areaObservationToAdd.type.name.lowercase(Locale.ROOT)}",
                         "color",
                         context.packageName
-                    ).takeIf { it > 0 } ?: R.color.accent)
+                    )
+                        .takeIf { it > 0 } ?: R.color.accent)
                     setTextColor(
                         ThemeUtils.getColor(
                             context,
@@ -558,11 +572,12 @@ class TaxaFragment : AbstractInputFragment() {
 
             // build kingdom taxonomy filter chip
             with(
-                LayoutInflater.from(context).inflate(
-                    R.layout.chip,
-                    filterChipGroup,
-                    false
-                ) as Chip
+                LayoutInflater.from(context)
+                    .inflate(
+                        R.layout.chip,
+                        filterChipGroup,
+                        false
+                    ) as Chip
             ) {
                 tag = Taxonomy(selectedTaxonomy.kingdom)
                 text = selectedTaxonomy.kingdom
@@ -581,11 +596,12 @@ class TaxaFragment : AbstractInputFragment() {
             // build group taxonomy filter chip
             if (selectedTaxonomy.group != Taxonomy.ANY) {
                 with(
-                    LayoutInflater.from(context).inflate(
-                        R.layout.chip,
-                        filterChipGroup,
-                        false
-                    ) as Chip
+                    LayoutInflater.from(context)
+                        .inflate(
+                            R.layout.chip,
+                            filterChipGroup,
+                            false
+                        ) as Chip
                 ) {
                     tag = selectedTaxonomy
                     text = selectedTaxonomy.group
@@ -605,7 +621,7 @@ class TaxaFragment : AbstractInputFragment() {
     }
 
     private fun getSelectedFilters(): List<Filter<*>> {
-        return savedState.getParcelableArray(KEY_SELECTED_FILTERS)?.map { it as Filter<*> }
+        return savedState.getParcelableArrayCompat<Filter<*>>(KEY_SELECTED_FILTERS)
             ?.toList() ?: emptyList()
     }
 

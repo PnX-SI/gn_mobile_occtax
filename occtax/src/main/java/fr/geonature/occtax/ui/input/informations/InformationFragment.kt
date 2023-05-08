@@ -18,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.lifecycle.observe
+import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.presentation.EditableNomenclatureTypeAdapter
@@ -210,8 +211,7 @@ class InformationFragment : AbstractInputFragment() {
     override fun refreshView() {
         nomenclatureViewModel.getEditableNomenclatures(
             EditableNomenclatureType.Type.INFORMATION,
-            (arguments?.getParcelableArray(ARG_PROPERTIES)
-                ?.map { it as PropertySettings }
+            (arguments?.getParcelableArrayCompat<PropertySettings>(ARG_PROPERTIES)
                 ?.toList() ?: emptyList()),
             observationRecord?.taxa?.selectedTaxonRecord?.taxon?.taxonomy
         )

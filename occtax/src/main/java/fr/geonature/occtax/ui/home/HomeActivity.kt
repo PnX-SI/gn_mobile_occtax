@@ -1,53 +1,38 @@
 package fr.geonature.occtax.ui.home
 
-import android.annotation.SuppressLint
 import android.content.Intent
-import android.database.Cursor
 import android.os.Bundle
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
+import android.view.animation.Animation
+import android.view.animation.LinearInterpolator
+import android.view.animation.RotateAnimation
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.os.bundleOf
-import androidx.core.view.children
-import androidx.loader.app.LoaderManager
-import androidx.loader.content.CursorLoader
-import androidx.loader.content.Loader
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.work.WorkInfo
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import fr.geonature.commons.data.ContentProviderAuthority
-import fr.geonature.commons.data.entity.AppSync
-import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.commons.error.Failure
 import fr.geonature.commons.lifecycle.observe
 import fr.geonature.commons.lifecycle.observeOnce
 import fr.geonature.commons.lifecycle.observeUntil
 import fr.geonature.commons.lifecycle.onFailure
-import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.commons.util.ThemeUtils.getErrorColor
 import fr.geonature.datasync.api.IGeoNatureAPIClient
+import fr.geonature.datasync.api.model.AuthLogin
 import fr.geonature.datasync.auth.AuthLoginViewModel
 import fr.geonature.datasync.features.settings.presentation.ConfigureServerSettingsActivity
 import fr.geonature.datasync.features.settings.presentation.ConfigureServerSettingsViewModel
@@ -65,13 +50,14 @@ import fr.geonature.occtax.BuildConfig
 import fr.geonature.occtax.MainApplication
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.ObservationRecord
-import fr.geonature.occtax.features.record.presentation.ObservationRecordViewModel
 import fr.geonature.occtax.settings.AppSettings
 import fr.geonature.occtax.settings.AppSettingsViewModel
 import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
 import fr.geonature.occtax.ui.settings.PreferencesActivity
 import org.tinylog.Logger
 import java.io.File
+import java.text.DateFormat
+import java.util.Date
 import javax.inject.Inject
 
 /**
@@ -80,7 +66,8 @@ import javax.inject.Inject
  * @author S. Grimault
  */
 @AndroidEntryPoint
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity(),
+    LastObservationRecordsFragment.OnLastObservationRecordsFragmentListener {
 
     private val authLoginViewModel: AuthLoginViewModel by viewModels()
     private val appSettingsViewModel: AppSettingsViewModel by viewModels()
@@ -88,227 +75,119 @@ class HomeActivity : AppCompatActivity() {
     private val dataSyncViewModel: DataSyncViewModel by viewModels()
     private val configureServerSettingsViewModel: ConfigureServerSettingsViewModel by viewModels()
     private val updateSettingsViewModel: UpdateSettingsViewModel by viewModels()
-    private val observationRecordViewModel: ObservationRecordViewModel by viewModels()
 
     @Inject
     lateinit var geoNatureAPIClient: IGeoNatureAPIClient
 
-    @ContentProviderAuthority
-    @Inject
-    lateinit var authority: String
-
+    private var loginLastnameTextView: TextView? = null
+    private var loginFirstnameTextView: TextView? = null
+    private var loginButton: Button? = null
+    private var navMenuDataSync: DrawerMenuEntryView? = null
+    private var navMenuLogout: DrawerMenuEntryView? = null
     private var homeContent: CoordinatorLayout? = null
-    private var appSyncView: AppSyncView? = null
-    private var inputToolbar: Toolbar? = null
-    private var inputRecyclerView: RecyclerView? = null
-    private var inputEmptyTextView: TextView? = null
-    private var fab: ExtendedFloatingActionButton? = null
-
-    private lateinit var adapter: InputRecyclerViewAdapter
     private var progressSnackbar: Pair<Snackbar, CircularProgressIndicator>? = null
 
     private var appSettings: AppSettings? = null
-    private var isLoggedIn: Boolean = false
+    private var isLoggedIn: AuthLogin? = null
 
     private lateinit var startSyncResultLauncher: ActivityResultLauncher<Intent>
-
-    private val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
-        override fun onCreateLoader(
-            id: Int,
-            args: Bundle?
-        ): Loader<Cursor> {
-            return when (id) {
-                LOADER_APP_SYNC -> CursorLoader(
-                    this@HomeActivity,
-                    buildUri(
-                        authority,
-                        AppSync.TABLE_NAME,
-                        args?.getString(AppSync.COLUMN_ID)
-                            ?: ""
-                    ),
-                    null,
-                    null,
-                    null,
-                    null
-                )
-                else -> throw IllegalArgumentException()
-            }
-        }
-
-        override fun onLoadFinished(
-            loader: Loader<Cursor>,
-            data: Cursor?
-        ) {
-
-            if (data == null) {
-                Logger.warn { "failed to load data from '${(loader as CursorLoader).uri}'" }
-
-                return
-            }
-
-            when (loader.id) {
-                LOADER_APP_SYNC -> {
-                    if (data.moveToFirst()) {
-                        appSyncView?.setAppSync(AppSync.fromCursor(data))
-                    }
-                }
-            }
-        }
-
-        override fun onLoaderReset(loader: Loader<Cursor>) {
-            // nothing to do...
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_home)
 
-        homeContent = findViewById(R.id.homeContent)
-        appSyncView = findViewById(R.id.appSyncView)
+        // setting a custom ActionBar
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
-        inputToolbar = findViewById<Toolbar?>(R.id.toolbar_inputs).apply {
-            inflateMenu(R.menu.status)
-            // all statuses checked by default
-            menu.children.forEach { it.isChecked = true }
-            setOnMenuItemClickListener { menuItem ->
-                when (menuItem.itemId) {
-                    R.id.menu_status_draft -> {
-                        menuItem.isChecked = !menuItem.isChecked
-
-                        if (menu.children.all { !it.isChecked }) {
-                            menu.children.forEach { it.isChecked = true }
-                        }
-
-                        loadObservationRecords()
-
-                        true
-                    }
-                    R.id.menu_status_to_sync -> {
-                        menuItem.isChecked = !menuItem.isChecked
-
-                        if (menu.children.all { !it.isChecked }) {
-                            menu.children.forEach { it.isChecked = true }
-                        }
-
-                        loadObservationRecords()
-
-                        true
-                    }
-                    else -> false
-                }
-            }
+        supportActionBar?.apply {
+            // showing the burger button on the ActionBar
+            setDisplayHomeAsUpEnabled(true)
+            subtitle = getString(R.string.home_last_inputs)
         }
 
-        inputRecyclerView = findViewById(R.id.inputRecyclerView)
-        inputEmptyTextView = findViewById(R.id.inputEmptyTextView)
-        fab = findViewById(R.id.fab)
+        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+        val toggle =
+            ActionBarDrawerToggle(
+                this,
+                drawerLayout,
+                toolbar,
+                R.string.home_drawer_open,
+                R.string.home_drawer_close
+            )
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
 
-        configureAuthLoginViewModel()
-        configurePackageInfoViewModel()
-        configureDataSyncViewModel()
-        configureConfigureServerSettingsViewModel()
-        configureUpdateSettingsViewModel()
-        configureObservationRecordViewModel()
-
-        appSyncView?.setListener(object : AppSyncView.OnAppSyncViewListener {
-            override fun onAction() {
-                appSettings?.dataSyncSettings?.run {
-                    dataSyncViewModel.startSync(
+        findViewById<ViewGroup>(R.id.nav_header)?.also {
+            loginLastnameTextView = it.findViewById(android.R.id.text1)
+            loginFirstnameTextView = it.findViewById(android.R.id.text2)
+            loginButton = it.findViewById<Button?>(android.R.id.button1)
+                ?.apply {
+                    setOnClickListener {
+                        startSyncResultLauncher.launch(LoginActivity.newIntent(this@HomeActivity))
+                        drawerLayout.close()
+                    }
+                }
+        }
+        findViewById<DrawerMenuEntryView>(R.id.nav_menu_settings)?.also {
+            it.setOnClickListener {
+                startSyncResultLauncher.launch(
+                    PreferencesActivity.newIntent(
                         this,
+                        appSettings
+                    )
+                )
+                drawerLayout.close()
+            }
+        }
+        navMenuDataSync = findViewById<DrawerMenuEntryView>(R.id.nav_menu_sync)?.also {
+            it.setOnClickListener {
+                appSettings?.dataSyncSettings?.also { dataSyncSettings ->
+                    dataSyncViewModel.startSync(
+                        dataSyncSettings,
                         HomeActivity::class.java,
                         MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                     )
-                    packageInfoViewModel.getAllApplications()
-                    packageInfoViewModel.synchronizeInstalledApplications()
                 }
             }
-        })
-
-        fab?.setOnClickListener {
-            val appSettings = appSettings ?: return@setOnClickListener
-
-            startInput(appSettings)
         }
-
-        adapter = InputRecyclerViewAdapter(object :
-            AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<ObservationRecord> {
-            override fun onClick(item: ObservationRecord) {
-                val appSettings = appSettings ?: return
-
-                Logger.info { "input selected: ${item.id}" }
-
-                startInput(
-                    appSettings,
-                    item
-                )
-            }
-
-            override fun onLongClicked(
-                position: Int,
-                item: ObservationRecord
-            ) {
-                ContextCompat.getSystemService(
-                    this@HomeActivity,
-                    Vibrator::class.java
-                )
-                    ?.vibrate(
-                        VibrationEffect.createOneShot(
-                            100,
-                            VibrationEffect.DEFAULT_AMPLITUDE
-                        )
-                    )
-
-                AlertDialog.Builder(this@HomeActivity)
-                    .setTitle(R.string.alert_dialog_input_delete_title)
-                    .setPositiveButton(
-                        R.string.alert_dialog_ok
-                    ) { dialog, _ ->
-                        observationRecordViewModel.delete(item)
-                        dialog.dismiss()
+        navMenuLogout = findViewById<DrawerMenuEntryView>(R.id.nav_menu_logout)?.also {
+            it.setOnClickListener {
+                authLoginViewModel
+                    .logout()
+                    .observe(
+                        this
+                    ) {
+                        Toast
+                            .makeText(
+                                this,
+                                R.string.toast_logout_success,
+                                Toast.LENGTH_SHORT
+                            )
+                            .show()
                     }
-                    .setNegativeButton(
-                        R.string.alert_dialog_cancel
-                    ) { dialog, _ -> dialog.dismiss() }
-                    .show()
+                drawerLayout.close()
             }
-
-            override fun showEmptyTextView(show: Boolean) {
-                if (inputEmptyTextView?.visibility == View.VISIBLE == show) {
-                    return
-                }
-
-                if (show) {
-                    inputEmptyTextView?.startAnimation(
-                        AnimationUtils.loadAnimation(
-                            this@HomeActivity,
-                            android.R.anim.fade_in
-                        )
-                    )
-                    inputEmptyTextView?.visibility = View.VISIBLE
-                } else {
-                    inputEmptyTextView?.startAnimation(
-                        AnimationUtils.loadAnimation(
-                            this@HomeActivity,
-                            android.R.anim.fade_out
-                        )
-                    )
-                    inputEmptyTextView?.visibility = View.GONE
-                }
-            }
-        })
-
-        inputRecyclerView?.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = this@HomeActivity.adapter
-
-            val dividerItemDecoration = DividerItemDecoration(
-                context,
-                (layoutManager as LinearLayoutManager).orientation
-            )
-            addItemDecoration(dividerItemDecoration)
         }
+        findViewById<DrawerMenuEntryView>(R.id.nav_menu_about)?.also {
+            it.setText2(
+                getString(
+                    R.string.app_version,
+                    BuildConfig.VERSION_NAME,
+                    BuildConfig.VERSION_CODE,
+                    DateFormat.getDateTimeInstance()
+                        .format(Date(BuildConfig.BUILD_DATE.toLong()))
+                )
+            )
+        }
+
+        homeContent = findViewById(R.id.homeContent)
+
+        configureAuthLoginViewModel()
+        configureDataSyncViewModel()
+        configureConfigureServerSettingsViewModel()
+        configureUpdateSettingsViewModel()
 
         startSyncResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -317,7 +196,7 @@ class HomeActivity : AppCompatActivity() {
                         val dataSyncSettings = appSettings?.dataSyncSettings
 
                         if (dataSyncSettings == null || geoNatureAPIClient.getBaseUrls().geoNatureBaseUrl != dataSyncSettings.geoNatureServerUrl) {
-                            configureServerSettingsViewModel.loadAppSettings(geoNatureAPIClient.getBaseUrls().geoNatureBaseUrl)
+                             configureServerSettingsViewModel.loadAppSettings(geoNatureAPIClient.getBaseUrls().geoNatureBaseUrl)
                         } else {
                             dataSyncViewModel.startSync(
                                 dataSyncSettings,
@@ -332,93 +211,14 @@ class HomeActivity : AppCompatActivity() {
         updateSettingsViewModel.updateAppSettings()
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStartEditObservationRecord(selectedObservationRecord: ObservationRecord?) {
+        val appSettings = appSettings ?: return
 
-        loadAppSync()
-
-        appSettings?.run {
-            loadObservationRecords()
-        }
-    }
-
-    @SuppressLint("RestrictedApi")
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(
-            R.menu.settings,
-            menu
-        )
-        menuInflater.inflate(
-            R.menu.login,
-            menu
-        )
-
-        if (menu is MenuBuilder) {
-            menu.setOptionalIconsVisible(true)
-        }
-
-        return true
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        menu?.run {
-            findItem(R.id.menu_login)?.also {
-                it.isEnabled = appSettings != null
-                it.isVisible = !isLoggedIn
-            }
-            findItem(R.id.menu_logout)?.also {
-                it.isEnabled = appSettings != null
-                it.isVisible = isLoggedIn
-            }
-        }
-
-        return super.onPrepareOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu_settings -> {
-                startSyncResultLauncher.launch(
-                    PreferencesActivity.newIntent(
-                        this,
-                        appSettings
-                    )
-                )
-                true
-            }
-            R.id.menu_login -> {
-                startSyncResultLauncher.launch(LoginActivity.newIntent(this))
-                true
-            }
-            R.id.menu_logout -> {
-                authLoginViewModel
-                    .logout()
-                    .observe(
-                        this
-                    ) {
-                        Toast
-                            .makeText(
-                                this,
-                                R.string.toast_logout_success,
-                                Toast.LENGTH_SHORT
-                            )
-                            .show()
-                    }
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    private fun startInput(
-        appSettings: AppSettings,
-        observationRecord: ObservationRecord? = null
-    ) {
         startActivity(
             InputPagerFragmentActivity.newIntent(
                 this,
                 appSettings,
-                observationRecord
+                selectedObservationRecord
             )
         )
     }
@@ -438,19 +238,29 @@ class HomeActivity : AppCompatActivity() {
                 this@HomeActivity
             ) {
                 this@HomeActivity.isLoggedIn = it
-                invalidateOptionsMenu()
+                loginLastnameTextView?.apply {
+                    text = it?.user?.lastname
+                    visibility = if (it == null) View.GONE else View.VISIBLE
+                }
+                loginFirstnameTextView?.apply {
+                    text = it?.user?.firstname
+                    visibility = if (it == null) View.GONE else View.VISIBLE
+                }
+                loginButton?.visibility = if (it == null) View.VISIBLE else View.GONE
+                navMenuLogout?.visibility = if (it == null) View.GONE else View.VISIBLE
             }
-        }
-    }
+            vm.loginResult.observe(this@HomeActivity) { result ->
+                result.success?.also {
+                    loginLastnameTextView?.text = it.user.lastname
+                    loginFirstnameTextView?.text = it.user.firstname
+                }
 
-    private fun configurePackageInfoViewModel() {
-        with(packageInfoViewModel) {
-            observe(packageInfos) {
-                it.find { packageInfo -> packageInfo.packageName == BuildConfig.APPLICATION_ID }
-                    ?.also { packageInfo ->
-                        appSyncView?.setPackageInfo(packageInfo)
-                        loadObservationRecords()
-                    }
+                loginLastnameTextView?.visibility =
+                    if (result.success == null) View.GONE else View.VISIBLE
+                loginFirstnameTextView?.visibility =
+                    if (result.success == null) View.GONE else View.VISIBLE
+                loginButton?.visibility = if (result.success == null) View.VISIBLE else View.GONE
+                navMenuLogout?.visibility = if (result.success == null) View.GONE else View.VISIBLE
             }
         }
     }
@@ -460,8 +270,21 @@ class HomeActivity : AppCompatActivity() {
             vm.isSyncRunning.observe(
                 this@HomeActivity
             ) {
-                appSyncView?.enableActionButton(!it)
-                invalidateOptionsMenu()
+                navMenuDataSync?.apply {
+                    isClickable = !it
+                    setText1(R.string.action_data_sync)
+                }
+            }
+            vm.lastSynchronizedDate.observe(this@HomeActivity) { syncState ->
+                navMenuDataSync?.setText2(getString(
+                    R.string.sync_last_synchronization,
+                    syncState?.second?.let {
+                        android.text.format.DateFormat.format(
+                            getString(R.string.sync_last_synchronization_date),
+                            it
+                        )
+                    } ?: getString(R.string.sync_last_synchronization_never)
+                ))
             }
             vm
                 .observeDataSyncStatus()
@@ -469,11 +292,52 @@ class HomeActivity : AppCompatActivity() {
                     this@HomeActivity
                 ) {
                     if (it == null) {
-                        appSyncView?.setDataSyncStatus(null)
+                        navMenuDataSync?.apply {
+                            icon.clearAnimation()
+                        }
                     }
 
                     it?.run {
-                        appSyncView?.setDataSyncStatus(this)
+                        when (state) {
+                            WorkInfo.State.RUNNING -> {
+                                navMenuDataSync?.apply {
+                                    if (icon.animation == null) {
+                                        setIcon(R.drawable.ic_sync)
+                                        icon.startAnimation(
+                                            RotateAnimation(
+                                                0F,
+                                                -360F,
+                                                Animation.RELATIVE_TO_SELF,
+                                                0.5F,
+                                                Animation.RELATIVE_TO_SELF,
+                                                0.5F
+                                            ).apply {
+                                                interpolator = LinearInterpolator()
+                                                duration = 900
+                                                repeatCount = Animation.INFINITE
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                            WorkInfo.State.FAILED -> {
+                                navMenuDataSync?.apply {
+                                    icon.clearAnimation()
+                                    setIcon(R.drawable.ic_sync_problem)
+                                }
+                            }
+                            else -> {
+                                navMenuDataSync?.apply {
+                                    icon.clearAnimation()
+                                    setIcon(R.drawable.ic_sync)
+                                }
+                            }
+                        }
+
+                        navMenuDataSync?.apply {
+                            setText1(R.string.action_data_sync_in_progress)
+                            setText2(syncMessage)
+                        }
 
                         if (it.serverStatus == ServerStatus.UNAUTHORIZED) {
                             Logger.info { "not connected (HTTP error code: 401), redirect to ${LoginActivity::class.java.name}" }
@@ -524,34 +388,11 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun configureObservationRecordViewModel() {
-        with(observationRecordViewModel) {
-            observe(
-                observationRecords,
-                ::handleObservationRecords
-            )
-        }
-    }
-
-    private fun loadAppSync() {
-        LoaderManager.getInstance(this)
-            .restartLoader(
-                LOADER_APP_SYNC,
-                bundleOf(AppSync.COLUMN_ID to packageName),
-                loaderCallbacks
-            )
-    }
-
     private fun loadAppSettings() {
         appSettingsViewModel.loadAppSettings()
             .observeOnce(this) {
                 if (it?.mapSettings == null) {
                     Logger.info { "failed to load settings" }
-
-                    fab?.hide()
-                    adapter.clear()
-                    appSyncView?.enableActionButton(false)
-                    invalidateOptionsMenu()
 
                     makeSnackbar(
                         getString(
@@ -563,9 +404,6 @@ class HomeActivity : AppCompatActivity() {
                     Logger.info { "app settings successfully loaded" }
 
                     appSettings = it
-                    fab?.show()
-                    appSyncView?.enableActionButton(it.dataSyncSettings != null)
-                    invalidateOptionsMenu()
 
                     it.dataSyncSettings?.also { dataSyncSettings ->
                         dataSyncViewModel.configurePeriodicSync(
@@ -574,26 +412,8 @@ class HomeActivity : AppCompatActivity() {
                             MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                         )
                     }
-
-                    loadObservationRecords()
                 }
             }
-    }
-
-    private fun loadObservationRecords() {
-        val filter = inputToolbar?.menu?.children?.filter { it.isChecked }
-            ?.map {
-                when (it.itemId) {
-                    R.id.menu_status_to_sync -> ObservationRecord.Status.TO_SYNC
-                    else -> ObservationRecord.Status.DRAFT
-                }
-            }
-            ?.toList() ?: listOf(
-            ObservationRecord.Status.DRAFT,
-            ObservationRecord.Status.TO_SYNC
-        )
-
-        observationRecordViewModel.getAll { input -> filter.any { input.status == it } }
     }
 
     private fun packageInfoUpdated(packageInfo: PackageInfo) {
@@ -608,17 +428,7 @@ class HomeActivity : AppCompatActivity() {
         loadAppSettings()
     }
 
-    private fun handleObservationRecords(observationRecords: List<ObservationRecord>) {
-        loadAppSync()
-        adapter.setItems(observationRecords)
-    }
-
     private fun handleFailure(failure: Failure) {
-        fab?.hide()
-        adapter.clear()
-        appSyncView?.enableActionButton(false)
-        invalidateOptionsMenu()
-
         when (failure) {
             is Failure.NetworkFailure -> {
                 makeSnackbar(failure.reason)
@@ -795,9 +605,5 @@ class HomeActivity : AppCompatActivity() {
         }
 
         startActivity(install)
-    }
-
-    companion object {
-        private const val LOADER_APP_SYNC = 1
     }
 }

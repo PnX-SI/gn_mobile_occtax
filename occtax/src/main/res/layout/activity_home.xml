@@ -1,83 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<androidx.drawerlayout.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/homeContent"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.HomeActivity">
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/homeContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.home.HomeActivity">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardViewAppSyncView"
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/padding_default"
-            app:cardCornerRadius="@dimen/cardview_radius"
-            app:cardElevation="@dimen/cardview_elevation"
-            app:contentPadding="@dimen/padding_default"
-            app:layout_constraintTop_toTopOf="parent">
+            android:theme="@style/AppTheme.AppBarOverlay">
 
-            <fr.geonature.occtax.ui.home.AppSyncView
-                android:id="@+id/appSyncView"
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:action="@string/sync_action_synchronize"
-                app:action_enabled="false"
-                app:title="@string/sync_device_status" />
+                android:minHeight="?android:actionBarSize"
+                app:contentInsetStartWithNavigation="0dp"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar_inputs"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragment_container_view"
+            android:name="fr.geonature.occtax.ui.home.LastObservationRecordsFragment"
             android:layout_width="match_parent"
-            android:layout_marginTop="@dimen/padding_default"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/cardViewAppSyncView"
-            app:title="@string/home_last_inputs" />
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:layout="@layout/fragment_recycler_view_fab" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_margin="@dimen/padding_default"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar_inputs">
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/inputRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-            <TextView
-                android:id="@+id/inputEmptyTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="@string/home_no_input"
-                android:visibility="gone" />
-
-        </FrameLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fab"
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="@dimen/padding_default"
-        android:layout_marginBottom="@dimen/padding_default"
-        android:clickable="true"
-        android:focusable="true"
-        android:text="@string/action_new_input"
-        android:visibility="visible"
-        app:elevation="@dimen/fab_elevation"
-        app:icon="@drawable/ic_add" />
+        android:layout_height="match_parent"
+        android:layout_gravity="start">
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/nav_header"
+                layout="@layout/drawer_header" />
+
+            <fr.geonature.occtax.ui.home.DrawerMenuEntryView
+                android:id="@+id/nav_menu_settings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:padding="@dimen/padding_default"
+                app:icon="@drawable/ic_settings"
+                app:text1="@string/action_settings" />
+
+            <fr.geonature.occtax.ui.home.DrawerMenuEntryView
+                android:id="@+id/nav_menu_sync"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:padding="@dimen/padding_default"
+                app:icon="@drawable/ic_sync"
+                app:text1="@string/action_data_sync" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <fr.geonature.occtax.ui.home.DrawerMenuEntryView
+                android:id="@+id/nav_menu_logout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:padding="@dimen/padding_default"
+                app:icon="@drawable/ic_logout"
+                app:text1="@string/action_logout" />
+
+            <fr.geonature.occtax.ui.home.DrawerMenuEntryView
+                android:id="@+id/nav_menu_about"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_default"
+                app:icon="@drawable/ic_info"
+                app:text1="@string/action_about" />
+
+        </LinearLayout>
+
+    </com.google.android.material.navigation.NavigationView>
+
+</androidx.drawerlayout.widget.DrawerLayout>

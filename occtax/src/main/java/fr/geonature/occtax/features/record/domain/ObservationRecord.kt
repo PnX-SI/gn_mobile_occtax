@@ -83,7 +83,10 @@ data class ObservationRecord(
 
     enum class Status {
         DRAFT,
-        TO_SYNC
+        TO_SYNC,
+        SYNC_IN_PROGRESS,
+        SYNC_ERROR,
+        SYNC_SUCCESSFUL
     }
 }
 

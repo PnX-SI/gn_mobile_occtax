@@ -40,7 +40,7 @@ class ObservationRecordLocalDataSourceImpl(
         ObservationRecordJsonWriter()
 
     override suspend fun readAll(): List<ObservationRecord> {
-        val exportedInput = FileUtils
+        val exportedObservationRecords = FileUtils
             .getInputsFolder(context)
             .walkTopDown()
             .asFlow()
@@ -66,16 +66,17 @@ class ObservationRecordLocalDataSourceImpl(
 
         return withContext(dispatcher) {
             (
-                exportedInput + preferenceManager.all
+                preferenceManager.all
                     .filterKeys { it.startsWith("${KEY_PREFERENCE_INPUT}_") }
                     .values
-                    .mapNotNull { if (it is String && it.isNotBlank()) runCatching { observationRecordJsonReader.read(it) }.getOrNull() else null }
-                ).sortedBy { it.internalId }
+                    .mapNotNull { if (it is String && it.isNotBlank()) runCatching { observationRecordJsonReader.read(it) }.getOrNull() else null } + exportedObservationRecords
+                ).distinctBy { it.internalId }
+                .sortedByDescending { it.dates.start }
         }
     }
 
     override suspend fun read(id: Long): ObservationRecord = withContext(dispatcher) {
-        val inputAsJson = preferenceManager.getString(
+        val observationRecordAsJson = preferenceManager.getString(
             buildInputPreferenceKey(id),
             null
         )
@@ -88,11 +89,11 @@ class ObservationRecordLocalDataSourceImpl(
                 .takeIf { it.exists() }
                 ?.readText()
 
-        if (inputAsJson.isNullOrBlank()) {
+        if (observationRecordAsJson.isNullOrBlank()) {
             throw ObservationRecordException.NotFoundException(id)
         }
 
-        runCatching { observationRecordJsonReader.read(inputAsJson) }
+        runCatching { observationRecordJsonReader.read(observationRecordAsJson) }
             .onFailure { throw ObservationRecordException.ReadException(id) }
             .getOrThrow()
     }
@@ -162,10 +163,10 @@ class ObservationRecordLocalDataSourceImpl(
     }
 
     override suspend fun export(id: Long, settings: AppSettings?): ObservationRecord {
-        val inputToExport = read(id)
+        val observationRecordToExport = read(id)
 
         return export(
-            inputToExport,
+            observationRecordToExport,
             settings
         )
     }

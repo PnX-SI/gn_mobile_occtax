@@ -1,5 +1,6 @@
 package fr.geonature.occtax.ui.input.counting
 
+import android.annotation.SuppressLint
 import android.text.Spanned
 import android.view.View
 import android.widget.TextView
@@ -128,6 +129,7 @@ class CountingRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListene
                 HtmlCompat.FROM_HTML_MODE_LEGACY)
         }
 
+        @SuppressLint("DiscouragedApi")
         private fun getNomenclatureTypeLabel(mnemonic: String): String {
             val resourceId = itemView.resources.getIdentifier(
                 "nomenclature_${mnemonic.lowercase()}",

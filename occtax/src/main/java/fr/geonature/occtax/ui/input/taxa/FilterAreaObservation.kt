@@ -6,7 +6,7 @@ import android.os.Parcelable
 /**
  * Area observation filter.
  *
- * @author [S. Grimault](mailto:sebastien.grimault@gmail.com)
+ * @author S. Grimault
  */
 class FilterAreaObservation(value: AreaObservation) : Filter<FilterAreaObservation.AreaObservation>(
     FilterType.AREA_OBSERVATION,
@@ -26,8 +26,8 @@ class FilterAreaObservation(value: AreaObservation) : Filter<FilterAreaObservati
             return 0
         }
 
-        override fun writeToParcel(dest: Parcel?, flags: Int) {
-            dest?.also {
+        override fun writeToParcel(dest: Parcel, flags: Int) {
+            dest.also {
                 it.writeString(type.name)
                 it.writeString(label)
                 it.writeString(short)
