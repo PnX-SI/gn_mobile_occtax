@@ -47,7 +47,7 @@
     <string name="no_data">No data</string>
 
     <string name="action_settings">Settings</string>
-    <string name="action_data_sync">Synchronize local data</string>
+    <string name="action_data_sync">Synchronize local data\n<font size="10"><i>(Nomenclature, Dataset, observers, taxa)</i></font></string>
     <string name="action_data_sync_in_progress">Data synchronization in progress…</string>
     <string name="action_input_sync">Send</string>
     <string name="action_input_sync_hint">Synchronize inputs</string>

@@ -25,7 +25,7 @@
         android:layout_marginHorizontal="@dimen/padding_default"
         android:duplicateParentState="true"
         android:ellipsize="end"
-        android:singleLine="true"
+        android:maxLines="2"
         android:textAppearance="?attr/textAppearanceListItem"
         app:layout_constraintBottom_toBottomOf="@android:id/icon"
         app:layout_constraintEnd_toEndOf="parent"

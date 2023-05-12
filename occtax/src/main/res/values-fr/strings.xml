@@ -45,7 +45,7 @@
     <string name="no_data">Aucune donnée</string>
 
     <string name="action_settings">Paramètres</string>
-    <string name="action_data_sync">Rafraîchir les données</string>
+    <string name="action_data_sync">Mettre à jour les données\n<font size="10"><i>(Nomenclature, JDD, observateurs, taxons)</i></font></string>
     <string name="action_data_sync_in_progress">Synchronisation en cours…</string>
     <string name="action_input_sync">Envoyer</string>
     <string name="action_input_sync_hint">Envoyer les relevés</string>
