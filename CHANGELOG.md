@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.6.1-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.1-rc0) (2023-05-13, pre-release)
+
+### 🐛 Corrections
+
+* Prise en compte de la configuration par défaut de la périodicité de la synchronisation des données.
+* Relance automatique de la synchronisation des données si la date de la dernière effectuée est trop
+  ancienne suite à un changement de configuration coté fichier de paramétrage.
+
+### ⚠️ Notes de version
+
+* Code de version : 3203
+
 ## [2.6.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.0) (2023-05-08, release)
 
 ### 🚀 Nouveautés
