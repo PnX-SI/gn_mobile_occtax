@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.6.1-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.1-rc1) (2023-05-16, pre-release)
+
+### 🐛 Corrections
+
+* Correction sur l'affichage des valeurs de nomenclature en doublon (#223).
+
+### ⚠️ Notes de version
+
+* Code de version : 3209
+
 ## [2.6.1-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.1-rc0) (2023-05-13, pre-release)
 
 ### 🐛 Corrections
