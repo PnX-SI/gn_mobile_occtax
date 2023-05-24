@@ -33,7 +33,6 @@ import fr.geonature.commons.lifecycle.onFailure
 import fr.geonature.commons.util.ThemeUtils.getErrorColor
 import fr.geonature.commons.util.add
 import fr.geonature.datasync.api.IGeoNatureAPIClient
-import fr.geonature.datasync.api.model.AuthLogin
 import fr.geonature.datasync.auth.AuthLoginViewModel
 import fr.geonature.datasync.features.settings.presentation.ConfigureServerSettingsActivity
 import fr.geonature.datasync.features.settings.presentation.ConfigureServerSettingsViewModel
@@ -91,7 +90,6 @@ class HomeActivity : AppCompatActivity(),
     private var progressSnackbar: Pair<Snackbar, CircularProgressIndicator>? = null
 
     private var appSettings: AppSettings? = null
-    private var isLoggedIn: AuthLogin? = null
 
     private lateinit var startSyncResultLauncher: ActivityResultLauncher<Intent>
 
@@ -240,7 +238,6 @@ class HomeActivity : AppCompatActivity(),
             vm.isLoggedIn.observe(
                 this@HomeActivity
             ) {
-                this@HomeActivity.isLoggedIn = it
                 loginLastnameTextView?.apply {
                     text = it?.user?.lastname
                     visibility = if (it == null) View.GONE else View.VISIBLE
@@ -304,6 +301,9 @@ class HomeActivity : AppCompatActivity(),
                         when (state) {
                             WorkInfo.State.RUNNING -> {
                                 navMenuDataSync?.apply {
+                                    setText1(R.string.action_data_sync_in_progress)
+                                    setText2(syncMessage)
+
                                     if (icon.animation == null) {
                                         setIcon(R.drawable.ic_sync)
                                         icon.startAnimation(
@@ -337,11 +337,6 @@ class HomeActivity : AppCompatActivity(),
                                     setIcon(R.drawable.ic_sync)
                                 }
                             }
-                        }
-
-                        navMenuDataSync?.apply {
-                            setText1(R.string.action_data_sync_in_progress)
-                            setText2(syncMessage)
                         }
 
                         if (it.serverStatus == ServerStatus.UNAUTHORIZED) {
@@ -410,6 +405,16 @@ class HomeActivity : AppCompatActivity(),
                             HomeActivity::class.java,
                             MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                         )
+
+                        if (dataSyncViewModel.lastSynchronizedDate.value?.second == null) {
+                            dataSyncViewModel.startSync(
+                                dataSyncSettings,
+                                HomeActivity::class.java,
+                                MainApplication.CHANNEL_DATA_SYNCHRONIZATION
+                            )
+
+                            return@also
+                        }
 
                         dataSyncViewModel.lastSynchronizedDate.value?.second?.also { lastDataSynchronization ->
                             if (
