@@ -11,6 +11,7 @@ import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.usecase.GetEditableNomenclaturesUseCase
 import fr.geonature.occtax.features.nomenclature.usecase.GetNomenclatureValuesByTypeAndTaxonomyUseCase
 import fr.geonature.occtax.settings.PropertySettings
+import org.tinylog.Logger
 import javax.inject.Inject
 
 /**
@@ -25,8 +26,7 @@ import javax.inject.Inject
 class NomenclatureViewModel @Inject constructor(
     private val getEditableNomenclaturesUseCase: GetEditableNomenclaturesUseCase,
     private val getNomenclatureValuesByTypeAndTaxonomyUseCase: GetNomenclatureValuesByTypeAndTaxonomyUseCase
-) :
-    BaseViewModel() {
+) : BaseViewModel() {
 
     private val _editableNomenclatures = MutableLiveData<List<EditableNomenclatureType>>()
     val editableNomenclatures: LiveData<List<EditableNomenclatureType>> = _editableNomenclatures
@@ -66,6 +66,10 @@ class NomenclatureViewModel @Inject constructor(
         mnemonic: String,
         taxonomy: Taxonomy? = null
     ): LiveData<List<Nomenclature>> {
+        Logger.info {
+            "fetching nomenclature values from mnemonic '$mnemonic'${taxonomy?.let { " matching taxonomy ${it.kingdom}:${it.group}" }}..."
+        }
+
         val nomenclatureValuesByTypeAndTaxonomy = MutableLiveData<List<Nomenclature>>()
 
         getNomenclatureValuesByTypeAndTaxonomyUseCase(

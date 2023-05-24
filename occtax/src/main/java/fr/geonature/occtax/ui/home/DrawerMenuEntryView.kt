@@ -64,18 +64,18 @@ class DrawerMenuEntryView : ConstraintLayout {
     }
 
     fun setText1(@StringRes textResourceId: Int) {
-        setText1(if (textResourceId == 0) null else context.getString(textResourceId))
+        setText1(if (textResourceId == 0) null else context.getText(textResourceId))
     }
 
-    fun setText1(title: String?) {
+    fun setText1(title: CharSequence?) {
         textView1.text = title
     }
 
     fun setText2(@StringRes textResourceId: Int) {
-        setText2(if (textResourceId == 0) null else context.getString(textResourceId))
+        setText2(if (textResourceId == 0) null else context.getText(textResourceId))
     }
 
-    fun setText2(text: String?) {
+    fun setText2(text: CharSequence?) {
         textView2.setText(text)
         textView2.visibility = if (text.isNullOrBlank()) GONE else VISIBLE
     }

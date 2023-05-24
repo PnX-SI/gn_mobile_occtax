@@ -31,8 +31,8 @@ import fr.geonature.commons.lifecycle.observeOnce
 import fr.geonature.commons.lifecycle.observeUntil
 import fr.geonature.commons.lifecycle.onFailure
 import fr.geonature.commons.util.ThemeUtils.getErrorColor
+import fr.geonature.commons.util.add
 import fr.geonature.datasync.api.IGeoNatureAPIClient
-import fr.geonature.datasync.api.model.AuthLogin
 import fr.geonature.datasync.auth.AuthLoginViewModel
 import fr.geonature.datasync.features.settings.presentation.ConfigureServerSettingsActivity
 import fr.geonature.datasync.features.settings.presentation.ConfigureServerSettingsViewModel
@@ -57,6 +57,8 @@ import fr.geonature.occtax.ui.settings.PreferencesActivity
 import org.tinylog.Logger
 import java.io.File
 import java.text.DateFormat
+import java.time.Instant
+import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 
@@ -88,7 +90,6 @@ class HomeActivity : AppCompatActivity(),
     private var progressSnackbar: Pair<Snackbar, CircularProgressIndicator>? = null
 
     private var appSettings: AppSettings? = null
-    private var isLoggedIn: AuthLogin? = null
 
     private lateinit var startSyncResultLauncher: ActivityResultLauncher<Intent>
 
@@ -196,7 +197,7 @@ class HomeActivity : AppCompatActivity(),
                         val dataSyncSettings = appSettings?.dataSyncSettings
 
                         if (dataSyncSettings == null || geoNatureAPIClient.getBaseUrls().geoNatureBaseUrl != dataSyncSettings.geoNatureServerUrl) {
-                             configureServerSettingsViewModel.loadAppSettings(geoNatureAPIClient.getBaseUrls().geoNatureBaseUrl)
+                            configureServerSettingsViewModel.loadAppSettings(geoNatureAPIClient.getBaseUrls().geoNatureBaseUrl)
                         } else {
                             dataSyncViewModel.startSync(
                                 dataSyncSettings,
@@ -237,7 +238,6 @@ class HomeActivity : AppCompatActivity(),
             vm.isLoggedIn.observe(
                 this@HomeActivity
             ) {
-                this@HomeActivity.isLoggedIn = it
                 loginLastnameTextView?.apply {
                     text = it?.user?.lastname
                     visibility = if (it == null) View.GONE else View.VISIBLE
@@ -301,6 +301,9 @@ class HomeActivity : AppCompatActivity(),
                         when (state) {
                             WorkInfo.State.RUNNING -> {
                                 navMenuDataSync?.apply {
+                                    setText1(R.string.action_data_sync_in_progress)
+                                    setText2(syncMessage)
+
                                     if (icon.animation == null) {
                                         setIcon(R.drawable.ic_sync)
                                         icon.startAnimation(
@@ -320,23 +323,20 @@ class HomeActivity : AppCompatActivity(),
                                     }
                                 }
                             }
+
                             WorkInfo.State.FAILED -> {
                                 navMenuDataSync?.apply {
                                     icon.clearAnimation()
                                     setIcon(R.drawable.ic_sync_problem)
                                 }
                             }
+
                             else -> {
                                 navMenuDataSync?.apply {
                                     icon.clearAnimation()
                                     setIcon(R.drawable.ic_sync)
                                 }
                             }
-                        }
-
-                        navMenuDataSync?.apply {
-                            setText1(R.string.action_data_sync_in_progress)
-                            setText2(syncMessage)
                         }
 
                         if (it.serverStatus == ServerStatus.UNAUTHORIZED) {
@@ -360,12 +360,6 @@ class HomeActivity : AppCompatActivity(),
     private fun configureConfigureServerSettingsViewModel() {
         with(configureServerSettingsViewModel) {
             observe(dataSyncSettingLoaded) {
-                dataSyncViewModel.startSync(
-                    it,
-                    HomeActivity::class.java,
-                    MainApplication.CHANNEL_DATA_SYNCHRONIZATION
-                )
-
                 loadAppSettings()
             }
             onFailure(
@@ -411,6 +405,35 @@ class HomeActivity : AppCompatActivity(),
                             HomeActivity::class.java,
                             MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                         )
+
+                        if (dataSyncViewModel.lastSynchronizedDate.value?.second == null) {
+                            dataSyncViewModel.startSync(
+                                dataSyncSettings,
+                                HomeActivity::class.java,
+                                MainApplication.CHANNEL_DATA_SYNCHRONIZATION
+                            )
+
+                            return@also
+                        }
+
+                        dataSyncViewModel.lastSynchronizedDate.value?.second?.also { lastDataSynchronization ->
+                            if (
+                                lastDataSynchronization.add(
+                                    Calendar.SECOND,
+                                    dataSyncSettings.dataSyncPeriodicity?.inWholeSeconds?.toInt()
+                                        ?: 0
+                                )
+                                    .before(Date.from(Instant.now()))
+                            ) {
+                                Logger.info { "the last data synchronization seems to be old (done on $lastDataSynchronization), restarting data synchronization..." }
+
+                                dataSyncViewModel.startSync(
+                                    dataSyncSettings,
+                                    HomeActivity::class.java,
+                                    MainApplication.CHANNEL_DATA_SYNCHRONIZATION
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -435,16 +458,19 @@ class HomeActivity : AppCompatActivity(),
                     ?.setBackgroundTint(getErrorColor(this))
                     ?.show()
             }
+
             is Failure.ServerFailure -> {
                 makeSnackbar(getString(fr.geonature.datasync.R.string.settings_server_error))
                     ?.setBackgroundTint(getErrorColor(this))
                     ?.show()
             }
+
             is PackageInfoNotFoundFromRemoteFailure -> {
                 makeSnackbar(getString(fr.geonature.datasync.R.string.settings_server_settings_not_found))
                     ?.setBackgroundTint(getErrorColor(this))
                     ?.show()
             }
+
             is DataSyncSettingsNotFoundFailure -> {
                 Logger.warn { "failed to load settings${if (failure.source.isNullOrBlank()) "" else " from source '${failure.source}'"}" }
 
@@ -459,6 +485,7 @@ class HomeActivity : AppCompatActivity(),
                     configureServerSettingsViewModel.loadAppSettings(geoNatureBaseUrl)
                 }
             }
+
             is DataSyncSettingsJsonParseFailure -> {
                 makeSnackbar(
                     getString(
@@ -468,10 +495,12 @@ class HomeActivity : AppCompatActivity(),
                     ?.setBackgroundTint(getErrorColor(this))
                     ?.show()
             }
+
             is PackageInfoNotFoundFailure -> {
                 // should never occur...
                 Logger.error { "this app '${packageName}' seems to be incompatible..." }
             }
+
             else -> {
                 makeSnackbar(getString(fr.geonature.datasync.R.string.error_settings_undefined))
                     ?.setBackgroundTint(getErrorColor(this))
@@ -569,12 +598,14 @@ class HomeActivity : AppCompatActivity(),
                         WorkInfo.State.FAILED -> {
                             if (packageName == BuildConfig.APPLICATION_ID) progressSnackbar?.first?.dismiss()
                         }
+
                         WorkInfo.State.SUCCEEDED -> {
                             if (packageName == BuildConfig.APPLICATION_ID) progressSnackbar?.first?.dismiss()
                             apkFilePath?.run {
                                 installApk(this)
                             }
                         }
+
                         else -> {
                             if (packageName == BuildConfig.APPLICATION_ID) {
                                 progressSnackbar?.second?.also { circularProgressIndicator ->
