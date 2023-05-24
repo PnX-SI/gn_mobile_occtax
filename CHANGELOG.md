@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.6.1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.1) (2023-05-24, release)
+
+### 🐛 Corrections
+
+* Correction sur l'affichage des valeurs de nomenclature en doublon (#223).
+* Prise en compte de la configuration par défaut de la périodicité de la synchronisation des données.
+* Relance automatique de la synchronisation des données si la date de la dernière effectuée est trop
+  ancienne suite à un changement de configuration coté fichier de paramétrage.
+* Corrections visuelles diverses, notamment sur l'écran d'accueil.
+
+### ⚠️ Notes de version
+
+* Code de version : 3210
+
 ## [2.6.1-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.1-rc1) (2023-05-16, pre-release)
 
 ### 🐛 Corrections
