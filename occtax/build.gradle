@@ -37,12 +37,11 @@ android {
 
     buildTypes {
         debug {
-            versionNameSuffix ".${defaultConfig.versionCode}-DEV"
+            versionNameSuffix "-DEV"
         }
 
         release {
             signingConfig signingConfigs.release
-            versionNameSuffix ".${defaultConfig.versionCode}"
             debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
