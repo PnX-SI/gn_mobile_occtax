@@ -4,12 +4,10 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.NomenclatureType
 import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSource
-import fr.geonature.commons.fp.identity
-import fr.geonature.commons.fp.orNull
+import fr.geonature.commons.features.nomenclature.error.NomenclatureException
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureSettingsLocalDataSource
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
-import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
@@ -127,7 +125,7 @@ class NomenclatureRepositoryTest {
             nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
 
         // then
-        assertTrue(editableNomenclatureSettings.isRight)
+        assertTrue(editableNomenclatureSettings.isSuccess)
         assertEquals(
             listOf(
                 EditableNomenclatureType(
@@ -163,7 +161,7 @@ class NomenclatureRepositoryTest {
                     )
                 )
             ),
-            editableNomenclatureSettings.orNull()
+            editableNomenclatureSettings.getOrThrow()
         )
     }
 
@@ -229,7 +227,7 @@ class NomenclatureRepositoryTest {
                 nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
 
             // then
-            assertTrue(editableNomenclatureSettings.isRight)
+            assertTrue(editableNomenclatureSettings.isSuccess)
             assertEquals(
                 listOf(
                     EditableNomenclatureType(
@@ -252,7 +250,7 @@ class NomenclatureRepositoryTest {
                         default = false
                     )
                 ),
-                editableNomenclatureSettings.orNull()
+                editableNomenclatureSettings.getOrThrow()
             )
         }
 
@@ -301,7 +299,7 @@ class NomenclatureRepositoryTest {
                 nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
 
             // then
-            assertTrue(editableNomenclatureSettings.isRight)
+            assertTrue(editableNomenclatureSettings.isSuccess)
             assertEquals(
                 listOf(
                     EditableNomenclatureType(
@@ -317,7 +315,7 @@ class NomenclatureRepositoryTest {
                         default = false
                     )
                 ),
-                editableNomenclatureSettings.orNull()
+                editableNomenclatureSettings.getOrThrow()
             )
         }
 
@@ -354,8 +352,8 @@ class NomenclatureRepositoryTest {
                 nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
 
             // then
-            assertTrue(editableNomenclatureSettings.isLeft)
-            assertTrue(editableNomenclatureSettings.fold(::identity) {} is NoNomenclatureTypeFoundLocallyFailure)
+            assertTrue(editableNomenclatureSettings.isFailure)
+            assertTrue(editableNomenclatureSettings.exceptionOrNull() is NomenclatureException.NoNomenclatureTypeFoundException)
         }
 
     @Test
@@ -403,7 +401,7 @@ class NomenclatureRepositoryTest {
                 nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
 
             // then
-            assertTrue(editableNomenclatureSettings.isLeft)
-            assertTrue(editableNomenclatureSettings.fold(::identity) {} is NoNomenclatureTypeFoundLocallyFailure)
+            assertTrue(editableNomenclatureSettings.isFailure)
+            assertTrue(editableNomenclatureSettings.exceptionOrNull() is NomenclatureException.NoNomenclatureTypeFoundException)
         }
 }

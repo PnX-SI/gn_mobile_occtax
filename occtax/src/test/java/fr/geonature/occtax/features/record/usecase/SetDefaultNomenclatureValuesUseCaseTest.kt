@@ -4,7 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.commons.fp.Either
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.features.nomenclature.repository.INomenclatureRepository
@@ -60,7 +59,7 @@ class SetDefaultNomenclatureValuesUseCaseTest {
             // and some default nomenclature values
             coEvery {
                 nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.DEFAULT)
-            } returns Either.Right(
+            } returns Result.success(
                 listOf(
                     EditableNomenclatureType(
                         EditableNomenclatureType.Type.DEFAULT,
@@ -145,7 +144,7 @@ class SetDefaultNomenclatureValuesUseCaseTest {
             // and some default nomenclature values
             coEvery {
                 nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.DEFAULT)
-            } returns Either.Right(
+            } returns Result.success(
                 listOf(
                     EditableNomenclatureType(
                         EditableNomenclatureType.Type.DEFAULT,
@@ -264,7 +263,7 @@ class SetDefaultNomenclatureValuesUseCaseTest {
             // with no default nomenclature values
             coEvery {
                 nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.DEFAULT)
-            } returns Either.Right(emptyList())
+            } returns Result.success(emptyList())
 
             // when trying to load all default nomenclature values from use case
             val result =

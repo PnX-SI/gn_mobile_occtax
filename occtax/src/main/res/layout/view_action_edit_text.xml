@@ -15,6 +15,7 @@
         android:imeOptions="actionDone"
         android:importantForAutofill="no"
         android:inputType="textNoSuggestions"
+        android:gravity="top"
         android:selectAllOnFocus="true"
         tools:ignore="SpeakableTextPresentCheck,TextContrastCheck" />
 

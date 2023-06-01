@@ -148,6 +148,31 @@ class ObservationRecordJsonWriterTest {
                         ).map { it.toPair() }
                             .forEach { properties[it.first] = it.second }
 
+                        additionalFields = listOf(
+                            PropertyValue.Text(
+                                "some_field_text",
+                                "some_value"
+                            ),
+                            PropertyValue.Number(
+                                "some_field_number",
+                                42L
+                            ),
+                            PropertyValue.StringArray(
+                                "some_field_array_string",
+                                arrayOf(
+                                    "val1",
+                                    "val2"
+                                )
+                            ),
+                            PropertyValue.NumberArray(
+                                "some_field_array_number",
+                                arrayOf(
+                                    3L,
+                                    8L
+                                )
+                            )
+                        )
+
                         counting.addOrUpdate(counting.create()
                             .apply {
                                 listOf(
@@ -181,6 +206,13 @@ class ObservationRecordJsonWriterTest {
                                     )
                                 ).map { it.toPair() }
                                     .forEach { properties[it.first] = it.second }
+
+                                additionalFields = listOf(
+                                    PropertyValue.Text(
+                                        "some_field_text",
+                                        "some_value"
+                                    )
+                                )
                             }
                         )
                     }
@@ -189,14 +221,14 @@ class ObservationRecordJsonWriterTest {
 
         // then
         assertEquals(
-            getFixture("observation_record_simple.json"),
+            getFixture("observation_record_complete.json"),
             json
         )
     }
 
     @Test
     fun `should write an observation record with only start date defined`() {
-        // given an an observation record instance to write
+        // given an observation record instance to write
         val observationRecord = ObservationRecord(
             internalId = 1234L
         ).apply {
@@ -223,7 +255,7 @@ class ObservationRecordJsonWriterTest {
 
     @Test
     fun `should write an observation record with only start date defined following settings startDateSettings=DATE`() {
-        // given an an observation record instance to write
+        // given an observation record instance to write
         val observationRecord = ObservationRecord(
             internalId = 1234L
         ).apply {
@@ -262,7 +294,7 @@ class ObservationRecordJsonWriterTest {
 
     @Test
     fun `should write an observation record with only start date defined following settings startDateSettings=DATETIME`() {
-        // given an an observation record instance to write
+        // given an observation record instance to write
         val observationRecord = ObservationRecord(
             internalId = 1234L
         ).apply {
@@ -311,7 +343,7 @@ class ObservationRecordJsonWriterTest {
 
     @Test
     fun `should write an observation record with start and end date defined following settings startDateSettings=DATE, endDateSettings=DATE`() {
-        // given an an observation record instance to write
+        // given an observation record instance to write
         val observationRecord = ObservationRecord(
             internalId = 1234L
         ).apply {
@@ -352,7 +384,7 @@ class ObservationRecordJsonWriterTest {
 
     @Test
     fun `should write an observation record with start and end date defined following settings startDateSettings=DATETIME, endDateSettings=DATETIME`() {
-        // given an an observation record instance to write
+        // given an observation record instance to write
         val observationRecord = ObservationRecord(
             internalId = 1234L
         ).apply {
@@ -403,7 +435,7 @@ class ObservationRecordJsonWriterTest {
 
     @Test
     fun `should write an observation record with module name defined`() {
-        // given an an observation record instance to write
+        // given an observation record instance to write
         val observationRecord = ObservationRecord(
             internalId = 1234L
         ).apply {

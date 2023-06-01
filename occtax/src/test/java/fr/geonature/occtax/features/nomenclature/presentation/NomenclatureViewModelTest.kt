@@ -7,11 +7,8 @@ import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.error.Failure
 import fr.geonature.commons.features.nomenclature.error.NomenclatureException
-import fr.geonature.commons.fp.Either.Left
-import fr.geonature.commons.fp.Either.Right
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
-import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
 import fr.geonature.occtax.features.nomenclature.usecase.GetEditableNomenclaturesUseCase
 import fr.geonature.occtax.features.nomenclature.usecase.GetNomenclatureValuesByTypeAndTaxonomyUseCase
 import fr.geonature.occtax.features.record.domain.PropertyValue
@@ -111,14 +108,14 @@ class NomenclatureViewModelTest {
             coEvery {
                 getEditableNomenclaturesUseCase.run(
                     GetEditableNomenclaturesUseCase.Params(
-                        EditableNomenclatureType.Type.INFORMATION,
+                        type = EditableNomenclatureType.Type.INFORMATION,
                     )
                 )
-            } returns Right(expectedEditableNomenclatures)
+            } returns Result.success(expectedEditableNomenclatures)
             coEvery {
                 getEditableNomenclaturesUseCase(
                     GetEditableNomenclaturesUseCase.Params(
-                        EditableNomenclatureType.Type.INFORMATION,
+                        type = EditableNomenclatureType.Type.INFORMATION,
                     ),
                     nomenclatureViewModel.viewModelScope,
                     any()
@@ -126,9 +123,9 @@ class NomenclatureViewModelTest {
             } answers { callOriginal() }
 
             // when
-            nomenclatureViewModel.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
+            nomenclatureViewModel.getEditableNomenclatures(type = EditableNomenclatureType.Type.INFORMATION)
             nomenclatureViewModel.editableNomenclatures.observeForever(editableNomenclaturesObserver)
-            nomenclatureViewModel.failure.observeForever(failureObserver)
+            nomenclatureViewModel.error.observeForever(errorObserver)
 
             // then
             verify(atLeast = 1) { editableNomenclaturesObserver.onChanged(expectedEditableNomenclatures) }
@@ -136,20 +133,20 @@ class NomenclatureViewModelTest {
         }
 
     @Test
-    fun `should get NoNomenclatureTypeFoundLocallyFailure if no nomenclature types was found`() =
+    fun `should get NoNomenclatureTypeFoundException if no nomenclature types was found`() =
         runTest {
             // given some failure from usecase
             coEvery {
                 getEditableNomenclaturesUseCase.run(
                     GetEditableNomenclaturesUseCase.Params(
-                        EditableNomenclatureType.Type.INFORMATION,
+                        type = EditableNomenclatureType.Type.INFORMATION,
                     )
                 )
-            } returns Left(NoNomenclatureTypeFoundLocallyFailure)
+            } returns Result.failure(NomenclatureException.NoNomenclatureTypeFoundException)
             coEvery {
                 getEditableNomenclaturesUseCase(
                     GetEditableNomenclaturesUseCase.Params(
-                        EditableNomenclatureType.Type.INFORMATION,
+                        type = EditableNomenclatureType.Type.INFORMATION,
                     ),
                     nomenclatureViewModel.viewModelScope,
                     any()
@@ -157,13 +154,13 @@ class NomenclatureViewModelTest {
             } answers { callOriginal() }
 
             // when
-            nomenclatureViewModel.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
+            nomenclatureViewModel.getEditableNomenclatures(type = EditableNomenclatureType.Type.INFORMATION)
             nomenclatureViewModel.editableNomenclatures.observeForever(editableNomenclaturesObserver)
-            nomenclatureViewModel.failure.observeForever(failureObserver)
+            nomenclatureViewModel.error.observeForever(errorObserver)
 
             // then
-            verify { failureObserver.onChanged(NoNomenclatureTypeFoundLocallyFailure) }
-            confirmVerified(failureObserver)
+            verify { errorObserver.onChanged(NomenclatureException.NoNomenclatureTypeFoundException) }
+            confirmVerified(errorObserver)
         }
 
     @Test

@@ -68,6 +68,25 @@ data class CountingRecord(
         }
 
     /**
+     * Additional fields of this taxon record.
+     */
+    @IgnoredOnParcel
+    var additionalFields: List<PropertyValue>
+        get() = properties[ADDITIONAL_FIELDS_KEY]
+            ?.takeIf { it is PropertyValue.AdditionalField }
+            ?.let { it as PropertyValue.AdditionalField }?.value?.values?.toList()
+            ?: emptyList()
+        set(value) {
+            PropertyValue.AdditionalField(
+                ADDITIONAL_FIELDS_KEY,
+                value.associate { it.toPair() }
+            )
+                .also {
+                    properties[it.code] = it
+                }
+        }
+
+    /**
      * All [MediaRecord] added to this taxon counting record.
      */
     @IgnoredOnParcel
@@ -84,6 +103,7 @@ data class CountingRecord(
     companion object {
         const val MIN_KEY = "count_min"
         const val MAX_KEY = "count_max"
+        const val ADDITIONAL_FIELDS_KEY = "additional_fields"
     }
 }
 

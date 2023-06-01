@@ -207,11 +207,13 @@ class CountingFragment : AbstractInputFragment() {
 
     private fun launchEditCountingMetadataActivity(countingRecord: CountingRecord? = null) {
         val context = context ?: return
+        val datasetId = observationRecord?.dataset?.datasetId
         val taxonRecord = observationRecord?.taxa?.selectedTaxonRecord ?: return
 
         editCountingResultLauncher.launch(
             EditCountingMetadataActivity.newIntent(
                 context,
+                datasetId,
                 taxonRecord,
                 countingRecord,
                 arguments?.getBoolean(

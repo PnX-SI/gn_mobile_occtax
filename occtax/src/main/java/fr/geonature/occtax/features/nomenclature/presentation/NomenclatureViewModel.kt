@@ -38,21 +38,26 @@ class NomenclatureViewModel @Inject constructor(
      * @param defaultPropertySettings the default nomenclature settings
      */
     fun getEditableNomenclatures(
+        datasetId: Long? = null,
         type: EditableNomenclatureType.Type,
         defaultPropertySettings: List<PropertySettings> = listOf(),
         taxonomy: Taxonomy? = null
     ) {
         getEditableNomenclaturesUseCase(
             GetEditableNomenclaturesUseCase.Params(
+                datasetId,
                 type,
                 defaultPropertySettings,
                 taxonomy
             ),
             viewModelScope
         ) {
-            it.fold(::handleFailure) { editableNomenclatures ->
-                _editableNomenclatures.value = editableNomenclatures
-            }
+            it.fold(
+                onSuccess = { editableNomenclatures ->
+                    _editableNomenclatures.value = editableNomenclatures
+                },
+                ::handleError
+            )
         }
     }
 

@@ -109,4 +109,83 @@ class CountingRecordTest {
                 .toSortedMap()
         ).isEmpty())
     }
+
+    @Test
+    fun `should get all additional fields values`() {
+        // given a counting record
+        val countingRecord = CountingRecord(
+            index = 1,
+            properties = sortedMapOf(
+                "STADE_VIE" to
+                    PropertyValue.Nomenclature(
+                        code = "STADE_VIE",
+                        label = "Inconnu",
+                        value = 1
+                    ),
+                CountingRecord.ADDITIONAL_FIELDS_KEY to PropertyValue.AdditionalField(
+                    CountingRecord.ADDITIONAL_FIELDS_KEY,
+                    mapOf(
+                        "some_key" to PropertyValue.Text(
+                            "some_key",
+                            "some_value"
+                        )
+                    )
+                )
+            )
+        )
+
+        assertArrayEquals(
+            arrayOf(
+                PropertyValue.Text(
+                    "some_key",
+                    "some_value"
+                )
+            ),
+            countingRecord.additionalFields.toTypedArray()
+        )
+    }
+
+    @Test
+    fun `should set additional fields values`() {
+        // given a counting record with some additional fields
+        val countingRecord = CountingRecord(
+            index = 1,
+            properties = sortedMapOf(
+                "STADE_VIE" to
+                    PropertyValue.Nomenclature(
+                        code = "STADE_VIE",
+                        label = "Inconnu",
+                        value = 1
+                    ),
+                CountingRecord.ADDITIONAL_FIELDS_KEY to PropertyValue.AdditionalField(
+                    CountingRecord.ADDITIONAL_FIELDS_KEY,
+                    mapOf(
+                        "some_key" to PropertyValue.Text(
+                            "some_key",
+                            "some_value"
+                        )
+                    )
+                )
+            )
+        )
+
+        // when updating additional fields
+        countingRecord.additionalFields = listOf(
+            PropertyValue.Text(
+                "another_key",
+                "another_value"
+            )
+        )
+
+        // then
+        assertArrayEquals(
+            arrayOf(
+                PropertyValue.Text(
+                    "another_key",
+                    "another_value"
+                )
+            ),
+            countingRecord.additionalFields.toTypedArray()
+        )
+    }
 }

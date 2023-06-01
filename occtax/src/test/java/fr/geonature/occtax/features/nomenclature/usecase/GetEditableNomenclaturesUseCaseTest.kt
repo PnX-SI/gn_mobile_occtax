@@ -2,13 +2,11 @@ package fr.geonature.occtax.features.nomenclature.usecase
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.commons.fp.Either.Left
+import fr.geonature.commons.features.nomenclature.error.NomenclatureException
 import fr.geonature.commons.fp.Either.Right
-import fr.geonature.commons.fp.identity
-import fr.geonature.commons.fp.orNull
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
-import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
+import fr.geonature.occtax.features.nomenclature.repository.IAdditionalFieldRepository
 import fr.geonature.occtax.features.nomenclature.repository.IDefaultPropertyValueRepository
 import fr.geonature.occtax.features.nomenclature.repository.INomenclatureRepository
 import fr.geonature.occtax.features.record.domain.PropertyValue
@@ -41,6 +39,9 @@ class GetEditableNomenclaturesUseCaseTest {
     private lateinit var nomenclatureRepository: INomenclatureRepository
 
     @MockK
+    private lateinit var additionalFieldRepository: IAdditionalFieldRepository
+
+    @MockK
     private lateinit var defaultPropertyValueRepository: IDefaultPropertyValueRepository
 
     private lateinit var getEditableNomenclaturesUseCase: GetEditableNomenclaturesUseCase
@@ -51,6 +52,7 @@ class GetEditableNomenclaturesUseCaseTest {
 
         getEditableNomenclaturesUseCase = GetEditableNomenclaturesUseCase(
             nomenclatureRepository,
+            additionalFieldRepository,
             defaultPropertyValueRepository
         )
     }
@@ -59,7 +61,9 @@ class GetEditableNomenclaturesUseCaseTest {
     fun `should get all editable nomenclature types with default value by nomenclature main type`() =
         runTest {
             // given some nomenclature types
-            coEvery { nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION) } returns Right(
+            coEvery {
+                nomenclatureRepository.getEditableNomenclatures(any())
+            } returns Result.success(
                 listOf(
                     EditableNomenclatureType(
                         EditableNomenclatureType.Type.INFORMATION,
@@ -87,12 +91,22 @@ class GetEditableNomenclaturesUseCaseTest {
                     )
                 )
             )
+
+            // and no additional fields
+            coEvery {
+                additionalFieldRepository.getAllAdditionalFields(
+                    any(),
+                    any()
+                )
+            } returns Result.success(emptyList())
+
             // and no default property values
             coEvery { defaultPropertyValueRepository.getPropertyValues() } returns Right(listOf())
 
             // when fetching all editable nomenclature types with default value
-            val response =
-                getEditableNomenclaturesUseCase.run(GetEditableNomenclaturesUseCase.Params(EditableNomenclatureType.Type.INFORMATION))
+            val result = getEditableNomenclaturesUseCase.run(
+                GetEditableNomenclaturesUseCase.Params(type = EditableNomenclatureType.Type.INFORMATION)
+            )
 
             // then
             assertEquals(
@@ -122,8 +136,8 @@ class GetEditableNomenclaturesUseCaseTest {
                         )
                     )
                 ).sortedBy { it.code },
-                response.orNull()
-                    ?.sortedBy { it.code }
+                result.getOrThrow()
+                    .sortedBy { it.code }
             )
         }
 
@@ -131,7 +145,9 @@ class GetEditableNomenclaturesUseCaseTest {
     fun `should get all editable nomenclature types with some property values defined by nomenclature main type`() =
         runTest {
             // given some nomenclature types
-            coEvery { nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION) } returns Right(
+            coEvery {
+                nomenclatureRepository.getEditableNomenclatures(any())
+            } returns Result.success(
                 listOf(
                     EditableNomenclatureType(
                         EditableNomenclatureType.Type.INFORMATION,
@@ -166,6 +182,15 @@ class GetEditableNomenclaturesUseCaseTest {
                     )
                 )
             )
+
+            // and no additional fields
+            coEvery {
+                additionalFieldRepository.getAllAdditionalFields(
+                    any(),
+                    any()
+                )
+            } returns Result.success(emptyList())
+
             // and some default property values matching taxonomy
             coEvery {
                 defaultPropertyValueRepository.getPropertyValues(
@@ -189,7 +214,7 @@ class GetEditableNomenclaturesUseCaseTest {
             )
 
             // when fetching all editable nomenclature types with values matching given taxonomy
-            val response =
+            val result =
                 getEditableNomenclaturesUseCase.run(
                     GetEditableNomenclaturesUseCase.Params(
                         type = EditableNomenclatureType.Type.INFORMATION,
@@ -241,8 +266,8 @@ class GetEditableNomenclaturesUseCaseTest {
                         locked = true
                     )
                 ).sortedBy { it.code },
-                response.orNull()
-                    ?.sortedBy { it.code }
+                result.getOrThrow()
+                    .sortedBy { it.code }
             )
         }
 
@@ -250,14 +275,17 @@ class GetEditableNomenclaturesUseCaseTest {
     fun `should return NoNomenclatureTypeFoundLocallyFailure if no nomenclature types was found`() =
         runTest {
             // given some failure from repository
-            coEvery { nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION) } returns Left(NoNomenclatureTypeFoundLocallyFailure)
+            coEvery {
+                nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
+            } returns Result.failure(NomenclatureException.NoNomenclatureTypeFoundException)
 
             // when fetching all editable nomenclature types with default value
-            val response =
-                getEditableNomenclaturesUseCase.run(GetEditableNomenclaturesUseCase.Params(EditableNomenclatureType.Type.INFORMATION))
+            val result = getEditableNomenclaturesUseCase.run(
+                GetEditableNomenclaturesUseCase.Params(type = EditableNomenclatureType.Type.INFORMATION)
+            )
 
             // then
-            assertTrue(response.isLeft)
-            assertTrue(response.fold(::identity) {} is NoNomenclatureTypeFoundLocallyFailure)
+            assertTrue(result.isFailure)
+            assertTrue(result.exceptionOrNull() is NomenclatureException.NoNomenclatureTypeFoundException)
         }
 }

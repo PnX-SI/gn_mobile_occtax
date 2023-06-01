@@ -36,6 +36,7 @@ import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewMo
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.MediaRecord
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.settings.PropertySettings
 import kotlinx.coroutines.launch
@@ -214,11 +215,21 @@ class EditCountingMetadataFragment : Fragment() {
             override fun onUpdate(editableNomenclatureType: EditableNomenclatureType) {
                 val countingRecord = countingRecord ?: return
 
-                editableNomenclatureType.value?.toPair()
-                    .also {
-                        if (it == null) countingRecord.properties.remove(editableNomenclatureType.code)
-                        else countingRecord.properties[editableNomenclatureType.code] = it.second
-                    }
+                if (editableNomenclatureType.additionalField) {
+                    // as additional field
+                    countingRecord.additionalFields =
+                        (countingRecord.additionalFields.filter {
+                            it.toPair().first != editableNomenclatureType.code
+                        } + listOfNotNull(editableNomenclatureType.value))
+                } else {
+                    // as default editable nomenclature value
+                    editableNomenclatureType.value?.toPair()
+                        .also {
+                            if (it == null) countingRecord.properties.remove(editableNomenclatureType.code)
+                            else countingRecord.properties[editableNomenclatureType.code] =
+                                it.second
+                        }
+                }
 
                 listener?.onCountingRecord(countingRecord)
 
@@ -326,6 +337,11 @@ class EditCountingMetadataFragment : Fragment() {
         } ?: return
 
         nomenclatureViewModel.getEditableNomenclatures(
+            arguments?.getLong(
+                ARG_DATASET_ID,
+                -1L
+            )
+                ?.takeIf { it >= 0L },
             EditableNomenclatureType.Type.COUNTING,
             (arguments?.getParcelableArrayCompat<PropertySettings>(ARG_PROPERTIES)
                 ?.toList() ?: emptyList()),
@@ -350,10 +366,11 @@ class EditCountingMetadataFragment : Fragment() {
 
         adapter?.bind(
             editableNomenclatureTypes,
-            *(countingRecord?.properties?.values
+            *((countingRecord?.properties?.values
                 ?.filterNotNull()
                 ?.filterNot { it.isEmpty() }
-                ?.toTypedArray() ?: emptyArray())
+                ?.filterNot { it is PropertyValue.AdditionalField }
+                ?: emptyList()) + (countingRecord?.additionalFields ?: emptyList())).toTypedArray()
         )
     }
 
@@ -396,6 +413,7 @@ class EditCountingMetadataFragment : Fragment() {
 
     companion object {
 
+        private const val ARG_DATASET_ID = "arg_dataset_id"
         private const val ARG_TAXON_RECORD = "arg_taxon_record"
         private const val ARG_COUNTING_RECORD = "arg_counting_record"
         private const val ARG_SAVE_DEFAULT_VALUES = "arg_save_default_values"
@@ -411,12 +429,19 @@ class EditCountingMetadataFragment : Fragment() {
          */
         @JvmStatic
         fun newInstance(
+            datasetId: Long? = null,
             taxonRecord: TaxonRecord,
             countingRecord: CountingRecord? = null,
             saveDefaultValues: Boolean = false,
             vararg propertySettings: PropertySettings
         ) = EditCountingMetadataFragment().apply {
             arguments = Bundle().apply {
+                datasetId?.also {
+                    putLong(
+                        ARG_DATASET_ID,
+                        it
+                    )
+                }
                 putParcelable(
                     ARG_TAXON_RECORD,
                     taxonRecord
