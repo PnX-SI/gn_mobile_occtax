@@ -416,24 +416,41 @@ class HomeActivity : AppCompatActivity(),
                             return@also
                         }
 
-                        dataSyncViewModel.lastSynchronizedDate.value?.second?.also { lastDataSynchronization ->
-                            if (
-                                lastDataSynchronization.add(
-                                    Calendar.SECOND,
-                                    dataSyncSettings.dataSyncPeriodicity?.inWholeSeconds?.toInt()
-                                        ?: 0
-                                )
-                                    .before(Date.from(Instant.now()))
-                            ) {
-                                Logger.info { "the last data synchronization seems to be old (done on $lastDataSynchronization), restarting data synchronization..." }
+                        dataSyncViewModel.hasLocalData()
+                            .observeOnce(this) { hasLocalData ->
+                                if (hasLocalData == true) {
+                                    dataSyncViewModel.lastSynchronizedDate.value?.second?.also { lastDataSynchronization ->
+                                        if (
+                                            lastDataSynchronization.add(
+                                                Calendar.SECOND,
+                                                dataSyncSettings.dataSyncPeriodicity?.inWholeSeconds?.toInt()
+                                                    ?: 0
+                                            )
+                                                .before(Date.from(Instant.now()))
+                                        ) {
+                                            Logger.info {
+                                                "the last data synchronization seems to be old (done on $lastDataSynchronization), restarting data synchronization..."
+                                            }
 
-                                dataSyncViewModel.startSync(
-                                    dataSyncSettings,
-                                    HomeActivity::class.java,
-                                    MainApplication.CHANNEL_DATA_SYNCHRONIZATION
-                                )
+                                            dataSyncViewModel.startSync(
+                                                dataSyncSettings,
+                                                HomeActivity::class.java,
+                                                MainApplication.CHANNEL_DATA_SYNCHRONIZATION
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    Logger.warn {
+                                        "no local data found locally, starting a new data synchronization..."
+                                    }
+
+                                    dataSyncViewModel.startSync(
+                                        dataSyncSettings,
+                                        HomeActivity::class.java,
+                                        MainApplication.CHANNEL_DATA_SYNCHRONIZATION
+                                    )
+                                }
                             }
-                        }
                     }
                 }
             }
