@@ -25,6 +25,7 @@ import fr.geonature.occtax.features.nomenclature.presentation.EditableNomenclatu
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
 import fr.geonature.occtax.features.record.domain.MediaRecord
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
@@ -138,14 +139,24 @@ class InformationFragment : AbstractInputFragment() {
             }
 
             override fun onUpdate(editableNomenclatureType: EditableNomenclatureType) {
-                editableNomenclatureType.value?.toPair()
-                    .also {
-                        if (it == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(editableNomenclatureType.code)
-                        else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
-                            editableNomenclatureType.code,
-                            it.second
-                        )
+                if (editableNomenclatureType.additionalField) {
+                    // as additional field
+                    observationRecord?.taxa?.selectedTaxonRecord?.also {
+                        it.additionalFields = it.additionalFields.filter { pv ->
+                            pv.toPair().first != editableNomenclatureType.code
+                        } + listOfNotNull(editableNomenclatureType.value)
                     }
+                } else {
+                    // as default editable nomenclature value
+                    editableNomenclatureType.value?.toPair()
+                        .also {
+                            if (it == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(editableNomenclatureType.code)
+                            else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
+                                editableNomenclatureType.code,
+                                it.second
+                            )
+                        }
+                }
 
                 val propertyValue = editableNomenclatureType.value
 
@@ -210,6 +221,7 @@ class InformationFragment : AbstractInputFragment() {
 
     override fun refreshView() {
         nomenclatureViewModel.getEditableNomenclatures(
+            observationRecord?.dataset?.datasetId,
             EditableNomenclatureType.Type.INFORMATION,
             (arguments?.getParcelableArrayCompat<PropertySettings>(ARG_PROPERTIES)
                 ?.toList() ?: emptyList()),
@@ -234,10 +246,12 @@ class InformationFragment : AbstractInputFragment() {
 
         adapter?.bind(
             editableNomenclatureTypes,
-            *(observationRecord?.taxa?.selectedTaxonRecord?.properties?.values
+            *((observationRecord?.taxa?.selectedTaxonRecord?.properties?.values
                 ?.filterNotNull()
                 ?.filterNot { it.isEmpty() }
-                ?.toTypedArray() ?: emptyArray())
+                ?.filterNot { it is PropertyValue.AdditionalField }
+                ?: emptyList()) + (observationRecord?.taxa?.selectedTaxonRecord?.additionalFields
+                ?: emptyList())).toTypedArray()
         )
     }
 

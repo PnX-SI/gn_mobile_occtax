@@ -45,6 +45,29 @@ data class TaxonRecord(
         taxon.id,
         properties
     )
+
+    /**
+     * Additional fields of this taxon record.
+     */
+    @IgnoredOnParcel
+    var additionalFields: List<PropertyValue>
+        get() = properties[ADDITIONAL_FIELDS_KEY]
+            ?.takeIf { it is PropertyValue.AdditionalField }
+            ?.let { it as PropertyValue.AdditionalField }?.value?.values?.toList()
+            ?: emptyList()
+        set(value) {
+            PropertyValue.AdditionalField(
+                ADDITIONAL_FIELDS_KEY,
+                value.associate { it.toPair() }
+            )
+                .also {
+                    properties[it.code] = it
+                }
+        }
+
+    companion object {
+        const val ADDITIONAL_FIELDS_KEY = "additional_fields"
+    }
 }
 
 /**

@@ -1,7 +1,6 @@
 package fr.geonature.occtax.features.nomenclature.repository
 
 import fr.geonature.commons.error.Failure
-import fr.geonature.commons.fp.Either
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.commons.features.nomenclature.repository.INomenclatureRepository as IBaseNomenclatureRepository
@@ -25,5 +24,5 @@ interface INomenclatureRepository : IBaseNomenclatureRepository {
     suspend fun getEditableNomenclatures(
         type: EditableNomenclatureType.Type,
         vararg defaultPropertySettings: PropertySettings
-    ): Either<Failure, List<EditableNomenclatureType>>
+    ): Result<List<EditableNomenclatureType>>
 }

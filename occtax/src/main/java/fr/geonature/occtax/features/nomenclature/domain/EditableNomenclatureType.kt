@@ -16,11 +16,17 @@ data class EditableNomenclatureType(
     val viewType: ViewType,
     val visible: Boolean = true,
     val default: Boolean = true,
+    val additionalField: Boolean = false,
 
     /**
      * Nomenclature type's label.
      */
     val label: String? = null,
+
+    /**
+     * Available values for this property.
+     */
+    val values: List<PropertyValue> = emptyList(),
 
     /**
      * The current value for this nomenclature type.
@@ -63,9 +69,29 @@ data class EditableNomenclatureType(
         NONE,
 
         /**
+         * As list of checkboxes.
+         */
+        CHECKBOX,
+
+        /**
          * As dropdown menu items.
          */
         NOMENCLATURE_TYPE,
+
+        /**
+         * As radio group.
+         */
+        RADIO,
+
+        /**
+         * As a single select.
+         */
+        SELECT_SIMPLE,
+
+        /**
+         * As multiselect.
+         */
+        SELECT_MULTIPLE,
 
         /**
          * As a simple text field.
@@ -76,6 +102,11 @@ data class EditableNomenclatureType(
          * As multi-lines text field.
          */
         TEXT_MULTIPLE,
+
+        /**
+         * As number text field.
+         */
+        NUMBER,
 
         /**
          * As a bounded numerical value.

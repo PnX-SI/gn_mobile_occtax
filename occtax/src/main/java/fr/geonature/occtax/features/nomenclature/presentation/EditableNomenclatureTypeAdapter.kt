@@ -1,6 +1,8 @@
 package fr.geonature.occtax.features.nomenclature.presentation
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.Context
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
@@ -9,7 +11,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AutoCompleteTextView
 import android.widget.Button
+import android.widget.CheckBox
+import android.widget.CompoundButton
+import android.widget.EditText
 import android.widget.NumberPicker
+import android.widget.RadioButton
 import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.res.ResourcesCompat
@@ -26,6 +32,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.lifecycle.observeOnce
+import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
@@ -98,11 +105,16 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AbstractViewHolder {
         return when (viewType) {
             EditableNomenclatureType.ViewType.NONE.ordinal -> MoreViewHolder(parent)
-            EditableNomenclatureType.ViewType.TEXT_SIMPLE.ordinal -> TextSimpleViewHolder(parent)
-            EditableNomenclatureType.ViewType.TEXT_MULTIPLE.ordinal -> TextMultipleViewHolder(parent)
+            EditableNomenclatureType.ViewType.CHECKBOX.ordinal -> CheckboxViewHolder(parent)
             EditableNomenclatureType.ViewType.MIN_MAX.ordinal -> MinMaxViewHolder(parent)
             EditableNomenclatureType.ViewType.MEDIA.ordinal -> MediaViewHolder(parent)
-            else -> NomenclatureTypeViewHolder(parent)
+            EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE.ordinal -> NomenclatureTypeViewHolder(parent)
+            EditableNomenclatureType.ViewType.RADIO.ordinal -> RadioViewHolder(parent)
+            EditableNomenclatureType.ViewType.SELECT_SIMPLE.ordinal -> SelectSimpleViewHolder(parent)
+            EditableNomenclatureType.ViewType.SELECT_MULTIPLE.ordinal -> SelectMultipleViewHolder(parent)
+            EditableNomenclatureType.ViewType.TEXT_MULTIPLE.ordinal -> TextMultipleViewHolder(parent)
+            EditableNomenclatureType.ViewType.NUMBER.ordinal -> NumberViewHolder(parent)
+            else -> TextSimpleViewHolder(parent)
         }
     }
 
@@ -274,21 +286,129 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
          * Build the default label for given editable nomenclature type as fallback.
          */
         @SuppressLint("DiscouragedApi")
-        fun getNomenclatureTypeLabel(mnemonic: String): String {
-            return itemView.resources.getIdentifier(
-                "nomenclature_${mnemonic.lowercase()}",
+        fun getNomenclatureTypeLabel(editableNomenclatureType: EditableNomenclatureType): String {
+            return editableNomenclatureType.label ?: itemView.resources.getIdentifier(
+                "nomenclature_${editableNomenclatureType.code.lowercase()}",
                 "string",
                 itemView.context.packageName
             )
                 .takeIf { it > 0 }
-                ?.let { itemView.context.getString(it) } ?: mnemonic
+                ?.let { itemView.context.getString(it) } ?: editableNomenclatureType.code
+        }
+    }
+
+    inner class CheckboxViewHolder(parent: ViewGroup) : AbstractViewHolder(
+        LayoutInflater.from(parent.context)
+            .inflate(
+                R.layout.view_action_list,
+                parent,
+                false
+            )
+    ) {
+        private var title: TextView = itemView.findViewById(android.R.id.title)
+        private var recyclerView: RecyclerView = itemView.findViewById(android.R.id.list)
+        private var adapter =
+            object : AbstractListItemRecyclerViewAdapter<Pair<PropertyValue.Text, Boolean>>() {
+                override fun getViewHolder(view: View, viewType: Int): AbstractViewHolder {
+                    return ViewHolder(view)
+                }
+
+                override fun getLayoutResourceId(
+                    position: Int,
+                    item: Pair<PropertyValue.Text, Boolean>
+                ): Int {
+                    return R.layout.list_item_checkbox
+                }
+
+                override fun areItemsTheSame(
+                    oldItems: List<Pair<PropertyValue.Text, Boolean>>,
+                    newItems: List<Pair<PropertyValue.Text, Boolean>>,
+                    oldItemPosition: Int,
+                    newItemPosition: Int
+                ): Boolean {
+                    return oldItems[oldItemPosition] == newItems[newItemPosition]
+                }
+
+                override fun areContentsTheSame(
+                    oldItems: List<Pair<PropertyValue.Text, Boolean>>,
+                    newItems: List<Pair<PropertyValue.Text, Boolean>>,
+                    oldItemPosition: Int,
+                    newItemPosition: Int
+                ): Boolean {
+                    return oldItems[oldItemPosition] == newItems[newItemPosition]
+                }
+
+                inner class ViewHolder(itemView: View) :
+                    AbstractListItemRecyclerViewAdapter<Pair<PropertyValue.Text, Boolean>>.AbstractViewHolder(itemView) {
+
+                    private val checkbox: CheckBox =
+                        itemView.findViewById<CheckBox?>(android.R.id.checkbox)
+                            .apply {
+                                setOnClickListener { view ->
+                                    nomenclatureType?.run {
+                                        value = value?.takeIf { it is PropertyValue.StringArray }
+                                            ?.let { it as PropertyValue.StringArray }
+                                            ?.let {
+                                                it.copy(
+                                                    value = it.value.filter { value -> value != view.tag.toString() }
+                                                        .toTypedArray() + (
+                                                        if (isChecked) arrayOf(view.tag.toString())
+                                                        else arrayOf()),
+                                                )
+                                            } ?: PropertyValue.StringArray(
+                                            code,
+                                            if (isChecked) arrayOf(view.tag.toString())
+                                            else arrayOf()
+                                        )
+                                        listener.onUpdate(this)
+                                    }
+                                }
+                            }
+
+                    override fun onBind(item: Pair<PropertyValue.Text, Boolean>) {
+                        with(checkbox) {
+                            tag = item.first.code
+                            text = item.first.value ?: item.first.code
+                            isChecked = item.second
+                        }
+                    }
+                }
+            }
+
+        init {
+            with(recyclerView) {
+                layoutManager = GridLayoutManager(
+                    context,
+                    2
+                )
+                adapter = this@CheckboxViewHolder.adapter
+            }
+        }
+
+        override fun onBind(nomenclatureType: EditableNomenclatureType) {
+            title.text = nomenclatureType.label
+
+            val currentValues = nomenclatureType.value
+                .takeIf { it is PropertyValue.StringArray }
+                ?.let { it as PropertyValue.StringArray }?.value
+
+            adapter.setItems(nomenclatureType.values.mapNotNull { pv ->
+                pv.takeIf { it is PropertyValue.Text }
+                    ?.let { it as PropertyValue.Text }
+                    ?.let {
+                        Pair(
+                            it,
+                            currentValues?.contains(it.code) == true
+                        )
+                    }
+            })
         }
     }
 
     inner class NomenclatureTypeViewHolder(parent: ViewGroup) : AbstractViewHolder(
         LayoutInflater.from(parent.context)
             .inflate(
-                R.layout.view_action_nomenclature_type_select,
+                R.layout.view_action_select_simple,
                 parent,
                 false
             )
@@ -339,7 +459,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                     )
                     listener.onUpdate(nomenclatureType)
                 }
-                hint = nomenclatureType.label ?: getNomenclatureTypeLabel(nomenclatureType.code)
+                hint = nomenclatureType.label ?: getNomenclatureTypeLabel(nomenclatureType)
                 setEndIconOnClickListener { setNomenclatureValues(nomenclatureType) }
                 (editText as? AutoCompleteTextView)?.apply {
                     setOnClickListener { setNomenclatureValues(nomenclatureType) }
@@ -383,12 +503,339 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
 
         override fun onBind(nomenclatureType: EditableNomenclatureType) {
             with(button1) {
-                text = getNomenclatureTypeLabel(nomenclatureType.code)
+                text = getNomenclatureTypeLabel(nomenclatureType)
                 setOnClickListener {
                     showAllNomenclatureTypes()
                     listener.showMore()
                 }
             }
+        }
+    }
+
+    inner class RadioViewHolder(parent: ViewGroup) : AbstractViewHolder(
+        LayoutInflater.from(parent.context)
+            .inflate(
+                R.layout.view_action_list,
+                parent,
+                false
+            )
+    ) {
+        private var title: TextView = itemView.findViewById(android.R.id.title)
+        private var recyclerView: RecyclerView = itemView.findViewById(android.R.id.list)
+        private var adapter =
+            object : AbstractListItemRecyclerViewAdapter<Pair<PropertyValue.Text, Boolean>>() {
+                override fun getViewHolder(view: View, viewType: Int): AbstractViewHolder {
+                    return ViewHolder(view)
+                }
+
+                override fun getLayoutResourceId(
+                    position: Int,
+                    item: Pair<PropertyValue.Text, Boolean>
+                ): Int {
+                    return R.layout.list_item_radio
+                }
+
+                override fun areItemsTheSame(
+                    oldItems: List<Pair<PropertyValue.Text, Boolean>>,
+                    newItems: List<Pair<PropertyValue.Text, Boolean>>,
+                    oldItemPosition: Int,
+                    newItemPosition: Int
+                ): Boolean {
+                    return oldItems[oldItemPosition] == newItems[newItemPosition]
+                }
+
+                override fun areContentsTheSame(
+                    oldItems: List<Pair<PropertyValue.Text, Boolean>>,
+                    newItems: List<Pair<PropertyValue.Text, Boolean>>,
+                    oldItemPosition: Int,
+                    newItemPosition: Int
+                ): Boolean {
+                    return oldItems[oldItemPosition] == newItems[newItemPosition]
+                }
+
+                inner class ViewHolder(itemView: View) :
+                    AbstractListItemRecyclerViewAdapter<Pair<PropertyValue.Text, Boolean>>.AbstractViewHolder(itemView) {
+
+                    private val radioButton: RadioButton =
+                        itemView.findViewById<RadioButton?>(android.R.id.checkbox)
+                            .apply {
+                                setOnClickListener { view ->
+                                    nomenclatureType?.run {
+                                        value = (view as CompoundButton).takeIf { it.isChecked }
+                                            ?.let {
+                                                PropertyValue.Text(
+                                                    code,
+                                                    it.tag.toString()
+                                                )
+                                            }
+                                        listener.onUpdate(this)
+                                    }
+
+                                    if (isChecked) {
+                                        setItems(items.map {
+                                            Pair(
+                                                it.first,
+                                                it.first.code == view.tag.toString()
+                                            )
+                                        })
+                                    }
+                                }
+                            }
+
+                    override fun onBind(item: Pair<PropertyValue.Text, Boolean>) {
+                        with(radioButton) {
+                            tag = item.first.code
+                            text = item.first.value ?: item.first.code
+                            isChecked = item.second
+                        }
+                    }
+                }
+            }
+
+        init {
+            with(recyclerView) {
+                layoutManager = GridLayoutManager(
+                    context,
+                    2
+                )
+                adapter = this@RadioViewHolder.adapter
+            }
+        }
+
+        override fun onBind(nomenclatureType: EditableNomenclatureType) {
+            title.text = nomenclatureType.label
+
+            adapter.setItems(nomenclatureType.values.mapNotNull { pv ->
+                pv.takeIf { it is PropertyValue.Text }
+                    ?.let { it as PropertyValue.Text }
+                    ?.let {
+                        Pair(
+                            it,
+                            nomenclatureType.value?.let { value -> value is PropertyValue.Text && value.value == it.code }
+                                ?: false
+                        )
+                    }
+            })
+        }
+    }
+
+    inner class SelectSimpleViewHolder(parent: ViewGroup) : AbstractViewHolder(
+        LayoutInflater.from(parent.context)
+            .inflate(
+                R.layout.view_action_select_simple,
+                parent,
+                false
+            )
+    ) {
+        private var edit: TextInputLayout = itemView.findViewById(android.R.id.edit)
+        private var propertyValueTextAdapter = PropertyValueTextAdapter(parent.context)
+
+        init {
+            (edit.editText as? AutoCompleteTextView)?.also {
+                it.setAdapter(propertyValueTextAdapter)
+                it.setOnItemClickListener { _, _, position, _ ->
+                    nomenclatureType?.run {
+                        value = PropertyValue.Text(
+                            code = code,
+                            propertyValueTextAdapter.getPropertyValue(position)
+                                .takeIf { pv -> pv is PropertyValue.Text }
+                                ?.let { pv -> pv as PropertyValue.Text }?.code
+                        )
+                        listener.onUpdate(this)
+                    }
+                }
+            }
+        }
+
+        override fun onBind(nomenclatureType: EditableNomenclatureType) {
+            if (!lockDefaultValues) {
+                nomenclatureType.locked = false
+            }
+
+            propertyValueTextAdapter.setPropertyValues(nomenclatureType.values)
+
+            with(edit) {
+                startIconDrawable = if (lockDefaultValues) ResourcesCompat.getDrawable(
+                    itemView.resources,
+                    if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                    itemView.context.theme
+                ) else null
+                setStartIconOnClickListener {
+                    if (!lockDefaultValues) return@setStartIconOnClickListener
+
+                    nomenclatureType.locked = !nomenclatureType.locked
+                    startIconDrawable = ResourcesCompat.getDrawable(
+                        itemView.resources,
+                        if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                        itemView.context.theme
+                    )
+                    listener.onUpdate(nomenclatureType)
+                }
+                hint = nomenclatureType.label ?: getNomenclatureTypeLabel(nomenclatureType)
+                (editText as? AutoCompleteTextView)?.apply {
+                    text = nomenclatureType.value
+                        ?.takeIf { it is PropertyValue.Text }
+                        ?.let { it as PropertyValue.Text }
+                        ?.let { pv -> nomenclatureType.values.firstOrNull { it is PropertyValue.Text && it.code == pv.value } }
+                        ?.let { it as PropertyValue.Text }
+                        ?.let {
+                            Editable.Factory
+                                .getInstance()
+                                .newEditable(it.value ?: it.code)
+                        }
+                }
+            }
+        }
+    }
+
+    inner class SelectMultipleViewHolder(parent: ViewGroup) : AbstractViewHolder(
+        LayoutInflater.from(parent.context)
+            .inflate(
+                R.layout.view_action_select_simple,
+                parent,
+                false
+            )
+    ) {
+        private var edit: TextInputLayout = itemView.findViewById(android.R.id.edit)
+
+        init {
+            (edit.editText as? AutoCompleteTextView)?.also { editText ->
+                editText.setOnClickListener {
+                    nomenclatureType?.also {
+                        showSelectionDialog(
+                            itemView.context,
+                            it,
+                            editText
+                        )
+                    }
+                }
+                edit.setEndIconOnClickListener {
+                    nomenclatureType?.also {
+                        showSelectionDialog(
+                            itemView.context,
+                            it,
+                            editText
+                        )
+                    }
+                }
+            }
+        }
+
+        override fun onBind(nomenclatureType: EditableNomenclatureType) {
+            if (!lockDefaultValues) {
+                nomenclatureType.locked = false
+            }
+
+            with(edit) {
+                startIconDrawable = if (lockDefaultValues) ResourcesCompat.getDrawable(
+                    itemView.resources,
+                    if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                    itemView.context.theme
+                ) else null
+                setStartIconOnClickListener {
+                    if (!lockDefaultValues) return@setStartIconOnClickListener
+
+                    nomenclatureType.locked = !nomenclatureType.locked
+                    startIconDrawable = ResourcesCompat.getDrawable(
+                        itemView.resources,
+                        if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                        itemView.context.theme
+                    )
+                    listener.onUpdate(nomenclatureType)
+                }
+                hint = nomenclatureType.label ?: getNomenclatureTypeLabel(nomenclatureType)
+                (editText as? AutoCompleteTextView)?.apply {
+                    text = nomenclatureType.value
+                        ?.takeIf { it is PropertyValue.StringArray }
+                        ?.let { it as PropertyValue.StringArray }
+                        ?.let { stringArray ->
+                            nomenclatureType.values.mapNotNull { pv ->
+                                pv.takeIf { it is PropertyValue.Text }
+                                    ?.let { it as PropertyValue.Text }
+                                    ?.let { text ->
+                                        stringArray.value.firstOrNull { it == text.code }
+                                            ?.let { text }
+                                    }
+                            }
+                        }
+                        ?.joinToString(", ") { it.value ?: it.code }
+                        ?.let {
+                            Editable.Factory
+                                .getInstance()
+                                .newEditable(it)
+                        }
+                }
+            }
+        }
+
+        private fun showSelectionDialog(
+            context: Context,
+            nomenclatureType: EditableNomenclatureType,
+            editText: EditText
+        ) {
+            val items = nomenclatureType.values.filterIsInstance<PropertyValue.Text>()
+                .map { it.value ?: it.code }
+                .toTypedArray()
+            val selectedItems = nomenclatureType.values.filterIsInstance<PropertyValue.Text>()
+                .associateWith { false }
+                .let {
+                    val selectedItems =
+                        nomenclatureType.value?.takeIf { v -> v is PropertyValue.StringArray }
+                            ?.let { v -> v as PropertyValue.StringArray }?.value ?: emptyArray()
+                    it.map { item -> item.key to selectedItems.any { selectedItem -> selectedItem == item.key.code } }
+                }
+                .map { it.second }
+                .toBooleanArray()
+
+            AlertDialog.Builder(context)
+                .setTitle(
+                    nomenclatureType.label ?: getNomenclatureTypeLabel(nomenclatureType)
+                )
+                .setNegativeButton(context.getString(R.string.alert_dialog_cancel)) { _, _ ->
+                    // nothing to do...
+                }
+                .setPositiveButton(context.getString(R.string.alert_dialog_ok)) { _, _ ->
+                    PropertyValue.StringArray(
+                        code = nomenclatureType.code,
+                        value = nomenclatureType.values.filterIsInstance<PropertyValue.Text>()
+                            .mapIndexed { index, v ->
+                                v to selectedItems[index]
+                            }
+                            .filter {
+                                it.second
+                            }
+                            .map { it.first.code }
+                            .toTypedArray()
+                    )
+                        .also { propertyValue ->
+                            nomenclatureType.value = propertyValue
+                            editText.text = propertyValue
+                                .let { stringArray ->
+                                    nomenclatureType.values.mapNotNull { pv ->
+                                        pv.takeIf { it is PropertyValue.Text }
+                                            ?.let { it as PropertyValue.Text }
+                                            ?.let { text ->
+                                                stringArray.value.firstOrNull { it == text.code }
+                                                    ?.let { text }
+                                            }
+                                    }
+                                }
+                                .joinToString(", ") { it.value ?: it.code }
+                                .let {
+                                    Editable.Factory
+                                        .getInstance()
+                                        .newEditable(it)
+                                }
+                        }
+                    listener.onUpdate(nomenclatureType)
+                }
+                .setMultiChoiceItems(
+                    items,
+                    selectedItems
+                ) { _, which, checked ->
+                    selectedItems[which] = checked
+                }
+                .show()
         }
     }
 
@@ -465,7 +912,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                     )
                     listener.onUpdate(nomenclatureType)
                 }
-                hint = getNomenclatureTypeLabel(nomenclatureType.code)
+                hint = getNomenclatureTypeLabel(nomenclatureType)
             }
 
             nomenclatureType.value
@@ -488,6 +935,14 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                 inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 minLines = 2
                 maxLines = 4
+            }
+        }
+    }
+
+    inner class NumberViewHolder(parent: ViewGroup) : TextSimpleViewHolder(parent) {
+        init {
+            edit.editText?.apply {
+                inputType = InputType.TYPE_CLASS_NUMBER
             }
         }
     }
@@ -631,7 +1086,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
         }
 
         override fun onBind(nomenclatureType: EditableNomenclatureType) {
-            title.text = nomenclatureType.label ?: getNomenclatureTypeLabel(nomenclatureType.code)
+            title.text = nomenclatureType.label ?: getNomenclatureTypeLabel(nomenclatureType)
             adapter.setItems(nomenclatureType.value
                 .takeIf { it is PropertyValue.Media }
                 ?.let { it as PropertyValue.Media }?.value

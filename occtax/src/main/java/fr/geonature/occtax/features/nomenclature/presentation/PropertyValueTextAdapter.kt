@@ -8,29 +8,30 @@ import android.widget.BaseAdapter
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
-import fr.geonature.commons.data.entity.Nomenclature
+import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
- * Default Adapter about [Nomenclature] values.
+ * Default Adapter about [PropertyValue.Text].
  *
  * @author S. Grimault
  */
-class NomenclatureValueAdapter(context: Context) : BaseAdapter(), Filterable {
-    private val nomenclatureValues = mutableListOf<Nomenclature>()
-    private val filteredNomenclatureValues = mutableListOf<Nomenclature>()
+class PropertyValueTextAdapter(context: Context) : BaseAdapter(), Filterable {
+
+    private val fieldValues = mutableListOf<PropertyValue.Text>()
+    private val filteredFieldValues = mutableListOf<PropertyValue.Text>()
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
     private val defaultFilter = DefaultFilter()
 
     override fun getCount(): Int {
-        return filteredNomenclatureValues.size
+        return filteredFieldValues.size
     }
 
-    override fun getItem(position: Int): String {
-        return filteredNomenclatureValues[position].defaultLabel
+    override fun getItem(position: Int): Any {
+        return filteredFieldValues[position].value ?: filteredFieldValues[position].code
     }
 
     override fun getItemId(position: Int): Long {
-        return filteredNomenclatureValues[position].id
+        return position.toLong()
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
@@ -41,7 +42,7 @@ class NomenclatureValueAdapter(context: Context) : BaseAdapter(), Filterable {
                 false
             )
         view.findViewById<TextView>(android.R.id.text1).text =
-            filteredNomenclatureValues[position].defaultLabel
+            filteredFieldValues[position].value ?: filteredFieldValues[position].code
 
         return view
     }
@@ -50,18 +51,18 @@ class NomenclatureValueAdapter(context: Context) : BaseAdapter(), Filterable {
         return defaultFilter
     }
 
-    fun getNomenclatureValue(position: Int): Nomenclature {
-        return filteredNomenclatureValues[position]
+    fun getPropertyValue(position: Int): PropertyValue {
+        return filteredFieldValues[position]
     }
 
-    fun setNomenclatureValues(nomenclatureValues: List<Nomenclature>) {
-        with(this.nomenclatureValues) {
+    fun setPropertyValues(propertyValues: List<PropertyValue>) {
+        with(this.fieldValues) {
             clear()
-            addAll(nomenclatureValues)
+            addAll(propertyValues.filterIsInstance<PropertyValue.Text>())
         }
-        with(this.filteredNomenclatureValues) {
+        with(this.filteredFieldValues) {
             clear()
-            addAll(nomenclatureValues)
+            addAll(propertyValues.filterIsInstance<PropertyValue.Text>())
         }
 
         notifyDataSetChanged()
@@ -69,7 +70,7 @@ class NomenclatureValueAdapter(context: Context) : BaseAdapter(), Filterable {
 
     inner class DefaultFilter : Filter() {
         override fun performFiltering(constraint: CharSequence?): FilterResults {
-            return filteredNomenclatureValues.filter { if (constraint == null) true else it.defaultLabel.contains(constraint) }
+            return fieldValues
                 .let {
                     FilterResults().apply {
                         values = it
@@ -79,10 +80,10 @@ class NomenclatureValueAdapter(context: Context) : BaseAdapter(), Filterable {
         }
 
         override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-            with(filteredNomenclatureValues) {
+            with(filteredFieldValues) {
                 clear()
                 @Suppress("UNCHECKED_CAST")
-                addAll((results?.values as List<Nomenclature>?) ?: emptyList())
+                addAll((results?.values as List<PropertyValue.Text>?) ?: emptyList())
             }
 
             if (results?.count == 0) notifyDataSetInvalidated() else notifyDataSetChanged()

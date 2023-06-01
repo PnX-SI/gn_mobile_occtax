@@ -193,7 +193,7 @@ class ObservationRecordJsonReaderTest {
     @Test
     fun `should read an observation record from a JSON string`() {
         // given an observation record to read
-        val json = getFixture("observation_record_simple.json")
+        val json = getFixture("observation_record_with_invalid_additional_fields.json")
 
         // when parsing this file as ObservationRecord
         val observationRecord = ObservationRecordJsonReader().read(json)
@@ -290,6 +290,31 @@ class ObservationRecordJsonReaderTest {
                         ).map { it.toPair() }
                             .forEach { properties[it.first] = it.second }
 
+                        additionalFields = listOf(
+                            PropertyValue.Text(
+                                "some_field_text",
+                                "some_value"
+                            ),
+                            PropertyValue.Number(
+                                "some_field_number",
+                                42L
+                            ),
+                            PropertyValue.StringArray(
+                                "some_field_array_string",
+                                arrayOf(
+                                    "val1",
+                                    "val2"
+                                )
+                            ),
+                            PropertyValue.NumberArray(
+                                "some_field_array_number",
+                                arrayOf(
+                                    3L,
+                                    8L
+                                )
+                            )
+                        )
+
                         counting.addOrUpdate(counting.create()
                             .apply {
                                 listOf(
@@ -323,6 +348,13 @@ class ObservationRecordJsonReaderTest {
                                     )
                                 ).map { it.toPair() }
                                     .forEach { properties[it.first] = it.second }
+
+                                additionalFields = listOf(
+                                    PropertyValue.Text(
+                                        "some_field_text",
+                                        "some_value"
+                                    )
+                                )
                             }
                         )
                     }

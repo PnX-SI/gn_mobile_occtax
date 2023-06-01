@@ -59,6 +59,11 @@ class EditCountingMetadataActivity : AppCompatActivity(),
                     replace(
                         android.R.id.content,
                         EditCountingMetadataFragment.newInstance(
+                            intent.getLongExtra(
+                                EXTRA_DATASET_ID,
+                                -1L
+                            )
+                                .takeIf { it >= 0L },
                             taxonRecord,
                             countingRecord,
                             intent.getBooleanExtra(
@@ -80,6 +85,7 @@ class EditCountingMetadataActivity : AppCompatActivity(),
                 confirmBeforeQuit()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -131,6 +137,7 @@ class EditCountingMetadataActivity : AppCompatActivity(),
 
     companion object {
 
+        const val EXTRA_DATASET_ID = "extra_dataset_id"
         const val EXTRA_TAXON_RECORD = "extra_taxon_record"
         const val EXTRA_COUNTING_RECORD = "extra_counting_record"
         const val EXTRA_SAVE_DEFAULT_VALUES = "extra_save_default_values"
@@ -138,6 +145,7 @@ class EditCountingMetadataActivity : AppCompatActivity(),
 
         fun newIntent(
             context: Context,
+            datasetId: Long? = null,
             taxonRecord: TaxonRecord,
             countingRecord: CountingRecord? = null,
             saveDefaultValues: Boolean = false,
@@ -147,6 +155,10 @@ class EditCountingMetadataActivity : AppCompatActivity(),
                 context,
                 EditCountingMetadataActivity::class.java
             ).apply {
+                putExtra(
+                    EXTRA_DATASET_ID,
+                    datasetId
+                )
                 putExtra(
                     EXTRA_TAXON_RECORD,
                     taxonRecord
