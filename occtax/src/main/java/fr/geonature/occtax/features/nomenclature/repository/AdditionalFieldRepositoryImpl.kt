@@ -167,6 +167,16 @@ class AdditionalFieldRepositoryImpl(
                             label = it.additionalField.label
                         )
 
+                        AdditionalField.FieldType.TEXTAREA -> EditableNomenclatureType(
+                            type = type,
+                            code = it.additionalField.name,
+                            viewType = EditableNomenclatureType.ViewType.TEXT_MULTIPLE,
+                            visible = true,
+                            default = type != EditableNomenclatureType.Type.INFORMATION,
+                            additionalField = true,
+                            label = it.additionalField.label
+                        )
+
                         else -> {
                             Logger.warn {
                                 "additional field of type '${it.additionalField.fieldType}' is not supported"
