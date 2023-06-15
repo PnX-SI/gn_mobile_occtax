@@ -12,45 +12,45 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 /**
- * Unit tests about [EditableNomenclatureType].
+ * Unit tests about [EditableField].
  *
  * @author S. Grimault
  */
 @RunWith(RobolectricTestRunner::class)
-class EditableNomenclatureTypeTest {
+class EditableFieldTest {
 
     @Test
     fun `should be the same editable nomenclature type`() {
         assertEquals(
-            EditableNomenclatureType(
-                EditableNomenclatureType.Type.INFORMATION,
+            EditableField(
+                EditableField.Type.INFORMATION,
                 "ETA_BIO",
-                EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableField.ViewType.NOMENCLATURE_TYPE,
                 visible = true,
                 default = false
             ),
-            EditableNomenclatureType(
-                EditableNomenclatureType.Type.INFORMATION,
+            EditableField(
+                EditableField.Type.INFORMATION,
                 "ETA_BIO",
-                EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableField.ViewType.NOMENCLATURE_TYPE,
                 visible = true,
                 default = false
             ),
         )
 
         assertEquals(
-            EditableNomenclatureType(
-                EditableNomenclatureType.Type.INFORMATION,
+            EditableField(
+                EditableField.Type.INFORMATION,
                 "STATUT_BIO",
-                EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableField.ViewType.NOMENCLATURE_TYPE,
                 label = "Statut biologique",
                 visible = false,
                 default = false
             ),
-            EditableNomenclatureType(
-                EditableNomenclatureType.Type.INFORMATION,
+            EditableField(
+                EditableField.Type.INFORMATION,
                 "STATUT_BIO",
-                EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableField.ViewType.NOMENCLATURE_TYPE,
                 label = "Statut biologique",
                 visible = false,
                 default = false
@@ -61,10 +61,10 @@ class EditableNomenclatureTypeTest {
     @Test
     fun `should create EditableNomenclatureType from Parcelable`() {
         // given an editable nomenclature type instance
-        val editableNomenclatureType = EditableNomenclatureType(
-            EditableNomenclatureType.Type.INFORMATION,
+        val editableField = EditableField(
+            EditableField.Type.INFORMATION,
             "STATUT_BIO",
-            EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+            EditableField.ViewType.NOMENCLATURE_TYPE,
             label = "Statut biologique",
             visible = false,
             default = false,
@@ -73,7 +73,7 @@ class EditableNomenclatureTypeTest {
 
         // when we obtain a Parcel object to write the editable nomenclature type instance to it
         val parcel = Parcel.obtain()
-        editableNomenclatureType.writeToParcel(
+        editableField.writeToParcel(
             parcel,
             0
         )
@@ -83,26 +83,26 @@ class EditableNomenclatureTypeTest {
 
         // then
         assertEquals(
-            editableNomenclatureType,
-            parcelableCreator<EditableNomenclatureType>().createFromParcel(parcel)
+            editableField,
+            parcelableCreator<EditableField>().createFromParcel(parcel)
         )
     }
 
     @Test
     fun `should create a list of EditableNomenclatureType from Parcelable array`() {
         // given a list of editable nomenclature types
-        val expectedEditableNomenclatureTypes = listOf(
-            EditableNomenclatureType(
-                EditableNomenclatureType.Type.INFORMATION,
+        val expectedEditableFields = listOf(
+            EditableField(
+                EditableField.Type.INFORMATION,
                 "DETERMINER",
-                EditableNomenclatureType.ViewType.TEXT_SIMPLE,
+                EditableField.ViewType.TEXT_SIMPLE,
                 visible = true,
                 default = false
             ),
-            EditableNomenclatureType(
-                EditableNomenclatureType.Type.INFORMATION,
+            EditableField(
+                EditableField.Type.INFORMATION,
                 "STATUT_BIO",
-                EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableField.ViewType.NOMENCLATURE_TYPE,
                 label = "Statut biologique",
                 visible = false,
                 default = false,
@@ -119,13 +119,13 @@ class EditableNomenclatureTypeTest {
         val bundle = Bundle().apply {
             putParcelableArray(
                 "editable_nomenclature_types",
-                expectedEditableNomenclatureTypes.toTypedArray()
+                expectedEditableFields.toTypedArray()
             )
         }
 
         // then
         assertArrayEquals(
-            expectedEditableNomenclatureTypes.toTypedArray(),
+            expectedEditableFields.toTypedArray(),
             bundle.getParcelableArrayCompat("editable_nomenclature_types")
         )
     }

@@ -5,21 +5,31 @@ import fr.geonature.occtax.features.record.domain.PropertyValue
 import kotlinx.parcelize.Parcelize
 
 /**
- * Describes an editable nomenclature type with value.
+ * Describes an editable field type with value.
  *
  * @author S. Grimault
  */
 @Parcelize
-data class EditableNomenclatureType(
+data class EditableField(
     val type: Type,
     val code: String,
     val viewType: ViewType,
+
+    /**
+     * Whether this editable field is linked with a nomenclature type.
+     */
+    val nomenclatureType: String? = null,
+
     val visible: Boolean = true,
     val default: Boolean = true,
+
+    /**
+     * Whether this editable field is considered as an additional field or not.
+     */
     val additionalField: Boolean = false,
 
     /**
-     * Nomenclature type's label.
+     * Editable field's label.
      */
     val label: String? = null,
 
@@ -29,7 +39,7 @@ data class EditableNomenclatureType(
     val values: List<PropertyValue> = emptyList(),
 
     /**
-     * The current value for this nomenclature type.
+     * The current value for this editable field.
      */
     var value: PropertyValue? = null,
 
@@ -40,27 +50,27 @@ data class EditableNomenclatureType(
 ) : Parcelable {
 
     /**
-     * Describes main editable nomenclature type.
+     * Describes the main category of an editable field.
      */
     enum class Type {
         /**
-         * Default nomenclature types.
+         * Default category.
          */
         DEFAULT,
 
         /**
-         * Nomenclature types used for main information.
+         * Used for main information.
          */
         INFORMATION,
 
         /**
-         * Nomenclature types used for describing counting.
+         * Used for describing counting.
          */
         COUNTING
     }
 
     /**
-     * Describes an editable nomenclature type view type.
+     * Describes an editable field's view type.
      */
     enum class ViewType {
         /**
@@ -74,7 +84,7 @@ data class EditableNomenclatureType(
         CHECKBOX,
 
         /**
-         * As dropdown menu items.
+         * As dropdown nomenclature items.
          */
         NOMENCLATURE_TYPE,
 

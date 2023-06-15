@@ -35,7 +35,7 @@ import fr.geonature.commons.lifecycle.observeOnce
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
+import fr.geonature.occtax.features.nomenclature.domain.EditableField
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.MediaRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
@@ -44,16 +44,16 @@ import java.io.File
 import kotlin.math.ceil
 
 /**
- * Default RecyclerView Adapter about [EditableNomenclatureType].
+ * Default RecyclerView Adapter about [EditableField].
  *
  * @author S. Grimault
  */
-class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatureTypeAdapter) :
-    RecyclerView.Adapter<EditableNomenclatureTypeAdapter.AbstractViewHolder>() {
+class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
+    RecyclerView.Adapter<EditableFieldAdapter.AbstractViewHolder>() {
 
-    private val availableNomenclatureTypes = mutableListOf<EditableNomenclatureType>()
-    private val selectedNomenclatureTypes = mutableListOf<EditableNomenclatureType>()
-    private var showAllNomenclatureTypes = false
+    private val availableEditableFields = mutableListOf<EditableField>()
+    private val selectedEditableFields = mutableListOf<EditableField>()
+    private var showAll = false
     private var lockDefaultValues = false
 
     init {
@@ -104,27 +104,27 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AbstractViewHolder {
         return when (viewType) {
-            EditableNomenclatureType.ViewType.NONE.ordinal -> MoreViewHolder(parent)
-            EditableNomenclatureType.ViewType.CHECKBOX.ordinal -> CheckboxViewHolder(parent)
-            EditableNomenclatureType.ViewType.MIN_MAX.ordinal -> MinMaxViewHolder(parent)
-            EditableNomenclatureType.ViewType.MEDIA.ordinal -> MediaViewHolder(parent)
-            EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE.ordinal -> NomenclatureTypeViewHolder(parent)
-            EditableNomenclatureType.ViewType.RADIO.ordinal -> RadioViewHolder(parent)
-            EditableNomenclatureType.ViewType.SELECT_SIMPLE.ordinal -> SelectSimpleViewHolder(parent)
-            EditableNomenclatureType.ViewType.SELECT_MULTIPLE.ordinal -> SelectMultipleViewHolder(parent)
-            EditableNomenclatureType.ViewType.TEXT_MULTIPLE.ordinal -> TextMultipleViewHolder(parent)
-            EditableNomenclatureType.ViewType.NUMBER.ordinal -> NumberViewHolder(parent)
+            EditableField.ViewType.NONE.ordinal -> MoreViewHolder(parent)
+            EditableField.ViewType.CHECKBOX.ordinal -> CheckboxViewHolder(parent)
+            EditableField.ViewType.MIN_MAX.ordinal -> MinMaxViewHolder(parent)
+            EditableField.ViewType.MEDIA.ordinal -> MediaViewHolder(parent)
+            EditableField.ViewType.NOMENCLATURE_TYPE.ordinal -> NomenclatureTypeViewHolder(parent)
+            EditableField.ViewType.RADIO.ordinal -> RadioViewHolder(parent)
+            EditableField.ViewType.SELECT_SIMPLE.ordinal -> SelectSimpleViewHolder(parent)
+            EditableField.ViewType.SELECT_MULTIPLE.ordinal -> SelectMultipleViewHolder(parent)
+            EditableField.ViewType.TEXT_MULTIPLE.ordinal -> TextMultipleViewHolder(parent)
+            EditableField.ViewType.NUMBER.ordinal -> NumberViewHolder(parent)
             else -> TextSimpleViewHolder(parent)
         }
     }
 
     override fun onBindViewHolder(holder: AbstractViewHolder, position: Int) {
-        selectedNomenclatureTypes.fold(listOf<EditableNomenclatureType>()) { acc, editableNomenclatureType ->
-            acc + if (editableNomenclatureType.viewType == EditableNomenclatureType.ViewType.MIN_MAX && acc.any { it.viewType == EditableNomenclatureType.ViewType.MIN_MAX }) listOf() else listOf(editableNomenclatureType)
+        selectedEditableFields.fold(listOf<EditableField>()) { acc, editableField ->
+            acc + if (editableField.viewType == EditableField.ViewType.MIN_MAX && acc.any { it.viewType == EditableField.ViewType.MIN_MAX }) listOf() else listOf(editableField)
         }
             .sortedWith { o1, o2 ->
-                val i1 = selectedNomenclatureTypes.indexOfFirst { it == o1 }
-                val i2 = selectedNomenclatureTypes.indexOfFirst { it == o2 }
+                val i1 = selectedEditableFields.indexOfFirst { it == o1 }
+                val i2 = selectedEditableFields.indexOfFirst { it == o2 }
 
                 when {
                     i1 == -1 -> 1
@@ -137,17 +137,17 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
     }
 
     override fun getItemCount(): Int {
-        return selectedNomenclatureTypes.filter { it.viewType != EditableNomenclatureType.ViewType.MIN_MAX }.size +
-            selectedNomenclatureTypes.filter { it.viewType == EditableNomenclatureType.ViewType.MIN_MAX }.size.coerceAtMost(1)
+        return selectedEditableFields.filter { it.viewType != EditableField.ViewType.MIN_MAX }.size +
+            selectedEditableFields.filter { it.viewType == EditableField.ViewType.MIN_MAX }.size.coerceAtMost(1)
     }
 
     override fun getItemViewType(position: Int): Int {
-        return selectedNomenclatureTypes.fold(listOf<EditableNomenclatureType>()) { acc, editableNomenclatureType ->
-            acc + if (editableNomenclatureType.viewType == EditableNomenclatureType.ViewType.MIN_MAX && acc.any { it.viewType == EditableNomenclatureType.ViewType.MIN_MAX }) listOf() else listOf(editableNomenclatureType)
+        return selectedEditableFields.fold(listOf<EditableField>()) { acc, editableField ->
+            acc + if (editableField.viewType == EditableField.ViewType.MIN_MAX && acc.any { it.viewType == EditableField.ViewType.MIN_MAX }) listOf() else listOf(editableField)
         }
             .sortedWith { o1, o2 ->
-                val i1 = selectedNomenclatureTypes.indexOfFirst { it == o1 }
-                val i2 = selectedNomenclatureTypes.indexOfFirst { it == o2 }
+                val i1 = selectedEditableFields.indexOfFirst { it == o1 }
+                val i2 = selectedEditableFields.indexOfFirst { it == o2 }
 
                 when {
                     i1 == -1 -> 1
@@ -158,40 +158,40 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
     }
 
     fun bind(
-        nomenclatureTypes: List<EditableNomenclatureType>,
+        editableFields: List<EditableField>,
         vararg propertyValue: PropertyValue
     ) {
-        availableNomenclatureTypes.clear()
-        availableNomenclatureTypes.addAll(
-            nomenclatureTypes.filter { it.visible }
+        availableEditableFields.clear()
+        availableEditableFields.addAll(
+            editableFields.filter { it.visible }
                 .map {
                     it.copy(value = propertyValue.firstOrNull { propertyValue -> propertyValue.toPair().first == it.code }
                         ?: it.value)
                 }
         )
 
-        if (showAllNomenclatureTypes) showAllNomenclatureTypes(notify = true) else showDefaultNomenclatureTypes(notify = true)
+        if (showAll) showAllEditableFields(notify = true) else showDefaultEditableFields(notify = true)
     }
 
-    fun showDefaultNomenclatureTypes(notify: Boolean = false) {
-        showAllNomenclatureTypes = false
+    fun showDefaultEditableFields(notify: Boolean = false) {
+        showAll = false
 
-        if (availableNomenclatureTypes.isEmpty()) return
+        if (availableEditableFields.isEmpty()) return
 
-        availableNomenclatureTypes.filter { it.default }
+        availableEditableFields.filter { it.default }
             .run {
                 if (isEmpty()) {
                     // nothing to show by default: show everything
-                    showAllNomenclatureTypes(notify)
+                    showAllEditableFields(notify)
                 } else {
-                    setSelectedNomenclatureTypes(
-                        // show 'MORE' button only if we have some other editable nomenclatures to show
-                        this + if (this.size < availableNomenclatureTypes.size) listOf(
-                            EditableNomenclatureType(
-                                EditableNomenclatureType.Type.INFORMATION,
-                                "MORE",
-                                EditableNomenclatureType.ViewType.NONE,
-                                true
+                    setEditableFields(
+                        // show 'MORE' button only if we have some other editable field to show
+                        this + if (this.size < availableEditableFields.size) listOf(
+                            EditableField(
+                                type = EditableField.Type.INFORMATION,
+                                code = "MORE",
+                                viewType = EditableField.ViewType.NONE,
+                                visible = true
                             )
                         ) else emptyList()
                     )
@@ -199,10 +199,10 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
             }
     }
 
-    fun showAllNomenclatureTypes(notify: Boolean = false) {
-        showAllNomenclatureTypes = true
-        setSelectedNomenclatureTypes(
-            availableNomenclatureTypes,
+    fun showAllEditableFields(notify: Boolean = false) {
+        showAll = true
+        setEditableFields(
+            availableEditableFields,
             notify
         )
     }
@@ -212,24 +212,24 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
     }
 
     fun setPropertyValues(vararg propertyValue: PropertyValue) {
-        availableNomenclatureTypes.map {
+        availableEditableFields.map {
             it.copy(value = propertyValue.firstOrNull { propertyValue -> propertyValue.toPair().first == it.code }
                 ?: it.value)
         }
             .also {
-                availableNomenclatureTypes.clear()
-                availableNomenclatureTypes.addAll(it)
+                availableEditableFields.clear()
+                availableEditableFields.addAll(it)
             }
 
-        if (showAllNomenclatureTypes) showAllNomenclatureTypes(notify = true) else showDefaultNomenclatureTypes(notify = true)
+        if (showAll) showAllEditableFields(notify = true) else showDefaultEditableFields(notify = true)
     }
 
-    private fun setSelectedNomenclatureTypes(
-        nomenclatureTypes: List<EditableNomenclatureType>,
+    private fun setEditableFields(
+        editableFields: List<EditableField>,
         notify: Boolean = false
     ) {
-        val oldKeys = selectedNomenclatureTypes.map { it.code }
-        val newKeys = nomenclatureTypes.map { it.code }
+        val oldKeys = selectedEditableFields.map { it.code }
+        val newKeys = editableFields.map { it.code }
 
         if (notify && oldKeys.isEmpty() && newKeys.isEmpty()) {
             listener.showEmptyTextView(true)
@@ -238,7 +238,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
         }
 
         val checkMedia =
-            selectedNomenclatureTypes.firstOrNull { it.viewType == EditableNomenclatureType.ViewType.MEDIA }?.value == nomenclatureTypes.firstOrNull { it.viewType == EditableNomenclatureType.ViewType.MEDIA }?.value
+            selectedEditableFields.firstOrNull { it.viewType == EditableField.ViewType.MEDIA }?.value == editableFields.firstOrNull { it.viewType == EditableField.ViewType.MEDIA }?.value
 
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun getOldListSize(): Int = oldKeys.size
@@ -256,14 +256,14 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
             ) =
                 checkMedia &&
                     (oldKeys.elementAtOrNull(oldItemPosition)
-                        ?.let { code -> selectedNomenclatureTypes.firstOrNull { it.code == code } }
+                        ?.let { code -> selectedEditableFields.firstOrNull { it.code == code } }
                         ?.value?.toPair()?.second == newKeys.elementAtOrNull(newItemPosition)
-                        ?.let { code -> nomenclatureTypes.firstOrNull { it.code == code } }
+                        ?.let { code -> editableFields.firstOrNull { it.code == code } }
                         ?.value?.toPair()?.second)
         })
 
-        selectedNomenclatureTypes.clear()
-        selectedNomenclatureTypes.addAll(nomenclatureTypes)
+        selectedEditableFields.clear()
+        selectedEditableFields.addAll(editableFields)
 
         diffResult.dispatchUpdatesTo(this)
     }
@@ -272,28 +272,28 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
      * Base [ViewHolder][RecyclerView.ViewHolder] used by this adapter.
      */
     abstract inner class AbstractViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal var nomenclatureType: EditableNomenclatureType? = null
+        internal var editableField: EditableField? = null
 
-        fun bind(nomenclatureType: EditableNomenclatureType) {
-            this.nomenclatureType = nomenclatureType
+        fun bind(editableField: EditableField) {
+            this.editableField = editableField
 
-            onBind(nomenclatureType)
+            onBind(editableField)
         }
 
-        abstract fun onBind(nomenclatureType: EditableNomenclatureType)
+        abstract fun onBind(editableField: EditableField)
 
         /**
-         * Build the default label for given editable nomenclature type as fallback.
+         * Build the default label for given editable field as fallback.
          */
         @SuppressLint("DiscouragedApi")
-        fun getNomenclatureTypeLabel(editableNomenclatureType: EditableNomenclatureType): String {
-            return editableNomenclatureType.label ?: itemView.resources.getIdentifier(
-                "nomenclature_${editableNomenclatureType.code.lowercase()}",
+        fun getDefaultLabel(editableField: EditableField): String {
+            return editableField.label ?: itemView.resources.getIdentifier(
+                "nomenclature_${editableField.code.lowercase()}",
                 "string",
                 itemView.context.packageName
             )
                 .takeIf { it > 0 }
-                ?.let { itemView.context.getString(it) } ?: editableNomenclatureType.code
+                ?.let { itemView.context.getString(it) } ?: editableField.code
         }
     }
 
@@ -345,7 +345,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                         itemView.findViewById<CheckBox?>(android.R.id.checkbox)
                             .apply {
                                 setOnClickListener { view ->
-                                    nomenclatureType?.run {
+                                    editableField?.run {
                                         value = value?.takeIf { it is PropertyValue.StringArray }
                                             ?.let { it as PropertyValue.StringArray }
                                             ?.let {
@@ -385,14 +385,14 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
             }
         }
 
-        override fun onBind(nomenclatureType: EditableNomenclatureType) {
-            title.text = nomenclatureType.label
+        override fun onBind(editableField: EditableField) {
+            title.text = editableField.label
 
-            val currentValues = nomenclatureType.value
+            val currentValues = editableField.value
                 .takeIf { it is PropertyValue.StringArray }
                 ?.let { it as PropertyValue.StringArray }?.value
 
-            adapter.setItems(nomenclatureType.values.mapNotNull { pv ->
+            adapter.setItems(editableField.values.mapNotNull { pv ->
                 pv.takeIf { it is PropertyValue.Text }
                     ?.let { it as PropertyValue.Text }
                     ?.let {
@@ -414,15 +414,13 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
             )
     ) {
         private var edit: TextInputLayout = itemView.findViewById(android.R.id.edit)
-        private var nomenclatureAdapter = NomenclatureValueAdapter(parent.context)
-        private var showDropdown = false
+        private val nomenclatureAdapter = NomenclatureValueAdapter(parent.context)
 
         init {
             (edit.editText as? AutoCompleteTextView)?.also {
                 it.setAdapter(nomenclatureAdapter)
                 it.setOnItemClickListener { _, _, position, _ ->
-                    showDropdown = false
-                    nomenclatureType?.run {
+                    editableField?.run {
                         value = nomenclatureAdapter.getNomenclatureValue(position)
                             .let { nomenclature ->
                                 PropertyValue.Nomenclature(
@@ -437,57 +435,44 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
             }
         }
 
-        override fun onBind(nomenclatureType: EditableNomenclatureType) {
+        override fun onBind(editableField: EditableField) {
             if (!lockDefaultValues) {
-                nomenclatureType.locked = false
+                editableField.locked = false
             }
+
+            listener.getNomenclatureValues(editableField.nomenclatureType ?: editableField.code)
+                .observeOnce(listener.getLifecycleOwner()) { nomenclatureValues ->
+                    nomenclatureAdapter.setNomenclatureValues(nomenclatureValues ?: listOf())
+                    (edit.editText as AutoCompleteTextView?)?.text = editableField.value
+                        ?.takeIf { it is PropertyValue.Nomenclature }
+                        ?.let { it as PropertyValue.Nomenclature }
+                        ?.let { pv -> nomenclatureValues?.firstOrNull { it.id == pv.value } }
+                        ?.let { nomenclatureValue ->
+                            Editable.Factory
+                                .getInstance()
+                                .newEditable(nomenclatureValue.defaultLabel)
+                        }
+                }
 
             with(edit) {
                 startIconDrawable = if (lockDefaultValues) ResourcesCompat.getDrawable(
                     itemView.resources,
-                    if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                    if (editableField.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
                     itemView.context.theme
                 ) else null
                 setStartIconOnClickListener {
                     if (!lockDefaultValues) return@setStartIconOnClickListener
 
-                    nomenclatureType.locked = !nomenclatureType.locked
+                    editableField.locked = !editableField.locked
                     startIconDrawable = ResourcesCompat.getDrawable(
                         itemView.resources,
-                        if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                        if (editableField.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
                         itemView.context.theme
                     )
-                    listener.onUpdate(nomenclatureType)
+                    listener.onUpdate(editableField)
                 }
-                hint = nomenclatureType.label ?: getNomenclatureTypeLabel(nomenclatureType)
-                setEndIconOnClickListener { setNomenclatureValues(nomenclatureType) }
-                (editText as? AutoCompleteTextView)?.apply {
-                    setOnClickListener { setNomenclatureValues(nomenclatureType) }
-                    text = nomenclatureType.value
-                        ?.takeIf { it is PropertyValue.Nomenclature }
-                        ?.let { it as PropertyValue.Nomenclature }
-                        ?.let {
-                            Editable.Factory
-                                .getInstance()
-                                .newEditable(it.label ?: it.code)
-                        }
-                }
+                hint = editableField.label ?: getDefaultLabel(editableField)
             }
-        }
-
-        private fun setNomenclatureValues(nomenclatureType: EditableNomenclatureType) {
-            if (showDropdown) {
-                showDropdown = false
-                (edit.editText as? AutoCompleteTextView)?.dismissDropDown()
-                return
-            }
-
-            listener.getNomenclatureValues(nomenclatureType.code)
-                .observeOnce(listener.getLifecycleOwner()) {
-                    showDropdown = true
-                    nomenclatureAdapter.setNomenclatureValues(it ?: listOf())
-                    (edit.editText as? AutoCompleteTextView)?.showDropDown()
-                }
         }
     }
 
@@ -501,11 +486,11 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
     ) {
         private var button1: Button = itemView.findViewById(android.R.id.button1)
 
-        override fun onBind(nomenclatureType: EditableNomenclatureType) {
+        override fun onBind(editableField: EditableField) {
             with(button1) {
-                text = getNomenclatureTypeLabel(nomenclatureType)
+                text = getDefaultLabel(editableField)
                 setOnClickListener {
-                    showAllNomenclatureTypes()
+                    showAllEditableFields()
                     listener.showMore()
                 }
             }
@@ -560,7 +545,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                         itemView.findViewById<RadioButton?>(android.R.id.checkbox)
                             .apply {
                                 setOnClickListener { view ->
-                                    nomenclatureType?.run {
+                                    editableField?.run {
                                         value = (view as CompoundButton).takeIf { it.isChecked }
                                             ?.let {
                                                 PropertyValue.Text(
@@ -602,16 +587,16 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
             }
         }
 
-        override fun onBind(nomenclatureType: EditableNomenclatureType) {
-            title.text = nomenclatureType.label
+        override fun onBind(editableField: EditableField) {
+            title.text = editableField.label
 
-            adapter.setItems(nomenclatureType.values.mapNotNull { pv ->
+            adapter.setItems(editableField.values.mapNotNull { pv ->
                 pv.takeIf { it is PropertyValue.Text }
                     ?.let { it as PropertyValue.Text }
                     ?.let {
                         Pair(
                             it,
-                            nomenclatureType.value?.let { value -> value is PropertyValue.Text && value.value == it.code }
+                            editableField.value?.let { value -> value is PropertyValue.Text && value.value == it.code }
                                 ?: false
                         )
                     }
@@ -634,7 +619,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
             (edit.editText as? AutoCompleteTextView)?.also {
                 it.setAdapter(propertyValueTextAdapter)
                 it.setOnItemClickListener { _, _, position, _ ->
-                    nomenclatureType?.run {
+                    editableField?.run {
                         value = PropertyValue.Text(
                             code = code,
                             propertyValueTextAdapter.getPropertyValue(position)
@@ -647,36 +632,36 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
             }
         }
 
-        override fun onBind(nomenclatureType: EditableNomenclatureType) {
+        override fun onBind(editableField: EditableField) {
             if (!lockDefaultValues) {
-                nomenclatureType.locked = false
+                editableField.locked = false
             }
 
-            propertyValueTextAdapter.setPropertyValues(nomenclatureType.values)
+            propertyValueTextAdapter.setPropertyValues(editableField.values)
 
             with(edit) {
                 startIconDrawable = if (lockDefaultValues) ResourcesCompat.getDrawable(
                     itemView.resources,
-                    if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                    if (editableField.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
                     itemView.context.theme
                 ) else null
                 setStartIconOnClickListener {
                     if (!lockDefaultValues) return@setStartIconOnClickListener
 
-                    nomenclatureType.locked = !nomenclatureType.locked
+                    editableField.locked = !editableField.locked
                     startIconDrawable = ResourcesCompat.getDrawable(
                         itemView.resources,
-                        if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                        if (editableField.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
                         itemView.context.theme
                     )
-                    listener.onUpdate(nomenclatureType)
+                    listener.onUpdate(editableField)
                 }
-                hint = nomenclatureType.label ?: getNomenclatureTypeLabel(nomenclatureType)
+                hint = editableField.label ?: getDefaultLabel(editableField)
                 (editText as? AutoCompleteTextView)?.apply {
-                    text = nomenclatureType.value
+                    text = editableField.value
                         ?.takeIf { it is PropertyValue.Text }
                         ?.let { it as PropertyValue.Text }
-                        ?.let { pv -> nomenclatureType.values.firstOrNull { it is PropertyValue.Text && it.code == pv.value } }
+                        ?.let { pv -> editableField.values.firstOrNull { it is PropertyValue.Text && it.code == pv.value } }
                         ?.let { it as PropertyValue.Text }
                         ?.let {
                             Editable.Factory
@@ -701,7 +686,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
         init {
             (edit.editText as? AutoCompleteTextView)?.also { editText ->
                 editText.setOnClickListener {
-                    nomenclatureType?.also {
+                    editableField?.also {
                         showSelectionDialog(
                             itemView.context,
                             it,
@@ -710,7 +695,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                     }
                 }
                 edit.setEndIconOnClickListener {
-                    nomenclatureType?.also {
+                    editableField?.also {
                         showSelectionDialog(
                             itemView.context,
                             it,
@@ -721,35 +706,35 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
             }
         }
 
-        override fun onBind(nomenclatureType: EditableNomenclatureType) {
+        override fun onBind(editableField: EditableField) {
             if (!lockDefaultValues) {
-                nomenclatureType.locked = false
+                editableField.locked = false
             }
 
             with(edit) {
                 startIconDrawable = if (lockDefaultValues) ResourcesCompat.getDrawable(
                     itemView.resources,
-                    if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                    if (editableField.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
                     itemView.context.theme
                 ) else null
                 setStartIconOnClickListener {
                     if (!lockDefaultValues) return@setStartIconOnClickListener
 
-                    nomenclatureType.locked = !nomenclatureType.locked
+                    editableField.locked = !editableField.locked
                     startIconDrawable = ResourcesCompat.getDrawable(
                         itemView.resources,
-                        if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                        if (editableField.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
                         itemView.context.theme
                     )
-                    listener.onUpdate(nomenclatureType)
+                    listener.onUpdate(editableField)
                 }
-                hint = nomenclatureType.label ?: getNomenclatureTypeLabel(nomenclatureType)
+                hint = editableField.label ?: getDefaultLabel(editableField)
                 (editText as? AutoCompleteTextView)?.apply {
-                    text = nomenclatureType.value
+                    text = editableField.value
                         ?.takeIf { it is PropertyValue.StringArray }
                         ?.let { it as PropertyValue.StringArray }
                         ?.let { stringArray ->
-                            nomenclatureType.values.mapNotNull { pv ->
+                            editableField.values.mapNotNull { pv ->
                                 pv.takeIf { it is PropertyValue.Text }
                                     ?.let { it as PropertyValue.Text }
                                     ?.let { text ->
@@ -770,17 +755,17 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
 
         private fun showSelectionDialog(
             context: Context,
-            nomenclatureType: EditableNomenclatureType,
+            editableField: EditableField,
             editText: EditText
         ) {
-            val items = nomenclatureType.values.filterIsInstance<PropertyValue.Text>()
+            val items = editableField.values.filterIsInstance<PropertyValue.Text>()
                 .map { it.value ?: it.code }
                 .toTypedArray()
-            val selectedItems = nomenclatureType.values.filterIsInstance<PropertyValue.Text>()
+            val selectedItems = editableField.values.filterIsInstance<PropertyValue.Text>()
                 .associateWith { false }
                 .let {
                     val selectedItems =
-                        nomenclatureType.value?.takeIf { v -> v is PropertyValue.StringArray }
+                        editableField.value?.takeIf { v -> v is PropertyValue.StringArray }
                             ?.let { v -> v as PropertyValue.StringArray }?.value ?: emptyArray()
                     it.map { item -> item.key to selectedItems.any { selectedItem -> selectedItem == item.key.code } }
                 }
@@ -789,15 +774,15 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
 
             AlertDialog.Builder(context)
                 .setTitle(
-                    nomenclatureType.label ?: getNomenclatureTypeLabel(nomenclatureType)
+                    editableField.label ?: getDefaultLabel(editableField)
                 )
                 .setNegativeButton(context.getString(R.string.alert_dialog_cancel)) { _, _ ->
                     // nothing to do...
                 }
                 .setPositiveButton(context.getString(R.string.alert_dialog_ok)) { _, _ ->
                     PropertyValue.StringArray(
-                        code = nomenclatureType.code,
-                        value = nomenclatureType.values.filterIsInstance<PropertyValue.Text>()
+                        code = editableField.code,
+                        value = editableField.values.filterIsInstance<PropertyValue.Text>()
                             .mapIndexed { index, v ->
                                 v to selectedItems[index]
                             }
@@ -808,10 +793,10 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                             .toTypedArray()
                     )
                         .also { propertyValue ->
-                            nomenclatureType.value = propertyValue
+                            editableField.value = propertyValue
                             editText.text = propertyValue
                                 .let { stringArray ->
-                                    nomenclatureType.values.mapNotNull { pv ->
+                                    editableField.values.mapNotNull { pv ->
                                         pv.takeIf { it is PropertyValue.Text }
                                             ?.let { it as PropertyValue.Text }
                                             ?.let { text ->
@@ -827,7 +812,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                                         .newEditable(it)
                                 }
                         }
-                    listener.onUpdate(nomenclatureType)
+                    listener.onUpdate(editableField)
                 }
                 .setMultiChoiceItems(
                     items,
@@ -866,7 +851,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
             }
 
             override fun afterTextChanged(s: Editable?) {
-                nomenclatureType?.run {
+                editableField?.run {
                     value = PropertyValue.Text(
                         code,
                         s?.toString()
@@ -890,32 +875,32 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
             }
         }
 
-        override fun onBind(nomenclatureType: EditableNomenclatureType) {
+        override fun onBind(editableField: EditableField) {
             if (!lockDefaultValues) {
-                nomenclatureType.locked = false
+                editableField.locked = false
             }
 
             with(edit) {
                 startIconDrawable = if (lockDefaultValues) ResourcesCompat.getDrawable(
                     itemView.resources,
-                    if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                    if (editableField.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
                     itemView.context.theme
                 ) else null
                 setStartIconOnClickListener {
                     if (!lockDefaultValues) return@setStartIconOnClickListener
 
-                    nomenclatureType.locked = !nomenclatureType.locked
+                    editableField.locked = !editableField.locked
                     startIconDrawable = ResourcesCompat.getDrawable(
                         itemView.resources,
-                        if (nomenclatureType.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                        if (editableField.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
                         itemView.context.theme
                     )
-                    listener.onUpdate(nomenclatureType)
+                    listener.onUpdate(editableField)
                 }
-                hint = getNomenclatureTypeLabel(nomenclatureType)
+                hint = getDefaultLabel(editableField)
             }
 
-            nomenclatureType.value
+            editableField.value
                 .takeIf { it is PropertyValue.Text && !it.isEmpty() }
                 ?.let { it as PropertyValue.Text }
                 ?.also {
@@ -961,8 +946,8 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
         private var editMinPicker: NumberPicker = itemView.findViewById(R.id.editMinPicker)
         private var editMaxPicker: NumberPicker = itemView.findViewById(R.id.editMaxPicker)
 
-        private var minNomenclatureType: EditableNomenclatureType? = null
-        private var maxNomenclatureType: EditableNomenclatureType? = null
+        private var minEditableField: EditableField? = null
+        private var maxEditableField: EditableField? = null
 
         init {
             with(editMinPicker) {
@@ -978,19 +963,19 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                         editMaxPicker.value = newValue
                     }
 
-                    minNomenclatureType?.also { nomenclatureType ->
-                        nomenclatureType.value = PropertyValue.Number(
-                            nomenclatureType.code,
+                    minEditableField?.also { editableField ->
+                        editableField.value = PropertyValue.Number(
+                            editableField.code,
                             newValue
                         )
-                        listener.onUpdate(nomenclatureType)
+                        listener.onUpdate(editableField)
                     }
-                    maxNomenclatureType?.also { nomenclatureType ->
-                        nomenclatureType.value = PropertyValue.Number(
-                            nomenclatureType.code,
+                    maxEditableField?.also { editableField ->
+                        editableField.value = PropertyValue.Number(
+                            editableField.code,
                             editMaxPicker.value
                         )
-                        listener.onUpdate(nomenclatureType)
+                        listener.onUpdate(editableField)
                     }
                 }
             }
@@ -1003,41 +988,41 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
 
                     if (editMinPicker.value > newValue) editMinPicker.value = newValue
 
-                    minNomenclatureType?.also { nomenclatureType ->
-                        nomenclatureType.value = PropertyValue.Number(
-                            nomenclatureType.code,
+                    minEditableField?.also { editableField ->
+                        editableField.value = PropertyValue.Number(
+                            editableField.code,
                             editMinPicker.value
                         )
-                        listener.onUpdate(nomenclatureType)
+                        listener.onUpdate(editableField)
                     }
-                    maxNomenclatureType?.also { nomenclatureType ->
-                        nomenclatureType.value = PropertyValue.Number(
-                            nomenclatureType.code,
+                    maxEditableField?.also { editableField ->
+                        editableField.value = PropertyValue.Number(
+                            editableField.code,
                             newValue
                         )
-                        listener.onUpdate(nomenclatureType)
+                        listener.onUpdate(editableField)
                     }
                 }
             }
         }
 
-        override fun onBind(nomenclatureType: EditableNomenclatureType) {
-            minNomenclatureType =
-                selectedNomenclatureTypes.firstOrNull { it.viewType == EditableNomenclatureType.ViewType.MIN_MAX && it.code == CountingRecord.MIN_KEY }
-            maxNomenclatureType =
-                selectedNomenclatureTypes.firstOrNull { it.viewType == EditableNomenclatureType.ViewType.MIN_MAX && it.code == CountingRecord.MAX_KEY }
+        override fun onBind(editableField: EditableField) {
+            minEditableField =
+                selectedEditableFields.firstOrNull { it.viewType == EditableField.ViewType.MIN_MAX && it.code == CountingRecord.MIN_KEY }
+            maxEditableField =
+                selectedEditableFields.firstOrNull { it.viewType == EditableField.ViewType.MIN_MAX && it.code == CountingRecord.MAX_KEY }
 
-            with(if (minNomenclatureType != null) View.VISIBLE else View.GONE) {
+            with(if (minEditableField != null) View.VISIBLE else View.GONE) {
                 editMinLabel.visibility = this
                 editMinPicker.visibility = this
             }
 
-            with(if (maxNomenclatureType != null) View.VISIBLE else View.GONE) {
+            with(if (maxEditableField != null) View.VISIBLE else View.GONE) {
                 editMaxLabel.visibility = this
                 editMaxPicker.visibility = this
             }
 
-            minNomenclatureType?.value?.takeIf { it is PropertyValue.Number }
+            minEditableField?.value?.takeIf { it is PropertyValue.Number }
                 ?.let { it as PropertyValue.Number }?.value?.toInt()
                 ?.also {
                     if (it > editMinPicker.maxValue) {
@@ -1049,7 +1034,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                     editMinPicker.value = it
                 }
 
-            maxNomenclatureType?.value?.takeIf { it is PropertyValue.Number }
+            maxEditableField?.value?.takeIf { it is PropertyValue.Number }
                 ?.let { it as PropertyValue.Number }?.value?.toInt()
                 ?.also {
                     if (it > editMaxPicker.maxValue) {
@@ -1085,9 +1070,9 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
             }
         }
 
-        override fun onBind(nomenclatureType: EditableNomenclatureType) {
-            title.text = nomenclatureType.label ?: getNomenclatureTypeLabel(nomenclatureType)
-            adapter.setItems(nomenclatureType.value
+        override fun onBind(editableField: EditableField) {
+            title.text = editableField.label ?: getDefaultLabel(editableField)
+            adapter.setItems(editableField.value
                 .takeIf { it is PropertyValue.Media }
                 ?.let { it as PropertyValue.Media }?.value
                 ?.filterIsInstance<MediaRecord.File>()
@@ -1208,7 +1193,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
             }
 
             fun onUpdate() {
-                nomenclatureType?.also {
+                editableField?.also {
                     listener.onUpdate(it.apply {
                         value = PropertyValue.Media(
                             it.code,
@@ -1264,7 +1249,7 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
                 override fun onBind(file: File?) {
                     itemView.findViewById<MaterialButton>(android.R.id.button1)
                         .setOnClickListener {
-                            nomenclatureType?.code?.also {
+                            editableField?.code?.also {
                                 listener.onAddMedia(it)
                             }
                         }
@@ -1286,9 +1271,9 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
     }
 
     /**
-     * Callback used by [EditableNomenclatureTypeAdapter].
+     * Callback used by [EditableFieldAdapter].
      */
-    interface OnEditableNomenclatureTypeAdapter {
+    interface OnEditableFieldAdapter {
 
         fun getLifecycleOwner(): LifecycleOwner
 
@@ -1310,11 +1295,11 @@ class EditableNomenclatureTypeAdapter(private val listener: OnEditableNomenclatu
         fun getNomenclatureValues(nomenclatureTypeMnemonic: String): LiveData<List<Nomenclature>>
 
         /**
-         * Called when an [EditableNomenclatureType] has been updated.
+         * Called when an [EditableField] has been updated.
          *
-         * @param editableNomenclatureType the [EditableNomenclatureType] updated
+         * @param editableField the [EditableField] updated
          */
-        fun onUpdate(editableNomenclatureType: EditableNomenclatureType)
+        fun onUpdate(editableField: EditableField)
 
         /**
          * Called when we want to add media.

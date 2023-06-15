@@ -1,7 +1,6 @@
 package fr.geonature.occtax.features.nomenclature.repository
 
-import fr.geonature.commons.error.Failure
-import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
+import fr.geonature.occtax.features.nomenclature.domain.EditableField
 import fr.geonature.occtax.settings.PropertySettings
 import fr.geonature.commons.features.nomenclature.repository.INomenclatureRepository as IBaseNomenclatureRepository
 
@@ -14,15 +13,15 @@ import fr.geonature.commons.features.nomenclature.repository.INomenclatureReposi
 interface INomenclatureRepository : IBaseNomenclatureRepository {
 
     /**
-     * Gets all editable nomenclatures from given type with default values from nomenclature.
+     * Gets all editable fields from given type with default values from nomenclature.
      *
-     * @param type the main editable nomenclature type
+     * @param type the main editable field type
      * @param defaultPropertySettings the default nomenclature settings
      *
-     * @return a list of [EditableNomenclatureType] or [Failure] if none was configured
+     * @return a list of [EditableField] or [Result.Failure] if none was configured
      */
-    suspend fun getEditableNomenclatures(
-        type: EditableNomenclatureType.Type,
+    suspend fun getEditableFields(
+        type: EditableField.Type,
         vararg defaultPropertySettings: PropertySettings
-    ): Result<List<EditableNomenclatureType>>
+    ): Result<List<EditableField>>
 }

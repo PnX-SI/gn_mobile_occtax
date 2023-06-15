@@ -284,7 +284,7 @@ class TaxonRecordJsonWriter {
 
         additionalField.value.values.forEach {
             when (it) {
-                is PropertyValue.Text -> writer.name(it.code)
+                is PropertyValue.Nomenclature -> writer.name(it.code)
                     .value(it.value)
 
                 is PropertyValue.Number -> writer.name(it.code)
@@ -303,6 +303,9 @@ class TaxonRecordJsonWriter {
                     it.value.forEach { value -> writer.value(value) }
                     writer.endArray()
                 }
+
+                is PropertyValue.Text -> writer.name(it.code)
+                    .value(it.value)
 
                 else -> {}
             }

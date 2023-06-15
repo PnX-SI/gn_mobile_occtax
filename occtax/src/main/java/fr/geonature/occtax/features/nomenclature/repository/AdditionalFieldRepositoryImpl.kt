@@ -3,7 +3,7 @@ package fr.geonature.occtax.features.nomenclature.repository
 import fr.geonature.commons.data.entity.AdditionalField
 import fr.geonature.commons.features.nomenclature.data.IAdditionalFieldLocalDataSource
 import fr.geonature.occtax.features.nomenclature.domain.AdditionalFieldType
-import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
+import fr.geonature.occtax.features.nomenclature.domain.EditableField
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import org.tinylog.Logger
 
@@ -19,15 +19,15 @@ class AdditionalFieldRepositoryImpl(
 
     override suspend fun getAllAdditionalFields(
         datasetId: Long?,
-        type: EditableNomenclatureType.Type
-    ): Result<List<EditableNomenclatureType>> {
+        type: EditableField.Type
+    ): Result<List<EditableField>> {
         return runCatching {
             additionalFieldLocalDataSource.getAdditionalFields(
                 datasetId,
                 *when (type) {
-                    EditableNomenclatureType.Type.DEFAULT -> arrayOf(AdditionalFieldType.DEFAULT.type)
-                    EditableNomenclatureType.Type.INFORMATION -> arrayOf(AdditionalFieldType.INFORMATION.type)
-                    EditableNomenclatureType.Type.COUNTING -> arrayOf(AdditionalFieldType.COUNTING.type)
+                    EditableField.Type.DEFAULT -> arrayOf(AdditionalFieldType.DEFAULT.type)
+                    EditableField.Type.INFORMATION -> arrayOf(AdditionalFieldType.INFORMATION.type)
+                    EditableField.Type.COUNTING -> arrayOf(AdditionalFieldType.COUNTING.type)
                 }
             )
                 .mapNotNull {
@@ -41,12 +41,12 @@ class AdditionalFieldRepositoryImpl(
                                 return@mapNotNull null
                             }
 
-                            EditableNomenclatureType(
+                            EditableField(
                                 type = type,
                                 code = it.additionalField.name,
-                                viewType = EditableNomenclatureType.ViewType.CHECKBOX,
+                                viewType = EditableField.ViewType.CHECKBOX,
                                 visible = true,
-                                default = type != EditableNomenclatureType.Type.INFORMATION,
+                                default = type != EditableField.Type.INFORMATION,
                                 additionalField = true,
                                 label = it.additionalField.label,
                                 values = it.values.map { fieldValue ->
@@ -67,12 +67,12 @@ class AdditionalFieldRepositoryImpl(
                                 return@mapNotNull null
                             }
 
-                            EditableNomenclatureType(
+                            EditableField(
                                 type = type,
                                 code = it.additionalField.name,
-                                viewType = EditableNomenclatureType.ViewType.SELECT_MULTIPLE,
+                                viewType = EditableField.ViewType.SELECT_MULTIPLE,
                                 visible = true,
-                                default = type != EditableNomenclatureType.Type.INFORMATION,
+                                default = type != EditableField.Type.INFORMATION,
                                 additionalField = true,
                                 label = it.additionalField.label,
                                 values = it.values.map { fieldValue ->
@@ -84,23 +84,33 @@ class AdditionalFieldRepositoryImpl(
                             )
                         }
 
-                        // TODO: additional field code should use mnemonic from nomenclature type...
-                        // AdditionalField.FieldType.NOMENCLATURE -> EditableNomenclatureType(
-                        //     type = type,
-                        //     code = it.additionalField.name,
-                        //     viewType = EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                        //     visible = true,
-                        //     default = type != EditableNomenclatureType.Type.INFORMATION,
-                        //     additionalField = true,
-                        //     label = it.additionalField.label
-                        // )
+                        AdditionalField.FieldType.NOMENCLATURE -> {
+                            it.nomenclatureTypeMnemonic?.let { mnemonic ->
+                                EditableField(
+                                    type = type,
+                                    code = it.additionalField.name,
+                                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                                    nomenclatureType = mnemonic,
+                                    visible = true,
+                                    default = type != EditableField.Type.INFORMATION,
+                                    additionalField = true,
+                                    label = it.additionalField.label
+                                )
+                            } ?: run {
+                                Logger.warn {
+                                    "invalid additional field of type '${it.additionalField.fieldType}': missing nomenclature type mnemonic code"
+                                }
 
-                        AdditionalField.FieldType.NUMBER -> EditableNomenclatureType(
+                                null
+                            }
+                        }
+
+                        AdditionalField.FieldType.NUMBER -> EditableField(
                             type = type,
                             code = it.additionalField.name,
-                            viewType = EditableNomenclatureType.ViewType.NUMBER,
+                            viewType = EditableField.ViewType.NUMBER,
                             visible = true,
-                            default = type != EditableNomenclatureType.Type.INFORMATION,
+                            default = type != EditableField.Type.INFORMATION,
                             additionalField = true,
                             label = it.additionalField.label
                         )
@@ -114,12 +124,12 @@ class AdditionalFieldRepositoryImpl(
                                 return@mapNotNull null
                             }
 
-                            EditableNomenclatureType(
+                            EditableField(
                                 type = type,
                                 code = it.additionalField.name,
-                                viewType = EditableNomenclatureType.ViewType.RADIO,
+                                viewType = EditableField.ViewType.RADIO,
                                 visible = true,
-                                default = type != EditableNomenclatureType.Type.INFORMATION,
+                                default = type != EditableField.Type.INFORMATION,
                                 additionalField = true,
                                 label = it.additionalField.label,
                                 values = it.values.map { fieldValue ->
@@ -140,12 +150,12 @@ class AdditionalFieldRepositoryImpl(
                                 return@mapNotNull null
                             }
 
-                            EditableNomenclatureType(
+                            EditableField(
                                 type = type,
                                 code = it.additionalField.name,
-                                viewType = EditableNomenclatureType.ViewType.SELECT_SIMPLE,
+                                viewType = EditableField.ViewType.SELECT_SIMPLE,
                                 visible = true,
-                                default = type != EditableNomenclatureType.Type.INFORMATION,
+                                default = type != EditableField.Type.INFORMATION,
                                 additionalField = true,
                                 label = it.additionalField.label,
                                 values = it.values.map { fieldValue ->
@@ -157,22 +167,22 @@ class AdditionalFieldRepositoryImpl(
                             )
                         }
 
-                        AdditionalField.FieldType.TEXT -> EditableNomenclatureType(
+                        AdditionalField.FieldType.TEXT -> EditableField(
                             type = type,
                             code = it.additionalField.name,
-                            viewType = EditableNomenclatureType.ViewType.TEXT_SIMPLE,
+                            viewType = EditableField.ViewType.TEXT_SIMPLE,
                             visible = true,
-                            default = type != EditableNomenclatureType.Type.INFORMATION,
+                            default = type != EditableField.Type.INFORMATION,
                             additionalField = true,
                             label = it.additionalField.label
                         )
 
-                        AdditionalField.FieldType.TEXTAREA -> EditableNomenclatureType(
+                        AdditionalField.FieldType.TEXTAREA -> EditableField(
                             type = type,
                             code = it.additionalField.name,
-                            viewType = EditableNomenclatureType.ViewType.TEXT_MULTIPLE,
+                            viewType = EditableField.ViewType.TEXT_MULTIPLE,
                             visible = true,
-                            default = type != EditableNomenclatureType.Type.INFORMATION,
+                            default = type != EditableField.Type.INFORMATION,
                             additionalField = true,
                             label = it.additionalField.label
                         )

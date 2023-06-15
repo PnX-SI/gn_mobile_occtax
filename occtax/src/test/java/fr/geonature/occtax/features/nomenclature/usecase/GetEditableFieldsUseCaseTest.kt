@@ -5,7 +5,7 @@ import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.features.nomenclature.error.NomenclatureException
 import fr.geonature.commons.fp.Either.Right
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
+import fr.geonature.occtax.features.nomenclature.domain.EditableField
 import fr.geonature.occtax.features.nomenclature.repository.IAdditionalFieldRepository
 import fr.geonature.occtax.features.nomenclature.repository.IDefaultPropertyValueRepository
 import fr.geonature.occtax.features.nomenclature.repository.INomenclatureRepository
@@ -22,12 +22,12 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * Unit tests about [GetEditableNomenclaturesUseCase].
+ * Unit tests about [GetEditableFieldsUseCase].
  *
  * @author S. Grimault
  */
 @ExperimentalCoroutinesApi
-class GetEditableNomenclaturesUseCaseTest {
+class GetEditableFieldsUseCaseTest {
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -44,13 +44,13 @@ class GetEditableNomenclaturesUseCaseTest {
     @MockK
     private lateinit var defaultPropertyValueRepository: IDefaultPropertyValueRepository
 
-    private lateinit var getEditableNomenclaturesUseCase: GetEditableNomenclaturesUseCase
+    private lateinit var getEditableFieldsUseCase: GetEditableFieldsUseCase
 
     @Before
     fun setUp() {
         init(this)
 
-        getEditableNomenclaturesUseCase = GetEditableNomenclaturesUseCase(
+        getEditableFieldsUseCase = GetEditableFieldsUseCase(
             nomenclatureRepository,
             additionalFieldRepository,
             defaultPropertyValueRepository
@@ -58,29 +58,29 @@ class GetEditableNomenclaturesUseCaseTest {
     }
 
     @Test
-    fun `should get all editable nomenclature types with default value by nomenclature main type`() =
+    fun `should get all editable fields with default value by nomenclature main type`() =
         runTest {
-            // given some nomenclature types
+            // given some editable fields
             coEvery {
-                nomenclatureRepository.getEditableNomenclatures(any())
+                nomenclatureRepository.getEditableFields(any())
             } returns Result.success(
                 listOf(
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
+                    EditableField(
+                        EditableField.Type.INFORMATION,
                         "METH_OBS",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
                         label = "Méthodes d'observation"
                     ),
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
+                    EditableField(
+                        EditableField.Type.INFORMATION,
                         "ETA_BIO",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
                         label = "Etat biologique de l'observation"
                     ),
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
+                    EditableField(
+                        EditableField.Type.INFORMATION,
                         "STATUT_BIO",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
                         label = "Statut biologique",
                         visible = false,
                         value = PropertyValue.Nomenclature(
@@ -103,30 +103,30 @@ class GetEditableNomenclaturesUseCaseTest {
             // and no default property values
             coEvery { defaultPropertyValueRepository.getPropertyValues() } returns Right(listOf())
 
-            // when fetching all editable nomenclature types with default value
-            val result = getEditableNomenclaturesUseCase.run(
-                GetEditableNomenclaturesUseCase.Params(type = EditableNomenclatureType.Type.INFORMATION)
+            // when fetching all editable fields with default value
+            val result = getEditableFieldsUseCase.run(
+                GetEditableFieldsUseCase.Params(type = EditableField.Type.INFORMATION)
             )
 
             // then
             assertEquals(
                 listOf(
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
+                    EditableField(
+                        EditableField.Type.INFORMATION,
                         "METH_OBS",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
                         label = "Méthodes d'observation"
                     ),
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
+                    EditableField(
+                        EditableField.Type.INFORMATION,
                         "ETA_BIO",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
                         label = "Etat biologique de l'observation"
                     ),
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
+                    EditableField(
+                        EditableField.Type.INFORMATION,
                         "STATUT_BIO",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
                         label = "Statut biologique",
                         visible = false,
                         value = PropertyValue.Nomenclature(
@@ -142,36 +142,36 @@ class GetEditableNomenclaturesUseCaseTest {
         }
 
     @Test
-    fun `should get all editable nomenclature types with some property values defined by nomenclature main type`() =
+    fun `should get all editable fields with some property values defined by nomenclature main type`() =
         runTest {
-            // given some nomenclature types
+            // given some editable fields
             coEvery {
-                nomenclatureRepository.getEditableNomenclatures(any())
+                nomenclatureRepository.getEditableFields(any())
             } returns Result.success(
                 listOf(
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
+                    EditableField(
+                        EditableField.Type.INFORMATION,
                         "METH_OBS",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
                         label = "Méthodes d'observation"
                     ),
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
+                    EditableField(
+                        EditableField.Type.INFORMATION,
                         "ETA_BIO",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
                         label = "Etat biologique de l'observation"
                     ),
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
+                    EditableField(
+                        EditableField.Type.INFORMATION,
                         "DETERMINER",
-                        EditableNomenclatureType.ViewType.TEXT_SIMPLE,
+                        EditableField.ViewType.TEXT_SIMPLE,
                         visible = true,
                         default = false
                     ),
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
+                    EditableField(
+                        EditableField.Type.INFORMATION,
                         "STATUT_BIO",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
                         label = "Statut biologique",
                         visible = false,
                         value = PropertyValue.Nomenclature(
@@ -213,11 +213,11 @@ class GetEditableNomenclaturesUseCaseTest {
                 )
             )
 
-            // when fetching all editable nomenclature types with values matching given taxonomy
+            // when fetching all editable fields with values matching given taxonomy
             val result =
-                getEditableNomenclaturesUseCase.run(
-                    GetEditableNomenclaturesUseCase.Params(
-                        type = EditableNomenclatureType.Type.INFORMATION,
+                getEditableFieldsUseCase.run(
+                    GetEditableFieldsUseCase.Params(
+                        type = EditableField.Type.INFORMATION,
                         taxonomy = Taxonomy(
                             kingdom = "Animalia",
                             group = "Oiseaux"
@@ -228,22 +228,22 @@ class GetEditableNomenclaturesUseCaseTest {
             // then
             assertEquals(
                 listOf(
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
+                    EditableField(
+                        EditableField.Type.INFORMATION,
                         "METH_OBS",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
                         label = "Méthodes d'observation"
                     ),
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
+                    EditableField(
+                        EditableField.Type.INFORMATION,
                         "ETA_BIO",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
                         label = "Etat biologique de l'observation"
                     ),
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
+                    EditableField(
+                        EditableField.Type.INFORMATION,
                         "DETERMINER",
-                        EditableNomenclatureType.ViewType.TEXT_SIMPLE,
+                        EditableField.ViewType.TEXT_SIMPLE,
                         visible = true,
                         default = false,
                         value = PropertyValue.Text(
@@ -252,10 +252,10 @@ class GetEditableNomenclaturesUseCaseTest {
                         ),
                         locked = true
                     ),
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
+                    EditableField(
+                        EditableField.Type.INFORMATION,
                         "STATUT_BIO",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
                         label = "Statut biologique",
                         visible = false,
                         value = PropertyValue.Nomenclature(
@@ -276,12 +276,12 @@ class GetEditableNomenclaturesUseCaseTest {
         runTest {
             // given some failure from repository
             coEvery {
-                nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
+                nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
             } returns Result.failure(NomenclatureException.NoNomenclatureTypeFoundException)
 
-            // when fetching all editable nomenclature types with default value
-            val result = getEditableNomenclaturesUseCase.run(
-                GetEditableNomenclaturesUseCase.Params(type = EditableNomenclatureType.Type.INFORMATION)
+            // when fetching all editable fields with default value
+            val result = getEditableFieldsUseCase.run(
+                GetEditableFieldsUseCase.Params(type = EditableField.Type.INFORMATION)
             )
 
             // then

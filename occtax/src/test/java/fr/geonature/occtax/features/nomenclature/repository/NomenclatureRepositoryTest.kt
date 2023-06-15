@@ -7,7 +7,7 @@ import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSou
 import fr.geonature.commons.features.nomenclature.error.NomenclatureException
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureSettingsLocalDataSource
-import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
+import fr.geonature.occtax.features.nomenclature.domain.EditableField
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
@@ -79,32 +79,34 @@ class NomenclatureRepositoryTest {
                 defaultLabel = "Méthodes d'observation"
             )
         )
-        // and corresponding editable nomenclature types
-        coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.INFORMATION) } returns listOf(
-            EditableNomenclatureType(
-                EditableNomenclatureType.Type.INFORMATION,
-                "METH_OBS",
-                EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                true
+        // and corresponding editable fields
+        coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.INFORMATION) } returns listOf(
+            EditableField(
+                type = EditableField.Type.INFORMATION,
+                code = "METH_OBS",
+                viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                nomenclatureType = "METH_OBS",
+                visible = true
             ),
-            EditableNomenclatureType(
-
-                EditableNomenclatureType.Type.INFORMATION,
-                "ETA_BIO",
-                EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                true
+            EditableField(
+                type = EditableField.Type.INFORMATION,
+                code = "ETA_BIO",
+                viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                nomenclatureType = "ETA_BIO",
+                visible = true
             ),
-            EditableNomenclatureType(
-                EditableNomenclatureType.Type.INFORMATION,
-                "DETERMINER",
-                EditableNomenclatureType.ViewType.TEXT_SIMPLE,
+            EditableField(
+                type = EditableField.Type.INFORMATION,
+                code = "DETERMINER",
+                viewType = EditableField.ViewType.TEXT_SIMPLE,
                 visible = true,
                 default = false
             ),
-            EditableNomenclatureType(
-                EditableNomenclatureType.Type.INFORMATION,
-                "STATUT_BIO",
-                EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+            EditableField(
+                type = EditableField.Type.INFORMATION,
+                code = "STATUT_BIO",
+                viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                nomenclatureType = "STATUT_BIO",
                 visible = false,
                 default = false
             ),
@@ -122,35 +124,38 @@ class NomenclatureRepositoryTest {
 
         // when
         val editableNomenclatureSettings =
-            nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
+            nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
 
         // then
         assertTrue(editableNomenclatureSettings.isSuccess)
         assertEquals(
             listOf(
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "METH_OBS",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "METH_OBS",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "METH_OBS",
                     label = "Méthodes d'observation"
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "ETA_BIO",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "ETA_BIO",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "ETA_BIO",
                     label = "Etat biologique de l'observation"
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "DETERMINER",
-                    EditableNomenclatureType.ViewType.TEXT_SIMPLE,
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "DETERMINER",
+                    viewType = EditableField.ViewType.TEXT_SIMPLE,
                     visible = true,
                     default = false
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "STATUT_BIO",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "STATUT_BIO",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "STATUT_BIO",
                     label = "Statut biologique",
                     visible = false,
                     default = false,
@@ -181,32 +186,34 @@ class NomenclatureRepositoryTest {
                     defaultLabel = "Méthodes d'observation"
                 )
             )
-            // and corresponding editable nomenclature types
-            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.INFORMATION) } returns listOf(
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "METH_OBS",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                    true
+            // and corresponding editable fields
+            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.INFORMATION) } returns listOf(
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "METH_OBS",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "METH_OBS",
+                    visible = true
                 ),
-                EditableNomenclatureType(
-
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "ETA_BIO",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
-                    true
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "ETA_BIO",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "ETA_BIO",
+                    visible = true
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "DETERMINER",
-                    EditableNomenclatureType.ViewType.TEXT_SIMPLE,
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "DETERMINER",
+                    viewType = EditableField.ViewType.TEXT_SIMPLE,
                     visible = true,
                     default = false
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "STATUT_BIO",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "STATUT_BIO",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "STATUT_BIO",
                     visible = false,
                     default = false
                 ),
@@ -224,28 +231,30 @@ class NomenclatureRepositoryTest {
 
             // when
             val editableNomenclatureSettings =
-                nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
+                nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
 
             // then
             assertTrue(editableNomenclatureSettings.isSuccess)
             assertEquals(
                 listOf(
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
-                        "METH_OBS",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableField(
+                        type = EditableField.Type.INFORMATION,
+                        code = "METH_OBS",
+                        viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                        nomenclatureType = "METH_OBS",
                         label = "Méthodes d'observation"
                     ),
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
-                        "ETA_BIO",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableField(
+                        type = EditableField.Type.INFORMATION,
+                        code = "ETA_BIO",
+                        viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                        nomenclatureType = "ETA_BIO",
                         label = "Etat biologique de l'observation"
                     ),
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
-                        "DETERMINER",
-                        EditableNomenclatureType.ViewType.TEXT_SIMPLE,
+                    EditableField(
+                        type = EditableField.Type.INFORMATION,
+                        code = "DETERMINER",
+                        viewType = EditableField.ViewType.TEXT_SIMPLE,
                         visible = true,
                         default = false
                     )
@@ -259,34 +268,36 @@ class NomenclatureRepositoryTest {
         runTest {
             // given no nomenclature types found
             coEvery { nomenclatureLocalDataSource.getAllNomenclatureTypes() } returns listOf()
-            // and some editable nomenclature types
-            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.INFORMATION) } returns listOf(
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "METH_OBS",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+            // and some editable fields
+            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.INFORMATION) } returns listOf(
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "METH_OBS",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "METH_OBS"
                 ),
-                EditableNomenclatureType(
-
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "ETA_BIO",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "ETA_BIO",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "ETA_BIO"
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "DETERMINER",
-                    EditableNomenclatureType.ViewType.TEXT_SIMPLE
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "DETERMINER",
+                    viewType = EditableField.ViewType.TEXT_SIMPLE
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "STATUT_BIO",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "STATUT_BIO",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "STATUT_BIO",
                     default = false
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "COMMENT",
-                    EditableNomenclatureType.ViewType.TEXT_MULTIPLE,
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "COMMENT",
+                    viewType = EditableField.ViewType.TEXT_MULTIPLE,
                     visible = true,
                     default = false
                 )
@@ -296,21 +307,21 @@ class NomenclatureRepositoryTest {
 
             // when
             val editableNomenclatureSettings =
-                nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
+                nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
 
             // then
             assertTrue(editableNomenclatureSettings.isSuccess)
             assertEquals(
                 listOf(
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
-                        "DETERMINER",
-                        EditableNomenclatureType.ViewType.TEXT_SIMPLE
+                    EditableField(
+                        type = EditableField.Type.INFORMATION,
+                        code = "DETERMINER",
+                        viewType = EditableField.ViewType.TEXT_SIMPLE
                     ),
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
-                        "COMMENT",
-                        EditableNomenclatureType.ViewType.TEXT_MULTIPLE,
+                    EditableField(
+                        type = EditableField.Type.INFORMATION,
+                        code = "COMMENT",
+                        viewType = EditableField.ViewType.TEXT_MULTIPLE,
                         visible = true,
                         default = false
                     )
@@ -324,22 +335,25 @@ class NomenclatureRepositoryTest {
         runTest {
             // given no nomenclature types found
             coEvery { nomenclatureLocalDataSource.getAllNomenclatureTypes() } returns listOf()
-            // and some editable nomenclature types
-            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.INFORMATION) } returns listOf(
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "METH_OBS",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+            // and some editable fields
+            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.INFORMATION) } returns listOf(
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "METH_OBS",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "METH_OBS"
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "ETA_BIO",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "ETA_BIO",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "ETA_BIO"
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "STATUT_BIO",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "STATUT_BIO",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "STATUT_BIO",
                     visible = false,
                     default = false
                 ),
@@ -349,7 +363,7 @@ class NomenclatureRepositoryTest {
 
             // when
             val editableNomenclatureSettings =
-                nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
+                nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
 
             // then
             assertTrue(editableNomenclatureSettings.isFailure)
@@ -377,12 +391,13 @@ class NomenclatureRepositoryTest {
                     defaultLabel = "Méthodes d'observation"
                 )
             )
-            // and some other editable nomenclature types
-            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.INFORMATION) } returns listOf(
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.COUNTING,
-                    "TYP_DENBR",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+            // and some other editable fields
+            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.INFORMATION) } returns listOf(
+                EditableField(
+                    type = EditableField.Type.COUNTING,
+                    code = "TYP_DENBR",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "TYP_DENBR"
                 )
             )
             // and some default values for these types
@@ -398,7 +413,7 @@ class NomenclatureRepositoryTest {
 
             // when
             val editableNomenclatureSettings =
-                nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
+                nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
 
             // then
             assertTrue(editableNomenclatureSettings.isFailure)
