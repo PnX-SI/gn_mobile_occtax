@@ -69,7 +69,7 @@ class NomenclatureValueAdapter(context: Context) : BaseAdapter(), Filterable {
 
     inner class DefaultFilter : Filter() {
         override fun performFiltering(constraint: CharSequence?): FilterResults {
-            return filteredNomenclatureValues.filter { if (constraint == null) true else it.defaultLabel.contains(constraint) }
+            return nomenclatureValues
                 .let {
                     FilterResults().apply {
                         values = it

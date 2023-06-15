@@ -30,8 +30,8 @@ import fr.geonature.compat.content.getParcelableExtraCompat
 import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.compat.os.getParcelableCompat
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
-import fr.geonature.occtax.features.nomenclature.presentation.EditableNomenclatureTypeAdapter
+import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.presentation.EditableFieldAdapter
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
 import fr.geonature.occtax.features.record.domain.CountingRecord
@@ -64,7 +64,7 @@ class EditCountingMetadataFragment : Fragment() {
     private var fab: ExtendedFloatingActionButton? = null
 
     private var listener: OnEditCountingMetadataFragmentListener? = null
-    private var adapter: EditableNomenclatureTypeAdapter? = null
+    private var adapter: EditableFieldAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +80,7 @@ class EditCountingMetadataFragment : Fragment() {
         with(nomenclatureViewModel) {
             observe(
                 editableNomenclatures,
-                ::handleEditableNomenclatureTypes
+                ::handleEditableFields
             )
         }
 
@@ -156,8 +156,8 @@ class EditCountingMetadataFragment : Fragment() {
             }
 
         // Set the adapter
-        adapter = EditableNomenclatureTypeAdapter(object :
-            EditableNomenclatureTypeAdapter.OnEditableNomenclatureTypeAdapter {
+        adapter = EditableFieldAdapter(object :
+            EditableFieldAdapter.OnEditableFieldAdapter {
 
             override fun getLifecycleOwner(): LifecycleOwner {
                 return this@EditCountingMetadataFragment
@@ -212,21 +212,21 @@ class EditCountingMetadataFragment : Fragment() {
                 )
             }
 
-            override fun onUpdate(editableNomenclatureType: EditableNomenclatureType) {
+            override fun onUpdate(editableField: EditableField) {
                 val countingRecord = countingRecord ?: return
 
-                if (editableNomenclatureType.additionalField) {
+                if (editableField.additionalField) {
                     // as additional field
                     countingRecord.additionalFields =
                         (countingRecord.additionalFields.filter {
-                            it.toPair().first != editableNomenclatureType.code
-                        } + listOfNotNull(editableNomenclatureType.value))
+                            it.toPair().first != editableField.code
+                        } + listOfNotNull(editableField.value))
                 } else {
-                    // as default editable nomenclature value
-                    editableNomenclatureType.value?.toPair()
+                    // as editable field
+                    editableField.value?.toPair()
                         .also {
-                            if (it == null) countingRecord.properties.remove(editableNomenclatureType.code)
-                            else countingRecord.properties[editableNomenclatureType.code] =
+                            if (it == null) countingRecord.properties.remove(editableField.code)
+                            else countingRecord.properties[editableField.code] =
                                 it.second
                         }
                 }
@@ -237,14 +237,14 @@ class EditCountingMetadataFragment : Fragment() {
                     Taxonomy.ANY,
                     Taxonomy.ANY
                 )
-                val propertyValue = editableNomenclatureType.value
+                val propertyValue = editableField.value
 
-                if (propertyValue !== null && editableNomenclatureType.locked) propertyValueModel.setPropertyValue(
+                if (propertyValue !== null && editableField.locked) propertyValueModel.setPropertyValue(
                     taxonomy,
                     propertyValue
                 ) else propertyValueModel.clearPropertyValue(
                     taxonomy,
-                    editableNomenclatureType.code
+                    editableField.code
                 )
             }
 
@@ -336,21 +336,21 @@ class EditCountingMetadataFragment : Fragment() {
             null
         } ?: return
 
-        nomenclatureViewModel.getEditableNomenclatures(
+        nomenclatureViewModel.getEditableFields(
             arguments?.getLong(
                 ARG_DATASET_ID,
                 -1L
             )
                 ?.takeIf { it >= 0L },
-            EditableNomenclatureType.Type.COUNTING,
+            EditableField.Type.COUNTING,
             (arguments?.getParcelableArrayCompat<PropertySettings>(ARG_PROPERTIES)
                 ?.toList() ?: emptyList()),
             taxonRecord.taxon.taxonomy
         )
     }
 
-    private fun handleEditableNomenclatureTypes(editableNomenclatureTypes: List<EditableNomenclatureType>) {
-        editableNomenclatureTypes.filter { it.value != null }
+    private fun handleEditableFields(editableFields: List<EditableField>) {
+        editableFields.filter { it.value != null }
             .forEach {
                 if (countingRecord?.properties?.containsKey(it.code) == true) return@forEach
 
@@ -365,7 +365,7 @@ class EditCountingMetadataFragment : Fragment() {
             }
 
         adapter?.bind(
-            editableNomenclatureTypes,
+            editableFields,
             *((countingRecord?.properties?.values
                 ?.filterNotNull()
                 ?.filterNot { it.isEmpty() }

@@ -2,14 +2,14 @@ package fr.geonature.occtax.features.nomenclature.data
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
+import fr.geonature.occtax.features.nomenclature.domain.EditableField
 import fr.geonature.occtax.features.record.domain.AllMediaRecord
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.settings.PropertySettings
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -38,124 +38,136 @@ class NomenclatureSettingsLocalDataSourceTest {
     fun `should get default nomenclature type settings by nomenclature main type`() = runTest {
         assertEquals(
             listOf(
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.DEFAULT,
-                    "TYP_GRP",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                EditableField(
+                    type = EditableField.Type.DEFAULT,
+                    code = "TYP_GRP",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "TYP_GRP"
                 )
             ),
-            nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.DEFAULT)
+            nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.DEFAULT)
         )
 
         assertEquals(
             listOf(
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "METH_OBS",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "METH_OBS",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "METH_OBS"
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "ETA_BIO",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "ETA_BIO",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "ETA_BIO"
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "METH_DETERMIN",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "METH_DETERMIN",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "METH_DETERMIN",
                     default = false
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "determiner",
-                    EditableNomenclatureType.ViewType.TEXT_SIMPLE,
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "determiner",
+                    viewType = EditableField.ViewType.TEXT_SIMPLE,
                     default = false
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "STATUT_BIO",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "STATUT_BIO",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "STATUT_BIO",
                     default = false
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "OCC_COMPORTEMENT",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "OCC_COMPORTEMENT",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "OCC_COMPORTEMENT",
                     default = false
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "NATURALITE",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "NATURALITE",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "NATURALITE",
                     default = false
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "PREUVE_EXIST",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "PREUVE_EXIST",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "PREUVE_EXIST",
                     default = false
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
-                    "comment",
-                    EditableNomenclatureType.ViewType.TEXT_MULTIPLE,
+                EditableField(
+                    type = EditableField.Type.INFORMATION,
+                    code = "comment",
+                    viewType = EditableField.ViewType.TEXT_MULTIPLE,
                     default = false
                 )
             ),
-            nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.INFORMATION)
+            nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.INFORMATION)
         )
 
         assertEquals(
             listOf(
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.COUNTING,
-                    "STADE_VIE",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                EditableField(
+                    type = EditableField.Type.COUNTING,
+                    code = "STADE_VIE",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "STADE_VIE"
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.COUNTING,
-                    "SEXE",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                EditableField(
+                    type = EditableField.Type.COUNTING,
+                    code = "SEXE",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "SEXE"
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.COUNTING,
-                    "OBJ_DENBR",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                EditableField(
+                    type = EditableField.Type.COUNTING,
+                    code = "OBJ_DENBR",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "OBJ_DENBR"
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.COUNTING,
-                    "TYP_DENBR",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                EditableField(
+                    type = EditableField.Type.COUNTING,
+                    code = "TYP_DENBR",
+                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    nomenclatureType = "TYP_DENBR"
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.COUNTING,
-                    CountingRecord.MIN_KEY,
-                    EditableNomenclatureType.ViewType.MIN_MAX
+                EditableField(
+                    type = EditableField.Type.COUNTING,
+                    code = CountingRecord.MIN_KEY,
+                    viewType = EditableField.ViewType.MIN_MAX
                 ).apply {
                     value = PropertyValue.Number(
                         code,
                         1
                     )
                 },
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.COUNTING,
-                    CountingRecord.MAX_KEY,
-                    EditableNomenclatureType.ViewType.MIN_MAX
+                EditableField(
+                    type = EditableField.Type.COUNTING,
+                    code = CountingRecord.MAX_KEY,
+                    viewType = EditableField.ViewType.MIN_MAX
                 ).apply {
                     value = PropertyValue.Number(
                         code,
                         1
                     )
                 },
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.COUNTING,
-                    AllMediaRecord.MEDIAS_KEY,
-                    EditableNomenclatureType.ViewType.MEDIA
+                EditableField(
+                    type = EditableField.Type.COUNTING,
+                    code = AllMediaRecord.MEDIAS_KEY,
+                    viewType = EditableField.ViewType.MEDIA
                 ).apply {
                     value = PropertyValue.Media(code)
                 }
             ),
-            nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.COUNTING)
+            nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.COUNTING)
         )
     }
 
@@ -164,25 +176,27 @@ class NomenclatureSettingsLocalDataSourceTest {
         runTest {
             assertEquals(
                 listOf(
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.DEFAULT,
-                        "TYP_GRP",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                    EditableField(
+                        type = EditableField.Type.DEFAULT,
+                        code = "TYP_GRP",
+                        viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                        nomenclatureType = "TYP_GRP"
                     )
                 ),
-                nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableNomenclatureType.Type.DEFAULT)
+                nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.DEFAULT)
             )
 
             assertEquals(
                 listOf(
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.DEFAULT,
-                        "TYP_GRP",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                    EditableField(
+                        type = EditableField.Type.DEFAULT,
+                        code = "TYP_GRP",
+                        viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                        nomenclatureType = "TYP_GRP"
                     )
                 ),
                 nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(
-                    EditableNomenclatureType.Type.DEFAULT,
+                    EditableField.Type.DEFAULT,
                     PropertySettings(
                         key = "TYP_GRP",
                         visible = false,
@@ -197,27 +211,30 @@ class NomenclatureSettingsLocalDataSourceTest {
         runTest {
             assertEquals(
                 listOf(
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
-                        "METH_OBS",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                    EditableField(
+                        type = EditableField.Type.INFORMATION,
+                        code = "METH_OBS",
+                        viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                        nomenclatureType = "METH_OBS"
                     ),
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
-                        "ETA_BIO",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableField(
+                        type = EditableField.Type.INFORMATION,
+                        code = "ETA_BIO",
+                        viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                        nomenclatureType = "ETA_BIO",
                         visible = true,
                         default = false
                     ),
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.INFORMATION,
-                        "OCC_COMPORTEMENT",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableField(
+                        type = EditableField.Type.INFORMATION,
+                        code = "OCC_COMPORTEMENT",
+                        viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                        nomenclatureType = "OCC_COMPORTEMENT",
                         visible = false
                     )
                 ),
                 nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(
-                    EditableNomenclatureType.Type.INFORMATION,
+                    EditableField.Type.INFORMATION,
                     PropertySettings(
                         key = "METH_OBS",
                         visible = true,
@@ -238,14 +255,15 @@ class NomenclatureSettingsLocalDataSourceTest {
 
             assertEquals(
                 listOf(
-                    EditableNomenclatureType(
-                        EditableNomenclatureType.Type.COUNTING,
-                        "STADE_VIE",
-                        EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE
+                    EditableField(
+                        type = EditableField.Type.COUNTING,
+                        code = "STADE_VIE",
+                        viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                        nomenclatureType = "STADE_VIE",
                     )
                 ),
                 nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(
-                    EditableNomenclatureType.Type.COUNTING,
+                    EditableField.Type.COUNTING,
                     PropertySettings(
                         key = "STADE_VIE",
                         visible = true,

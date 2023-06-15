@@ -1,6 +1,6 @@
 package fr.geonature.occtax.features.nomenclature.repository
 
-import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
+import fr.geonature.occtax.features.nomenclature.domain.EditableField
 
 /**
  * Additional fields repository
@@ -10,14 +10,14 @@ import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
 interface IAdditionalFieldRepository {
 
     /**
-     * Gets all additional fields as list of [EditableNomenclatureType].
+     * Gets all additional fields as list of [EditableField].
      *
      * @param type the main editable nomenclature type
      *
-     * @return a list of [EditableNomenclatureType]
+     * @return a list of [EditableField]
      */
     suspend fun getAllAdditionalFields(
         datasetId: Long? = null,
-        type: EditableNomenclatureType.Type
-    ): Result<List<EditableNomenclatureType>>
+        type: EditableField.Type
+    ): Result<List<EditableField>>
 }
