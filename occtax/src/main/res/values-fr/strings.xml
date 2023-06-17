@@ -20,8 +20,6 @@
     <string name="sync_last_synchronization">Dernière synchronisation\n%s</string>
     <string name="sync_last_synchronization_date">le EEE dd MMM yyyy à kk:mm:ss</string>
     <string name="sync_last_synchronization_never">jamais</string>
-    <string name="sync_data_additional_fields">Champs additionnels : %1$d</string>
-    <string name="sync_data_additional_fields_error">Champs additionnels : échec</string>
 
     <string name="home_drawer_open">Ouvrir le menu latéral</string>
     <string name="home_drawer_close">Fermer le menu latéral</string>

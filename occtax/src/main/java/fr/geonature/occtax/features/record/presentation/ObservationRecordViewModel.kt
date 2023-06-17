@@ -175,12 +175,19 @@ class ObservationRecordViewModel @Inject constructor(
      * Start edit the given [ObservationRecord].
      *
      * @param observationRecord the [ObservationRecord] to edit
+     * @param withAdditionalFields whether we want to manage additional fields
      */
-    fun startEdit(observationRecord: ObservationRecord) {
+    fun startEdit(
+        observationRecord: ObservationRecord,
+        withAdditionalFields: Boolean = false
+    ) {
         Logger.info { "loading default nomenclature values from record '${observationRecord.internalId}'..." }
 
         editObservationRecordUseCase(
-            EditObservationRecordUseCase.Params(observationRecord),
+            EditObservationRecordUseCase.Params(
+                observationRecord,
+                withAdditionalFields
+            ),
             viewModelScope
         ) {
             it.fold(

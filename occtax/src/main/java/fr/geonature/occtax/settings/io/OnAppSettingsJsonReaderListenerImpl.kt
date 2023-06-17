@@ -126,6 +126,7 @@ class OnAppSettingsJsonReaderListenerImpl :
         }
 
         var saveDefaultValues = false
+        var withAdditionalFields = false
         val information = mutableListOf<PropertySettings>()
         val counting = mutableListOf<PropertySettings>()
 
@@ -134,6 +135,7 @@ class OnAppSettingsJsonReaderListenerImpl :
         while (reader.hasNext()) {
             when (reader.nextName()) {
                 "save_default_values" -> saveDefaultValues = reader.nextBooleanOrElse { false }
+                "additional_fields" -> withAdditionalFields = reader.nextBooleanOrElse { false }
                 "information" -> information.addAll(readPropertySettingsAsList(reader))
                 "counting" -> counting.addAll(readPropertySettingsAsList(reader))
             }
@@ -143,6 +145,7 @@ class OnAppSettingsJsonReaderListenerImpl :
 
         return NomenclatureSettings(
             saveDefaultValues = saveDefaultValues,
+            withAdditionalFields = withAdditionalFields,
             information = information,
             counting = counting
         )
@@ -205,11 +208,13 @@ class OnAppSettingsJsonReaderListenerImpl :
                     default
                 )
             }
+
             JsonToken.STRING -> PropertySettings(
                 reader.nextString(),
                 visible = true,
                 default = true
             )
+
             else -> {
                 reader.skipValue()
                 null
