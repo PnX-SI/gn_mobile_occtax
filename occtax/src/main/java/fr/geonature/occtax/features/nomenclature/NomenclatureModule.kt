@@ -1,10 +1,8 @@
 package fr.geonature.occtax.features.nomenclature
 
-import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import fr.geonature.commons.data.GeoNatureModuleName
 import fr.geonature.commons.data.LocalDatabase
@@ -14,8 +12,6 @@ import fr.geonature.commons.features.nomenclature.data.AdditionalFieldLocalDataS
 import fr.geonature.commons.features.nomenclature.data.IAdditionalFieldLocalDataSource
 import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSource
 import fr.geonature.commons.features.nomenclature.data.NomenclatureLocalDataSourceImpl
-import fr.geonature.datasync.api.IGeoNatureAPIClient
-import fr.geonature.datasync.sync.repository.ISynchronizeAdditionalDataRepository
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureSettingsLocalDataSource
 import fr.geonature.occtax.features.nomenclature.data.IPropertyValueLocalDataSource
 import fr.geonature.occtax.features.nomenclature.data.InMemoryPropertyValueLocalDataSourceImpl
@@ -26,7 +22,6 @@ import fr.geonature.occtax.features.nomenclature.repository.IAdditionalFieldRepo
 import fr.geonature.occtax.features.nomenclature.repository.IDefaultPropertyValueRepository
 import fr.geonature.occtax.features.nomenclature.repository.INomenclatureRepository
 import fr.geonature.occtax.features.nomenclature.repository.NomenclatureRepositoryImpl
-import fr.geonature.occtax.features.nomenclature.repository.SynchronizeAdditionalFieldRepositoryImpl
 import javax.inject.Singleton
 
 /**
@@ -106,21 +101,5 @@ object NomenclatureModule {
         additionalFieldLocalDataSource: IAdditionalFieldLocalDataSource
     ): IAdditionalFieldRepository {
         return AdditionalFieldRepositoryImpl(additionalFieldLocalDataSource)
-    }
-
-    @Singleton
-    @Provides
-    fun provideSynchronizeAdditionalFieldRepository(
-        @ApplicationContext appContext: Context,
-        @GeoNatureModuleName moduleName: String,
-        additionalFieldLocalDataSource: IAdditionalFieldLocalDataSource,
-        geoNatureAPIClient: IGeoNatureAPIClient,
-    ): ISynchronizeAdditionalDataRepository {
-        return SynchronizeAdditionalFieldRepositoryImpl(
-            appContext,
-            moduleName,
-            additionalFieldLocalDataSource,
-            geoNatureAPIClient
-        )
     }
 }

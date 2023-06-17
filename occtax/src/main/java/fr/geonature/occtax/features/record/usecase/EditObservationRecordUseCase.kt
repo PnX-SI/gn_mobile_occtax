@@ -23,7 +23,12 @@ class EditObservationRecordUseCase @Inject constructor(
         Logger.info { "loading default nomenclature values from record '${params.observationRecord.internalId}'..." }
 
         var result =
-            setDefaultNomenclatureValuesUseCase.run(SetDefaultNomenclatureValuesUseCase.Params(params.observationRecord))
+            setDefaultNomenclatureValuesUseCase.run(
+                SetDefaultNomenclatureValuesUseCase.Params(
+                    params.observationRecord,
+                    params.withAdditionalFields
+                )
+            )
 
         if (result.isFailure) {
             Logger.error { "failed to load default nomenclature values from record '${params.observationRecord.internalId}" }
@@ -48,5 +53,8 @@ class EditObservationRecordUseCase @Inject constructor(
         return result
     }
 
-    data class Params(val observationRecord: ObservationRecord)
+    data class Params(
+        val observationRecord: ObservationRecord,
+        val withAdditionalFields: Boolean = false
+    )
 }

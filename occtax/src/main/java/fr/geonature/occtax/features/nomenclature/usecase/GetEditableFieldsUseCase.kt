@@ -35,11 +35,12 @@ class GetEditableFieldsUseCase @Inject constructor(
                     )
                 }
             } +
-            additionalFieldRepository.getAllAdditionalFields(
+            if (params.withAdditionalFields) additionalFieldRepository.getAllAdditionalFields(
                 params.datasetId,
                 params.type
             )
-                .getOrDefault(emptyList()))
+                .getOrDefault(emptyList()) else emptyList())
+
             // set media type at last position
             .sortedWith { a, b ->
                 if (a.viewType == EditableField.ViewType.MEDIA) 1
@@ -69,6 +70,7 @@ class GetEditableFieldsUseCase @Inject constructor(
 
     data class Params(
         val datasetId: Long? = null,
+        val withAdditionalFields: Boolean = false,
         val type: EditableField.Type,
         val settings: List<PropertySettings> = listOf(),
         val taxonomy: Taxonomy? = null

@@ -31,6 +31,7 @@
   "nomenclature": {
     "additional_fields": true,
     "save_default_values": true,
+    "additional_fields": true,
     "information": [
       "METH_OBS",
       {

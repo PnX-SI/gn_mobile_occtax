@@ -23,8 +23,6 @@
     <string name="sync_last_synchronization">Last synchronization\n%s</string>
     <string name="sync_last_synchronization_date">EEE dd MMM yyyy, kk:mm:ss</string>
     <string name="sync_last_synchronization_never">never</string>
-    <string name="sync_data_additional_fields">Additional fields: %1$d</string>
-    <string name="sync_data_additional_fields_error">Additional fields: failure</string>
 
     <string name="home_drawer_open">Open drawer menu</string>
     <string name="home_drawer_close">Close drawer menu</string>

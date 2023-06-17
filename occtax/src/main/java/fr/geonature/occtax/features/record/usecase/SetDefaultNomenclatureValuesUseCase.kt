@@ -47,11 +47,11 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
 
         val editableFieldsInformation =
             nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
-                .getOrElse { emptyList() } + additionalFieldRepository.getAllAdditionalFields(
+                .getOrElse { emptyList() } + if (params.withAdditionalFields) additionalFieldRepository.getAllAdditionalFields(
                 observationRecord.dataset.datasetId,
                 EditableField.Type.INFORMATION
             )
-                .getOrElse { emptyList() }
+                .getOrElse { emptyList() } else emptyList()
 
         if (editableFieldsInformation.isEmpty()) {
             Logger.warn {
@@ -67,11 +67,11 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
 
         val editableFieldsCounting =
             nomenclatureRepository.getEditableFields(EditableField.Type.COUNTING)
-                .getOrElse { emptyList() } + additionalFieldRepository.getAllAdditionalFields(
+                .getOrElse { emptyList() } + if (params.withAdditionalFields) additionalFieldRepository.getAllAdditionalFields(
                 observationRecord.dataset.datasetId,
                 EditableField.Type.COUNTING
             )
-                .getOrElse { emptyList() }
+                .getOrElse { emptyList() } else emptyList()
 
         if (editableFieldsCounting.isEmpty()) {
             Logger.warn {
@@ -162,5 +162,8 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
         }
     }
 
-    data class Params(val observationRecord: ObservationRecord)
+    data class Params(
+        val observationRecord: ObservationRecord,
+        val withAdditionalFields: Boolean = false
+    )
 }

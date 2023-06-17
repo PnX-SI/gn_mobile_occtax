@@ -184,11 +184,15 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
             R.string.pager_fragment_taxa_title to TaxaFragment.newInstance(appSettings.areaObservationDuration),
             R.string.pager_fragment_information_title to InformationFragment.newInstance(
                 saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues ?: false,
+                withAdditionalFields = appSettings.nomenclatureSettings?.withAdditionalFields
+                    ?: false,
                 *appSettings.nomenclatureSettings?.information?.toTypedArray()
                     ?: emptyArray()
             ),
             R.string.pager_fragment_counting_title to CountingFragment.newInstance(
                 saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues ?: false,
+                withAdditionalFields = appSettings.nomenclatureSettings?.withAdditionalFields
+                    ?: false,
                 *appSettings.nomenclatureSettings?.counting?.toTypedArray()
                     ?: emptyArray()
             ),

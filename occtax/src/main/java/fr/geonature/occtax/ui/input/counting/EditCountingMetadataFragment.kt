@@ -342,6 +342,10 @@ class EditCountingMetadataFragment : Fragment() {
                 -1L
             )
                 ?.takeIf { it >= 0L },
+            arguments?.getBoolean(
+                ARG_WITH_ADDITIONAL_FIELDS,
+                false
+            ) ?: false,
             EditableField.Type.COUNTING,
             (arguments?.getParcelableArrayCompat<PropertySettings>(ARG_PROPERTIES)
                 ?.toList() ?: emptyList()),
@@ -417,6 +421,7 @@ class EditCountingMetadataFragment : Fragment() {
         private const val ARG_TAXON_RECORD = "arg_taxon_record"
         private const val ARG_COUNTING_RECORD = "arg_counting_record"
         private const val ARG_SAVE_DEFAULT_VALUES = "arg_save_default_values"
+        private const val ARG_WITH_ADDITIONAL_FIELDS = "arg_with_additional_fields"
         private const val ARG_PROPERTIES = "arg_properties"
 
         private const val ADD_PHOTO_DIALOG_FRAGMENT = "add_photo_dialog_fragment"
@@ -433,6 +438,7 @@ class EditCountingMetadataFragment : Fragment() {
             taxonRecord: TaxonRecord,
             countingRecord: CountingRecord? = null,
             saveDefaultValues: Boolean = false,
+            withAdditionalFields: Boolean = false,
             vararg propertySettings: PropertySettings
         ) = EditCountingMetadataFragment().apply {
             arguments = Bundle().apply {
@@ -442,6 +448,10 @@ class EditCountingMetadataFragment : Fragment() {
                         it
                     )
                 }
+                putBoolean(
+                    ARG_WITH_ADDITIONAL_FIELDS,
+                    withAdditionalFields
+                )
                 putParcelable(
                     ARG_TAXON_RECORD,
                     taxonRecord

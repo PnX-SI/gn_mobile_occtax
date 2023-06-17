@@ -222,6 +222,10 @@ class InformationFragment : AbstractInputFragment() {
     override fun refreshView() {
         nomenclatureViewModel.getEditableFields(
             observationRecord?.dataset?.datasetId,
+            arguments?.getBoolean(
+                ARG_WITH_ADDITIONAL_FIELDS,
+                false
+            ) ?: false,
             EditableField.Type.INFORMATION,
             (arguments?.getParcelableArrayCompat<PropertySettings>(ARG_PROPERTIES)
                 ?.toList() ?: emptyList()),
@@ -258,6 +262,7 @@ class InformationFragment : AbstractInputFragment() {
     companion object {
 
         private const val ARG_SAVE_DEFAULT_VALUES = "arg_save_default_values"
+        private const val ARG_WITH_ADDITIONAL_FIELDS = "arg_with_additional_fields"
         private const val ARG_PROPERTIES = "arg_properties"
         private const val KEY_SHOW_ALL_NOMENCLATURE_TYPES = "show_all_nomenclature_types"
 
@@ -269,12 +274,17 @@ class InformationFragment : AbstractInputFragment() {
         @JvmStatic
         fun newInstance(
             saveDefaultValues: Boolean = false,
+            withAdditionalFields: Boolean = false,
             vararg propertySettings: PropertySettings
         ) = InformationFragment().apply {
             arguments = Bundle().apply {
                 putBoolean(
                     ARG_SAVE_DEFAULT_VALUES,
                     saveDefaultValues
+                )
+                putBoolean(
+                    ARG_WITH_ADDITIONAL_FIELDS,
+                    withAdditionalFields
                 )
                 putParcelableArray(
                     ARG_PROPERTIES,

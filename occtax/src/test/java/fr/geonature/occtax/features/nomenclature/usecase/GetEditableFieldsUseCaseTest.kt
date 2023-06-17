@@ -272,6 +272,157 @@ class GetEditableFieldsUseCaseTest {
         }
 
     @Test
+    fun `should get all editable fields with additional fields`() =
+        runTest {
+            // given some editable fields
+            coEvery {
+                nomenclatureRepository.getEditableFields(any())
+            } returns Result.success(
+                listOf(
+                    EditableField(
+                        EditableField.Type.INFORMATION,
+                        "METH_OBS",
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
+                        label = "Méthodes d'observation"
+                    ),
+                    EditableField(
+                        EditableField.Type.INFORMATION,
+                        "ETA_BIO",
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
+                        label = "Etat biologique de l'observation",
+                        visible = false
+                    )
+                )
+            )
+
+            // with additional fields
+            coEvery {
+                additionalFieldRepository.getAllAdditionalFields(
+                    any(),
+                    any()
+                )
+            } returns Result.success(
+                listOf(
+                    EditableField(
+                        EditableField.Type.INFORMATION,
+                        "as_text",
+                        EditableField.ViewType.TEXT_SIMPLE,
+                        label = "As text"
+                    )
+                )
+            )
+
+            // and no default property values
+            coEvery { defaultPropertyValueRepository.getPropertyValues() } returns Right(listOf())
+
+            // when fetching all editable fields with default value
+            val result = getEditableFieldsUseCase.run(
+                GetEditableFieldsUseCase.Params(
+                    withAdditionalFields = true,
+                    type = EditableField.Type.INFORMATION
+                )
+            )
+
+            // then
+            assertEquals(
+                listOf(
+                    EditableField(
+                        EditableField.Type.INFORMATION,
+                        "METH_OBS",
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
+                        label = "Méthodes d'observation"
+                    ),
+                    EditableField(
+                        EditableField.Type.INFORMATION,
+                        "ETA_BIO",
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
+                        label = "Etat biologique de l'observation",
+                        visible = false
+                    ),
+                    EditableField(
+                        EditableField.Type.INFORMATION,
+                        "as_text",
+                        EditableField.ViewType.TEXT_SIMPLE,
+                        label = "As text"
+                    )
+                ).sortedBy { it.code },
+                result.getOrThrow()
+                    .sortedBy { it.code }
+            )
+        }
+
+    @Test
+    fun `should get all editable fields with no additional fields`() =
+        runTest {
+            // given some editable fields
+            coEvery {
+                nomenclatureRepository.getEditableFields(any())
+            } returns Result.success(
+                listOf(
+                    EditableField(
+                        EditableField.Type.INFORMATION,
+                        "METH_OBS",
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
+                        label = "Méthodes d'observation"
+                    ),
+                    EditableField(
+                        EditableField.Type.INFORMATION,
+                        "ETA_BIO",
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
+                        label = "Etat biologique de l'observation",
+                        visible = false
+                    )
+                )
+            )
+
+            // with additional fields
+            coEvery {
+                additionalFieldRepository.getAllAdditionalFields(
+                    any(),
+                    any()
+                )
+            } returns Result.success(
+                listOf(
+                    EditableField(
+                        EditableField.Type.INFORMATION,
+                        "as_text",
+                        EditableField.ViewType.TEXT_SIMPLE,
+                        label = "As text"
+                    )
+                )
+            )
+
+            // and no default property values
+            coEvery { defaultPropertyValueRepository.getPropertyValues() } returns Right(listOf())
+
+            // when fetching all editable fields with default value
+            val result = getEditableFieldsUseCase.run(
+                GetEditableFieldsUseCase.Params(type = EditableField.Type.INFORMATION)
+            )
+
+            // then
+            assertEquals(
+                listOf(
+                    EditableField(
+                        EditableField.Type.INFORMATION,
+                        "METH_OBS",
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
+                        label = "Méthodes d'observation"
+                    ),
+                    EditableField(
+                        EditableField.Type.INFORMATION,
+                        "ETA_BIO",
+                        EditableField.ViewType.NOMENCLATURE_TYPE,
+                        label = "Etat biologique de l'observation",
+                        visible = false
+                    )
+                ).sortedBy { it.code },
+                result.getOrThrow()
+                    .sortedBy { it.code }
+            )
+        }
+
+    @Test
     fun `should return NoNomenclatureTypeFoundLocallyFailure if no nomenclature types was found`() =
         runTest {
             // given some failure from repository

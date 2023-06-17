@@ -39,6 +39,7 @@ class NomenclatureViewModel @Inject constructor(
      */
     fun getEditableFields(
         datasetId: Long? = null,
+        withAdditionalFields: Boolean = false,
         type: EditableField.Type,
         defaultPropertySettings: List<PropertySettings> = listOf(),
         taxonomy: Taxonomy? = null
@@ -46,6 +47,7 @@ class NomenclatureViewModel @Inject constructor(
         getEditableFieldsUseCase(
             GetEditableFieldsUseCase.Params(
                 datasetId,
+                withAdditionalFields,
                 type,
                 defaultPropertySettings,
                 taxonomy
