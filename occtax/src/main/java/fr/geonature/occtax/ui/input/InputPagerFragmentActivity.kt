@@ -18,6 +18,7 @@ import fr.geonature.commons.util.ThemeUtils
 import fr.geonature.compat.content.getParcelableExtraCompat
 import fr.geonature.maps.settings.MapSettings
 import fr.geonature.maps.ui.MapFragment
+import fr.geonature.maps.ui.widget.EditFeatureButton
 import fr.geonature.maps.util.CheckPermissionLifecycleObserver
 import fr.geonature.maps.util.ManageExternalStoragePermissionLifecycleObserver
 import fr.geonature.maps.util.MapSettingsPreferencesUtils.showCompass
@@ -112,6 +113,7 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
                     .showCompass(showCompass(this))
                     .showScale(showScale(this))
                     .showZoom(showZoom(this))
+                    .editMode(EditFeatureButton.EditMode.SINGLE)
                     .build()
             ),
             R.string.pager_fragment_summary_title to InputTaxaSummaryFragment.newInstance(appSettings.inputSettings.dateSettings)

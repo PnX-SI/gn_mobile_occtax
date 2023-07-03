@@ -17,7 +17,7 @@ import fr.geonature.occtax.features.record.domain.ObservationRecord
  *
  * @author S. Grimault
  *
- * @see LastObservationRecordsFragment
+ * @see ObservationRecordsListFragment
  */
 class ObservationRecordRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapterListener<ObservationRecord>) :
     AbstractListItemRecyclerViewAdapter<ObservationRecord>(listener) {

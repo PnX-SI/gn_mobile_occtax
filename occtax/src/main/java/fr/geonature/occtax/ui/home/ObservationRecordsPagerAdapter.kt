@@ -1,0 +1,31 @@
+package fr.geonature.occtax.ui.home
+
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import fr.geonature.occtax.settings.AppSettings
+
+/**
+ * Default pager adapter to show current observation records as list or on the map.
+ *
+ * @author S. Grimault
+ */
+class ObservationRecordsPagerAdapter(
+    fragmentActivity: FragmentActivity,
+    private val appSettings: AppSettings
+) :
+    FragmentStateAdapter(fragmentActivity) {
+
+    override fun getItemCount(): Int {
+        return appSettings.mapSettings?.let { 2 } ?: 1
+    }
+
+    override fun createFragment(position: Int): Fragment {
+        return when (position) {
+            1 -> appSettings.mapSettings?.let { ObservationRecordsMapFragment.newInstance(it) }
+                ?: ObservationRecordsListFragment.newInstance()
+
+            else -> ObservationRecordsListFragment.newInstance()
+        }
+    }
+}
