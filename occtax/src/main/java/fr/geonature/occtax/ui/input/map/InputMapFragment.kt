@@ -13,7 +13,6 @@ import fr.geonature.maps.settings.MapSettings
 import fr.geonature.maps.ui.MapFragment
 import fr.geonature.maps.ui.overlay.feature.FeatureCollectionOverlay
 import fr.geonature.maps.ui.overlay.feature.filter.ContainsFeaturesFilter
-import fr.geonature.maps.ui.widget.EditFeatureButton
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.presentation.ObservationRecordViewModel
@@ -180,10 +179,6 @@ class InputMapFragment : MapFragment(),
                 putParcelable(
                     ARG_MAP_SETTINGS,
                     mapSettings
-                )
-                putSerializable(
-                    ARG_EDIT_MODE,
-                    EditFeatureButton.EditMode.SINGLE
                 )
             }
         }

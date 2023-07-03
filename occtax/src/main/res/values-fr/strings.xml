@@ -55,6 +55,8 @@
     <string name="action_about">À propos</string>
     <string name="action_search">Recherche</string>
     <string name="action_filter">Filtres</string>
+    <string name="action_as_list">Vue liste</string>
+    <string name="action_as_map">Vue carte</string>
     <string name="action_new_input">relevé</string>
     <string name="action_new_counting">dénombrement</string>
     <string name="action_add">Ajouter</string>

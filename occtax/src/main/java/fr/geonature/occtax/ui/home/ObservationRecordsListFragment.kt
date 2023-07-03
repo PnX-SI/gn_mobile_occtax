@@ -29,31 +29,28 @@ import fr.geonature.datasync.sync.DataSyncViewModel
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.presentation.ObservationRecordViewModel
-import fr.geonature.occtax.settings.AppSettings
-import fr.geonature.occtax.settings.AppSettingsViewModel
 import org.tinylog.Logger
 
 /**
- * [Fragment] to show all current [ObservationRecord].
+ * [Fragment] to show all current [ObservationRecord] as list.
  *
  * @author S. Grimault
  */
 @AndroidEntryPoint
-class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_fab) {
+class ObservationRecordsListFragment : Fragment(R.layout.fragment_recycler_view_fab) {
 
-    private val appSettingsViewModel: AppSettingsViewModel by activityViewModels()
     private val dataSyncViewModel: DataSyncViewModel by activityViewModels()
     private val observationRecordViewModel: ObservationRecordViewModel by viewModels()
 
+    private var listener: OnObservationRecordListener? = null
+
     private var emptyTextView: TextView? = null
     private var fab: ExtendedFloatingActionButton? = null
-    private var listener: OnLastObservationRecordsFragmentListener? = null
     private var adapter: ObservationRecordRecyclerViewAdapter? = null
     private var statusesFilter: MutableList<ObservationRecord.Status> = mutableListOf(
         ObservationRecord.Status.DRAFT,
         ObservationRecord.Status.TO_SYNC
     )
-    private var appSettings: AppSettings? = null
     private var isSyncRunning = false
     private var hasObservationRecordsReadyToSynchronize = false
 
@@ -150,7 +147,7 @@ class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_
 
         with(recyclerView) {
             layoutManager = LinearLayoutManager(context)
-            adapter = this@LastObservationRecordsFragment.adapter
+            adapter = this@ObservationRecordsListFragment.adapter
 
             val dividerItemDecoration = DividerItemDecoration(
                 context,
@@ -159,7 +156,6 @@ class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_
             addItemDecoration(dividerItemDecoration)
         }
 
-        configureAppSettingsViewModel()
         configureDataSyncViewModel()
         configureObservationRecordViewModel()
     }
@@ -167,20 +163,18 @@ class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_
     override fun onResume() {
         super.onResume()
 
-        appSettings?.run {
-            loadObservationRecords()
-        }
+        loadObservationRecords()
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        context.takeIf { it is OnLastObservationRecordsFragmentListener }
-            ?.let { it as OnLastObservationRecordsFragmentListener }
+        context.takeIf { it is OnObservationRecordListener }
+            ?.let { it as OnObservationRecordListener }
             ?.also {
                 listener = it
             } ?: throw RuntimeException(
-            "$context must implement ${OnLastObservationRecordsFragmentListener::class.java.simpleName}"
+            "$context must implement ${OnObservationRecordListener::class.java.simpleName}"
         )
     }
 
@@ -199,7 +193,7 @@ class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_
                 menu
             )
             inflate(
-                R.menu.status,
+                R.menu.status_filter,
                 menu
             )
         }
@@ -272,22 +266,6 @@ class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_
         }
     }
 
-    private fun configureAppSettingsViewModel() {
-        appSettingsViewModel.appSettings.observe(viewLifecycleOwner) {
-            appSettings = it
-
-            if (it == null) {
-                fab?.hide()
-                adapter?.clear()
-
-                return@observe
-            }
-
-            fab?.show()
-            loadObservationRecords()
-        }
-    }
-
     private fun configureDataSyncViewModel() {
         with(dataSyncViewModel) {
             observe(isSyncRunning) {
@@ -299,7 +277,7 @@ class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_
                 if (it && dataSyncViewModel.lastSynchronizedDate.value?.second == null) {
                     fab?.hide()
                     adapter?.clear()
-                } else if (appSettings != null) {
+                } else {
                     fab?.show()
 
                     if (adapter?.items?.isEmpty() == true) {
@@ -317,11 +295,11 @@ class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_
                 ::handleObservationRecords
             )
             observe(isSyncRunning) {
-                this@LastObservationRecordsFragment.isSyncRunning = it
+                this@ObservationRecordsListFragment.isSyncRunning = it
                 activity?.invalidateOptionsMenu()
             }
             observe(hasObservationRecordsReadyToSynchronize) {
-                this@LastObservationRecordsFragment.hasObservationRecordsReadyToSynchronize = it
+                this@ObservationRecordsListFragment.hasObservationRecordsReadyToSynchronize = it
                 activity?.invalidateOptionsMenu()
             }
         }
@@ -344,26 +322,14 @@ class LastObservationRecordsFragment : Fragment(R.layout.fragment_recycler_view_
         adapter?.setItems(observationRecords)
     }
 
-    /**
-     * Callback used by [LastObservationRecordsFragment].
-     */
-    interface OnLastObservationRecordsFragmentListener {
-
-        /**
-         * Called when we want to start editing a given [ObservationRecord].
-         * If no [ObservationRecord] was given, creates a new one.
-         */
-        fun onStartEditObservationRecord(selectedObservationRecord: ObservationRecord? = null)
-    }
-
     companion object {
 
         /**
-         * Use this factory method to create a new instance of [LastObservationRecordsFragment].
+         * Use this factory method to create a new instance of [ObservationRecordsListFragment].
          *
-         * @return A new instance of [LastObservationRecordsFragment]
+         * @return A new instance of [ObservationRecordsListFragment]
          */
         @JvmStatic
-        fun newInstance() = LastObservationRecordsFragment()
+        fun newInstance() = ObservationRecordsListFragment()
     }
 }
