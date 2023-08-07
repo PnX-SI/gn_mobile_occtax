@@ -3,6 +3,7 @@
 
     <string name="activity_login_title">Authentification</string>
     <string name="activity_preferences_title">Paramètres</string>
+    <string name="activity_map_preferences_title">Paramètres</string>
     <string name="activity_input_title">Editer le relevé</string>
     <string name="activity_dataset_title">Jeu de données</string>
     <string name="activity_observers_title">Observateurs</string>
@@ -45,6 +46,7 @@
     <string name="no_data">Aucune donnée</string>
 
     <string name="action_settings">Paramètres</string>
+    <string name="action_map_settings">Paramètres</string>
     <string name="action_data_sync">Mettre à jour les données\n<font size="10"><i>(Nomenclatures, JDD, observateurs, taxons)</i></font></string>
     <string name="action_data_sync_in_progress">Synchronisation en cours…</string>
     <string name="action_input_sync">Envoyer</string>

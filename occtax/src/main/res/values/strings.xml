@@ -6,6 +6,7 @@
 
     <string name="activity_login_title">Sign in</string>
     <string name="activity_preferences_title">Settings</string>
+    <string name="activity_map_preferences_title">Map settings</string>
     <string name="activity_input_title">Edit input</string>
     <string name="activity_dataset_title">Dataset</string>
     <string name="activity_observers_title">Observers</string>
@@ -47,6 +48,7 @@
     <string name="no_data">No data</string>
 
     <string name="action_settings">Settings</string>
+    <string name="action_map_settings">Map settings</string>
     <string name="action_data_sync">Update local data\n<font size="10"><i>(Nomenclatures, datasets, observers, taxa)</i></font></string>
     <string name="action_data_sync_in_progress">Data synchronization in progress…</string>
     <string name="action_input_sync">Send</string>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_map_settings"
+        android:checkable="false"
+        android:checked="false"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/action_map_settings"
+        android:visible="true"
+        app:showAsAction="never" />
+
+</menu>
