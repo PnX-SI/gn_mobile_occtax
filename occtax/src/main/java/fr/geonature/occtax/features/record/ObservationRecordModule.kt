@@ -9,7 +9,6 @@ import dagger.hilt.components.SingletonComponent
 import fr.geonature.commons.data.GeoNatureModuleName
 import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSource
 import fr.geonature.commons.features.taxon.data.ITaxonLocalDataSource
-import fr.geonature.commons.settings.IAppSettingsManager
 import fr.geonature.datasync.api.IGeoNatureAPIClient
 import fr.geonature.datasync.auth.IAuthManager
 import fr.geonature.occtax.api.IOcctaxAPIClient
@@ -25,7 +24,7 @@ import fr.geonature.occtax.features.record.repository.ISynchronizeObservationRec
 import fr.geonature.occtax.features.record.repository.MediaRecordRepositoryImpl
 import fr.geonature.occtax.features.record.repository.ObservationRecordRepositoryImpl
 import fr.geonature.occtax.features.record.repository.SynchronizeObservationRecordRepositoryImpl
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.repository.IAppSettingsRepository
 import javax.inject.Singleton
 
 /**
@@ -85,7 +84,7 @@ object ObservationRecordModule {
         @ApplicationContext appContext: Context,
         geoNatureAPIClient: IGeoNatureAPIClient,
         authManager: IAuthManager,
-        appSettingsManager: IAppSettingsManager<AppSettings>,
+        appSettingsRepository: IAppSettingsRepository,
         nomenclatureLocalDataSource: INomenclatureLocalDataSource,
         observationRecordLocalDataSource: IObservationRecordLocalDataSource,
         observationRecordRemoteDataSource: IObservationRecordRemoteDataSource,
@@ -95,7 +94,7 @@ object ObservationRecordModule {
             appContext,
             geoNatureAPIClient,
             authManager,
-            appSettingsManager,
+            appSettingsRepository,
             nomenclatureLocalDataSource,
             observationRecordLocalDataSource,
             observationRecordRemoteDataSource,

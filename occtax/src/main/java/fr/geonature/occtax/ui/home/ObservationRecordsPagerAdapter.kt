@@ -3,7 +3,7 @@ package fr.geonature.occtax.ui.home
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 
 /**
  * Default pager adapter to show current observation records as list or on the map.
@@ -17,14 +17,12 @@ class ObservationRecordsPagerAdapter(
     FragmentStateAdapter(fragmentActivity) {
 
     override fun getItemCount(): Int {
-        return appSettings.mapSettings?.let { 2 } ?: 1
+        return 2
     }
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            1 -> appSettings.mapSettings?.let { ObservationRecordsMapFragment.newInstance(it) }
-                ?: ObservationRecordsListFragment.newInstance()
-
+            1 -> ObservationRecordsMapFragment.newInstance(appSettings.mapSettings)
             else -> ObservationRecordsListFragment.newInstance()
         }
     }

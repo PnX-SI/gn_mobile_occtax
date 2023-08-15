@@ -1,7 +1,7 @@
 package fr.geonature.occtax.features.nomenclature.data
 
 import fr.geonature.occtax.features.nomenclature.domain.EditableField
-import fr.geonature.occtax.settings.PropertySettings
+import fr.geonature.occtax.features.settings.domain.PropertySettings
 
 /**
  * Local data source about nomenclature types settings.

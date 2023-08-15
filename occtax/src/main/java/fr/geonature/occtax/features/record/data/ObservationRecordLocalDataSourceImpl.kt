@@ -9,7 +9,7 @@ import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.error.ObservationRecordException
 import fr.geonature.occtax.features.record.io.ObservationRecordJsonReader
 import fr.geonature.occtax.features.record.io.ObservationRecordJsonWriter
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.asFlow

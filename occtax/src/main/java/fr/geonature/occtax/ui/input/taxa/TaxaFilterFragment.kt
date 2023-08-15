@@ -20,7 +20,7 @@ import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.occtax.R
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 import org.tinylog.kotlin.Logger
 import javax.inject.Inject
 
@@ -157,8 +157,8 @@ class TaxaFilterFragment : Fragment() {
             loadFilterAreaObservation(
                 arguments?.getInt(
                     ARG_AREA_OBSERVATION_DURATION,
-                    AppSettings.DEFAULT_AREA_OBSERVATION_DURATION
-                ) ?: AppSettings.DEFAULT_AREA_OBSERVATION_DURATION
+                    AppSettings.Builder.DEFAULT_AREA_OBSERVATION_DURATION
+                ) ?: AppSettings.Builder.DEFAULT_AREA_OBSERVATION_DURATION
             )
         }
 
@@ -278,7 +278,7 @@ class TaxaFilterFragment : Fragment() {
         @JvmStatic
         fun newInstance(
             withAreaObservation: Boolean = false,
-            areaObservationDuration: Int = AppSettings.DEFAULT_AREA_OBSERVATION_DURATION,
+            areaObservationDuration: Int = AppSettings.Builder.DEFAULT_AREA_OBSERVATION_DURATION,
             vararg filter: Filter<*>
         ) =
             TaxaFilterFragment().apply {

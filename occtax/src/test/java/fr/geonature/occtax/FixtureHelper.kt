@@ -24,7 +24,7 @@ object FixtureHelper {
     @Throws(FileNotFoundException::class)
     fun getFixtureAsFile(name: String): File {
         val resource = FixtureHelper::class.java.classLoader!!.getResource("fixtures/$name")
-            ?: throw FileNotFoundException("file not found $name")
+            ?: throw FileNotFoundException("file not found: '$name'")
 
         return File(resource.file)
     }

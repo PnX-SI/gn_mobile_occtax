@@ -1,7 +1,7 @@
 package fr.geonature.occtax.features.record.repository
 
 import fr.geonature.occtax.features.record.domain.ObservationRecord
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 
 /**
  * [ObservationRecord] repository.

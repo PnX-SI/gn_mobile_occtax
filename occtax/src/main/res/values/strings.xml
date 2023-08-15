@@ -28,6 +28,7 @@
     <string name="home_drawer_open">Open drawer menu</string>
     <string name="home_drawer_close">Close drawer menu</string>
     <string name="home_last_inputs">Last inputs</string>
+    <string name="home_no_settings">No app settings found.</string>
     <string name="home_no_input">No existing input.\nCreate a new one by tapping the + button.</string>
     <string name="home_first_sync">Data synchronization in progress.\nPlease wait.</string>
     <string name="home_input_date">EEE dd MMM yyyy</string>

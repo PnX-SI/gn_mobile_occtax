@@ -21,7 +21,7 @@ import fr.geonature.occtax.features.record.usecase.ExportObservationRecordUseCas
 import fr.geonature.occtax.features.record.usecase.GetAllObservationRecordsUseCase
 import fr.geonature.occtax.features.record.usecase.SaveObservationRecordUseCase
 import fr.geonature.occtax.features.record.worker.SynchronizeObservationRecordsWorker
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 import kotlinx.coroutines.delay
 import org.tinylog.kotlin.Logger
 import java.util.UUID

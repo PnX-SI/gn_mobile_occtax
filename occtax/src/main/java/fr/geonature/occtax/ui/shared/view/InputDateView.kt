@@ -22,7 +22,7 @@ import fr.geonature.commons.util.get
 import fr.geonature.commons.util.set
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.ObservationRecord
-import fr.geonature.occtax.settings.InputDateSettings
+import fr.geonature.occtax.features.settings.domain.InputDateSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

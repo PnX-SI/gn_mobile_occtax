@@ -11,7 +11,7 @@ import androidx.fragment.app.FragmentManager
 import fr.geonature.compat.os.getParcelableCompat
 import fr.geonature.compat.os.getSerializableCompat
 import fr.geonature.occtax.R
-import fr.geonature.occtax.settings.InputDateSettings
+import fr.geonature.occtax.features.settings.domain.InputDateSettings
 import fr.geonature.occtax.ui.shared.view.InputDateView
 import java.util.Date
 

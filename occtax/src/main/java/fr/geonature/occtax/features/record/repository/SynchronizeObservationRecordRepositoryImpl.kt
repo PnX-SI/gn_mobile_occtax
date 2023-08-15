@@ -3,8 +3,6 @@ package fr.geonature.occtax.features.record.repository
 import android.content.Context
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSource
-import fr.geonature.commons.settings.IAppSettingsManager
-import fr.geonature.commons.settings.error.AppSettingsException
 import fr.geonature.datasync.api.IGeoNatureAPIClient
 import fr.geonature.datasync.api.model.AuthUser
 import fr.geonature.datasync.auth.IAuthManager
@@ -17,7 +15,8 @@ import fr.geonature.occtax.features.record.data.IObservationRecordRemoteDataSour
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.features.record.error.ObservationRecordException
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.error.AppSettingsException
+import fr.geonature.occtax.features.settings.repository.IAppSettingsRepository
 import org.tinylog.kotlin.Logger
 import retrofit2.await
 import retrofit2.awaitResponse
@@ -34,7 +33,7 @@ class SynchronizeObservationRecordRepositoryImpl(
     private val context: Context,
     private val geoNatureAPIClient: IGeoNatureAPIClient,
     private val authManager: IAuthManager,
-    private val appSettingsManager: IAppSettingsManager<AppSettings>,
+    private val appSettingsRepository: IAppSettingsRepository,
     private val nomenclatureLocalDataSource: INomenclatureLocalDataSource,
     private val observationRecordLocalDataSource: IObservationRecordLocalDataSource,
     private val observationRecordRemoteDataSource: IObservationRecordRemoteDataSource,
@@ -49,11 +48,16 @@ class SynchronizeObservationRecordRepositoryImpl(
         val authUser = authManager.getAuthLogin()?.user
             ?: return Result.failure(AuthException.NotConnectedException)
 
-        val appSettings = appSettingsManager.loadAppSettings()
-            ?: return Result.failure(AppSettingsException.NoAppSettingsFoundLocallyException)
+        val appSettings = appSettingsRepository.loadAppSettings()
+            .let {
+                it.getOrNull() ?: return Result.failure(
+                    it.exceptionOrNull()
+                        ?.let { t -> if (t is AppSettingsException.MissingAttributeException && t.attributeName == "sync") DataSyncSettingsNotFoundException() else t }
+                        ?: AppSettingsException.NotFoundException
+                )
+            }
 
         val dataSyncSettings = appSettings.dataSyncSettings
-            ?: return Result.failure(DataSyncSettingsNotFoundException())
 
         observationRecordRemoteDataSource.setBaseUrl(dataSyncSettings.geoNatureServerUrl)
 
