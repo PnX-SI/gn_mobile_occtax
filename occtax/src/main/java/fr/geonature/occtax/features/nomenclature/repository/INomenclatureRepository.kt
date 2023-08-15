@@ -1,7 +1,7 @@
 package fr.geonature.occtax.features.nomenclature.repository
 
 import fr.geonature.occtax.features.nomenclature.domain.EditableField
-import fr.geonature.occtax.settings.PropertySettings
+import fr.geonature.occtax.features.settings.domain.PropertySettings
 import fr.geonature.commons.features.nomenclature.repository.INomenclatureRepository as IBaseNomenclatureRepository
 
 /**

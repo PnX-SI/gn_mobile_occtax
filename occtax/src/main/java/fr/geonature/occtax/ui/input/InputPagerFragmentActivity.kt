@@ -28,7 +28,7 @@ import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.error.ObservationRecordException
 import fr.geonature.occtax.features.record.presentation.ObservationRecordViewModel
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 import fr.geonature.occtax.ui.input.counting.CountingFragment
 import fr.geonature.occtax.ui.input.informations.InformationFragment
 import fr.geonature.occtax.ui.input.map.InputMapFragment
@@ -108,8 +108,8 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
                 saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues ?: false
             ),
             R.string.pager_fragment_map_title to InputMapFragment.newInstance(
-                MapSettings.Builder.newInstance()
-                    .from(appSettings.mapSettings!!)
+                MapSettings.Builder()
+                    .from(appSettings.mapSettings)
                     .showCompass(showCompass(this))
                     .showScale(showScale(this))
                     .showZoom(showZoom(this))

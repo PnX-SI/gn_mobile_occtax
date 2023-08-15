@@ -5,7 +5,7 @@ import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.error.ObservationRecordException
 import fr.geonature.occtax.features.record.io.ObservationRecordJsonWriter
 import fr.geonature.occtax.features.record.io.TaxonRecordJsonWriter
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 import org.json.JSONObject
 import retrofit2.await
 import retrofit2.awaitResponse

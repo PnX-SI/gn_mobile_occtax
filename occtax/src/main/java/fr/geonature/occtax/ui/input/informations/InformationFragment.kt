@@ -27,7 +27,7 @@ import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
 import fr.geonature.occtax.features.record.domain.MediaRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.domain.TaxonRecord
-import fr.geonature.occtax.settings.PropertySettings
+import fr.geonature.occtax.features.settings.domain.PropertySettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
 
 /**

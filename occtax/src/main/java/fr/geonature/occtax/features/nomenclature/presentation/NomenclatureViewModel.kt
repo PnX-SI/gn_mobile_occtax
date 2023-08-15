@@ -10,7 +10,7 @@ import fr.geonature.commons.lifecycle.BaseViewModel
 import fr.geonature.occtax.features.nomenclature.domain.EditableField
 import fr.geonature.occtax.features.nomenclature.usecase.GetEditableFieldsUseCase
 import fr.geonature.occtax.features.nomenclature.usecase.GetNomenclatureValuesByTypeAndTaxonomyUseCase
-import fr.geonature.occtax.settings.PropertySettings
+import fr.geonature.occtax.features.settings.domain.PropertySettings
 import org.tinylog.Logger
 import javax.inject.Inject
 

@@ -1,4 +1,4 @@
-package fr.geonature.occtax.settings
+package fr.geonature.occtax.features.settings.domain
 
 import android.os.Parcel
 import kotlinx.parcelize.parcelableCreator

@@ -7,7 +7,7 @@ import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.MediaRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.domain.TaxonRecord
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 import java.io.IOException
 import java.io.StringWriter
 import java.io.Writer

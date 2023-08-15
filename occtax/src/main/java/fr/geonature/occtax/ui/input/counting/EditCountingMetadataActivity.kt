@@ -13,7 +13,7 @@ import fr.geonature.compat.content.getParcelableExtraCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.TaxonRecord
-import fr.geonature.occtax.settings.PropertySettings
+import fr.geonature.occtax.features.settings.domain.PropertySettings
 
 /**
  * Edit additional counting information Activity.

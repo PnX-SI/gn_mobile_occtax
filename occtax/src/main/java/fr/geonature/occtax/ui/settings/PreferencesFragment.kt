@@ -307,7 +307,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
         MapSettingsPreferencesUtils.setDefaultPreferences(
             context,
-            MapSettings.Builder.newInstance()
+            MapSettings.Builder()
                 .from(mapSettings)
                 .build(),
             preferenceScreen

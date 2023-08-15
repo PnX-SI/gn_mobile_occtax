@@ -5,8 +5,6 @@ import androidx.test.core.app.ApplicationProvider
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSource
-import fr.geonature.commons.settings.IAppSettingsManager
-import fr.geonature.commons.settings.error.AppSettingsException
 import fr.geonature.commons.util.add
 import fr.geonature.datasync.api.IGeoNatureAPIClient
 import fr.geonature.datasync.api.model.AuthLogin
@@ -15,6 +13,8 @@ import fr.geonature.datasync.auth.IAuthManager
 import fr.geonature.datasync.auth.error.AuthException
 import fr.geonature.datasync.settings.DataSyncSettings
 import fr.geonature.datasync.settings.error.DataSyncSettingsNotFoundException
+import fr.geonature.maps.settings.LayerSettings
+import fr.geonature.maps.settings.MapSettings
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.record.data.IMediaRecordLocalDataSource
 import fr.geonature.occtax.features.record.data.IObservationRecordLocalDataSource
@@ -22,9 +22,11 @@ import fr.geonature.occtax.features.record.data.IObservationRecordRemoteDataSour
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.error.ObservationRecordException
-import fr.geonature.occtax.settings.AppSettings
-import fr.geonature.occtax.settings.InputDateSettings
-import fr.geonature.occtax.settings.InputSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
+import fr.geonature.occtax.features.settings.domain.InputDateSettings
+import fr.geonature.occtax.features.settings.domain.InputSettings
+import fr.geonature.occtax.features.settings.error.AppSettingsException
+import fr.geonature.occtax.features.settings.repository.IAppSettingsRepository
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -42,6 +44,8 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.util.Calendar
 import java.util.Date
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 /**
  * Unit tests about [ISynchronizeObservationRecordRepository].
@@ -65,7 +69,7 @@ class SynchronizeObservationRecordRepositoryTest {
     private lateinit var geoNatureAPIClient: IGeoNatureAPIClient
 
     @MockK
-    private lateinit var appSettingsManager: IAppSettingsManager<AppSettings>
+    private lateinit var appSettingsRepository: IAppSettingsRepository
 
     @MockK
     private lateinit var nomenclatureLocalDataSource: INomenclatureLocalDataSource
@@ -89,7 +93,7 @@ class SynchronizeObservationRecordRepositoryTest {
             ApplicationProvider.getApplicationContext(),
             geoNatureAPIClient,
             authManager,
-            appSettingsManager,
+            appSettingsRepository,
             nomenclatureLocalDataSource,
             observationRecordLocalDataSource,
             observationRecordRemoteDataSource,
@@ -154,7 +158,11 @@ class SynchronizeObservationRecordRepositoryTest {
             )
 
             // and no app settings
-            coEvery { appSettingsManager.loadAppSettings() } returns null
+            coEvery {
+                appSettingsRepository.loadAppSettings()
+            } returns Result.failure(
+                AppSettingsException.NoAppSettingsFoundLocallyException("/absolute/path/to/settings.json ")
+            )
 
             // when trying to synchronize an observation record from ID
             val result = synchronizeObservationRecordRepository.synchronize(
@@ -207,14 +215,7 @@ class SynchronizeObservationRecordRepositoryTest {
             )
 
             // and an incomplete app settings
-            coEvery { appSettingsManager.loadAppSettings() } returns AppSettings(
-                inputSettings = InputSettings(
-                    dateSettings = InputDateSettings(
-                        startDateSettings = InputDateSettings.DateSettings.DATETIME,
-                        endDateSettings = InputDateSettings.DateSettings.DATETIME
-                    )
-                )
-            )
+            coEvery { appSettingsRepository.loadAppSettings() } returns Result.failure(AppSettingsException.MissingAttributeException("sync"))
 
             // when trying to synchronize an observation record from ID
             val result = synchronizeObservationRecordRepository.synchronize(
@@ -268,25 +269,36 @@ class SynchronizeObservationRecordRepositoryTest {
 
             // and an app settings
             val appSettings = AppSettings(
-                inputSettings = InputSettings(
-                    dateSettings = InputDateSettings(
-                        startDateSettings = InputDateSettings.DateSettings.DATETIME,
-                        endDateSettings = InputDateSettings.DateSettings.DATETIME
-                    )
-                ),
                 dataSyncSettings = DataSyncSettings(
                     geoNatureServerUrl = "https://demo.geonature.fr/geonature",
                     taxHubServerUrl = "https://demo.geonature.fr/taxhub",
                     applicationId = 3,
                     usersListId = 1,
                     taxrefListId = 100,
-                    codeAreaType = "M10"
+                    codeAreaType = "M10",
+                    pageSize = 1000,
+                    dataSyncPeriodicity = 30.toDuration(DurationUnit.MINUTES),
+                    essentialDataSyncPeriodicity = 20.toDuration(DurationUnit.MINUTES)
+                ),
+                mapSettings = MapSettings.Builder()
+                    .addLayer(
+                        LayerSettings.Builder.newInstance()
+                            .label("OSM")
+                            .addSource("https://a.tile.openstreetmap.org")
+                            .build()
+                    )
+                    .build(),
+                inputSettings = InputSettings(
+                    dateSettings = InputDateSettings(
+                        startDateSettings = InputDateSettings.DateSettings.DATETIME,
+                        endDateSettings = InputDateSettings.DateSettings.DATETIME
+                    )
                 )
             )
-            coEvery { appSettingsManager.loadAppSettings() } returns appSettings
+            coEvery { appSettingsRepository.loadAppSettings() } returns Result.success(appSettings)
             coEvery {
                 observationRecordRemoteDataSource.setBaseUrl(
-                    appSettings.dataSyncSettings?.geoNatureServerUrl!!
+                    appSettings.dataSyncSettings.geoNatureServerUrl
                 )
             } returns Unit
 
@@ -342,25 +354,36 @@ class SynchronizeObservationRecordRepositoryTest {
 
         // and an app settings
         val appSettings = AppSettings(
-            inputSettings = InputSettings(
-                dateSettings = InputDateSettings(
-                    startDateSettings = InputDateSettings.DateSettings.DATETIME,
-                    endDateSettings = InputDateSettings.DateSettings.DATETIME
-                )
-            ),
             dataSyncSettings = DataSyncSettings(
                 geoNatureServerUrl = "https://demo.geonature.fr/geonature",
                 taxHubServerUrl = "https://demo.geonature.fr/taxhub",
                 applicationId = 3,
                 usersListId = 1,
                 taxrefListId = 100,
-                codeAreaType = "M10"
+                codeAreaType = "M10",
+                pageSize = 1000,
+                dataSyncPeriodicity = 30.toDuration(DurationUnit.MINUTES),
+                essentialDataSyncPeriodicity = 20.toDuration(DurationUnit.MINUTES)
+            ),
+            mapSettings = MapSettings.Builder()
+                .addLayer(
+                    LayerSettings.Builder.newInstance()
+                        .label("OSM")
+                        .addSource("https://a.tile.openstreetmap.org")
+                        .build()
+                )
+                .build(),
+            inputSettings = InputSettings(
+                dateSettings = InputDateSettings(
+                    startDateSettings = InputDateSettings.DateSettings.DATETIME,
+                    endDateSettings = InputDateSettings.DateSettings.DATETIME
+                )
             )
         )
-        coEvery { appSettingsManager.loadAppSettings() } returns appSettings
+        coEvery { appSettingsRepository.loadAppSettings() } returns Result.success(appSettings)
         coEvery {
             observationRecordRemoteDataSource.setBaseUrl(
-                appSettings.dataSyncSettings?.geoNatureServerUrl!!
+                appSettings.dataSyncSettings.geoNatureServerUrl
             )
         } returns Unit
 
@@ -415,7 +438,7 @@ class SynchronizeObservationRecordRepositoryTest {
         assertTrue(result.isSuccess)
         coVerifySequence {
             observationRecordRemoteDataSource.setBaseUrl(
-                appSettings.dataSyncSettings?.geoNatureServerUrl!!
+                appSettings.dataSyncSettings.geoNatureServerUrl
             )
             observationRecordRemoteDataSource.sendObservationRecord(
                 expectedObservationRecordToSend,
@@ -454,25 +477,36 @@ class SynchronizeObservationRecordRepositoryTest {
 
         // and an app settings
         val appSettings = AppSettings(
-            inputSettings = InputSettings(
-                dateSettings = InputDateSettings(
-                    startDateSettings = InputDateSettings.DateSettings.DATETIME,
-                    endDateSettings = InputDateSettings.DateSettings.DATETIME
-                )
-            ),
             dataSyncSettings = DataSyncSettings(
                 geoNatureServerUrl = "https://demo.geonature.fr/geonature",
                 taxHubServerUrl = "https://demo.geonature.fr/taxhub",
                 applicationId = 3,
                 usersListId = 1,
                 taxrefListId = 100,
-                codeAreaType = "M10"
+                codeAreaType = "M10",
+                pageSize = 1000,
+                dataSyncPeriodicity = 30.toDuration(DurationUnit.MINUTES),
+                essentialDataSyncPeriodicity = 20.toDuration(DurationUnit.MINUTES)
+            ),
+            mapSettings = MapSettings.Builder()
+                .addLayer(
+                    LayerSettings.Builder.newInstance()
+                        .label("OSM")
+                        .addSource("https://a.tile.openstreetmap.org")
+                        .build()
+                )
+                .build(),
+            inputSettings = InputSettings(
+                dateSettings = InputDateSettings(
+                    startDateSettings = InputDateSettings.DateSettings.DATETIME,
+                    endDateSettings = InputDateSettings.DateSettings.DATETIME
+                )
             )
         )
-        coEvery { appSettingsManager.loadAppSettings() } returns appSettings
+        coEvery { appSettingsRepository.loadAppSettings() } returns Result.success(appSettings)
         coEvery {
             observationRecordRemoteDataSource.setBaseUrl(
-                appSettings.dataSyncSettings?.geoNatureServerUrl!!
+                appSettings.dataSyncSettings.geoNatureServerUrl
             )
         } returns Unit
 
@@ -536,7 +570,7 @@ class SynchronizeObservationRecordRepositoryTest {
         )
         coVerifySequence {
             observationRecordRemoteDataSource.setBaseUrl(
-                appSettings.dataSyncSettings?.geoNatureServerUrl!!
+                appSettings.dataSyncSettings.geoNatureServerUrl
             )
             observationRecordRemoteDataSource.sendObservationRecord(
                 expectedObservationRecordToSend,

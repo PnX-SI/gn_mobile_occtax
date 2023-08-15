@@ -6,7 +6,7 @@ import fr.geonature.commons.features.nomenclature.error.NomenclatureException
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureSettingsLocalDataSource
 import fr.geonature.occtax.features.nomenclature.domain.EditableField
 import fr.geonature.occtax.features.record.domain.PropertyValue
-import fr.geonature.occtax.settings.PropertySettings
+import fr.geonature.occtax.features.settings.domain.PropertySettings
 import org.tinylog.Logger
 import fr.geonature.commons.features.nomenclature.repository.NomenclatureRepositoryImpl as BaseNomenclatureRepositoryImpl
 

@@ -1,66 +1,86 @@
-package fr.geonature.occtax.settings.io
+package fr.geonature.occtax.features.settings.io
 
 import android.util.JsonReader
 import android.util.JsonToken
-import fr.geonature.commons.settings.io.AppSettingsJsonReader
 import fr.geonature.commons.util.nextBooleanOrElse
-import fr.geonature.datasync.settings.DataSyncSettings
 import fr.geonature.datasync.settings.io.DataSyncSettingsJsonReader
-import fr.geonature.maps.settings.MapSettings
 import fr.geonature.maps.settings.io.MapSettingsReader
-import fr.geonature.occtax.settings.AppSettings
-import fr.geonature.occtax.settings.InputDateSettings
-import fr.geonature.occtax.settings.InputSettings
-import fr.geonature.occtax.settings.NomenclatureSettings
-import fr.geonature.occtax.settings.PropertySettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
+import fr.geonature.occtax.features.settings.domain.InputDateSettings
+import fr.geonature.occtax.features.settings.domain.InputSettings
+import fr.geonature.occtax.features.settings.domain.NomenclatureSettings
+import fr.geonature.occtax.features.settings.domain.PropertySettings
+import fr.geonature.occtax.features.settings.error.AppSettingsException
 import org.tinylog.Logger
-import java.io.IOException
+import java.io.Reader
+import java.io.StringReader
 
 /**
- * Default implementation of [AppSettingsJsonReader.OnAppSettingsJsonReaderListener].
+ * Default [JsonReader] about reading a `JSON` stream and build the corresponding [AppSettings]
+ * metadata.
  *
  * @author S. Grimault
  */
-class OnAppSettingsJsonReaderListenerImpl :
-    AppSettingsJsonReader.OnAppSettingsJsonReaderListener<AppSettings> {
+class AppSettingsJsonReader(private val fromExistingAppSettings: AppSettings? = null) {
 
-    override fun createAppSettings(): AppSettings {
-        return AppSettings()
+    /**
+     * parse a `JSON` string to convert as [AppSettings].
+     *
+     * @param json the `JSON` string to parse
+     *
+     * @return a [AppSettings] instance from the `JSON` string
+     * @throws AppSettingsException if something goes wrong
+     */
+    fun read(json: String): AppSettings {
+        return read(StringReader(json))
     }
 
-    override fun readAdditionalAppSettingsData(
-        reader: JsonReader,
-        keyName: String,
-        appSettings: AppSettings
-    ) {
-        when (keyName) {
-            "area_observation_duration" -> appSettings.areaObservationDuration = reader.nextInt()
-            "input" -> appSettings.inputSettings = readInputSettings(reader)
-            "sync" -> appSettings.dataSyncSettings = readDataSyncSettings(reader)
-            "map" -> appSettings.mapSettings = readMapSettings(reader)
-            "nomenclature" -> appSettings.nomenclatureSettings = readNomenclatureSettings(reader)
-            else -> reader.skipValue()
-        }
+    /**
+     * parse a `JSON` reader to convert as [AppSettings].
+     *
+     * @param reader the `Reader` to parse
+     * @return a [AppSettings] instance from the `JSON` reader
+     * @throws AppSettingsException if something goes wrong
+     */
+    fun read(reader: Reader): AppSettings {
+        val jsonReader = JsonReader(reader)
+        val observationRecord = read(jsonReader)
+        jsonReader.close()
+
+        return observationRecord
     }
 
-    private fun readDataSyncSettings(reader: JsonReader): DataSyncSettings? {
-        if (reader.peek() != JsonToken.BEGIN_OBJECT) {
-            reader.skipValue()
+    private fun read(reader: JsonReader): AppSettings {
+        val builder = AppSettings.Builder()
+        fromExistingAppSettings?.also { builder.from(it) }
 
-            return null
+        runCatching {
+            reader.beginObject()
+
+            while (reader.hasNext()) {
+                when (reader.nextName()) {
+                    "area_observation_duration" -> builder.areaObservationDuration(reader.nextInt())
+                    "input" -> builder.inputSettings(readInputSettings(reader).let {
+                        if (it == InputSettings(dateSettings = InputDateSettings.DEFAULT) && fromExistingAppSettings?.inputSettings != it) (fromExistingAppSettings?.inputSettings
+                            ?: it)
+                        else it
+                    })
+
+                    "sync" -> builder.dataSyncSettings(DataSyncSettingsJsonReader(fromExistingAppSettings?.dataSyncSettings).read(reader))
+                    "map" -> builder.mapSettings(MapSettingsReader(fromExistingAppSettings?.mapSettings).read(reader))
+                    "nomenclature" -> readNomenclatureSettings(reader)?.also { builder.nomenclatureSettings(it) }
+                    else -> reader.skipValue()
+                }
+            }
+
+            reader.endObject()
+        }.onFailure {
+            it.message?.also { Logger.warn { it } }
+
+            throw AppSettingsException.JsonParseException(it.message)
         }
 
-        return DataSyncSettingsJsonReader().read(reader)
-    }
-
-    private fun readMapSettings(reader: JsonReader): MapSettings? {
-        if (reader.peek() != JsonToken.BEGIN_OBJECT) {
-            reader.skipValue()
-
-            return null
-        }
-
-        return MapSettingsReader().read(reader)
+        return builder.build()
     }
 
     private fun readInputSettings(reader: JsonReader): InputSettings {
@@ -163,12 +183,14 @@ class OnAppSettingsJsonReaderListenerImpl :
         reader.beginArray()
 
         while (reader.hasNext()) {
-            try {
+            runCatching {
                 readPropertySettings(reader)?.also {
                     propertySettingsList.add(it)
                 }
-            } catch (ioe: IOException) {
-                Logger.error(ioe)
+            }.onFailure {
+                it.message?.also {
+                    Logger.warn { it }
+                }
             }
         }
 
@@ -177,7 +199,6 @@ class OnAppSettingsJsonReaderListenerImpl :
         return propertySettingsList
     }
 
-    @Throws(Exception::class)
     private fun readPropertySettings(reader: JsonReader): PropertySettings? {
         return when (reader.peek()) {
             JsonToken.BEGIN_OBJECT -> {

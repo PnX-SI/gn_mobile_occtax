@@ -3,7 +3,7 @@ package fr.geonature.occtax.features.record.usecase
 import fr.geonature.commons.interactor.BaseResultUseCase
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.repository.IObservationRecordRepository
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 import javax.inject.Inject
 
 /**

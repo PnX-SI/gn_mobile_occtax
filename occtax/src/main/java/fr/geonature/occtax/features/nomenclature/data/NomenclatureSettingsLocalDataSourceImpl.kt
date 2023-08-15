@@ -4,7 +4,7 @@ import fr.geonature.occtax.features.nomenclature.domain.EditableField
 import fr.geonature.occtax.features.record.domain.AllMediaRecord
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
-import fr.geonature.occtax.settings.PropertySettings
+import fr.geonature.occtax.features.settings.domain.PropertySettings
 
 /**
  * Default implementation of [INomenclatureSettingsLocalDataSource].

@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 
 /**
  * Apply filters on taxa list.
@@ -42,7 +42,7 @@ class TaxaFilterActivity : AppCompatActivity(), TaxaFilterFragment.OnTaxaFilterF
                         ),
                         intent.getIntExtra(
                             EXTRA_AREA_OBSERVATION_DURATION,
-                            AppSettings.DEFAULT_AREA_OBSERVATION_DURATION
+                            AppSettings.Builder.DEFAULT_AREA_OBSERVATION_DURATION
                         ),
                         * selectedFilters.toTypedArray()
                     )
@@ -95,7 +95,7 @@ class TaxaFilterActivity : AppCompatActivity(), TaxaFilterFragment.OnTaxaFilterF
         fun newIntent(
             context: Context,
             withAreaObservation: Boolean = false,
-            areaObservationDuration: Int = AppSettings.DEFAULT_AREA_OBSERVATION_DURATION,
+            areaObservationDuration: Int = AppSettings.Builder.DEFAULT_AREA_OBSERVATION_DURATION,
             vararg filter: Filter<*>
         ): Intent {
             return Intent(

@@ -2,7 +2,7 @@ package fr.geonature.occtax.features.record.data
 
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.error.ObservationRecordException
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 
 /**
  * Local data source about [ObservationRecord].

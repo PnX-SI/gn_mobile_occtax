@@ -39,7 +39,7 @@ import fr.geonature.commons.util.ThemeUtils
 import fr.geonature.compat.content.getParcelableArrayExtraCompat
 import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.occtax.R
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
 import org.tinylog.Logger
 import java.util.Locale
@@ -368,8 +368,8 @@ class TaxaFragment : AbstractInputFragment() {
                             .isNullOrEmpty(),
                         arguments?.getInt(
                             ARG_AREA_OBSERVATION_DURATION,
-                            AppSettings.DEFAULT_AREA_OBSERVATION_DURATION
-                        ) ?: AppSettings.DEFAULT_AREA_OBSERVATION_DURATION,
+                            AppSettings.Builder.DEFAULT_AREA_OBSERVATION_DURATION
+                        ) ?: AppSettings.Builder.DEFAULT_AREA_OBSERVATION_DURATION,
                         *getSelectedFilters().toTypedArray()
                     )
                 )
@@ -641,7 +641,7 @@ class TaxaFragment : AbstractInputFragment() {
          * @return A new instance of [TaxaFragment]
          */
         @JvmStatic
-        fun newInstance(areaObservationDuration: Int = AppSettings.DEFAULT_AREA_OBSERVATION_DURATION) =
+        fun newInstance(areaObservationDuration: Int = AppSettings.Builder.DEFAULT_AREA_OBSERVATION_DURATION) =
             TaxaFragment().apply {
                 arguments = Bundle().apply {
                     putInt(

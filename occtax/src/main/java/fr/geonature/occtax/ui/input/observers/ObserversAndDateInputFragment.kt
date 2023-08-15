@@ -33,7 +33,7 @@ import fr.geonature.compat.os.getParcelableCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
 import fr.geonature.occtax.features.record.domain.PropertyValue
-import fr.geonature.occtax.settings.InputDateSettings
+import fr.geonature.occtax.features.settings.domain.InputDateSettings
 import fr.geonature.occtax.ui.dataset.DatasetListActivity
 import fr.geonature.occtax.ui.input.AbstractInputFragment
 import fr.geonature.occtax.ui.input.InputPagerFragmentActivity

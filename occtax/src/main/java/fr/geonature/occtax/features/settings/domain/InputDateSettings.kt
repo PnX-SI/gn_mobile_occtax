@@ -1,4 +1,4 @@
-package fr.geonature.occtax.settings
+package fr.geonature.occtax.features.settings.domain
 
 import android.os.Parcelable
 import fr.geonature.occtax.features.record.domain.ObservationRecord

@@ -33,7 +33,7 @@ import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.compat.os.getParcelableCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.TaxonRecord
-import fr.geonature.occtax.settings.InputDateSettings
+import fr.geonature.occtax.features.settings.domain.InputDateSettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
 import fr.geonature.occtax.ui.input.taxa.Filter
 import fr.geonature.occtax.ui.input.taxa.FilterTaxonomy

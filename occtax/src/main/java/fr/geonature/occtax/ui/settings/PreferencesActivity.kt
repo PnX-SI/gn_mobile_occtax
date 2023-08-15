@@ -11,7 +11,7 @@ import fr.geonature.commons.fp.orNull
 import fr.geonature.compat.content.getParcelableExtraCompat
 import fr.geonature.datasync.api.IGeoNatureAPIClient
 import fr.geonature.datasync.settings.DataSyncSettingsViewModel
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 
 /**
  * Global settings.

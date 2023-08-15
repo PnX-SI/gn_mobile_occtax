@@ -5,13 +5,16 @@ import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.util.toDate
 import fr.geonature.commons.util.toIsoDateString
 import fr.geonature.commons.util.toMap
+import fr.geonature.datasync.settings.DataSyncSettings
+import fr.geonature.maps.settings.LayerSettings
+import fr.geonature.maps.settings.MapSettings
 import fr.geonature.occtax.FixtureHelper.getFixture
 import fr.geonature.occtax.features.record.domain.ModuleRecord
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
-import fr.geonature.occtax.settings.AppSettings
-import fr.geonature.occtax.settings.InputDateSettings
-import fr.geonature.occtax.settings.InputSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
+import fr.geonature.occtax.features.settings.domain.InputDateSettings
+import fr.geonature.occtax.features.settings.domain.InputSettings
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Before
@@ -22,6 +25,8 @@ import org.locationtech.jts.geom.GeometryFactory
 import org.robolectric.RobolectricTestRunner
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 /**
  * Unit tests about [ObservationRecordJsonWriter].
@@ -266,6 +271,25 @@ class ObservationRecordJsonWriterTest {
         val json = ObservationRecordJsonWriter().write(
             observationRecord,
             AppSettings(
+                dataSyncSettings = DataSyncSettings(
+                    geoNatureServerUrl = "https://demo.geonature.fr/geonature",
+                    taxHubServerUrl = "https://demo.geonature.fr/taxhub",
+                    applicationId = 3,
+                    usersListId = 1,
+                    taxrefListId = 100,
+                    codeAreaType = "M10",
+                    pageSize = 1000,
+                    dataSyncPeriodicity = 30.toDuration(DurationUnit.MINUTES),
+                    essentialDataSyncPeriodicity = 20.toDuration(DurationUnit.MINUTES)
+                ),
+                mapSettings = MapSettings.Builder()
+                    .addLayer(
+                        LayerSettings.Builder.newInstance()
+                            .label("OSM")
+                            .addSource("https://a.tile.openstreetmap.org")
+                            .build()
+                    )
+                    .build(),
                 inputSettings = InputSettings(
                     dateSettings = InputDateSettings(
                         startDateSettings = InputDateSettings.DateSettings.DATE,
@@ -305,6 +329,25 @@ class ObservationRecordJsonWriterTest {
         val json = ObservationRecordJsonWriter().write(
             observationRecord,
             AppSettings(
+                dataSyncSettings = DataSyncSettings(
+                    geoNatureServerUrl = "https://demo.geonature.fr/geonature",
+                    taxHubServerUrl = "https://demo.geonature.fr/taxhub",
+                    applicationId = 3,
+                    usersListId = 1,
+                    taxrefListId = 100,
+                    codeAreaType = "M10",
+                    pageSize = 1000,
+                    dataSyncPeriodicity = 30.toDuration(DurationUnit.MINUTES),
+                    essentialDataSyncPeriodicity = 20.toDuration(DurationUnit.MINUTES)
+                ),
+                mapSettings = MapSettings.Builder()
+                    .addLayer(
+                        LayerSettings.Builder.newInstance()
+                            .label("OSM")
+                            .addSource("https://a.tile.openstreetmap.org")
+                            .build()
+                    )
+                    .build(),
                 inputSettings = InputSettings(
                     dateSettings = InputDateSettings(
                         startDateSettings = InputDateSettings.DateSettings.DATETIME,
@@ -355,6 +398,25 @@ class ObservationRecordJsonWriterTest {
         val json = ObservationRecordJsonWriter().write(
             observationRecord,
             AppSettings(
+                dataSyncSettings = DataSyncSettings(
+                    geoNatureServerUrl = "https://demo.geonature.fr/geonature",
+                    taxHubServerUrl = "https://demo.geonature.fr/taxhub",
+                    applicationId = 3,
+                    usersListId = 1,
+                    taxrefListId = 100,
+                    codeAreaType = "M10",
+                    pageSize = 1000,
+                    dataSyncPeriodicity = 30.toDuration(DurationUnit.MINUTES),
+                    essentialDataSyncPeriodicity = 20.toDuration(DurationUnit.MINUTES)
+                ),
+                mapSettings = MapSettings.Builder()
+                    .addLayer(
+                        LayerSettings.Builder.newInstance()
+                            .label("OSM")
+                            .addSource("https://a.tile.openstreetmap.org")
+                            .build()
+                    )
+                    .build(),
                 inputSettings = InputSettings(
                     dateSettings = InputDateSettings(
                         startDateSettings = InputDateSettings.DateSettings.DATE,
@@ -396,6 +458,25 @@ class ObservationRecordJsonWriterTest {
         val json = ObservationRecordJsonWriter().write(
             observationRecord,
             AppSettings(
+                dataSyncSettings = DataSyncSettings(
+                    geoNatureServerUrl = "https://demo.geonature.fr/geonature",
+                    taxHubServerUrl = "https://demo.geonature.fr/taxhub",
+                    applicationId = 3,
+                    usersListId = 1,
+                    taxrefListId = 100,
+                    codeAreaType = "M10",
+                    pageSize = 1000,
+                    dataSyncPeriodicity = 30.toDuration(DurationUnit.MINUTES),
+                    essentialDataSyncPeriodicity = 20.toDuration(DurationUnit.MINUTES)
+                ),
+                mapSettings = MapSettings.Builder()
+                    .addLayer(
+                        LayerSettings.Builder.newInstance()
+                            .label("OSM")
+                            .addSource("https://a.tile.openstreetmap.org")
+                            .build()
+                    )
+                    .build(),
                 inputSettings = InputSettings(
                     dateSettings = InputDateSettings(
                         startDateSettings = InputDateSettings.DateSettings.DATETIME,
