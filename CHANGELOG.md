@@ -1,5 +1,25 @@
 # Changelog
 
+## [2.7.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc0) (2023-09-03, pre-release)
+
+### 🚀 Nouveautés
+
+* Affichage des relevés en cours sur la carte (https://github.com/PnX-SI/gn_mobile_occtax/issues/224)
+  en plus de la vue sous forme de liste.
+* Possibilité de charger une couche cartographique locale non spécifiée dans la configuration (https://github.com/PnX-SI/gn_mobile_occtax/issues/170).
+* Support des champs additionnels, désactivé par défaut (https://github.com/PnX-SI/gn_mobile_occtax/issues/122).
+* Possibilité de surcharger la configuration (https://github.com/PnX-SI/gn_mobile_maps/issues/95).
+
+### 🐛 Corrections
+
+* Prise en compte des caractères spéciaux lors de la recherche par nom depuis la liste des taxons (https://github.com/PnX-SI/gn_mobile_maps/issues/230).
+* Prise en compte de la date et l'heure locale du terminal dans la gestion des relevés (https://github.com/PnX-SI/gn_mobile_occtax/issues/225).
+* Suppression du suffix du nom de l'application lors du build de l'APK (https://github.com/PnX-SI/gn_mobile_occtax/issues/134).
+
+### ⚠️ Notes de version
+
+* Code de version : 3217
+
 ## [2.6.1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.1) (2023-05-24, release)
 
 ### 🐛 Corrections
