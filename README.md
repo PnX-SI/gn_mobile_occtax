@@ -21,8 +21,8 @@ Based on [datasync module](https://github.com/PnX-SI/gn_mobile_core) to synchron
 
 ## Settings
 
-The app settings file is automatically updated when the application is started, as soon as the *GeoNature* URL is defined.
-This settings file `settings_occtax.json` can be found in the `Android/data/fr.geonature.occtax2/` directory of the terminal's main storage. Example:
+The app settings file is automatically updated locally when the application is started, as soon as the *GeoNature* URL is defined, with the one on *GeoNature* server.
+This settings file `settings_occtax.json` can be found locally in the `Android/data/fr.geonature.occtax2/` directory of the terminal's main storage. Example:
 
 ```json
 {
@@ -271,8 +271,8 @@ Each property may be a simple string representing the nomenclature attribute to 
 
 ### Override parameters from app settings
 
-As this settings file is updated automatically, we advise you not to update it directly by hand.
-To do this, you can overwrite the values from the *GeoNature* server by creating a `settings_occtax.local.json` file in the same location as the app settings file.
+As this local settings file is updated automatically with the one on *GeoNature* server, we advise you not to update it directly by hand.
+To do this, you can locally overwrite the values from the *GeoNature* server by creating a `settings_occtax.local.json` file in the same location as the app settings file in the terminal's main storage.
 Then simply copy the parameters to be overwritten, respecting the JSON structure of the app settings file. Example, to override map layers configuration:
 
 ```json
@@ -298,7 +298,7 @@ Then simply copy the parameters to be overwritten, respecting the JSON structure
 
 **⚠ Note:** When using such a configuration, which can potentially replace all the application's parameters, it's your responsibility to ensure that the final configuration is always valid and keeps pace with any changes made to *GeoNature*.
 
-In case of errors, if the final configuration is incorrect, the application will automatically ignore the settings file that allows you to replace the parameters and load the default configuration from *GeoNature*. Any errors reported can be found in the application logs.
+In case of errors, if the final configuration is incorrect, the application will automatically ignore the local settings file that allows you to replace the parameters and load the default configuration from *GeoNature*. Any errors reported can be found in the application logs.
 
 ## Upgrade git sub modules
 
