@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.7.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc1) (2023-09-13, pre-release)
+
+### 🐛 Corrections
+
+* Prise en compte du paramètre 'additional_fields' lors de la synchronisation des données concernant
+  les champs additionnels (https://github.com/PnX-SI/gn_mobile_occtax/issues/122).
+
+### ⚠️ Notes de version
+
+* Code de version : 3221
+
 ## [2.7.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc0) (2023-09-03, pre-release)
 
 ### 🚀 Nouveautés
