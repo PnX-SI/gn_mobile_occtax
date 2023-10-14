@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.7.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc2) (2023-10-14, pre-release)
+
+### 🚀 Nouveautés
+
+* Ne pas synchroniser les taxons à chaque synchronisation (https://github.com/PnX-SI/gn_mobile_occtax/issues/133).
+
+### 🐛 Corrections
+
+* Erreur transparente lors de la synchronisation des données si le champ 'nom_valide' est non
+  renseigné coté taxref (https://github.com/PnX-SI/gn_mobile_occtax/issues/133).
+
+### ⚠️ Notes de version
+
+* Code de version : 3229
+
 ## [2.7.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc1) (2023-09-13, pre-release)
 
 ### 🐛 Corrections
