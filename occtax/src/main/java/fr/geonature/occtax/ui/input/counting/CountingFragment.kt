@@ -207,7 +207,7 @@ class CountingFragment : AbstractInputFragment() {
 
     private fun launchEditCountingMetadataActivity(countingRecord: CountingRecord? = null) {
         val context = context ?: return
-        val datasetId = observationRecord?.dataset?.datasetId
+        val datasetId = observationRecord?.dataset?.dataset?.datasetId
         val taxonRecord = observationRecord?.taxa?.selectedTaxonRecord ?: return
 
         editCountingResultLauncher.launch(

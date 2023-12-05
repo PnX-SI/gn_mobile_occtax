@@ -223,7 +223,7 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
                 text2.text = taxon.commonName
 
                 summary.text = HtmlCompat.fromHtml(
-                    "${if (taxon.description.isNullOrBlank()) "" else "<i>${taxon.description ?: ""}</i>"}${if (taxon.rank.isNullOrBlank()) "" else "${if (taxon.description.isNullOrBlank()) "" else " - [${taxon.rank}]"} "}",
+                    if (taxon.description.isNullOrBlank()) "" else "<i>${taxon.description ?: ""}</i>",
                     HtmlCompat.FROM_HTML_MODE_COMPACT
                 )
                 itemView.isSelected = selectedTaxon?.id == taxon.id

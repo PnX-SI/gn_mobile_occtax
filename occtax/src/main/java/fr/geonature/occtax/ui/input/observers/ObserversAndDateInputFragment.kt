@@ -100,6 +100,7 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                     null,
                     null
                 )
+
                 LOADER_DATASET_ID -> CursorLoader(
                     requireContext(),
                     buildUri(
@@ -117,6 +118,7 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                     null,
                     null
                 )
+
                 else -> throw IllegalArgumentException()
             }
         }
@@ -163,10 +165,11 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
 
                     updateSelectedObservers(inputObserversLoaded)
                 }
+
                 LOADER_DATASET_ID -> {
                     if (data.count == 0) {
                         selectedDataset = null
-                        observationRecord?.dataset?.datasetId = null
+                        observationRecord?.dataset?.setDatasetId(null)
                         listener.validateCurrentPage()
                     }
 
@@ -174,6 +177,11 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                         selectedDataset = Dataset.fromCursor(data)
                     }
 
+                    selectedDataset?.also {
+                        Logger.info { "selected dataset: ${it.id}, taxa list ID: ${it.taxaListId}" }
+                    }
+
+                    observationRecord?.dataset?.setDataset(selectedDataset)
                     updateSelectedDatasetActionView(selectedDataset)
                 }
             }
@@ -315,7 +323,7 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
     override fun validate(): Boolean {
         return observationRecord?.observers?.getAllObserverIds()
             ?.isNotEmpty() ?: false &&
-            this.observationRecord?.dataset?.datasetId != null &&
+            this.observationRecord?.dataset?.dataset?.datasetId != null &&
             this.observationRecord?.properties?.filterValues { it is PropertyValue.Nomenclature }
                 ?.isNotEmpty() == true &&
             inputDateView?.hasErrors() == false
@@ -353,7 +361,7 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                 }
             }
 
-        val selectedDatasetId = observationRecord?.dataset?.datasetId
+        val selectedDatasetId = observationRecord?.dataset?.dataset?.datasetId
 
         if (selectedDatasetId != null) {
             LoaderManager.getInstance(this)
@@ -413,11 +421,13 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
     }
 
     private fun updateSelectedDataset(selectedDataset: Dataset?) {
+        selectedDataset?.also {
+            Logger.info { "selected dataset: ${it.id}, taxa list ID: ${it.taxaListId}" }
+        }
+
         this.selectedDataset = selectedDataset
 
-        observationRecord?.dataset?.also {
-            it.datasetId = selectedDataset?.id
-        }
+        observationRecord?.dataset?.setDataset(selectedDataset)
 
         listener.validateCurrentPage()
 
@@ -453,10 +463,10 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
 
     private fun setDefaultDatasetFromSettings() {
         observationRecord?.dataset?.run {
-            if (datasetId == null) {
+            if (dataset?.datasetId == null) {
                 val context = context ?: return
                 getDefaultDatasetId(context).also { defaultDatasetId ->
-                    if (defaultDatasetId != null) this.datasetId = defaultDatasetId
+                    if (defaultDatasetId != null) setDatasetId(defaultDatasetId)
                 }
             }
         }

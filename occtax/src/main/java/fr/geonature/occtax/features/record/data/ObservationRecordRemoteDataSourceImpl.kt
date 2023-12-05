@@ -39,7 +39,7 @@ class ObservationRecordRemoteDataSourceImpl(private val occtaxAPIClient: IOcctax
             geometry = observationRecord.geometry
         ).apply {
             comment.comment = observationRecord.comment.comment
-            dataset.datasetId = observationRecord.dataset.datasetId
+            dataset.dataset = observationRecord.dataset.dataset
             dates.start = observationRecord.dates.start
             dates.end = observationRecord.dates.end
             observationRecord.observers.getAllObserverIds()

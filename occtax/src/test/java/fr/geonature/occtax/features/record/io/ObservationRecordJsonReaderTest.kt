@@ -71,7 +71,7 @@ class ObservationRecordJsonReaderTest {
                 status = ObservationRecord.Status.DRAFT
             ).apply {
                 comment.comment = "Global comment"
-                dataset.datasetId = 17L
+                dataset.setDatasetId(17L)
                 dates.start = toDate("2016-10-28T08:15:00Z")!!
                 dates.end = toDate("2016-10-29T09:00:00Z")!!
 
@@ -212,7 +212,7 @@ class ObservationRecordJsonReaderTest {
                 status = ObservationRecord.Status.DRAFT
             ).apply {
                 comment.comment = "Global comment"
-                dataset.datasetId = 17L
+                dataset.setDatasetId(17L)
                 dates.start = toDate("2016-10-28T08:15:00Z")!!
                 dates.end = toDate("2016-10-29T09:00:00Z")!!
 
@@ -385,7 +385,7 @@ class ObservationRecordJsonReaderTest {
                 status = ObservationRecord.Status.DRAFT
             ).apply {
                 comment.comment = "Global comment"
-                dataset.datasetId = 17L
+                dataset.setDatasetId(17L)
                 dates.start = toDate("2016-10-28T08:15:00Z")!!
                 dates.end = toDate("2016-10-29T09:00:00Z")!!
 
@@ -442,7 +442,7 @@ class ObservationRecordJsonReaderTest {
                 status = ObservationRecord.Status.DRAFT
             ).apply {
                 comment.comment = "Global comment"
-                dataset.datasetId = 1L
+                dataset.setDatasetId(1L)
                 dates.start = toDate("2016-10-28")!!.set(
                     Calendar.HOUR_OF_DAY,
                     0
