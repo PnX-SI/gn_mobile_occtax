@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.7.0-rc3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc3) (2023-12-05, pre-release)
+
+### 🚀 Nouveautés
+
+* La liste des taxons est automatiquement filtrée selon le jeu de données sélectionné. Si ce dernier
+  n'est lié à aucune liste de taxons, la liste des taxons est filtrée selon la valeur du paramètre
+  `taxa_list_id`. Si ce paramètre n'est pas renseigné et que le jeu de donnée n'est lié à aucune 
+  liste de taxons, la liste des taxons ne sera pas filtrée (https://github.com/PnX-SI/gn_mobile_core/issues/41, https://github.com/PnX-SI/gn_mobile_occtax/issues/133).
+
+### ⚠️ Notes de version
+
+* Code de version : 3251
+
 ## [2.7.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc2) (2023-10-14, pre-release)
 
 ### 🚀 Nouveautés
