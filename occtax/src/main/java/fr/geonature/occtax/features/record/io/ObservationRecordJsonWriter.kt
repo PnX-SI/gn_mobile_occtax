@@ -158,14 +158,20 @@ class ObservationRecordJsonWriter {
             when (val propertyValue = it.value) {
                 is PropertyValue.Text -> writer.name(propertyValue.code)
                     .value(propertyValue.value)
+
                 is PropertyValue.Number -> writer.name(propertyValue.code)
                     .value(propertyValue.value)
+
                 is PropertyValue.NumberArray -> {
                     writer.name(propertyValue.code)
                         .beginArray()
                     propertyValue.value.forEach { value -> writer.value(value) }
                     writer.endArray()
                 }
+
+                is PropertyValue.Dataset -> writer.name(propertyValue.code)
+                    .value(propertyValue.datasetId)
+
                 is PropertyValue.Nomenclature -> {
                     // GeoNature default properties mapping
                     when (propertyValue.code) {
@@ -173,6 +179,7 @@ class ObservationRecordJsonWriter {
                             .value(propertyValue.value)
                     }
                 }
+
                 is PropertyValue.Taxa -> {
                     writer.name(propertyValue.code)
                         .beginArray()
@@ -185,6 +192,7 @@ class ObservationRecordJsonWriter {
                     }
                     writer.endArray()
                 }
+
                 else -> {}
             }
         }

@@ -48,7 +48,7 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
         val editableFieldsInformation =
             nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
                 .getOrElse { emptyList() } + if (params.withAdditionalFields) additionalFieldRepository.getAllAdditionalFields(
-                observationRecord.dataset.datasetId,
+                observationRecord.dataset.dataset?.datasetId,
                 EditableField.Type.INFORMATION
             )
                 .getOrElse { emptyList() } else emptyList()
@@ -68,7 +68,7 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
         val editableFieldsCounting =
             nomenclatureRepository.getEditableFields(EditableField.Type.COUNTING)
                 .getOrElse { emptyList() } + if (params.withAdditionalFields) additionalFieldRepository.getAllAdditionalFields(
-                observationRecord.dataset.datasetId,
+                observationRecord.dataset.dataset?.datasetId,
                 EditableField.Type.COUNTING
             )
                 .getOrElse { emptyList() } else emptyList()

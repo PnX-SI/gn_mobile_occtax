@@ -75,7 +75,7 @@ class ObservationRecordJsonWriterTest {
                 status = ObservationRecord.Status.DRAFT
             ).apply {
                 comment.comment = "Global comment"
-                dataset.datasetId = 17L
+                dataset.setDatasetId(17L)
                 dates.start = toDate("2016-10-28T08:15:00Z")!!
                 dates.end = toDate("2016-10-29T09:00:00Z")!!
 

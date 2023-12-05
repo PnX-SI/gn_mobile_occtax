@@ -20,6 +20,7 @@ sealed class PropertyValue : Parcelable {
             is StringArray -> value.isEmpty()
             is Number -> value == null
             is NumberArray -> value.isEmpty()
+            is Dataset -> datasetId == null
             is Nomenclature -> value == null
             is AdditionalField -> value.all { it.value.isEmpty() }
             is Taxa -> value.all { taxon -> taxon.properties.all { it.value.isEmpty() } }
@@ -37,6 +38,7 @@ sealed class PropertyValue : Parcelable {
         is StringArray -> code
         is Number -> code
         is NumberArray -> code
+        is Dataset -> code
         is Nomenclature -> code
         is AdditionalField -> code
         is Taxa -> code
@@ -111,6 +113,13 @@ sealed class PropertyValue : Parcelable {
             return result
         }
     }
+
+    /**
+     * As dataset.
+     */
+    @Parcelize
+    data class Dataset(val code: String, val datasetId: Long?, val taxaListId: Long? = null) :
+        PropertyValue()
 
     /**
      * As nomenclature value.

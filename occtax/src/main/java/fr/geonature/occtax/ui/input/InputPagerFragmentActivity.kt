@@ -183,7 +183,10 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
 
     override fun startEditTaxon() {
         pageFragmentViewModel.add(
-            R.string.pager_fragment_taxa_title to TaxaFragment.newInstance(appSettings.areaObservationDuration),
+            R.string.pager_fragment_taxa_title to TaxaFragment.newInstance(
+                appSettings.areaObservationDuration,
+                appSettings.dataSyncSettings.taxrefListId.toLong()
+            ),
             R.string.pager_fragment_information_title to InformationFragment.newInstance(
                 saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues ?: false,
                 withAdditionalFields = appSettings.nomenclatureSettings?.withAdditionalFields

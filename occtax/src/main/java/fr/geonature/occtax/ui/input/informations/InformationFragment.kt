@@ -221,7 +221,7 @@ class InformationFragment : AbstractInputFragment() {
 
     override fun refreshView() {
         nomenclatureViewModel.getEditableFields(
-            observationRecord?.dataset?.datasetId,
+            observationRecord?.dataset?.dataset?.datasetId,
             arguments?.getBoolean(
                 ARG_WITH_ADDITIONAL_FIELDS,
                 false

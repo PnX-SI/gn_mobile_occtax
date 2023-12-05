@@ -2,9 +2,11 @@ package fr.geonature.occtax.features.record.io
 
 import android.util.JsonReader
 import android.util.JsonToken
+import fr.geonature.commons.util.nextLongOrNull
 import fr.geonature.commons.util.nextStringOrNull
 import fr.geonature.commons.util.toDate
 import fr.geonature.maps.jts.geojson.io.GeoJsonReader
+import fr.geonature.occtax.features.record.domain.DatasetRecord
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.ObserversRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
@@ -66,6 +68,7 @@ class ObservationRecordJsonReader {
                             internalId = it
                         )
                     }
+
                 "status" -> observationRecord = observationRecord.copy(
                     status = runCatching {
                         reader
@@ -74,14 +77,17 @@ class ObservationRecordJsonReader {
                     }.getOrNull()
                         ?: ObservationRecord.Status.DRAFT
                 )
+
                 "geometry" -> observationRecord = readGeometry(
                     reader,
                     observationRecord
                 )
+
                 "properties" -> observationRecord = readProperties(
                     reader,
                     observationRecord
                 )
+
                 else -> reader.skipValue()
             }
         }
@@ -110,9 +116,11 @@ class ObservationRecordJsonReader {
                 reader.nextNull()
                 observationRecord
             }
+
             JsonToken.BEGIN_OBJECT -> {
                 observationRecord.copy(geometry = GeoJsonReader().readGeometry(reader))
             }
+
             else -> {
                 reader.skipValue()
                 observationRecord
@@ -132,18 +140,26 @@ class ObservationRecordJsonReader {
             when (val keyName = reader.nextName()) {
                 "internal_id" -> updatedObservationRecord =
                     updatedObservationRecord.copy(internalId = reader.nextLong())
+
                 "dataset" -> reader.skipValue()
                 // ignore legacy "default" property
                 "default" -> reader.skipValue()
                 "digitiser" -> reader.skipValue()
+
+                DatasetRecord.DATASET_ID_KEY -> {
+                    updatedObservationRecord.dataset.setDatasetId(reader.nextLongOrNull())
+                }
+
                 ObserversRecord.OBSERVERS_KEY -> readObservers(
                     reader,
                     observationRecord
                 )
+
                 TaxaRecord.TAXA_KEY -> readTaxa(
                     reader,
                     observationRecord
                 )
+
                 else -> {
                     if (keyName.startsWith("id_nomenclature")) {
                         readNomenclatureValue(
@@ -165,11 +181,13 @@ class ObservationRecordJsonReader {
                             .also {
                                 updatedObservationRecord.properties[it.first] = it.second
                             }
+
                         JsonToken.NUMBER -> updatedObservationRecord.properties[keyName] =
                             PropertyValue.Number(
                                 keyName,
                                 reader.nextLong()
                             )
+
                         else -> reader.skipValue()
                     }
                 }
@@ -246,6 +264,7 @@ class ObservationRecordJsonReader {
                         JsonToken.NUMBER -> {
                             observationRecord.observers.addObserverId(reader.nextLong())
                         }
+
                         JsonToken.BEGIN_OBJECT -> {
                             reader.beginObject()
                             while (reader.hasNext()) {
@@ -256,11 +275,13 @@ class ObservationRecordJsonReader {
                             }
                             reader.endObject()
                         }
+
                         else -> reader.skipValue()
                     }
                 }
                 reader.endArray()
             }
+
             else -> reader.skipValue()
         }
     }
@@ -283,11 +304,13 @@ class ObservationRecordJsonReader {
                                 observationRecord
                             )
                         }
+
                         else -> reader.skipValue()
                     }
                 }
                 reader.endArray()
             }
+
             else -> reader.skipValue()
         }
     }
