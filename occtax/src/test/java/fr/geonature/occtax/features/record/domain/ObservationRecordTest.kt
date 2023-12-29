@@ -74,11 +74,11 @@ class ObservationRecordTest {
         record.dataset.setDataset(
             Dataset(
                 id = 17L,
-                module = "occtax",
                 name = "Jeu de données personnel de Auger Ariane",
                 description = "Jeu de données personnel de Auger Ariane",
                 active = true,
                 createdAt = Date.from(Instant.parse("2020-03-28T10:00:00Z")),
+                updatedAt = null,
                 100L
             )
         )

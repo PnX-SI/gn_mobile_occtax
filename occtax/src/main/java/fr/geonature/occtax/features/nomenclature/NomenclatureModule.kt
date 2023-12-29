@@ -61,14 +61,8 @@ object NomenclatureModule {
 
     @Singleton
     @Provides
-    fun provideAdditionalFieldDataSource(
-        @GeoNatureModuleName moduleName: String,
-        database: LocalDatabase,
-    ): IAdditionalFieldLocalDataSource {
-        return AdditionalFieldLocalDataSourceImpl(
-            moduleName,
-            database
-        )
+    fun provideAdditionalFieldDataSource(database: LocalDatabase): IAdditionalFieldLocalDataSource {
+        return AdditionalFieldLocalDataSourceImpl(database)
     }
 
     @Singleton
