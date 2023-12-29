@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.7.0-rc4](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc4) (2023-12-29, pre-release)
+
+### 🐛 Corrections
+
+* Utilisation de la nouvelle API pour la récupération des jeux de données (https://github.com/PnX-SI/gn_mobile_occtax/issues/239).
+
+### ⚠️ Notes de version
+
+* Code de version : 3253
+* Cette version nécessite la version 1.13.1 de TaxHub qui elle même nécessite au minimum la version
+  2.14 de GeoNature (pas encore disponible).
+
 ## [2.7.0-rc3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc3) (2023-12-05, pre-release)
 
 ### 🚀 Nouveautés
@@ -12,6 +24,8 @@
 ### ⚠️ Notes de version
 
 * Code de version : 3251
+* Cette version nécessite la version 1.13.1 de TaxHub qui elle même nécessite au minimum la version
+  2.14 de GeoNature (pas encore disponible).
 
 ## [2.7.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc2) (2023-10-14, pre-release)
 
