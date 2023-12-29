@@ -22,7 +22,6 @@ import androidx.loader.content.Loader
 import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.ContentProviderAuthority
-import fr.geonature.commons.data.GeoNatureModuleName
 import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.entity.InputObserver
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
@@ -59,10 +58,6 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
     @ContentProviderAuthority
     @Inject
     lateinit var authority: String
-
-    @GeoNatureModuleName
-    @Inject
-    lateinit var moduleName: String
 
     private val propertyValueModel: PropertyValueModel by viewModels()
 
@@ -106,7 +101,6 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                     buildUri(
                         authority,
                         Dataset.TABLE_NAME,
-                        args?.getString(Dataset.COLUMN_MODULE) ?: "",
                         args?.getLong(
                             Dataset.COLUMN_ID,
                             -1
@@ -368,10 +362,6 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                 .initLoader(
                     LOADER_DATASET_ID,
                     bundleOf(
-                        kotlin.Pair(
-                            Dataset.COLUMN_MODULE,
-                            moduleName
-                        ),
                         kotlin.Pair(
                             Dataset.COLUMN_ID,
                             selectedDatasetId
