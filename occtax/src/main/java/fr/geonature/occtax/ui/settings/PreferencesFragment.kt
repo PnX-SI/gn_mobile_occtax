@@ -66,7 +66,6 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                     buildUri(
                         authority,
                         Dataset.TABLE_NAME,
-                        "occtax",
                         args!!.getLong(KEY_SELECTED_DATASET)
                             .toString()
                     ),
