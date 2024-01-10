@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.7.0-rc5](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc5) (2024-01-10, pre-release)
+
+### 🐛 Corrections
+
+* Erreur entraînant un plantage de l'application lors du chargement du jeu de données par défaut
+  suite aux changements des URIs du fournisseur de données sur la partie jeu de données.
+
+### ⚠️ Notes de version
+
+* Code de version : 3257
+* Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
+  qui elle même nécessite au minimum la version  2.14 de GeoNature (pas encore disponible).
+
 ## [2.7.0-rc4](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc4) (2023-12-29, pre-release)
 
 ### 🐛 Corrections
@@ -9,8 +22,8 @@
 ### ⚠️ Notes de version
 
 * Code de version : 3253
-* Cette version nécessite la version 1.13.1 de TaxHub qui elle même nécessite au minimum la version
-  2.14 de GeoNature (pas encore disponible).
+* Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
+  qui elle même nécessite au minimum la version  2.14 de GeoNature (pas encore disponible).
 
 ## [2.7.0-rc3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc3) (2023-12-05, pre-release)
 
@@ -24,8 +37,8 @@
 ### ⚠️ Notes de version
 
 * Code de version : 3251
-* Cette version nécessite la version 1.13.1 de TaxHub qui elle même nécessite au minimum la version
-  2.14 de GeoNature (pas encore disponible).
+* Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
+  qui elle même nécessite au minimum la version  2.14 de GeoNature (pas encore disponible).
 
 ## [2.7.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc2) (2023-10-14, pre-release)
 
