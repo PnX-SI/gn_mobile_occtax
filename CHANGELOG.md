@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.7.0-rc6](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc6) (2024-02-14, pre-release)
+
+### 🐛 Corrections
+
+* Les valeurs numériques nulles en base n'étaient pas correctement interprétées depuis leurs
+  lectures via un cursor
+
+### ⚠️ Notes de version
+
+* Code de version : 3259
+* Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
+  qui elle même nécessite au minimum la version  2.14 de GeoNature (pas encore disponible).
+
 ## [2.7.0-rc5](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc5) (2024-01-10, pre-release)
 
 ### 🐛 Corrections
