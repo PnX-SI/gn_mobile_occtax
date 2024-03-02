@@ -136,6 +136,7 @@ class OnAppSettingsJsonReaderListenerImpl :
                 "save_default_values" -> saveDefaultValues = reader.nextBooleanOrElse { false }
                 "information" -> information.addAll(readPropertySettingsAsList(reader))
                 "counting" -> counting.addAll(readPropertySettingsAsList(reader))
+                else -> reader.skipValue()
             }
         }
 

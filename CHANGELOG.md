@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.6.2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.2) (2024-03-02, release)
+
+### 🐛 Corrections
+
+* Ignorer les attributs inconnus dans le fichier de configuration (https://github.com/PnX-SI/gn_mobile_occtax/issues/248).
+
+### ⚠️ Notes de version
+
+* Code de version : 3220
+
 ## [2.6.1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.1) (2023-05-24, release)
 
 ### 🐛 Corrections
