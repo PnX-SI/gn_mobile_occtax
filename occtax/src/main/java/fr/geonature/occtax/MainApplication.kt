@@ -71,7 +71,7 @@ class MainApplication : Application(), Configuration.Provider {
 
         Thread.setDefaultUncaughtExceptionHandler(TinylogUncaughtExceptionHandler())
 
-        Logger.info { "starting ${BuildConfig.APPLICATION_ID}..." }
+        Logger.info { "starting ${BuildConfig.APPLICATION_ID} (version ${BuildConfig.VERSION_NAME})..." }
         Logger.info { "logs directory: '$directoryForLogs'" }
     }
 

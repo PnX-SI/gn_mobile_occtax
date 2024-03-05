@@ -393,9 +393,10 @@ class HomeActivity : AppCompatActivity(),
             vm.isSyncRunning.observe(
                 this@HomeActivity
             ) {
+                emptyTextView?.isVisible = it
+
                 if (it && dataSyncViewModel.lastSynchronizedDate.value?.second == null) {
                     emptyTextView?.text = getString(R.string.home_first_sync)
-                    emptyTextView?.isVisible = true
                 }
 
                 navMenuDataSync?.apply {
@@ -423,6 +424,7 @@ class HomeActivity : AppCompatActivity(),
                         navMenuDataSync?.apply {
                             icon.clearAnimation()
                         }
+                        emptyTextView?.isVisible = false
                     }
 
                     it?.run {
@@ -464,6 +466,7 @@ class HomeActivity : AppCompatActivity(),
                                     icon.clearAnimation()
                                     setIcon(R.drawable.ic_sync)
                                 }
+                                emptyTextView?.isVisible = false
                             }
                         }
 

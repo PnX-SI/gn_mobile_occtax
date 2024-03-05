@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.7.0-rc7](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc7) (2024-03-05, pre-release)
+
+### 🐛 Corrections
+
+* Suppression de contrôles additionnels lors de la synchronisation des taxons ce qui permet
+  d'obtenir un gain non négligeable sur le temps de traitement (https://github.com/PnX-SI/gn_mobile_occtax/issues/247).
+* Petites corrections d'ordre ergonomique.
+
+### ⚠️ Notes de version
+
+* Code de version : 3271
+* Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
+  qui elle même nécessite au minimum la version  2.14 de GeoNature (pas encore disponible).
+
 ## [2.7.0-rc6](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc6) (2024-02-14, pre-release)
 
 ### 🐛 Corrections
