@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.7.0 (unreleased)
+
+### 🐛 Corrections
+
+* Fix #232 & #252
+
 ## [2.7.0-rc7](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc7) (2024-03-05, pre-release)
 
 ### 🐛 Corrections
