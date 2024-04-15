@@ -7,4 +7,4 @@
     android:clickable="true"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:scaleType="centerCrop" />
+    android:scaleType="fitCenter" />
