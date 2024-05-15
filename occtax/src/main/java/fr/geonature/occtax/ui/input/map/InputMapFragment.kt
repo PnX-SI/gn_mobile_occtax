@@ -257,8 +257,10 @@ class InputMapFragment : MapFragment(),
                         filter.getSelectedFeatures()
                     }
                     .flatMap { it.asSequence() }
-                    .map { it.id }
+                    // keep only valid Feature with ID as number
+                    .map { it.id?.toLongOrNull() }
                     .firstOrNull()
+                    ?.toString()
 
             listener.validateCurrentPage()
         }
