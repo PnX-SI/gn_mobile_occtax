@@ -180,6 +180,14 @@ class ObservationRecordJsonWriter {
                     }
                 }
 
+                is PropertyValue.AdditionalFields -> {
+                    writer.name(propertyValue.code)
+                    writeAdditionalFields(
+                        writer,
+                        propertyValue
+                    )
+                }
+
                 is PropertyValue.Taxa -> {
                     writer.name(propertyValue.code)
                         .beginArray()
@@ -248,5 +256,43 @@ class ObservationRecordJsonWriter {
                     else null
                 )
         }
+    }
+
+    private fun writeAdditionalFields(
+        writer: JsonWriter,
+        additionalFields: PropertyValue.AdditionalFields
+    ) {
+        writer.beginObject()
+
+        additionalFields.value.values.forEach {
+            when (it) {
+                is PropertyValue.Nomenclature -> writer.name(it.code)
+                    .value(it.value)
+
+                is PropertyValue.Number -> writer.name(it.code)
+                    .value(it.value)
+
+                is PropertyValue.NumberArray -> {
+                    writer.name(it.code)
+                        .beginArray()
+                    it.value.forEach { value -> writer.value(value) }
+                    writer.endArray()
+                }
+
+                is PropertyValue.StringArray -> {
+                    writer.name(it.code)
+                        .beginArray()
+                    it.value.forEach { value -> writer.value(value) }
+                    writer.endArray()
+                }
+
+                is PropertyValue.Text -> writer.name(it.code)
+                    .value(it.value)
+
+                else -> {}
+            }
+        }
+
+        writer.endObject()
     }
 }

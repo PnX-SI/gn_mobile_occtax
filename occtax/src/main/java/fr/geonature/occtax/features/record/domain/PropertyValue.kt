@@ -22,7 +22,7 @@ sealed class PropertyValue : Parcelable {
             is NumberArray -> value.isEmpty()
             is Dataset -> datasetId == null
             is Nomenclature -> value == null
-            is AdditionalField -> value.all { it.value.isEmpty() }
+            is AdditionalFields -> value.all { it.value.isEmpty() }
             is Taxa -> value.all { taxon -> taxon.properties.all { it.value.isEmpty() } }
             is Counting -> value.all { counting -> counting.properties.all { it.value.isEmpty() } }
             is Media -> value.isEmpty()
@@ -40,7 +40,7 @@ sealed class PropertyValue : Parcelable {
         is NumberArray -> code
         is Dataset -> code
         is Nomenclature -> code
-        is AdditionalField -> code
+        is AdditionalFields -> code
         is Taxa -> code
         is Counting -> code
         is Media -> code
@@ -129,10 +129,10 @@ sealed class PropertyValue : Parcelable {
         PropertyValue()
 
     /**
-     * As additional field.
+     * As additional fields.
      */
     @Parcelize
-    data class AdditionalField(val code: String, val value: Map<String, PropertyValue>) :
+    data class AdditionalFields(val code: String, val value: Map<String, PropertyValue>) :
         PropertyValue()
 
     /**

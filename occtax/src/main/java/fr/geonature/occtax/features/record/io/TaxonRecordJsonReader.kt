@@ -4,6 +4,7 @@ import android.util.JsonReader
 import android.util.JsonToken
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
+import fr.geonature.commons.util.nextLongOrNull
 import fr.geonature.commons.util.nextStringOrNull
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.ObservationRecord
@@ -284,7 +285,8 @@ class TaxonRecordJsonReader {
                         JsonToken.NUMBER -> additionalFields.add(
                             PropertyValue.Number(
                                 keyName,
-                                reader.nextLong()
+                                runCatching { reader.nextLongOrNull() }.getOrNull()
+                                    ?: reader.nextDouble()
                             )
                         )
 

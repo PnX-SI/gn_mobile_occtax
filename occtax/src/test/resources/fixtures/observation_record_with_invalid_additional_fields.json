@@ -40,7 +40,8 @@
         "id_nomenclature_bio_status": 29,
         "additional_fields": {
           "some_field_text": "some_value",
-          "some_field_number": 42,
+          "some_field_as_long": 42,
+          "some_field_as_double": 3.14,
           "some_field_array_string": [
             "val1",
             "val2"

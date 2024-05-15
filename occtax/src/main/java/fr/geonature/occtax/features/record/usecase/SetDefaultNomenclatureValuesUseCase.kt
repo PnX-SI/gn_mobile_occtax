@@ -121,8 +121,8 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
     ): List<PropertyValue> {
         return propertyValues.map {
             when (it) {
-                is PropertyValue.AdditionalField -> {
-                    PropertyValue.AdditionalField(
+                is PropertyValue.AdditionalFields -> {
+                    PropertyValue.AdditionalFields(
                         it.code,
                         mapPropertyValuesFromNomenclature(
                             taxonomy,

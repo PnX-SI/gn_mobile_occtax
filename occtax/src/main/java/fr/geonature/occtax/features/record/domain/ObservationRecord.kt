@@ -39,24 +39,24 @@ data class ObservationRecord(
     /**
      * The main properties of this observation record
      */
-    val properties: SortedMap<String, PropertyValue> = sortedMapOf(),
+    val properties: SortedMap<String, PropertyValue> = sortedMapOf(
+        PropertyValue.Text(
+            "meta_device_entry",
+            "mobile"
+        )
+            .toPair(),
+        PropertyValue.AdditionalFields(
+            ADDITIONAL_FIELDS_KEY,
+            mapOf()
+        )
+            .toPair()
+    ),
 
     /**
      * The current status of this observation record.
      */
     val status: Status = Status.DRAFT
 ) : Parcelable {
-
-    init {
-        PropertyValue.Text(
-            "meta_device_entry",
-            "mobile"
-        )
-            .toPair()
-            .also {
-                properties[it.first] = it.second
-            }
-    }
 
     @IgnoredOnParcel
     val comment = CommentRecord(properties)
@@ -88,6 +88,10 @@ data class ObservationRecord(
         SYNC_IN_PROGRESS,
         SYNC_ERROR,
         SYNC_SUCCESSFUL
+    }
+
+    companion object {
+        const val ADDITIONAL_FIELDS_KEY = "additional_fields"
     }
 }
 

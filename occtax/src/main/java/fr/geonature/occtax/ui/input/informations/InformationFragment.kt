@@ -253,7 +253,7 @@ class InformationFragment : AbstractInputFragment() {
             *((observationRecord?.taxa?.selectedTaxonRecord?.properties?.values
                 ?.filterNotNull()
                 ?.filterNot { it.isEmpty() }
-                ?.filterNot { it is PropertyValue.AdditionalField }
+                ?.filterNot { it is PropertyValue.AdditionalFields }
                 ?: emptyList()) + (observationRecord?.taxa?.selectedTaxonRecord?.additionalFields
                 ?: emptyList())).toTypedArray()
         )

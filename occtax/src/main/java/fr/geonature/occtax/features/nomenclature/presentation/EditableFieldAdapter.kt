@@ -851,15 +851,7 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
             }
 
             override fun afterTextChanged(s: Editable?) {
-                editableField?.run {
-                    value = PropertyValue.Text(
-                        code,
-                        s?.toString()
-                            ?.ifEmpty { null }
-                            ?.ifBlank { null }
-                    )
-                    listener.onUpdate(this)
-                }
+                this@TextSimpleViewHolder.afterTextChanged(s)
             }
         }
 
@@ -872,6 +864,18 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
                         hideSoftKeyboard(v)
                     }
                 }
+            }
+        }
+
+        internal open fun afterTextChanged(s: Editable?) {
+            editableField?.run {
+                value = PropertyValue.Text(
+                    code,
+                    s?.toString()
+                        ?.ifEmpty { null }
+                        ?.ifBlank { null }
+                )
+                listener.onUpdate(this)
             }
         }
 
@@ -901,14 +905,19 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
             }
 
             editableField.value
-                .takeIf { it is PropertyValue.Text && !it.isEmpty() }
+                ?.takeIf { it is PropertyValue.Text && !it.isEmpty() }
                 ?.let { it as PropertyValue.Text }
+                ?.value
                 ?.also {
-                    edit.editText?.removeTextChangedListener(textWatcher)
-                    edit.editText?.text = Editable.Factory.getInstance()
-                        .newEditable(it.value)
-                    edit.editText?.addTextChangedListener(textWatcher)
+                    setText(it)
                 }
+        }
+
+        internal fun setText(charSequence: CharSequence) {
+            edit.editText?.removeTextChangedListener(textWatcher)
+            edit.editText?.text = Editable.Factory.getInstance()
+                .newEditable(charSequence)
+            edit.editText?.addTextChangedListener(textWatcher)
         }
     }
 
@@ -927,8 +936,31 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
     inner class NumberViewHolder(parent: ViewGroup) : TextSimpleViewHolder(parent) {
         init {
             edit.editText?.apply {
-                inputType = InputType.TYPE_CLASS_NUMBER
+                inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
             }
+        }
+
+        override fun afterTextChanged(s: Editable?) {
+            editableField?.run {
+                value = PropertyValue.Number(
+                    code,
+                    s?.toString()
+                        ?.toDoubleOrNull()
+                )
+                listener.onUpdate(this)
+            }
+        }
+
+        override fun onBind(editableField: EditableField) {
+            super.onBind(editableField)
+
+            editableField.value
+                ?.takeIf { it is PropertyValue.Number && !it.isEmpty() }
+                ?.let { it as PropertyValue.Number }
+                ?.value
+                ?.also {
+                    setText(it.toString())
+                }
         }
     }
 

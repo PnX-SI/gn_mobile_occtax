@@ -216,6 +216,10 @@ class ObservationRecordJsonWriterTest {
                                     PropertyValue.Text(
                                         "some_field_text",
                                         "some_value"
+                                    ),
+                                    PropertyValue.Number(
+                                        "some_field_number",
+                                        3.14
                                     )
                                 )
                             }

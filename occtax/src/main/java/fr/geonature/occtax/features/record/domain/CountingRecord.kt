@@ -22,7 +22,12 @@ data class CountingRecord(
     /**
      * The main properties of this taxon counting record.
      */
-    val properties: SortedMap<String, PropertyValue> = sortedMapOf()
+    val properties: SortedMap<String, PropertyValue> = sortedMapOf(
+        ADDITIONAL_FIELDS_KEY to PropertyValue.AdditionalFields(
+            ADDITIONAL_FIELDS_KEY,
+            mapOf()
+        )
+    )
 ) : Parcelable {
 
     /**
@@ -73,11 +78,11 @@ data class CountingRecord(
     @IgnoredOnParcel
     var additionalFields: List<PropertyValue>
         get() = properties[ADDITIONAL_FIELDS_KEY]
-            ?.takeIf { it is PropertyValue.AdditionalField }
-            ?.let { it as PropertyValue.AdditionalField }?.value?.values?.toList()
+            ?.takeIf { it is PropertyValue.AdditionalFields }
+            ?.let { it as PropertyValue.AdditionalFields }?.value?.values?.toList()
             ?: emptyList()
         set(value) {
-            PropertyValue.AdditionalField(
+            PropertyValue.AdditionalFields(
                 ADDITIONAL_FIELDS_KEY,
                 value.associate { it.toPair() }
             )

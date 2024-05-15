@@ -296,8 +296,12 @@ class ObservationRecordJsonReaderTest {
                                 "some_value"
                             ),
                             PropertyValue.Number(
-                                "some_field_number",
+                                "some_field_as_long",
                                 42L
+                            ),
+                            PropertyValue.Number(
+                                "some_field_as_double",
+                                3.14
                             ),
                             PropertyValue.StringArray(
                                 "some_field_array_string",

@@ -111,6 +111,26 @@ class CountingRecordTest {
     }
 
     @Test
+    fun `should have additional fields with no values`() {
+        // given a counting record
+        val countingRecord = CountingRecord(index = 1).apply {
+            properties["STADE_VIE"] = PropertyValue.Nomenclature(
+                code = "STADE_VIE",
+                label = "Inconnu",
+                value = 1
+            )
+        }
+
+        assertEquals(
+            PropertyValue.AdditionalFields(
+                CountingRecord.ADDITIONAL_FIELDS_KEY,
+                mapOf()
+            ),
+            countingRecord.properties[CountingRecord.ADDITIONAL_FIELDS_KEY]
+        )
+    }
+
+    @Test
     fun `should get all additional fields values`() {
         // given a counting record
         val countingRecord = CountingRecord(
@@ -122,7 +142,7 @@ class CountingRecordTest {
                         label = "Inconnu",
                         value = 1
                     ),
-                CountingRecord.ADDITIONAL_FIELDS_KEY to PropertyValue.AdditionalField(
+                CountingRecord.ADDITIONAL_FIELDS_KEY to PropertyValue.AdditionalFields(
                     CountingRecord.ADDITIONAL_FIELDS_KEY,
                     mapOf(
                         "some_key" to PropertyValue.Text(
@@ -157,7 +177,7 @@ class CountingRecordTest {
                         label = "Inconnu",
                         value = 1
                     ),
-                CountingRecord.ADDITIONAL_FIELDS_KEY to PropertyValue.AdditionalField(
+                CountingRecord.ADDITIONAL_FIELDS_KEY to PropertyValue.AdditionalFields(
                     CountingRecord.ADDITIONAL_FIELDS_KEY,
                     mapOf(
                         "some_key" to PropertyValue.Text(

@@ -146,7 +146,7 @@ class TaxonRecordJsonWriter {
                     }
                 }
 
-                is PropertyValue.AdditionalField -> {
+                is PropertyValue.AdditionalFields -> {
                     writer.name(propertyValue.code)
                     writeAdditionalFields(
                         writer,
@@ -208,7 +208,7 @@ class TaxonRecordJsonWriter {
                     }
                 }
 
-                is PropertyValue.AdditionalField -> {
+                is PropertyValue.AdditionalFields -> {
                     writer.name(propertyValue.code)
                     writeAdditionalFields(
                         writer,
@@ -278,11 +278,11 @@ class TaxonRecordJsonWriter {
 
     private fun writeAdditionalFields(
         writer: JsonWriter,
-        additionalField: PropertyValue.AdditionalField
+        additionalFields: PropertyValue.AdditionalFields
     ) {
         writer.beginObject()
 
-        additionalField.value.values.forEach {
+        additionalFields.value.values.forEach {
             when (it) {
                 is PropertyValue.Nomenclature -> writer.name(it.code)
                     .value(it.value)

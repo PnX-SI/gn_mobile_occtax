@@ -373,7 +373,7 @@ class EditCountingMetadataFragment : Fragment() {
             *((countingRecord?.properties?.values
                 ?.filterNotNull()
                 ?.filterNot { it.isEmpty() }
-                ?.filterNot { it is PropertyValue.AdditionalField }
+                ?.filterNot { it is PropertyValue.AdditionalFields }
                 ?: emptyList()) + (countingRecord?.additionalFields ?: emptyList())).toTypedArray()
         )
     }

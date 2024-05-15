@@ -127,7 +127,7 @@ class TaxaFragment : AbstractInputFragment() {
                             authority,
                             Taxon.TABLE_NAME,
                             if (taxaListId == null) "" else "list/$taxaListId",
-                            if (selectedFeatureId.isNullOrBlank()) "" else "area/$selectedFeatureId"
+                            selectedFeatureId?.toLongOrNull()?.let { "area/$it" } ?:""
                         ),
                         null,
                         taxonFilter.first,

@@ -69,7 +69,11 @@ class ObservationRecordLocalDataSourceImpl(
                 preferenceManager.all
                     .filterKeys { it.startsWith("${KEY_PREFERENCE_INPUT}_") }
                     .values
-                    .mapNotNull { if (it is String && it.isNotBlank()) runCatching { observationRecordJsonReader.read(it) }.getOrNull() else null } + exportedObservationRecords
+                    .mapNotNull {
+                        if (it is String && it.isNotBlank()) runCatching { observationRecordJsonReader.read(it) }
+                            .onFailure { throwable -> Logger.error(throwable) { "failed to load observation record" } }
+                            .getOrNull() else null
+                    } + exportedObservationRecords
                 ).distinctBy { it.internalId }
                 .sortedByDescending { it.dates.start }
         }

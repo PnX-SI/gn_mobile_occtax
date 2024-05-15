@@ -9,6 +9,7 @@ import fr.geonature.occtax.features.nomenclature.repository.IAdditionalFieldRepo
 import fr.geonature.occtax.features.nomenclature.repository.IDefaultPropertyValueRepository
 import fr.geonature.occtax.features.nomenclature.repository.INomenclatureRepository
 import fr.geonature.occtax.features.settings.domain.PropertySettings
+import org.tinylog.Logger
 import javax.inject.Inject
 
 /**
@@ -23,6 +24,8 @@ class GetEditableFieldsUseCase @Inject constructor(
 ) :
     BaseResultUseCase<List<EditableField>, GetEditableFieldsUseCase.Params>() {
     override suspend fun run(params: Params): Result<List<EditableField>> {
+        Logger.info { "loading editable fields of type '${params.type.name}'${if (params.withAdditionalFields) " with additional fields" else ""}${params.datasetId?.let { " matching dataset ID $it" } ?: ""}..." }
+
         val editableNomenclatures = (nomenclatureRepository.getEditableFields(
             params.type,
             *params.settings.toTypedArray()

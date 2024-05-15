@@ -729,6 +729,10 @@ class ObservationRecordTest {
                     )
                 ),
                 properties = listOf(
+                    PropertyValue.AdditionalFields(
+                        TaxonRecord.ADDITIONAL_FIELDS_KEY,
+                        mapOf()
+                    ),
                     PropertyValue.Text(
                         "some_code",
                         "some_value"
@@ -755,6 +759,10 @@ class ObservationRecordTest {
                         )
                     ),
                     properties = listOf(
+                        PropertyValue.AdditionalFields(
+                            TaxonRecord.ADDITIONAL_FIELDS_KEY,
+                            mapOf()
+                        ),
                         PropertyValue.Text(
                             "some_code",
                             "some_value"
