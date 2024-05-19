@@ -1,5 +1,37 @@
 # Changelog
 
+## [2.7.0-rc8](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc8) (2024-05-19, pre-release)
+
+### 🐛 Corrections
+
+* Meilleure gestion des photos prises en haute résolution (https://github.com/PnX-SI/gn_mobile_occtax/issues/254) :
+  * Par défaut, les photos prises sont compressées avec une qualité de 80% et ne dépassent pas
+    2048px en largeur ou en hauteur selon son orientation (portrait ou paysage)
+* Gestion des signatures lors du build de l'APK au format v3 pour y inclure par rotation des
+  certificats un certificat plus officiel que celui actuellement utilisé par défaut. À terme, ce
+  nouveau certificat remplacera l'actuel. (https://github.com/PnX-SI/gn_mobile_occtax/issues/244, https://github.com/PnX-SI/gn_mobile_occtax/issues/134).
+* Les identifiants des objets géographiques dans les couches géographiques vectorielles deviennent
+  optionnels (https://github.com/PnX-SI/gn_mobile_maps/issues/11, https://github.com/PnX-SI/gn_mobile_occtax/issues/175).
+* Synchronisation périodique des identifiants de liste rattachés aux taxons (https://github.com/PnX-SI/gn_mobile_occtax/issues/133).
+* Série de corrections autour de la gestion des champs additionnels (https://github.com/PnX-SI/gn_mobile_occtax/issues/122).
+  En vrac :
+  * Synchronisation des relevés avec ou sans champs additionnels
+  * Filtrage des champs additionnels selon le jeu de données sélectionné
+  * Gestion des valeurs décimales sur les champs additionnels de type `number`
+* Meilleure affichage des photos qu'elles soient prises en mode portrait ou en mode paysage (https://github.com/PnX-SI/gn_mobile_occtax/issues/84).
+* Affichage des taxons filtrés selon l'identifiant de liste provenant du jeu de données (https://github.com/PnX-SI/gn_mobile_core/issues/41) :
+  * Un jeu de données peut définir un identifiant de liste et celle-ci peut être `null` ou égale à `-1`
+  * Si l'identifiant de liste est non défini, on prend la valeur par défaut venant du paramétrage de
+    l'application (`sync.taxa_list_id`) pour filtrer la liste des taxons
+  * Si l'identifiant de liste est égale à `-1`, on n'applique aucun filtre sur les identifiants de
+    liste même si c'est configuré coté paramétrage
+
+### ⚠️ Notes de version
+
+* Code de version : 3299
+* Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
+  qui elle même nécessite au minimum la version  2.14.1 de GeoNature (pas encore disponible).
+
 ## [2.7.0-rc7](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc7) (2024-03-05, pre-release)
 
 ### 🐛 Corrections
@@ -76,7 +108,7 @@
 ### 🐛 Corrections
 
 * Erreur transparente lors de la synchronisation des données si le champ 'nom_valide' est non
-  renseigné coté taxref (https://github.com/PnX-SI/gn_mobile_occtax/issues/133).
+  renseigné coté taxref (https://github.com/PnX-SI/gn_mobile_occtax/issues/233).
 
 ### ⚠️ Notes de version
 
