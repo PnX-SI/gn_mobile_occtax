@@ -127,7 +127,8 @@ class TaxaFragment : AbstractInputFragment() {
                             authority,
                             Taxon.TABLE_NAME,
                             if (taxaListId == null) "" else "list/$taxaListId",
-                            selectedFeatureId?.toLongOrNull()?.let { "area/$it" } ?:""
+                            selectedFeatureId?.toLongOrNull()
+                                ?.let { "area/$it" } ?: ""
                         ),
                         null,
                         taxonFilter.first,
@@ -436,13 +437,13 @@ class TaxaFragment : AbstractInputFragment() {
         (observationRecord?.dataset?.dataset?.taxaListId ?: arguments?.getLong(
             KEY_TAXA_LIST_ID,
             -1L
-        ))?.takeIf { it >= 0L }
-            ?.also {
+        ))?.also {
+            if (it >= 0L)
                 savedState.putLong(
                     KEY_TAXA_LIST_ID,
                     it
-                )
-            }
+                ) else savedState.remove(KEY_TAXA_LIST_ID)
+        }
 
         loadTaxa()
 
@@ -676,6 +677,8 @@ class TaxaFragment : AbstractInputFragment() {
             taxaListId: Long? = null
         ) =
             TaxaFragment().apply {
+                Logger.debug { "default taxa list ID: $taxaListId" }
+
                 arguments = Bundle().apply {
                     putInt(
                         ARG_AREA_OBSERVATION_DURATION,
