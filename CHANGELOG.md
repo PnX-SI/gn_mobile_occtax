@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.7.0-rc9](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc9) (2024-07-07, pre-release)
+
+### 🐛 Corrections
+
+* Le prénom de l'utilisateur connecté peut être non défini (https://github.com/PnX-SI/gn_mobile_occtax/issues/258).
+* Le paramètre `taxa_list_id` peut être non défini (-1 par défaut) (https://github.com/PnX-SI/gn_mobile_core/issues/41).
+* La base des taxons peut être incomplète suite à une synchronisation complète lors des appels en
+  cascade selon les données paginées remontées par l'API car l'ordre n'est pas garantit sur les
+  données paginées pouvant donc créer des doublons entre deux appels. La solution de contournement
+  est d'appliquer systématiquement un tri par défaut sur les identifiants des taxons.
+
+### ⚠️ Notes de version
+
+* Code de version : 3301
+* Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
+  qui elle même nécessite au minimum la version  2.14.1 de GeoNature (pas encore disponible).
+
 ## [2.7.0-rc8](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc8) (2024-05-19, pre-release)
 
 ### 🐛 Corrections
