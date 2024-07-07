@@ -215,7 +215,10 @@ class SynchronizeObservationRecordRepositoryImpl(
                         geoNatureAPIClient.sendMediaFile(
                             nomenclatureForImage.id,
                             idTableLocation,
-                            author = "${authUser.lastname.uppercase()} ${authUser.firstname.replaceFirstChar { c -> c.uppercase() }}",
+                            author = "${authUser.lastname.uppercase()}${
+                                authUser.firstname?.replaceFirstChar { c -> c.uppercase() }
+                                    ?.let { " $it" } ?: ""
+                            }",
                             titleEn = if (isFrenchLocale) null else mediaTitle,
                             titleFr = if (isFrenchLocale) mediaTitle else null,
                             descriptionEn = if (isFrenchLocale) null else mediaDescription,
