@@ -46,7 +46,7 @@ class AdditionalFieldRepositoryImpl(
                                 code = it.additionalField.name,
                                 viewType = EditableField.ViewType.CHECKBOX,
                                 visible = true,
-                                default = type != EditableField.Type.INFORMATION,
+                                default = true,
                                 additionalField = true,
                                 label = it.additionalField.label,
                                 values = it.values.map { fieldValue ->
@@ -72,7 +72,7 @@ class AdditionalFieldRepositoryImpl(
                                 code = it.additionalField.name,
                                 viewType = EditableField.ViewType.SELECT_MULTIPLE,
                                 visible = true,
-                                default = type != EditableField.Type.INFORMATION,
+                                default = true,
                                 additionalField = true,
                                 label = it.additionalField.label,
                                 values = it.values.map { fieldValue ->
@@ -92,7 +92,7 @@ class AdditionalFieldRepositoryImpl(
                                     viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
                                     nomenclatureType = mnemonic,
                                     visible = true,
-                                    default = type != EditableField.Type.INFORMATION,
+                                    default = true,
                                     additionalField = true,
                                     label = it.additionalField.label
                                 )
@@ -110,7 +110,7 @@ class AdditionalFieldRepositoryImpl(
                             code = it.additionalField.name,
                             viewType = EditableField.ViewType.NUMBER,
                             visible = true,
-                            default = type != EditableField.Type.INFORMATION,
+                            default = true,
                             additionalField = true,
                             label = it.additionalField.label
                         )
@@ -129,7 +129,7 @@ class AdditionalFieldRepositoryImpl(
                                 code = it.additionalField.name,
                                 viewType = EditableField.ViewType.RADIO,
                                 visible = true,
-                                default = type != EditableField.Type.INFORMATION,
+                                default = true,
                                 additionalField = true,
                                 label = it.additionalField.label,
                                 values = it.values.map { fieldValue ->
@@ -155,7 +155,7 @@ class AdditionalFieldRepositoryImpl(
                                 code = it.additionalField.name,
                                 viewType = EditableField.ViewType.SELECT_SIMPLE,
                                 visible = true,
-                                default = type != EditableField.Type.INFORMATION,
+                                default = true,
                                 additionalField = true,
                                 label = it.additionalField.label,
                                 values = it.values.map { fieldValue ->
@@ -172,7 +172,7 @@ class AdditionalFieldRepositoryImpl(
                             code = it.additionalField.name,
                             viewType = EditableField.ViewType.TEXT_SIMPLE,
                             visible = true,
-                            default = type != EditableField.Type.INFORMATION,
+                            default = true,
                             additionalField = true,
                             label = it.additionalField.label
                         )
@@ -182,7 +182,7 @@ class AdditionalFieldRepositoryImpl(
                             code = it.additionalField.name,
                             viewType = EditableField.ViewType.TEXT_MULTIPLE,
                             visible = true,
-                            default = type != EditableField.Type.INFORMATION,
+                            default = true,
                             additionalField = true,
                             label = it.additionalField.label
                         )
