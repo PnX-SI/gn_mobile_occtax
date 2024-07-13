@@ -135,7 +135,8 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
 
         val taxon = Taxon.fromCursor(cursor) ?: return ""
 
-        return taxon.name.elementAt(0).toString()
+        return taxon.name.elementAt(0)
+            .toString()
     }
 
     fun setSelectedTaxon(selectedTaxon: Taxon) {
@@ -182,11 +183,12 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
     }
 
     inner class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
-        LayoutInflater.from(parent.context).inflate(
-            R.layout.list_item_taxon,
-            parent,
-            false
-        )
+        LayoutInflater.from(parent.context)
+            .inflate(
+                R.layout.list_item_taxon,
+                parent,
+                false
+            )
     ) {
 
         private val title: TextView = itemView.findViewById(android.R.id.title)
@@ -210,20 +212,22 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
 
             val previousTitle = if (position > 0) {
                 cursor.moveToPosition(position - 1)
-                TaxonWithArea.fromCursor(cursor)?.name?.elementAt(0)?.toString() ?: ""
+                TaxonWithArea.fromCursor(cursor)?.name?.elementAt(0)
+                    ?.toString() ?: ""
             } else {
                 ""
             }
 
             if (taxon != null) {
-                val currentTitle = taxon.name.elementAt(0).toString()
+                val currentTitle = taxon.name.elementAt(0)
+                    .toString()
                 title.text = if (previousTitle == currentTitle) "" else currentTitle
 
                 text1.text = taxon.name
                 text2.text = taxon.commonName
 
                 summary.text = HtmlCompat.fromHtml(
-                    "${if (taxon.description.isNullOrBlank()) "" else "<i>${taxon.description ?: ""}</i>"}${if (taxon.rank.isNullOrBlank()) "" else "${if (taxon.description.isNullOrBlank()) "" else " - [${taxon.rank}]"} "}",
+                    if (taxon.description.isNullOrBlank()) "" else "<i>${taxon.description ?: ""}</i>",
                     HtmlCompat.FROM_HTML_MODE_COMPACT
                 )
                 itemView.isSelected = selectedTaxon?.id == taxon.id
@@ -239,12 +243,16 @@ class TaxaRecyclerViewAdapter(private val listener: OnTaxaRecyclerViewAdapterLis
                         return@with
                     }
 
-                    taxonColorView.setBackgroundColor(if (color.isNullOrBlank()) Color.TRANSPARENT else Color.parseColor(color))
+                    taxonColorView.setBackgroundColor(if (color.isNullOrBlank()) Color.TRANSPARENT else runCatching { Color.parseColor(color) }.getOrElse { Color.TRANSPARENT })
                     taxonObserversImageView.visibility = View.VISIBLE
                     taxonObserversView.text =
-                        NumberFormat.getNumberInstance().format(numberOfObservers)
+                        NumberFormat.getNumberInstance()
+                            .format(numberOfObservers)
                     taxonLastUpdatedAtView.text =
-                        lastUpdatedAt?.let { DateFormat.getDateFormat(itemView.context).format(it) }
+                        lastUpdatedAt?.let {
+                            DateFormat.getDateFormat(itemView.context)
+                                .format(it)
+                        }
                             ?: ""
                 }
 

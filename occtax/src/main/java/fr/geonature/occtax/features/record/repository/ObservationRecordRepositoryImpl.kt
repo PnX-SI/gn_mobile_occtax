@@ -3,7 +3,7 @@ package fr.geonature.occtax.features.record.repository
 import fr.geonature.commons.features.taxon.data.ITaxonLocalDataSource
 import fr.geonature.occtax.features.record.data.IObservationRecordLocalDataSource
 import fr.geonature.occtax.features.record.domain.ObservationRecord
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 
 /**
  * Default implementation of [IObservationRecordRepository].

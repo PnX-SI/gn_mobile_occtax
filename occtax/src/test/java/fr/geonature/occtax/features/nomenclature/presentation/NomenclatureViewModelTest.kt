@@ -7,12 +7,9 @@ import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.error.Failure
 import fr.geonature.commons.features.nomenclature.error.NomenclatureException
-import fr.geonature.commons.fp.Either.Left
-import fr.geonature.commons.fp.Either.Right
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
-import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
-import fr.geonature.occtax.features.nomenclature.usecase.GetEditableNomenclaturesUseCase
+import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.usecase.GetEditableFieldsUseCase
 import fr.geonature.occtax.features.nomenclature.usecase.GetNomenclatureValuesByTypeAndTaxonomyUseCase
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import io.mockk.MockKAnnotations.init
@@ -44,13 +41,13 @@ class NomenclatureViewModelTest {
     val coroutineTestRule = CoroutineTestRule()
 
     @RelaxedMockK
-    private lateinit var getEditableNomenclaturesUseCase: GetEditableNomenclaturesUseCase
+    private lateinit var getEditableFieldsUseCase: GetEditableFieldsUseCase
 
     @MockK
     private lateinit var getNomenclatureValuesByTypeAndTaxonomyUseCase: GetNomenclatureValuesByTypeAndTaxonomyUseCase
 
     @RelaxedMockK
-    private lateinit var editableNomenclaturesObserver: Observer<List<EditableNomenclatureType>>
+    private lateinit var editableNomenclaturesObserver: Observer<List<EditableField>>
 
     @RelaxedMockK
     private lateinit var nomenclatureValuesObserver: Observer<List<Nomenclature>>
@@ -68,7 +65,7 @@ class NomenclatureViewModelTest {
         init(this)
 
         nomenclatureViewModel = NomenclatureViewModel(
-            getEditableNomenclaturesUseCase,
+            getEditableFieldsUseCase,
             getNomenclatureValuesByTypeAndTaxonomyUseCase
         )
     }
@@ -83,22 +80,22 @@ class NomenclatureViewModelTest {
         runTest {
             // given some nomenclature types with default values
             val expectedEditableNomenclatures = listOf(
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
+                EditableField(
+                    EditableField.Type.INFORMATION,
                     "METH_OBS",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableField.ViewType.NOMENCLATURE_TYPE,
                     label = "Méthodes d'observation"
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
+                EditableField(
+                    EditableField.Type.INFORMATION,
                     "ETA_BIO",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableField.ViewType.NOMENCLATURE_TYPE,
                     label = "Etat biologique de l'observation"
                 ),
-                EditableNomenclatureType(
-                    EditableNomenclatureType.Type.INFORMATION,
+                EditableField(
+                    EditableField.Type.INFORMATION,
                     "STATUT_BIO",
-                    EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE,
+                    EditableField.ViewType.NOMENCLATURE_TYPE,
                     label = "Statut biologique",
                     visible = false,
                     value = PropertyValue.Nomenclature(
@@ -109,16 +106,16 @@ class NomenclatureViewModelTest {
                 )
             )
             coEvery {
-                getEditableNomenclaturesUseCase.run(
-                    GetEditableNomenclaturesUseCase.Params(
-                        EditableNomenclatureType.Type.INFORMATION,
+                getEditableFieldsUseCase.run(
+                    GetEditableFieldsUseCase.Params(
+                        type = EditableField.Type.INFORMATION,
                     )
                 )
-            } returns Right(expectedEditableNomenclatures)
+            } returns Result.success(expectedEditableNomenclatures)
             coEvery {
-                getEditableNomenclaturesUseCase(
-                    GetEditableNomenclaturesUseCase.Params(
-                        EditableNomenclatureType.Type.INFORMATION,
+                getEditableFieldsUseCase(
+                    GetEditableFieldsUseCase.Params(
+                        type = EditableField.Type.INFORMATION,
                     ),
                     nomenclatureViewModel.viewModelScope,
                     any()
@@ -126,9 +123,9 @@ class NomenclatureViewModelTest {
             } answers { callOriginal() }
 
             // when
-            nomenclatureViewModel.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
+            nomenclatureViewModel.getEditableFields(type = EditableField.Type.INFORMATION)
             nomenclatureViewModel.editableNomenclatures.observeForever(editableNomenclaturesObserver)
-            nomenclatureViewModel.failure.observeForever(failureObserver)
+            nomenclatureViewModel.error.observeForever(errorObserver)
 
             // then
             verify(atLeast = 1) { editableNomenclaturesObserver.onChanged(expectedEditableNomenclatures) }
@@ -136,20 +133,20 @@ class NomenclatureViewModelTest {
         }
 
     @Test
-    fun `should get NoNomenclatureTypeFoundLocallyFailure if no nomenclature types was found`() =
+    fun `should get NoNomenclatureTypeFoundException if no nomenclature types was found`() =
         runTest {
             // given some failure from usecase
             coEvery {
-                getEditableNomenclaturesUseCase.run(
-                    GetEditableNomenclaturesUseCase.Params(
-                        EditableNomenclatureType.Type.INFORMATION,
+                getEditableFieldsUseCase.run(
+                    GetEditableFieldsUseCase.Params(
+                        type = EditableField.Type.INFORMATION,
                     )
                 )
-            } returns Left(NoNomenclatureTypeFoundLocallyFailure)
+            } returns Result.failure(NomenclatureException.NoNomenclatureTypeFoundException)
             coEvery {
-                getEditableNomenclaturesUseCase(
-                    GetEditableNomenclaturesUseCase.Params(
-                        EditableNomenclatureType.Type.INFORMATION,
+                getEditableFieldsUseCase(
+                    GetEditableFieldsUseCase.Params(
+                        type = EditableField.Type.INFORMATION,
                     ),
                     nomenclatureViewModel.viewModelScope,
                     any()
@@ -157,13 +154,13 @@ class NomenclatureViewModelTest {
             } answers { callOriginal() }
 
             // when
-            nomenclatureViewModel.getEditableNomenclatures(EditableNomenclatureType.Type.INFORMATION)
+            nomenclatureViewModel.getEditableFields(type = EditableField.Type.INFORMATION)
             nomenclatureViewModel.editableNomenclatures.observeForever(editableNomenclaturesObserver)
-            nomenclatureViewModel.failure.observeForever(failureObserver)
+            nomenclatureViewModel.error.observeForever(errorObserver)
 
             // then
-            verify { failureObserver.onChanged(NoNomenclatureTypeFoundLocallyFailure) }
-            confirmVerified(failureObserver)
+            verify { errorObserver.onChanged(NomenclatureException.NoNomenclatureTypeFoundException) }
+            confirmVerified(errorObserver)
         }
 
     @Test

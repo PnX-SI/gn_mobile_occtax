@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
@@ -20,7 +19,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.ContentProviderAuthority
-import fr.geonature.commons.data.GeoNatureModuleName
 import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
 import fr.geonature.compat.os.getParcelableCompat
@@ -40,10 +38,6 @@ class DatasetListFragment : Fragment() {
     @Inject
     lateinit var authority: String
 
-    @GeoNatureModuleName
-    @Inject
-    lateinit var moduleName: String
-
     private var listener: OnDatasetListFragmentListener? = null
     private var adapter: DatasetRecyclerViewAdapter? = null
 
@@ -59,7 +53,6 @@ class DatasetListFragment : Fragment() {
                     buildUri(
                         authority,
                         Dataset.TABLE_NAME,
-                        args?.getString(Dataset.COLUMN_MODULE) ?: "",
                         "active"
                     ),
                     null,
@@ -159,12 +152,7 @@ class DatasetListFragment : Fragment() {
             LoaderManager.getInstance(this)
                 .initLoader(
                     LOADER_DATASET,
-                    bundleOf(
-                        Pair(
-                            Dataset.COLUMN_MODULE,
-                            moduleName
-                        )
-                    ),
+                    null,
                     loaderCallbacks
                 )
         }

@@ -5,15 +5,20 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import fr.geonature.commons.data.GeoNatureModuleName
+import fr.geonature.commons.data.LocalDatabase
 import fr.geonature.commons.data.dao.NomenclatureDao
 import fr.geonature.commons.data.dao.NomenclatureTypeDao
+import fr.geonature.commons.features.nomenclature.data.AdditionalFieldLocalDataSourceImpl
+import fr.geonature.commons.features.nomenclature.data.IAdditionalFieldLocalDataSource
 import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSource
 import fr.geonature.commons.features.nomenclature.data.NomenclatureLocalDataSourceImpl
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureSettingsLocalDataSource
 import fr.geonature.occtax.features.nomenclature.data.IPropertyValueLocalDataSource
 import fr.geonature.occtax.features.nomenclature.data.InMemoryPropertyValueLocalDataSourceImpl
 import fr.geonature.occtax.features.nomenclature.data.NomenclatureSettingsLocalDataSourceImpl
+import fr.geonature.occtax.features.nomenclature.repository.AdditionalFieldRepositoryImpl
 import fr.geonature.occtax.features.nomenclature.repository.DefaultPropertyValueRepositoryImpl
+import fr.geonature.occtax.features.nomenclature.repository.IAdditionalFieldRepository
 import fr.geonature.occtax.features.nomenclature.repository.IDefaultPropertyValueRepository
 import fr.geonature.occtax.features.nomenclature.repository.INomenclatureRepository
 import fr.geonature.occtax.features.nomenclature.repository.NomenclatureRepositoryImpl
@@ -56,6 +61,12 @@ object NomenclatureModule {
 
     @Singleton
     @Provides
+    fun provideAdditionalFieldDataSource(database: LocalDatabase): IAdditionalFieldLocalDataSource {
+        return AdditionalFieldLocalDataSourceImpl(database)
+    }
+
+    @Singleton
+    @Provides
     fun provideNomenclatureRepository(
         nomenclatureLocalDataSource: INomenclatureLocalDataSource,
         nomenclatureSettingsLocalDataSource: INomenclatureSettingsLocalDataSource
@@ -76,5 +87,13 @@ object NomenclatureModule {
             propertyValueLocalDataSource,
             nomenclatureLocalDataSource
         )
+    }
+
+    @Singleton
+    @Provides
+    fun provideAdditionalFieldRepository(
+        additionalFieldLocalDataSource: IAdditionalFieldLocalDataSource
+    ): IAdditionalFieldRepository {
+        return AdditionalFieldRepositoryImpl(additionalFieldLocalDataSource)
     }
 }

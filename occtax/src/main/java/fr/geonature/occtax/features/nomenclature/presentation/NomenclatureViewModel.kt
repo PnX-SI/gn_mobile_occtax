@@ -7,10 +7,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.lifecycle.BaseViewModel
-import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
-import fr.geonature.occtax.features.nomenclature.usecase.GetEditableNomenclaturesUseCase
+import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.usecase.GetEditableFieldsUseCase
 import fr.geonature.occtax.features.nomenclature.usecase.GetNomenclatureValuesByTypeAndTaxonomyUseCase
-import fr.geonature.occtax.settings.PropertySettings
+import fr.geonature.occtax.features.settings.domain.PropertySettings
 import org.tinylog.Logger
 import javax.inject.Inject
 
@@ -19,40 +19,47 @@ import javax.inject.Inject
  *
  * @author S. Grimault
  *
- * @see GetEditableNomenclaturesUseCase
+ * @see GetEditableFieldsUseCase
  * @see GetNomenclatureValuesByTypeAndTaxonomyUseCase
  */
 @HiltViewModel
 class NomenclatureViewModel @Inject constructor(
-    private val getEditableNomenclaturesUseCase: GetEditableNomenclaturesUseCase,
+    private val getEditableFieldsUseCase: GetEditableFieldsUseCase,
     private val getNomenclatureValuesByTypeAndTaxonomyUseCase: GetNomenclatureValuesByTypeAndTaxonomyUseCase
 ) : BaseViewModel() {
 
-    private val _editableNomenclatures = MutableLiveData<List<EditableNomenclatureType>>()
-    val editableNomenclatures: LiveData<List<EditableNomenclatureType>> = _editableNomenclatures
+    private val _editableNomenclatures = MutableLiveData<List<EditableField>>()
+    val editableNomenclatures: LiveData<List<EditableField>> = _editableNomenclatures
 
     /**
-     * Gets all editable nomenclatures from given type with default values.
+     * Gets all editable fields from given type with default values.
      *
      * @param type the main editable nomenclature type
      * @param defaultPropertySettings the default nomenclature settings
      */
-    fun getEditableNomenclatures(
-        type: EditableNomenclatureType.Type,
+    fun getEditableFields(
+        datasetId: Long? = null,
+        withAdditionalFields: Boolean = false,
+        type: EditableField.Type,
         defaultPropertySettings: List<PropertySettings> = listOf(),
         taxonomy: Taxonomy? = null
     ) {
-        getEditableNomenclaturesUseCase(
-            GetEditableNomenclaturesUseCase.Params(
+        getEditableFieldsUseCase(
+            GetEditableFieldsUseCase.Params(
+                datasetId,
+                withAdditionalFields,
                 type,
                 defaultPropertySettings,
                 taxonomy
             ),
             viewModelScope
         ) {
-            it.fold(::handleFailure) { editableNomenclatures ->
-                _editableNomenclatures.value = editableNomenclatures
-            }
+            it.fold(
+                onSuccess = { editableNomenclatures ->
+                    _editableNomenclatures.value = editableNomenclatures
+                },
+                ::handleError
+            )
         }
     }
 

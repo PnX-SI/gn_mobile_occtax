@@ -21,7 +21,8 @@ Based on [datasync module](https://github.com/PnX-SI/gn_mobile_core) to synchron
 
 ## Settings
 
-Example:
+The app settings file is automatically updated locally when the application is started, as soon as the *GeoNature* URL is defined, with the one on *GeoNature* server.
+This settings file `settings_occtax.json` can be found locally in the `Android/data/fr.geonature.occtax2/` directory of the terminal's main storage. Example:
 
 ```json
 {
@@ -99,7 +100,7 @@ Example:
 ### Parameters description
 
 | Parameter                          | UI      | Description                                                                                        | Default value |
-| ---------------------------------- | ------- | -------------------------------------------------------------------------------------------------- | ------------- |
+|------------------------------------| ------- |----------------------------------------------------------------------------------------------------| ------------- |
 | `area_observation_duration`        | &#9744; | Area observation duration period (in days)                                                         | 365           |
 | `sync`                             | &#9744; | Data synchronization settings (cf. https://github.com/PnX-SI/gn_mobile_core/tree/develop/datasync) |               |
 | `map`                              | &#9744; | Maps settings (cf. https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps)                     |               |
@@ -107,6 +108,7 @@ Example:
 | `input/date`                       | &#9744; | Date settings                                                                                      |               |
 | `nomenclature`                     | &#9744; | Nomenclature settings                                                                              |               |
 | `nomenclature/save_default_values` | &#9744; | Save default nomenclature values                                                                   | false         |
+| `nomenclature/additional_fields`   | &#9744; | Show additional fields                                                                             | false         |
 | `nomenclature/information`         | &#9744; | Information settings (as array)                                                                    |               |
 | `nomenclature/counting`            | &#9744; | Counting settings (as array)                                                                       |               |
 
@@ -266,6 +268,37 @@ Each property may be a simple string representing the nomenclature attribute to 
     "visible": false
   }
   ```
+
+### Override parameters from app settings
+
+As this local settings file is updated automatically with the one on *GeoNature* server, we advise you not to update it directly by hand.
+To do this, you can locally overwrite the values from the *GeoNature* server by creating a `settings_occtax.local.json` file in the same location as the app settings file in the terminal's main storage.
+Then simply copy the parameters to be overwritten, respecting the JSON structure of the app settings file. Example, to override map layers configuration:
+
+```json
+{
+  "map": {
+    "layers": [
+      {
+        "label": "OpenStreetMap",
+        "source": [
+          "https://a.tile.openstreetmap.org",
+          "https://b.tile.openstreetmap.org",
+          "https://c.tile.openstreetmap.org"
+        ]
+      },
+      {
+        "label": "My awesome layer",
+        "source": "custom.mbtiles"
+      }
+    ]
+  }
+}
+```
+
+**⚠ Note:** When using such a configuration, which can potentially replace all the application's parameters, it's your responsibility to ensure that the final configuration is always valid and keeps pace with any changes made to *GeoNature*.
+
+In case of errors, if the final configuration is incorrect, the application will automatically ignore the local settings file that allows you to replace the parameters and load the default configuration from *GeoNature*. Any errors reported can be found in the application logs.
 
 ## Upgrade git sub modules
 

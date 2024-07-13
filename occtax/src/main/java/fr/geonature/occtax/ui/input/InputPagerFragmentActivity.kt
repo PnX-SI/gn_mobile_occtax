@@ -18,6 +18,7 @@ import fr.geonature.commons.util.ThemeUtils
 import fr.geonature.compat.content.getParcelableExtraCompat
 import fr.geonature.maps.settings.MapSettings
 import fr.geonature.maps.ui.MapFragment
+import fr.geonature.maps.ui.widget.EditFeatureButton
 import fr.geonature.maps.util.CheckPermissionLifecycleObserver
 import fr.geonature.maps.util.ManageExternalStoragePermissionLifecycleObserver
 import fr.geonature.maps.util.MapSettingsPreferencesUtils.showCompass
@@ -27,7 +28,7 @@ import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.error.ObservationRecordException
 import fr.geonature.occtax.features.record.presentation.ObservationRecordViewModel
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 import fr.geonature.occtax.ui.input.counting.CountingFragment
 import fr.geonature.occtax.ui.input.informations.InformationFragment
 import fr.geonature.occtax.ui.input.map.InputMapFragment
@@ -107,11 +108,12 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
                 saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues ?: false
             ),
             R.string.pager_fragment_map_title to InputMapFragment.newInstance(
-                MapSettings.Builder.newInstance()
-                    .from(appSettings.mapSettings!!)
+                MapSettings.Builder()
+                    .from(appSettings.mapSettings)
                     .showCompass(showCompass(this))
                     .showScale(showScale(this))
                     .showZoom(showZoom(this))
+                    .editMode(EditFeatureButton.EditMode.SINGLE)
                     .build()
             ),
             R.string.pager_fragment_summary_title to InputTaxaSummaryFragment.newInstance(appSettings.inputSettings.dateSettings)
@@ -181,14 +183,21 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
 
     override fun startEditTaxon() {
         pageFragmentViewModel.add(
-            R.string.pager_fragment_taxa_title to TaxaFragment.newInstance(appSettings.areaObservationDuration),
+            R.string.pager_fragment_taxa_title to TaxaFragment.newInstance(
+                appSettings.areaObservationDuration,
+                appSettings.dataSyncSettings.taxrefListId.toLong()
+            ),
             R.string.pager_fragment_information_title to InformationFragment.newInstance(
                 saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues ?: false,
+                withAdditionalFields = appSettings.nomenclatureSettings?.withAdditionalFields
+                    ?: false,
                 *appSettings.nomenclatureSettings?.information?.toTypedArray()
                     ?: emptyArray()
             ),
             R.string.pager_fragment_counting_title to CountingFragment.newInstance(
                 saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues ?: false,
+                withAdditionalFields = appSettings.nomenclatureSettings?.withAdditionalFields
+                    ?: false,
                 *appSettings.nomenclatureSettings?.counting?.toTypedArray()
                     ?: emptyArray()
             ),

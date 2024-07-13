@@ -8,6 +8,7 @@
     "hour_min": null,
     "date_max": "2016-10-29T09:00:00Z",
     "hour_max": null,
+    "additional_fields": {},
     "meta_device_entry": "mobile"
   }
 }

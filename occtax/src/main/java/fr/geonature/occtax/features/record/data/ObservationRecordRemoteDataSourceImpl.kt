@@ -5,7 +5,7 @@ import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.error.ObservationRecordException
 import fr.geonature.occtax.features.record.io.ObservationRecordJsonWriter
 import fr.geonature.occtax.features.record.io.TaxonRecordJsonWriter
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 import org.json.JSONObject
 import retrofit2.await
 import retrofit2.awaitResponse
@@ -39,7 +39,7 @@ class ObservationRecordRemoteDataSourceImpl(private val occtaxAPIClient: IOcctax
             geometry = observationRecord.geometry
         ).apply {
             comment.comment = observationRecord.comment.comment
-            dataset.datasetId = observationRecord.dataset.datasetId
+            dataset.dataset = observationRecord.dataset.dataset
             dates.start = observationRecord.dates.start
             dates.end = observationRecord.dates.end
             observationRecord.observers.getAllObserverIds()

@@ -1,0 +1,96 @@
+@startuml
+
+!theme bluegray
+
+skinparam componentStyle uml2
+skinparam backgroundColor transparent
+
+title **Observation records synchronization workflow**
+
+participant "datasync" as datasync << module >>
+participant "//GeoNature//" as gn
+
+activate datasync
+
+datasync -> datasync : read all exported observation records with status ""TO_SYNC""
+
+loop for each observation record
+    datasync -> datasync : check for login
+    datasync -> datasync : fetch app synchronization settings
+    datasync -> datasync : get nomenclature values from type ""TYPE_MEDIA""\nand fetch nomenclature value of type ""photo""
+    datasync -> gn ++ : <font color="green">**GET**</font> ""/api/gn_commons/get_id_table_location/pr_occtax.cor_counting_occtax""
+    gn -> datasync -- : <font color=green">**200**</font>: ""id_table_location""
+    datasync -> gn ++ : <font color="goldenrod">**POST**</font> ""/api/occtax/OCCTAX/only/releve""
+    note left
+        **""ObservationRecord"" as GeoJSON:**
+        <code>
+        {
+            "geometry": <Geometry>,
+            "properties": <Properties as key-value pairs>
+        }
+        </code>
+    end note
+    gn -> datasync -- : <font color=green">**200**</font>: ""ObservationRecord""
+    note right of datasync
+        **""ObservationRecord"" as GeoJSON:**
+        <code>
+        {
+            "id": <observation_record_id>,
+            "geometry": <Geometry>,
+            "properties": <Properties as key-value pairs>
+        }
+        </code>
+    end note
+
+    alt nomenclature of type "photo" exists from type "TYPE_MEDIA""and\n ""id_table_location"" is defined
+        loop for each media file of each ""CountingRecord"" of each ""TaxonRecord""
+            datasync -> gn ++ : <font color="goldenrod">**POST**</font> ""/api/gn_commons/media""
+            note left
+                **Form data:**
+                <code>
+                id_nomenclature_media_type: <Long>,
+                id_table_location: <Long>,
+                author: <String>,
+                title_en: <String>,
+                title_fr: <String>,
+                description_en: <String>,
+                description_fr: <String>,
+                file: <File>
+                </code>
+            end note
+            gn -> datasync -- : <font color=green">**200**</font>: ""Media""
+            note right of datasync
+                **""Media"":**
+                <code>
+                {
+                    "id_media": <media ID>
+                }
+                </code>
+            end note
+            datasync -> datasync : set media added to ""CountingRecord""
+        end
+    end
+
+    loop for each ""TaxonRecord""
+        datasync -> gn ++ : <font color="goldenrod">**POST**</font> ""/api/occtax/OCCTAX/releve/:observation_record_id/occurrence""
+        note left
+            **""TaxonRecord"" as JSON**
+        end note
+        gn -> datasync -- : <font color=green">**200**</font>: ""TaxonRecord""
+    end
+
+    alt observation record successfully synchronized
+        datasync -> datasync : delete observation record
+    else #f4433640 whether any error occurs while synchronizing ""TaxonRecord""
+        loop for each synchronized media of each ""CountingRecord"" of each ""TaxonRecord""
+            datasync -> gn ++ : <font color="indianred">**DELETE**</font> ""/api/gn_commons/media/:id_media""
+            gn -> datasync -- : <font color=green">**200**</font>
+        end
+
+        datasync -> gn ++ : <font color="indianred">**DELETE**</font> ""/api/occtax/OCCTAX/releve/:observation_record_id""
+        gn -> datasync -- : <font color=green">**200**</font>
+    end
+
+end
+
+@enduml

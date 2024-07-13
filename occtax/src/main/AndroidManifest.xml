@@ -43,6 +43,9 @@
             android:label="@string/activity_preferences_title"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".ui.input.map.MapPreferencesActivity"
+            android:label="@string/activity_map_preferences_title" />
+        <activity
             android:name=".ui.dataset.DatasetListActivity"
             android:label="@string/activity_dataset_title"
             android:theme="@style/AppTheme.NoActionBar" />

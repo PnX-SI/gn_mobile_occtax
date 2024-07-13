@@ -1,11 +1,20 @@
 package fr.geonature.occtax.ui.input.map
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import androidx.appcompat.view.menu.MenuBuilder
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import fr.geonature.commons.lifecycle.observeUntil
 import fr.geonature.commons.util.ThemeUtils.getAccentColor
+import fr.geonature.commons.util.ThemeUtils.getColor
+import fr.geonature.compat.os.getParcelableCompat
 import fr.geonature.maps.jts.geojson.GeometryUtils.fromPoint
 import fr.geonature.maps.jts.geojson.GeometryUtils.toPoint
 import fr.geonature.maps.settings.LayerStyleSettings
@@ -13,7 +22,6 @@ import fr.geonature.maps.settings.MapSettings
 import fr.geonature.maps.ui.MapFragment
 import fr.geonature.maps.ui.overlay.feature.FeatureCollectionOverlay
 import fr.geonature.maps.ui.overlay.feature.filter.ContainsFeaturesFilter
-import fr.geonature.maps.ui.widget.EditFeatureButton
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.presentation.ObservationRecordViewModel
@@ -73,6 +81,19 @@ class InputMapFragment : MapFragment(),
         }
     }
 
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(
+            view,
+            savedInstanceState
+        )
+
+        // we have a menu item to show in action bar
+        setHasOptionsMenu(true)
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -90,6 +111,81 @@ class InputMapFragment : MapFragment(),
         super.onPause()
 
         clearActiveSelection()
+    }
+
+    @SuppressLint("RestrictedApi")
+    override fun onCreateOptionsMenu(
+        menu: Menu,
+        inflater: MenuInflater
+    ) {
+
+        super.onCreateOptionsMenu(
+            menu,
+            inflater
+        )
+
+        with(inflater) {
+            inflate(
+                R.menu.map_settings,
+                menu
+            )
+        }
+
+        // workaround to show menu item icons
+        if (menu is MenuBuilder) {
+            menu.setOptionalIconsVisible(true)
+        }
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+
+        val context = context ?: return
+
+        menu.findItem(R.id.menu_map_settings)
+            .apply {
+                isEnabled = arguments?.getParcelableCompat<MapSettings>(ARG_MAP_SETTINGS) != null
+                // workaround to fix icon color states
+                icon?.setTintList(
+                    ColorStateList(
+                        arrayOf(
+                            intArrayOf(-android.R.attr.state_enabled),
+                            IntArray(0)
+                        ),
+                        intArrayOf(
+                            getColor(
+                                context,
+                                android.R.attr.textColorHint
+                            ),
+                            getColor(
+                                context,
+                                android.R.attr.textColorPrimary
+                            )
+                        )
+                    )
+                )
+            }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_map_settings -> {
+                val context = context ?: return true
+                val mapSettings =
+                    arguments?.getParcelableCompat<MapSettings>(ARG_MAP_SETTINGS) ?: return true
+
+                startActivity(
+                    MapPreferencesActivity.newIntent(
+                        context,
+                        mapSettings
+                    )
+                )
+
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun getResourceTitle(): Int {
@@ -133,9 +229,10 @@ class InputMapFragment : MapFragment(),
         CoroutineScope(Main).launch {
             val context = context ?: return@launch
 
-            observationRecord = observationRecord?.copy(geometry = toPoint(poi))?.also {
-                observationRecordViewModel.edit(it)
-            }
+            observationRecord = observationRecord?.copy(geometry = toPoint(poi))
+                ?.also {
+                    observationRecordViewModel.edit(it)
+                }
 
             val accentColor = getAccentColor(context)
 
@@ -160,8 +257,10 @@ class InputMapFragment : MapFragment(),
                         filter.getSelectedFeatures()
                     }
                     .flatMap { it.asSequence() }
-                    .map { it.id }
+                    // keep only valid Feature with ID as number
+                    .map { it.id?.toLongOrNull() }
                     .firstOrNull()
+                    ?.toString()
 
             listener.validateCurrentPage()
         }
@@ -180,10 +279,6 @@ class InputMapFragment : MapFragment(),
                 putParcelable(
                     ARG_MAP_SETTINGS,
                     mapSettings
-                )
-                putSerializable(
-                    ARG_EDIT_MODE,
-                    EditFeatureButton.EditMode.SINGLE
                 )
             }
         }

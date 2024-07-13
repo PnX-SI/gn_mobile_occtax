@@ -7,8 +7,8 @@ import fr.geonature.maps.jts.geojson.io.GeoJsonWriter
 import fr.geonature.occtax.features.record.domain.DatesRecord
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
-import fr.geonature.occtax.settings.AppSettings
-import fr.geonature.occtax.settings.InputDateSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
+import fr.geonature.occtax.features.settings.domain.InputDateSettings
 import java.io.IOException
 import java.io.StringWriter
 import java.io.Writer
@@ -158,14 +158,20 @@ class ObservationRecordJsonWriter {
             when (val propertyValue = it.value) {
                 is PropertyValue.Text -> writer.name(propertyValue.code)
                     .value(propertyValue.value)
+
                 is PropertyValue.Number -> writer.name(propertyValue.code)
                     .value(propertyValue.value)
+
                 is PropertyValue.NumberArray -> {
                     writer.name(propertyValue.code)
                         .beginArray()
                     propertyValue.value.forEach { value -> writer.value(value) }
                     writer.endArray()
                 }
+
+                is PropertyValue.Dataset -> writer.name(propertyValue.code)
+                    .value(propertyValue.datasetId)
+
                 is PropertyValue.Nomenclature -> {
                     // GeoNature default properties mapping
                     when (propertyValue.code) {
@@ -173,6 +179,15 @@ class ObservationRecordJsonWriter {
                             .value(propertyValue.value)
                     }
                 }
+
+                is PropertyValue.AdditionalFields -> {
+                    writer.name(propertyValue.code)
+                    writeAdditionalFields(
+                        writer,
+                        propertyValue
+                    )
+                }
+
                 is PropertyValue.Taxa -> {
                     writer.name(propertyValue.code)
                         .beginArray()
@@ -185,6 +200,7 @@ class ObservationRecordJsonWriter {
                     }
                     writer.endArray()
                 }
+
                 else -> {}
             }
         }
@@ -240,5 +256,43 @@ class ObservationRecordJsonWriter {
                     else null
                 )
         }
+    }
+
+    private fun writeAdditionalFields(
+        writer: JsonWriter,
+        additionalFields: PropertyValue.AdditionalFields
+    ) {
+        writer.beginObject()
+
+        additionalFields.value.values.forEach {
+            when (it) {
+                is PropertyValue.Nomenclature -> writer.name(it.code)
+                    .value(it.value)
+
+                is PropertyValue.Number -> writer.name(it.code)
+                    .value(it.value)
+
+                is PropertyValue.NumberArray -> {
+                    writer.name(it.code)
+                        .beginArray()
+                    it.value.forEach { value -> writer.value(value) }
+                    writer.endArray()
+                }
+
+                is PropertyValue.StringArray -> {
+                    writer.name(it.code)
+                        .beginArray()
+                    it.value.forEach { value -> writer.value(value) }
+                    writer.endArray()
+                }
+
+                is PropertyValue.Text -> writer.name(it.code)
+                    .value(it.value)
+
+                else -> {}
+            }
+        }
+
+        writer.endObject()
     }
 }

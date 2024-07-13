@@ -22,7 +22,6 @@ import androidx.loader.content.Loader
 import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.data.ContentProviderAuthority
-import fr.geonature.commons.data.GeoNatureModuleName
 import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.entity.InputObserver
 import fr.geonature.commons.data.helper.ProviderHelper.buildUri
@@ -33,7 +32,7 @@ import fr.geonature.compat.os.getParcelableCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
 import fr.geonature.occtax.features.record.domain.PropertyValue
-import fr.geonature.occtax.settings.InputDateSettings
+import fr.geonature.occtax.features.settings.domain.InputDateSettings
 import fr.geonature.occtax.ui.dataset.DatasetListActivity
 import fr.geonature.occtax.ui.input.AbstractInputFragment
 import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
@@ -59,10 +58,6 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
     @ContentProviderAuthority
     @Inject
     lateinit var authority: String
-
-    @GeoNatureModuleName
-    @Inject
-    lateinit var moduleName: String
 
     private val propertyValueModel: PropertyValueModel by viewModels()
 
@@ -100,12 +95,12 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                     null,
                     null
                 )
+
                 LOADER_DATASET_ID -> CursorLoader(
                     requireContext(),
                     buildUri(
                         authority,
                         Dataset.TABLE_NAME,
-                        args?.getString(Dataset.COLUMN_MODULE) ?: "",
                         args?.getLong(
                             Dataset.COLUMN_ID,
                             -1
@@ -117,6 +112,7 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                     null,
                     null
                 )
+
                 else -> throw IllegalArgumentException()
             }
         }
@@ -163,10 +159,11 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
 
                     updateSelectedObservers(inputObserversLoaded)
                 }
+
                 LOADER_DATASET_ID -> {
                     if (data.count == 0) {
                         selectedDataset = null
-                        observationRecord?.dataset?.datasetId = null
+                        observationRecord?.dataset?.setDatasetId(null)
                         listener.validateCurrentPage()
                     }
 
@@ -174,6 +171,11 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                         selectedDataset = Dataset.fromCursor(data)
                     }
 
+                    selectedDataset?.also {
+                        Logger.info { "selected dataset: ${it.id}, taxa list ID: ${it.taxaListId}" }
+                    }
+
+                    observationRecord?.dataset?.setDataset(selectedDataset)
                     updateSelectedDatasetActionView(selectedDataset)
                 }
             }
@@ -315,7 +317,7 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
     override fun validate(): Boolean {
         return observationRecord?.observers?.getAllObserverIds()
             ?.isNotEmpty() ?: false &&
-            this.observationRecord?.dataset?.datasetId != null &&
+            this.observationRecord?.dataset?.dataset?.datasetId != null &&
             this.observationRecord?.properties?.filterValues { it is PropertyValue.Nomenclature }
                 ?.isNotEmpty() == true &&
             inputDateView?.hasErrors() == false
@@ -353,17 +355,13 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                 }
             }
 
-        val selectedDatasetId = observationRecord?.dataset?.datasetId
+        val selectedDatasetId = observationRecord?.dataset?.dataset?.datasetId
 
         if (selectedDatasetId != null) {
             LoaderManager.getInstance(this)
                 .initLoader(
                     LOADER_DATASET_ID,
                     bundleOf(
-                        kotlin.Pair(
-                            Dataset.COLUMN_MODULE,
-                            moduleName
-                        ),
                         kotlin.Pair(
                             Dataset.COLUMN_ID,
                             selectedDatasetId
@@ -413,11 +411,13 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
     }
 
     private fun updateSelectedDataset(selectedDataset: Dataset?) {
+        selectedDataset?.also {
+            Logger.info { "selected dataset: ${it.id}, taxa list ID: ${it.taxaListId}" }
+        }
+
         this.selectedDataset = selectedDataset
 
-        observationRecord?.dataset?.also {
-            it.datasetId = selectedDataset?.id
-        }
+        observationRecord?.dataset?.setDataset(selectedDataset)
 
         listener.validateCurrentPage()
 
@@ -453,10 +453,10 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
 
     private fun setDefaultDatasetFromSettings() {
         observationRecord?.dataset?.run {
-            if (datasetId == null) {
+            if (dataset?.datasetId == null) {
                 val context = context ?: return
                 getDefaultDatasetId(context).also { defaultDatasetId ->
-                    if (defaultDatasetId != null) this.datasetId = defaultDatasetId
+                    if (defaultDatasetId != null) setDatasetId(defaultDatasetId)
                 }
             }
         }

@@ -527,4 +527,132 @@ class TaxonRecordTest {
             ).absolutePath.substringAfterLast("external-files")
         )
     }
+
+    @Test
+    fun `should have additional fields with no values`() {
+        // given a taxon record
+        val taxonRecord = TaxonRecord(
+            recordId = 1234L,
+            taxon = Taxon(
+                8L,
+                "taxon_01",
+                Taxonomy(
+                    "Animalia",
+                    "Ascidies"
+                ),
+                null
+            )
+        ).apply {
+            properties["METH_OBS"] = PropertyValue.Nomenclature(
+                code = "METH_OBS",
+                label = "Autre",
+                value = 64
+            )
+        }
+
+        assertEquals(
+            PropertyValue.AdditionalFields(
+                TaxonRecord.ADDITIONAL_FIELDS_KEY,
+                mapOf()
+            ),
+            taxonRecord.properties[TaxonRecord.ADDITIONAL_FIELDS_KEY]
+        )
+    }
+
+    @Test
+    fun `should get all additional fields values`() {
+        // given a taxon record
+        val taxonRecord = TaxonRecord(
+            recordId = 1234L,
+            taxon = Taxon(
+                8L,
+                "taxon_01",
+                Taxonomy(
+                    "Animalia",
+                    "Ascidies"
+                ),
+                null
+            ),
+            properties = sortedMapOf(
+                "METH_OBS" to
+                    PropertyValue.Nomenclature(
+                        code = "METH_OBS",
+                        label = "Autre",
+                        value = 64
+                    ),
+                TaxonRecord.ADDITIONAL_FIELDS_KEY to PropertyValue.AdditionalFields(
+                    TaxonRecord.ADDITIONAL_FIELDS_KEY,
+                    mapOf(
+                        "some_key" to PropertyValue.Text(
+                            "some_key",
+                            "some_value"
+                        )
+                    )
+                )
+            )
+        )
+
+        assertArrayEquals(
+            arrayOf(
+                PropertyValue.Text(
+                    "some_key",
+                    "some_value"
+                )
+            ),
+            taxonRecord.additionalFields.toTypedArray()
+        )
+    }
+
+    @Test
+    fun `should set additional fields values`() {
+        // given a taxon record with some additional fields
+        val taxonRecord = TaxonRecord(
+            recordId = 1234L,
+            taxon = Taxon(
+                8L,
+                "taxon_01",
+                Taxonomy(
+                    "Animalia",
+                    "Ascidies"
+                ),
+                null
+            ),
+            properties = sortedMapOf(
+                "METH_OBS" to
+                    PropertyValue.Nomenclature(
+                        code = "METH_OBS",
+                        label = "Autre",
+                        value = 64
+                    ),
+                TaxonRecord.ADDITIONAL_FIELDS_KEY to PropertyValue.AdditionalFields(
+                    TaxonRecord.ADDITIONAL_FIELDS_KEY,
+                    mapOf(
+                        "some_key" to PropertyValue.Text(
+                            "some_key",
+                            "some_value"
+                        )
+                    )
+                )
+            )
+        )
+
+        // when updating additional fields
+        taxonRecord.additionalFields = listOf(
+            PropertyValue.Text(
+                "another_key",
+                "another_value"
+            )
+        )
+
+        // then
+        assertArrayEquals(
+            arrayOf(
+                PropertyValue.Text(
+                    "another_key",
+                    "another_value"
+                )
+            ),
+            taxonRecord.additionalFields.toTypedArray()
+        )
+    }
 }

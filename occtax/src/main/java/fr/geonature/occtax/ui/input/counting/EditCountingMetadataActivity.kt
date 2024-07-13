@@ -13,7 +13,7 @@ import fr.geonature.compat.content.getParcelableExtraCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.TaxonRecord
-import fr.geonature.occtax.settings.PropertySettings
+import fr.geonature.occtax.features.settings.domain.PropertySettings
 
 /**
  * Edit additional counting information Activity.
@@ -59,10 +59,19 @@ class EditCountingMetadataActivity : AppCompatActivity(),
                     replace(
                         android.R.id.content,
                         EditCountingMetadataFragment.newInstance(
+                            intent.getLongExtra(
+                                EXTRA_DATASET_ID,
+                                -1L
+                            )
+                                .takeIf { it >= 0L },
                             taxonRecord,
                             countingRecord,
                             intent.getBooleanExtra(
                                 EXTRA_SAVE_DEFAULT_VALUES,
+                                false
+                            ),
+                            intent.getBooleanExtra(
+                                EXTRA_WITH_ADDITIONAL_FIELDS,
                                 false
                             ),
                             *(intent.getParcelableArrayExtraCompat(EXTRA_PROPERTIES)
@@ -80,6 +89,7 @@ class EditCountingMetadataActivity : AppCompatActivity(),
                 confirmBeforeQuit()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -131,22 +141,30 @@ class EditCountingMetadataActivity : AppCompatActivity(),
 
     companion object {
 
+        const val EXTRA_DATASET_ID = "extra_dataset_id"
         const val EXTRA_TAXON_RECORD = "extra_taxon_record"
         const val EXTRA_COUNTING_RECORD = "extra_counting_record"
         const val EXTRA_SAVE_DEFAULT_VALUES = "extra_save_default_values"
+        const val EXTRA_WITH_ADDITIONAL_FIELDS = "extra_with_additional_fields"
         const val EXTRA_PROPERTIES = "extra_properties"
 
         fun newIntent(
             context: Context,
+            datasetId: Long? = null,
             taxonRecord: TaxonRecord,
             countingRecord: CountingRecord? = null,
             saveDefaultValues: Boolean = false,
+            withAdditionalFields: Boolean = false,
             vararg propertySettings: PropertySettings
         ): Intent {
             return Intent(
                 context,
                 EditCountingMetadataActivity::class.java
             ).apply {
+                putExtra(
+                    EXTRA_DATASET_ID,
+                    datasetId
+                )
                 putExtra(
                     EXTRA_TAXON_RECORD,
                     taxonRecord
@@ -160,6 +178,10 @@ class EditCountingMetadataActivity : AppCompatActivity(),
                 putExtra(
                     EXTRA_SAVE_DEFAULT_VALUES,
                     saveDefaultValues
+                )
+                putExtra(
+                    EXTRA_WITH_ADDITIONAL_FIELDS,
+                    withAdditionalFields
                 )
                 putExtra(
                     EXTRA_PROPERTIES,

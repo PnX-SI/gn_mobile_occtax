@@ -22,7 +22,12 @@ data class CountingRecord(
     /**
      * The main properties of this taxon counting record.
      */
-    val properties: SortedMap<String, PropertyValue> = sortedMapOf()
+    val properties: SortedMap<String, PropertyValue> = sortedMapOf(
+        ADDITIONAL_FIELDS_KEY to PropertyValue.AdditionalFields(
+            ADDITIONAL_FIELDS_KEY,
+            mapOf()
+        )
+    )
 ) : Parcelable {
 
     /**
@@ -68,6 +73,25 @@ data class CountingRecord(
         }
 
     /**
+     * Additional fields of this taxon record.
+     */
+    @IgnoredOnParcel
+    var additionalFields: List<PropertyValue>
+        get() = properties[ADDITIONAL_FIELDS_KEY]
+            ?.takeIf { it is PropertyValue.AdditionalFields }
+            ?.let { it as PropertyValue.AdditionalFields }?.value?.values?.toList()
+            ?: emptyList()
+        set(value) {
+            PropertyValue.AdditionalFields(
+                ADDITIONAL_FIELDS_KEY,
+                value.associate { it.toPair() }
+            )
+                .also {
+                    properties[it.code] = it
+                }
+        }
+
+    /**
      * All [MediaRecord] added to this taxon counting record.
      */
     @IgnoredOnParcel
@@ -84,6 +108,7 @@ data class CountingRecord(
     companion object {
         const val MIN_KEY = "count_min"
         const val MAX_KEY = "count_max"
+        const val ADDITIONAL_FIELDS_KEY = "additional_fields"
     }
 }
 

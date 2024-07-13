@@ -39,7 +39,7 @@ import fr.geonature.commons.util.ThemeUtils
 import fr.geonature.compat.content.getParcelableArrayExtraCompat
 import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.occtax.R
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
 import org.tinylog.Logger
 import java.util.Locale
@@ -77,16 +77,23 @@ class TaxaFragment : AbstractInputFragment() {
 
             return when (id) {
                 LOADER_TAXA -> {
+                    val taxaListId = args?.getLong(
+                        KEY_TAXA_LIST_ID,
+                        -1L
+                    )
+                        ?.takeIf { it >= 0L }
                     val selectedFeatureId = args?.getString(
                         KEY_SELECTED_FEATURE_ID,
                         null
                     )
 
-                    Logger.debug { "load taxa with selected feature ID: $selectedFeatureId" }
+                    Logger.debug {
+                        "loading taxa${if (taxaListId == null) "" else " from taxa list ID $taxaListId"}${if (selectedFeatureId.isNullOrBlank()) "" else " with selected feature ID '$selectedFeatureId'"}..."
+                    }
 
                     val taxonFilter =
                         TaxonWithArea.Filter()
-                            .byNameOrDescriptionOrRank(args?.getString(KEY_FILTER_BY_NAME))
+                            .byNameOrDescription(args?.getString(KEY_FILTER_BY_NAME))
                             .also {
                                 val filterByAreaObservation =
                                     selectedFilters
@@ -119,7 +126,9 @@ class TaxaFragment : AbstractInputFragment() {
                         buildUri(
                             authority,
                             Taxon.TABLE_NAME,
-                            if (selectedFeatureId.isNullOrBlank()) "" else "area/$selectedFeatureId"
+                            if (taxaListId == null) "" else "list/$taxaListId",
+                            selectedFeatureId?.toLongOrNull()
+                                ?.let { "area/$it" } ?: ""
                         ),
                         null,
                         taxonFilter.first,
@@ -130,6 +139,7 @@ class TaxaFragment : AbstractInputFragment() {
                             .build()
                     )
                 }
+
                 LOADER_TAXON -> {
                     val selectedFeatureId = args?.getString(
                         KEY_SELECTED_FEATURE_ID,
@@ -151,6 +161,7 @@ class TaxaFragment : AbstractInputFragment() {
                         null
                     )
                 }
+
                 else -> throw IllegalArgumentException()
             }
         }
@@ -172,12 +183,18 @@ class TaxaFragment : AbstractInputFragment() {
                     listener.validateCurrentPage()
                     (activity as AppCompatActivity?)?.supportActionBar?.subtitle = getSubtitle()
                 }
+
                 LOADER_TAXON -> {
                     if (data.moveToFirst()) {
                         val selectedTaxon = Taxon.fromCursor(data)
 
                         if (selectedTaxon != null) {
                             adapter?.setSelectedTaxon(selectedTaxon)
+                        }
+                    } else {
+                        // no taxon found according to given criteria
+                        observationRecord?.taxa?.selectedTaxonRecord?.taxon?.id?.also {
+                            observationRecord?.taxa?.delete(it)
                         }
                     }
 
@@ -368,14 +385,15 @@ class TaxaFragment : AbstractInputFragment() {
                             .isNullOrEmpty(),
                         arguments?.getInt(
                             ARG_AREA_OBSERVATION_DURATION,
-                            AppSettings.DEFAULT_AREA_OBSERVATION_DURATION
-                        ) ?: AppSettings.DEFAULT_AREA_OBSERVATION_DURATION,
+                            AppSettings.Builder.DEFAULT_AREA_OBSERVATION_DURATION
+                        ) ?: AppSettings.Builder.DEFAULT_AREA_OBSERVATION_DURATION,
                         *getSelectedFilters().toTypedArray()
                     )
                 )
 
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -414,6 +432,18 @@ class TaxaFragment : AbstractInputFragment() {
             KEY_SELECTED_FEATURE_ID,
             observationRecord?.feature?.id
         )
+
+        // set the current taxa list ID from selected dataset or from global settings as fallback
+        (observationRecord?.dataset?.dataset?.taxaListId ?: arguments?.getLong(
+            KEY_TAXA_LIST_ID,
+            -1L
+        ))?.also {
+            if (it >= 0L)
+                savedState.putLong(
+                    KEY_TAXA_LIST_ID,
+                    it
+                ) else savedState.remove(KEY_TAXA_LIST_ID)
+        }
 
         loadTaxa()
 
@@ -630,6 +660,7 @@ class TaxaFragment : AbstractInputFragment() {
         private const val ARG_AREA_OBSERVATION_DURATION = "arg_area_observation_duration"
         private const val LOADER_TAXA = 1
         private const val LOADER_TAXON = 2
+        private const val KEY_TAXA_LIST_ID = "key_taxa_list_id"
         private const val KEY_FILTER_BY_NAME = "key_filter_by_name"
         private const val KEY_SELECTED_FILTERS = "key_selected_filters"
         private const val KEY_SELECTED_FEATURE_ID = "key_selected_feature_id"
@@ -641,13 +672,24 @@ class TaxaFragment : AbstractInputFragment() {
          * @return A new instance of [TaxaFragment]
          */
         @JvmStatic
-        fun newInstance(areaObservationDuration: Int = AppSettings.DEFAULT_AREA_OBSERVATION_DURATION) =
+        fun newInstance(
+            areaObservationDuration: Int = AppSettings.Builder.DEFAULT_AREA_OBSERVATION_DURATION,
+            taxaListId: Long? = null
+        ) =
             TaxaFragment().apply {
+                Logger.debug { "default taxa list ID: $taxaListId" }
+
                 arguments = Bundle().apply {
                     putInt(
                         ARG_AREA_OBSERVATION_DURATION,
                         areaObservationDuration
                     )
+                    taxaListId?.also {
+                        putLong(
+                            KEY_TAXA_LIST_ID,
+                            it
+                        )
+                    }
                 }
             }
     }

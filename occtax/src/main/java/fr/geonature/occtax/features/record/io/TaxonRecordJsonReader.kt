@@ -4,13 +4,16 @@ import android.util.JsonReader
 import android.util.JsonToken
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
+import fr.geonature.commons.util.nextLongOrNull
 import fr.geonature.commons.util.nextStringOrNull
+import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.features.record.error.ObservationRecordException
 import java.io.IOException
 import java.io.Reader
+import java.io.Serializable
 import java.io.StringReader
 
 /**
@@ -134,15 +137,26 @@ class TaxonRecordJsonReader {
                         continue
                     }
 
+                    if (keyName == TaxonRecord.ADDITIONAL_FIELDS_KEY) {
+                        readAdditionalFields(reader).takeIf { it.isNotEmpty() }
+                            ?.also {
+                                taxonRecord?.additionalFields = it
+                            }
+
+                        continue
+                    }
+
                     when (reader.peek()) {
                         JsonToken.STRING -> taxonRecord.properties[keyName] = PropertyValue.Text(
                             keyName,
                             reader.nextStringOrNull()
                         )
+
                         JsonToken.NUMBER -> taxonRecord.properties[keyName] = PropertyValue.Number(
                             keyName,
                             reader.nextLong()
                         )
+
                         JsonToken.BEGIN_ARRAY -> {
                             reader.beginArray()
 
@@ -155,6 +169,7 @@ class TaxonRecordJsonReader {
 
                             reader.endArray()
                         }
+
                         else -> reader.skipValue()
                     }
                 }
@@ -219,16 +234,27 @@ class TaxonRecordJsonReader {
                         continue
                     }
 
+                    if (keyName == CountingRecord.ADDITIONAL_FIELDS_KEY) {
+                        readAdditionalFields(reader).takeIf { it.isNotEmpty() }
+                            ?.also {
+                                countingRecord.additionalFields = it
+                            }
+
+                        continue
+                    }
+
                     when (reader.peek()) {
                         JsonToken.STRING -> taxonRecord.properties[keyName] = PropertyValue.Text(
                             keyName,
                             reader.nextStringOrNull()
                         )
+
                         JsonToken.NUMBER -> countingRecord.properties[keyName] =
                             PropertyValue.Number(
                                 keyName,
                                 reader.nextLong()
                             )
+
                         else -> reader.skipValue()
                     }
                 }
@@ -238,6 +264,75 @@ class TaxonRecordJsonReader {
         reader.endObject()
 
         taxonRecord.counting.addOrUpdate(countingRecord)
+    }
+
+    private fun readAdditionalFields(reader: JsonReader): List<PropertyValue> {
+        val additionalFields = mutableListOf<PropertyValue>()
+
+        reader.beginObject()
+
+        while (reader.hasNext()) {
+            when (val keyName = reader.nextName()) {
+                else -> {
+                    when (reader.peek()) {
+                        JsonToken.STRING -> additionalFields.add(
+                            PropertyValue.Text(
+                                keyName,
+                                reader.nextStringOrNull()
+                            )
+                        )
+
+                        JsonToken.NUMBER -> additionalFields.add(
+                            PropertyValue.Number(
+                                keyName,
+                                runCatching { reader.nextLongOrNull() }.getOrNull()
+                                    ?: reader.nextDouble()
+                            )
+                        )
+
+                        JsonToken.BEGIN_ARRAY -> {
+                            val values = mutableListOf<Serializable>()
+
+                            reader.beginArray()
+
+                            while (reader.hasNext()) {
+                                when (reader.peek()) {
+                                    JsonToken.STRING -> values.add(reader.nextString())
+                                    JsonToken.NUMBER -> values.add(reader.nextLong())
+                                    else -> reader.skipValue()
+                                }
+                            }
+
+                            reader.endArray()
+
+                            (values.filterIsInstance<String>()
+                                .takeIf { it.size == values.size }
+                                ?.let {
+                                    PropertyValue.StringArray(
+                                        keyName,
+                                        it.toTypedArray()
+                                    )
+                                } ?: values.filterIsInstance<Long>()
+                                .takeIf { it.size == values.size }
+                                ?.let {
+                                    PropertyValue.NumberArray(
+                                        keyName,
+                                        it.toTypedArray()
+                                    )
+                                })?.also {
+                                additionalFields.add(it)
+                            }
+                        }
+
+                        else -> reader.skipValue()
+                    }
+                }
+            }
+        }
+
+        reader.endObject()
+
+        return additionalFields
     }
 
     /**

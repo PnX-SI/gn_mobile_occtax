@@ -2,9 +2,10 @@ package fr.geonature.occtax.ui.input.counting
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
-import android.webkit.MimeTypeMap
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
@@ -29,6 +30,8 @@ class TakePhotoLifecycleObserver(
 ) :
     DefaultLifecycleObserver {
 
+    private val imageMaxSize = 2048
+    private val imageQuality = 80
     private lateinit var takeImageResultLauncher: ActivityResultLauncher<Intent>
     private var chosenImageContinuation: CancellableContinuation<File?>? = null
     private var baseFilePath: File? = null
@@ -48,6 +51,7 @@ class TakePhotoLifecycleObserver(
 
                     chosenImageContinuation?.resumeWith(Result.success(null))
                 }
+
                 AppCompatActivity.RESULT_OK -> {
 
                     val imageFile = (result.data?.data ?: imageUri)?.let { asFile(it) }
@@ -91,9 +95,10 @@ class TakePhotoLifecycleObserver(
                                 baseFilePath,
                                 "${Date().time}.jpg"
                             )
-                        ).also {
-                            imageUri = it
-                        }
+                        )
+                            .also {
+                                imageUri = it
+                            }
                     )
                 }
             )
@@ -105,13 +110,7 @@ class TakePhotoLifecycleObserver(
 
     private fun asFile(uri: Uri): File {
         val filename = (uri.lastPathSegment ?: "${Date().time}").let {
-            "${it.substringBeforeLast(".")}${
-                it.substringAfterLast(
-                    ".",
-                    MimeTypeMap.getSingleton()
-                        .getExtensionFromMimeType(applicationContext.contentResolver.getType(uri)) ?: ""
-                ).takeIf { ext -> ext.isNotEmpty() }?.let { ext -> ".$ext" } ?: ""
-            }"
+            "${it.substringBeforeLast(".")}.jpg"
         }
 
         if (!File(
@@ -124,17 +123,41 @@ class TakePhotoLifecycleObserver(
                     File(
                         baseFilePath,
                         filename
-                    ).outputStream().use { outputSteam ->
-                        inputStream.copyTo(outputSteam)
-                        outputSteam.flush()
-                    }
+                    ).outputStream()
+                        .use { outputSteam ->
+                            inputStream.copyTo(outputSteam)
+                            outputSteam.flush()
+                        }
                 }
         }
 
         return File(
             baseFilePath,
             filename
-        )
+        ).also {
+            resizeAndCompress(it)
+        }
+    }
+
+    private fun resizeAndCompress(file: File, scaleTo: Int = imageMaxSize) {
+        val bmOptions = BitmapFactory.Options()
+        bmOptions.inJustDecodeBounds = true
+        BitmapFactory.decodeFile(file.absolutePath, bmOptions)
+        val width = bmOptions.outWidth
+        val height = bmOptions.outHeight
+
+        // determine how much to scale down the image
+        val scaleFactor = (width / scaleTo).coerceAtLeast(height / scaleTo)
+
+        bmOptions.inJustDecodeBounds = false
+        bmOptions.inSampleSize = scaleFactor
+
+        val resized = BitmapFactory.decodeFile(file.absolutePath, bmOptions) ?: return
+        file.outputStream().use {
+            resized.compress(Bitmap.CompressFormat.JPEG, imageQuality, it)
+            resized.recycle()
+            it.flush()
+        }
     }
 
     enum class ImagePicker {

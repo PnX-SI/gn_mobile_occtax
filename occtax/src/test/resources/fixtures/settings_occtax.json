@@ -1,5 +1,16 @@
 {
   "area_observation_duration": 365,
+  "sync": {
+    "geonature_url": "https://demo.geonature.fr/geonature",
+    "taxhub_url": "https://demo.geonature.fr/taxhub",
+    "gn_application_id": 3,
+    "observers_list_id": 1,
+    "taxa_list_id": 100,
+    "code_area_type": "M10",
+    "page_size": 1000,
+    "sync_periodicity_data_essential": "20m",
+    "sync_periodicity_data": "30m"
+  },
   "map": {
     "show_scale": true,
     "show_compass": true,
@@ -31,6 +42,7 @@
   "nomenclature": {
     "additional_fields": true,
     "save_default_values": true,
+    "additional_fields": true,
     "information": [
       "METH_OBS",
       {
@@ -63,6 +75,5 @@
       "OBJ_DENBR",
       "TYP_DENBR"
     ]
-  },
-  "no_such_property": "no_such_value"
+  }
 }

@@ -1,13 +1,14 @@
 package fr.geonature.occtax.features.record.usecase
 
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.commons.fp.getOrElse
 import fr.geonature.commons.interactor.BaseResultUseCase
-import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
+import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.repository.IAdditionalFieldRepository
 import fr.geonature.occtax.features.nomenclature.repository.INomenclatureRepository
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.error.ObservationRecordException
+import org.tinylog.Logger
 import javax.inject.Inject
 
 /**
@@ -16,15 +17,16 @@ import javax.inject.Inject
  * @author S. Grimault
  */
 class SetDefaultNomenclatureValuesUseCase @Inject constructor(
-    private val nomenclatureRepository: INomenclatureRepository
+    private val nomenclatureRepository: INomenclatureRepository,
+    private val additionalFieldRepository: IAdditionalFieldRepository
 ) : BaseResultUseCase<ObservationRecord, SetDefaultNomenclatureValuesUseCase.Params>() {
 
     override suspend fun run(params: Params): Result<ObservationRecord> {
         val observationRecord = params.observationRecord
 
-        // load default property values from default nomenclature values
+        // load default property values from editable fields of type DEFAULT
         val defaultNomenclatureValues =
-            nomenclatureRepository.getEditableNomenclatures(EditableNomenclatureType.Type.DEFAULT)
+            nomenclatureRepository.getEditableFields(EditableField.Type.DEFAULT)
                 .getOrElse { emptyList() }
                 .mapNotNull { it.value }
 
@@ -43,10 +45,51 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
             )
         }
 
+        val editableFieldsInformation =
+            nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
+                .getOrElse { emptyList() } + if (params.withAdditionalFields) additionalFieldRepository.getAllAdditionalFields(
+                observationRecord.dataset.dataset?.datasetId,
+                EditableField.Type.INFORMATION
+            )
+                .getOrElse { emptyList() } else emptyList()
+
+        if (editableFieldsInformation.isEmpty()) {
+            Logger.warn {
+                "no editable fields of type '${EditableField.Type.INFORMATION.name}' found"
+            }
+
+            return Result.failure(
+                ObservationRecordException.NoDefaultNomenclatureValuesFoundException(
+                    observationRecord.internalId
+                )
+            )
+        }
+
+        val editableFieldsCounting =
+            nomenclatureRepository.getEditableFields(EditableField.Type.COUNTING)
+                .getOrElse { emptyList() } + if (params.withAdditionalFields) additionalFieldRepository.getAllAdditionalFields(
+                observationRecord.dataset.dataset?.datasetId,
+                EditableField.Type.COUNTING
+            )
+                .getOrElse { emptyList() } else emptyList()
+
+        if (editableFieldsCounting.isEmpty()) {
+            Logger.warn {
+                "no editable fields of type '${EditableField.Type.COUNTING.name}' found"
+            }
+
+            return Result.failure(
+                ObservationRecordException.NoDefaultNomenclatureValuesFoundException(
+                    observationRecord.internalId
+                )
+            )
+        }
+
         observationRecord.taxa.taxa.forEach { taxonRecord ->
             // load property values from nomenclature values for each taxon added
-            loadPropertyValuesFromNomenclature(
+            mapPropertyValuesFromNomenclature(
                 taxonRecord.taxon.taxonomy,
+                editableFieldsInformation,
                 taxonRecord.properties.values.toList()
             )
                 .map { it.toPair() }
@@ -56,8 +99,9 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
 
             // load property values from nomenclature values for each counting added
             taxonRecord.counting.counting.forEach { countingRecord ->
-                loadPropertyValuesFromNomenclature(
+                mapPropertyValuesFromNomenclature(
                     taxonRecord.taxon.taxonomy,
+                    editableFieldsCounting,
                     countingRecord.properties.values.toList()
                 )
                     .map { it.toPair() }
@@ -70,28 +114,56 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
         return Result.success(observationRecord)
     }
 
-    private suspend fun loadPropertyValuesFromNomenclature(
+    private suspend fun mapPropertyValuesFromNomenclature(
         taxonomy: Taxonomy,
+        editableFields: List<EditableField>,
         propertyValues: List<PropertyValue>
-    ): List<PropertyValue.Nomenclature> {
-        return propertyValues.filterIsInstance<PropertyValue.Nomenclature>()
-            .filterNot { it.value == null }
-            .mapNotNull { propertyValue ->
-                nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
-                    propertyValue.code,
-                    taxonomy
-                )
-                    .getOrDefault(emptyList())
-                    .firstOrNull { it.id == propertyValue.value }
-                    ?.let {
-                        PropertyValue.Nomenclature(
-                            code = propertyValue.code,
-                            label = it.defaultLabel,
-                            value = it.id
-                        )
-                    }
+    ): List<PropertyValue> {
+        return propertyValues.map {
+            when (it) {
+                is PropertyValue.AdditionalFields -> {
+                    PropertyValue.AdditionalFields(
+                        it.code,
+                        mapPropertyValuesFromNomenclature(
+                            taxonomy,
+                            editableFields,
+                            it.value.values.toList()
+                        ).associate { pv -> pv.toPair() })
+                }
+
+                else -> {
+                    editableFields.firstOrNull { editableField -> editableField.code == it.toPair().first }
+                        ?.takeIf { editableField -> editableField.viewType == EditableField.ViewType.NOMENCLATURE_TYPE }
+                        ?.let { editableField ->
+                            when (it) {
+                                is PropertyValue.Number -> it.value
+                                is PropertyValue.Nomenclature -> it.value
+                                else -> null
+                            }?.let { currentValue ->
+                                editableField.nomenclatureType?.let { nomenclatureType ->
+                                    nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
+                                        nomenclatureType,
+                                        taxonomy
+                                    )
+                                        .getOrDefault(emptyList())
+                                        .firstOrNull { nomenclatureValue -> nomenclatureValue.id == currentValue }
+                                        ?.let { nomenclatureValue ->
+                                            PropertyValue.Nomenclature(
+                                                code = editableField.code,
+                                                label = nomenclatureValue.defaultLabel,
+                                                value = nomenclatureValue.id
+                                            )
+                                        }
+                                }
+                            }
+                        } ?: it
+                }
             }
+        }
     }
 
-    data class Params(val observationRecord: ObservationRecord)
+    data class Params(
+        val observationRecord: ObservationRecord,
+        val withAdditionalFields: Boolean = false
+    )
 }

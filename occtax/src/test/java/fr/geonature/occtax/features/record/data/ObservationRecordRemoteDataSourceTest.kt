@@ -5,6 +5,9 @@ import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.util.add
 import fr.geonature.datasync.auth.ICookieManager
+import fr.geonature.datasync.settings.DataSyncSettings
+import fr.geonature.maps.settings.LayerSettings
+import fr.geonature.maps.settings.MapSettings
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.FixtureHelper.getFixture
 import fr.geonature.occtax.api.IOcctaxAPIClient
@@ -12,9 +15,9 @@ import fr.geonature.occtax.api.OcctaxAPIClientImpl
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.error.ObservationRecordException
-import fr.geonature.occtax.settings.AppSettings
-import fr.geonature.occtax.settings.InputDateSettings
-import fr.geonature.occtax.settings.InputSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
+import fr.geonature.occtax.features.settings.domain.InputDateSettings
+import fr.geonature.occtax.features.settings.domain.InputSettings
 import io.mockk.MockKAnnotations.init
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -31,6 +34,8 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.util.Calendar
 import java.util.Date
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 /**
  * Unit tests about [IObservationRecordRemoteDataSource].
@@ -118,6 +123,25 @@ class ObservationRecordRemoteDataSourceTest {
         val observationRecordUpdated = observationRecordRemoteDataSource.sendObservationRecord(
             observationRecord,
             AppSettings(
+                dataSyncSettings = DataSyncSettings(
+                    geoNatureServerUrl = "https://demo.geonature.fr/geonature",
+                    taxHubServerUrl = "https://demo.geonature.fr/taxhub",
+                    applicationId = 3,
+                    usersListId = 1,
+                    taxrefListId = 100,
+                    codeAreaType = "M10",
+                    pageSize = 1000,
+                    dataSyncPeriodicity = 30.toDuration(DurationUnit.MINUTES),
+                    essentialDataSyncPeriodicity = 20.toDuration(DurationUnit.MINUTES)
+                ),
+                mapSettings = MapSettings.Builder()
+                    .addLayer(
+                        LayerSettings.Builder.newInstance()
+                            .label("OSM")
+                            .addSource("https://a.tile.openstreetmap.org")
+                            .build()
+                    )
+                    .build(),
                 inputSettings = InputSettings(
                     dateSettings = InputDateSettings(
                         startDateSettings = InputDateSettings.DateSettings.DATETIME,
@@ -191,6 +215,25 @@ class ObservationRecordRemoteDataSourceTest {
                 observationRecordRemoteDataSource.sendObservationRecord(
                     observationRecord,
                     AppSettings(
+                        dataSyncSettings = DataSyncSettings(
+                            geoNatureServerUrl = "https://demo.geonature.fr/geonature",
+                            taxHubServerUrl = "https://demo.geonature.fr/taxhub",
+                            applicationId = 3,
+                            usersListId = 1,
+                            taxrefListId = 100,
+                            codeAreaType = "M10",
+                            pageSize = 1000,
+                            dataSyncPeriodicity = 30.toDuration(DurationUnit.MINUTES),
+                            essentialDataSyncPeriodicity = 20.toDuration(DurationUnit.MINUTES)
+                        ),
+                        mapSettings = MapSettings.Builder()
+                            .addLayer(
+                                LayerSettings.Builder.newInstance()
+                                    .label("OSM")
+                                    .addSource("https://a.tile.openstreetmap.org")
+                                    .build()
+                            )
+                            .build(),
                         inputSettings = InputSettings(
                             dateSettings = InputDateSettings(
                                 startDateSettings = InputDateSettings.DateSettings.DATETIME,
@@ -321,6 +364,25 @@ class ObservationRecordRemoteDataSourceTest {
             observationRecordRemoteDataSource.sendTaxaRecords(
                 observationRecord,
                 AppSettings(
+                    dataSyncSettings = DataSyncSettings(
+                        geoNatureServerUrl = "https://demo.geonature.fr/geonature",
+                        taxHubServerUrl = "https://demo.geonature.fr/taxhub",
+                        applicationId = 3,
+                        usersListId = 1,
+                        taxrefListId = 100,
+                        codeAreaType = "M10",
+                        pageSize = 1000,
+                        dataSyncPeriodicity = 30.toDuration(DurationUnit.MINUTES),
+                        essentialDataSyncPeriodicity = 20.toDuration(DurationUnit.MINUTES)
+                    ),
+                    mapSettings = MapSettings.Builder()
+                        .addLayer(
+                            LayerSettings.Builder.newInstance()
+                                .label("OSM")
+                                .addSource("https://a.tile.openstreetmap.org")
+                                .build()
+                        )
+                        .build(),
                     inputSettings = InputSettings(
                         dateSettings = InputDateSettings(
                             startDateSettings = InputDateSettings.DateSettings.DATETIME,
@@ -372,6 +434,25 @@ class ObservationRecordRemoteDataSourceTest {
                 observationRecordRemoteDataSource.sendTaxaRecords(
                     observationRecord,
                     AppSettings(
+                        dataSyncSettings = DataSyncSettings(
+                            geoNatureServerUrl = "https://demo.geonature.fr/geonature",
+                            taxHubServerUrl = "https://demo.geonature.fr/taxhub",
+                            applicationId = 3,
+                            usersListId = 1,
+                            taxrefListId = 100,
+                            codeAreaType = "M10",
+                            pageSize = 1000,
+                            dataSyncPeriodicity = 30.toDuration(DurationUnit.MINUTES),
+                            essentialDataSyncPeriodicity = 20.toDuration(DurationUnit.MINUTES)
+                        ),
+                        mapSettings = MapSettings.Builder()
+                            .addLayer(
+                                LayerSettings.Builder.newInstance()
+                                    .label("OSM")
+                                    .addSource("https://a.tile.openstreetmap.org")
+                                    .build()
+                            )
+                            .build(),
                         inputSettings = InputSettings(
                             dateSettings = InputDateSettings(
                                 startDateSettings = InputDateSettings.DateSettings.DATETIME,
@@ -424,6 +505,25 @@ class ObservationRecordRemoteDataSourceTest {
                 observationRecordRemoteDataSource.sendTaxaRecords(
                     observationRecord,
                     AppSettings(
+                        dataSyncSettings = DataSyncSettings(
+                            geoNatureServerUrl = "https://demo.geonature.fr/geonature",
+                            taxHubServerUrl = "https://demo.geonature.fr/taxhub",
+                            applicationId = 3,
+                            usersListId = 1,
+                            taxrefListId = 100,
+                            codeAreaType = "M10",
+                            pageSize = 1000,
+                            dataSyncPeriodicity = 30.toDuration(DurationUnit.MINUTES),
+                            essentialDataSyncPeriodicity = 20.toDuration(DurationUnit.MINUTES)
+                        ),
+                        mapSettings = MapSettings.Builder()
+                            .addLayer(
+                                LayerSettings.Builder.newInstance()
+                                    .label("OSM")
+                                    .addSource("https://a.tile.openstreetmap.org")
+                                    .build()
+                            )
+                            .build(),
                         inputSettings = InputSettings(
                             dateSettings = InputDateSettings(
                                 startDateSettings = InputDateSettings.DateSettings.DATETIME,

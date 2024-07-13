@@ -18,12 +18,19 @@ android {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
+    dependenciesInfo {
+        // Disables dependency metadata when building APKs.
+        includeInApk = false
+        // Disables dependency metadata when building Android App Bundles.
+        includeInBundle = false
+    }
+
     defaultConfig {
         applicationId "fr.geonature.occtax2"
         minSdkVersion 26
         targetSdkVersion 33
-        versionCode 3220
-        versionName "2.6.2"
+        versionCode 3310
+        versionName "2.7.0"
         buildConfigField "String", "BUILD_DATE", "\"" + new Date().getTime() + "\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         archivesBaseName = project.name + "-" + versionName
@@ -31,18 +38,18 @@ android {
 
     signingConfigs {
         release {
+            enableV3Signing true
             readKeystoreProperties(project.name)
         }
     }
 
     buildTypes {
         debug {
-            versionNameSuffix ".${defaultConfig.versionCode}-DEV"
+            versionNameSuffix "-DEV"
         }
 
         release {
             signingConfig signingConfigs.release
-            versionNameSuffix ".${defaultConfig.versionCode}"
             debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

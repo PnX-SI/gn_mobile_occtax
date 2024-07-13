@@ -9,7 +9,7 @@ import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.error.ObservationRecordException
 import fr.geonature.occtax.features.record.io.ObservationRecordJsonReader
 import fr.geonature.occtax.features.record.io.ObservationRecordJsonWriter
-import fr.geonature.occtax.settings.AppSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.asFlow
@@ -69,7 +69,11 @@ class ObservationRecordLocalDataSourceImpl(
                 preferenceManager.all
                     .filterKeys { it.startsWith("${KEY_PREFERENCE_INPUT}_") }
                     .values
-                    .mapNotNull { if (it is String && it.isNotBlank()) runCatching { observationRecordJsonReader.read(it) }.getOrNull() else null } + exportedObservationRecords
+                    .mapNotNull {
+                        if (it is String && it.isNotBlank()) runCatching { observationRecordJsonReader.read(it) }
+                            .onFailure { throwable -> Logger.error(throwable) { "failed to load observation record" } }
+                            .getOrNull() else null
+                    } + exportedObservationRecords
                 ).distinctBy { it.internalId }
                 .sortedByDescending { it.dates.start }
         }

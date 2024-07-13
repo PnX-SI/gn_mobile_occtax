@@ -1,35 +1,31 @@
 package fr.geonature.occtax.features.nomenclature.repository
 
 import fr.geonature.commons.data.entity.NomenclatureWithType
-import fr.geonature.commons.error.Failure
 import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSource
-import fr.geonature.commons.fp.Either
-import fr.geonature.commons.fp.Either.Left
-import fr.geonature.commons.fp.Either.Right
+import fr.geonature.commons.features.nomenclature.error.NomenclatureException
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureSettingsLocalDataSource
-import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
-import fr.geonature.occtax.features.nomenclature.error.NoNomenclatureTypeFoundLocallyFailure
+import fr.geonature.occtax.features.nomenclature.domain.EditableField
 import fr.geonature.occtax.features.record.domain.PropertyValue
-import fr.geonature.occtax.settings.PropertySettings
+import fr.geonature.occtax.features.settings.domain.PropertySettings
 import org.tinylog.Logger
 import fr.geonature.commons.features.nomenclature.repository.NomenclatureRepositoryImpl as BaseNomenclatureRepositoryImpl
 
 /**
  * Implementation of [INomenclatureRepository] based from [BaseNomenclatureRepositoryImpl] with
- * support of [EditableNomenclatureType].
+ * support of [EditableField].
  *
  * @author S. Grimault
  * @see BaseNomenclatureRepositoryImpl
  */
 class NomenclatureRepositoryImpl(
     private val nomenclatureLocalDataSource: INomenclatureLocalDataSource,
-    private val nomenclatureSettingsLocalDataSource: INomenclatureSettingsLocalDataSource
+    private val nomenclatureSettingsLocalDataSource: INomenclatureSettingsLocalDataSource,
 ) : BaseNomenclatureRepositoryImpl(nomenclatureLocalDataSource), INomenclatureRepository {
 
-    override suspend fun getEditableNomenclatures(
-        type: EditableNomenclatureType.Type,
+    override suspend fun getEditableFields(
+        type: EditableField.Type,
         vararg defaultPropertySettings: PropertySettings
-    ): Either<Failure, List<EditableNomenclatureType>> {
+    ): Result<List<EditableField>> {
         return runCatching {
             val nomenclatureTypes =
                 nomenclatureLocalDataSource.getAllNomenclatureTypes()
@@ -50,38 +46,36 @@ class NomenclatureRepositoryImpl(
                 *defaultPropertySettings
             )
                 .mapNotNull {
-                    if (it.viewType == EditableNomenclatureType.ViewType.NOMENCLATURE_TYPE) nomenclatureTypes[it.code]?.let { nomenclatureType ->
-                        EditableNomenclatureType(
-                            it.type,
-                            it.code,
-                            it.viewType,
-                            it.visible,
-                            it.default,
-                            nomenclatureType.defaultLabel.takeIf { label -> label.isNotEmpty() }
+                    if (it.viewType == EditableField.ViewType.NOMENCLATURE_TYPE) nomenclatureTypes[it.code]?.let { nomenclatureType ->
+                        EditableField(
+                            type = it.type,
+                            code = it.code,
+                            viewType = it.viewType,
+                            nomenclatureType = it.code,
+                            visible = it.visible,
+                            default = it.default,
+                            additionalField = false,
+                            label = nomenclatureType.defaultLabel.takeIf { label -> label.isNotEmpty() }
                                 ?: run {
-                                    Logger.warn { "no label found for nomenclature type '${nomenclatureType.mnemonic}', use default…" }
+                                    Logger.warn { "no label found for nomenclature type '${nomenclatureType.mnemonic}', use default..." }
                                     null
                                 }
                         )
                     } else it
                 }
-                .map { editableNomenclature ->
-                    editableNomenclature.copy(value = defaultNomenclatureValues.firstOrNull { it.type?.mnemonic == editableNomenclature.code }
+                .map { editableField ->
+                    editableField.copy(value = defaultNomenclatureValues.firstOrNull { it.type?.mnemonic == editableField.code }
                         ?.let {
                             PropertyValue.Nomenclature(
-                                editableNomenclature.code,
+                                editableField.code,
                                 it.defaultLabel,
                                 it.id
                             )
-                        } ?: editableNomenclature.value)
+                        } ?: editableField.value)
                 }
-        }.fold(
-            onSuccess = {
-                if (it.isEmpty()) Left(NoNomenclatureTypeFoundLocallyFailure) else Right(it)
-            },
-            onFailure = {
-                Left(Failure.DbFailure(it))
-            }
-        )
+                .also {
+                    if (it.isEmpty()) throw NomenclatureException.NoNomenclatureTypeFoundException
+                }
+        }
     }
 }

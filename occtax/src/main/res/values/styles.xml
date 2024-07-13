@@ -14,11 +14,11 @@
 
         <item name="android:windowBackground">@color/grey_10</item>
 
+        <item name="bottomSheetStyle">@style/RoundedBottomSheetStyle</item>
         <item name="underlinePageIndicatorStyle">@style/UnderlinePageIndicator</item>
 
         <item name="materialThemeOverlay">@style/ButtonThemeOverlay</item>
         <item name="textAppearanceHeadline6">@style/TextAppearance.App.Headline6</item>
-        <item name="textAppearanceSubtitle1">@style/TextAppearance.App.Subtitle1</item>
 
     </style>
 
@@ -47,11 +47,20 @@
 
     </style>
 
+    <style name="RoundedBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="shapeAppearanceOverlay">@style/RoundedShapeAppearanceBottomSheetDialog</item>
+        <item name="android:padding">8dp</item>
+    </style>
+    <style name="RoundedShapeAppearanceBottomSheetDialog">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
     <style name="TextAppearance.App.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
         <item name="android:textSize">18sp</item>
-    </style>
-    <style name="TextAppearance.App.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
-        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="ActionBar.Login" parent="Widget.AppCompat.ActionBar.Solid">

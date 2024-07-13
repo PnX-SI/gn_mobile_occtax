@@ -1,5 +1,224 @@
 # Changelog
 
+## [2.7.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0) (2024-07-13, release)
+
+* ### 🚀 Nouveautés
+
+* Nouveau mécanisme de synchronisation des taxons. On synchronise désormais tout Taxref mais seulement
+  quand le champs `taxonomie.t_meta_taxref.update_date` indique que celui-ci a été mis à jour depuis 
+  la dernière synchronisation (https://github.com/PnX-SI/gn_mobile_occtax/issues/133).
+* Suppression de contrôles additionnels lors de la synchronisation des taxons, permettant  d'obtenir
+  un gain non négligeable sur le temps de traitement (https://github.com/PnX-SI/gn_mobile_occtax/issues/247).
+* La liste des taxons est automatiquement filtrée selon le jeu de données sélectionné. Si ce dernier
+  n'est lié à aucune liste de taxons, la liste des taxons est filtrée selon la valeur du paramètre
+  `taxa_list_id`. Si ce paramètre n'est pas renseigné et que le jeu de données n'est lié à aucune 
+  liste de taxons, la liste des taxons ne sera pas filtrée et renvoie donc tout Taxref.
+  Si l'identifiant de liste associé à un JDD est égal à `-1`, on n'applique aucun filtre sur les
+  identifiants de liste même si le paramètre `taxa_list_id` est défini (https://github.com/PnX-SI/gn_mobile_core/issues/41, https://github.com/PnX-SI/gn_mobile_occtax/issues/133).
+* Utilisation de la nouvelle API pour la récupération des jeux de données en fonction des permissions
+  de l'utilisateur authentifié (https://github.com/PnX-SI/gn_mobile_occtax/issues/239).
+* Possibilité d'afficher les relevés non synchronisés sur une carte en plus de la vue sous forme de
+  liste (https://github.com/PnX-SI/gn_mobile_occtax/issues/224).
+* Possibilité de charger une couche cartographique locale non spécifiée dans la configuration (https://github.com/PnX-SI/gn_mobile_occtax/issues/170).
+* Support des champs additionnels sur les taxons et les dénombrements, désactivé par défaut avec le
+  nouveau paramètre `additional_fields` (https://github.com/PnX-SI/gn_mobile_occtax/issues/122).
+* Possibilité de surcharger localement la configuration (https://github.com/PnX-SI/gn_mobile_occtax/issues/95).
+* Meilleure gestion des photos prises en haute résolution. Par défaut, les photos prises sont
+  compressées avec une qualité de 80% et ne dépassent pas 2048px en largeur ou en hauteur selon son
+  orientation (portrait ou paysage) (https://github.com/PnX-SI/gn_mobile_occtax/issues/254).
+* Meilleure affichage des photos qu'elles soient prises en mode portrait ou en mode paysage (https://github.com/PnX-SI/gn_mobile_occtax/issues/84).
+* Les identifiants des objets géographiques dans les couches géographiques vectorielles deviennent
+  optionnels (https://github.com/PnX-SI/gn_mobile_maps/issues/11, https://github.com/PnX-SI/gn_mobile_occtax/issues/175).
+* Synchronisation périodique des identifiants de liste rattachés aux taxons (https://github.com/PnX-SI/gn_mobile_occtax/issues/133).
+* La création d'un nouveau relevé est désactivée tant qu'une première synchronisation complète n'a
+  pas été terminée.
+
+### 🐛 Corrections
+
+* Prise en compte des caractères spéciaux lors de la recherche par nom depuis la liste des taxons (https://github.com/PnX-SI/gn_mobile_occtax/issues/230).
+* Prise en compte de la date et heure locale du terminal dans la gestion des relevés (https://github.com/PnX-SI/gn_mobile_occtax/issues/225).
+* Correction de la synchronisation des données si le champ `nom_valide` n'est pas renseigné coté
+  Taxref (https://github.com/PnX-SI/gn_mobile_occtax/issues/233).
+* Correction de la gestion des valeurs numériques nulles dans la base de données
+* Petites corrections ergonomiques
+* La synchronisation des taxons interroge désormais l'API de TaxHub paginée avec un paramètre
+  d'ordre pour être certain de récupérer tous les taxons. Idem pour la récupération des couleurs de
+  taxons par unité géographique.
+* Le prénom de l'utilisateur connecté peut être non défini (https://github.com/PnX-SI/gn_mobile_occtax/issues/258).
+* Récupération des couleurs de taxons seulement si le paramètre `code_area_type` est défini (https://github.com/PnX-SI/gn_mobile_occtax/issues/232, https://github.com/PnX-SI/gn_mobile_occtax/issues/252)
+* Suppression du suffixe du nom de l'application lors du build de l'APK (https://github.com/PnX-SI/gn_mobile_occtax/issues/134).
+* Gestion des signatures lors du build de l'APK au format v3 pour y inclure par rotation des
+  certificats, avec un certificat plus officiel que celui actuellement utilisé par défaut.
+  À terme, ce nouveau certificat remplacera l'actuel. (https://github.com/PnX-SI/gn_mobile_occtax/issues/244, https://github.com/PnX-SI/gn_mobile_occtax/issues/134).
+
+### ⚠️ Notes de version
+
+* Code de version : **3310**
+* Cette version nécessite la version [1.13.1 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+
+## [2.7.0-rc9](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc9) (2024-07-07, pre-release)
+
+### 🐛 Corrections
+
+* Le prénom de l'utilisateur connecté peut être non défini (https://github.com/PnX-SI/gn_mobile_occtax/issues/258).
+* Le paramètre `taxa_list_id` peut être non défini (-1 par défaut) (https://github.com/PnX-SI/gn_mobile_core/issues/41).
+* La base des taxons peut être incomplète suite à une synchronisation complète lors des appels en
+  cascade selon les données paginées remontées par l'API car l'ordre n'est pas garantit sur les
+  données paginées pouvant donc créer des doublons entre deux appels. La solution de contournement
+  est d'appliquer systématiquement un tri par défaut sur les identifiants des taxons.
+
+### ⚠️ Notes de version
+
+* Code de version : 3301
+* Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
+  qui elle même nécessite au minimum la version  2.14.1 de GeoNature (pas encore disponible).
+
+## [2.7.0-rc8](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc8) (2024-05-19, pre-release)
+
+### 🐛 Corrections
+
+* Meilleure gestion des photos prises en haute résolution (https://github.com/PnX-SI/gn_mobile_occtax/issues/254) :
+  * Par défaut, les photos prises sont compressées avec une qualité de 80% et ne dépassent pas
+    2048px en largeur ou en hauteur selon son orientation (portrait ou paysage)
+* Gestion des signatures lors du build de l'APK au format v3 pour y inclure par rotation des
+  certificats un certificat plus officiel que celui actuellement utilisé par défaut. À terme, ce
+  nouveau certificat remplacera l'actuel. (https://github.com/PnX-SI/gn_mobile_occtax/issues/244, https://github.com/PnX-SI/gn_mobile_occtax/issues/134).
+* Les identifiants des objets géographiques dans les couches géographiques vectorielles deviennent
+  optionnels (https://github.com/PnX-SI/gn_mobile_maps/issues/11, https://github.com/PnX-SI/gn_mobile_occtax/issues/175).
+* Synchronisation périodique des identifiants de liste rattachés aux taxons (https://github.com/PnX-SI/gn_mobile_occtax/issues/133).
+* Série de corrections autour de la gestion des champs additionnels (https://github.com/PnX-SI/gn_mobile_occtax/issues/122).
+  En vrac :
+  * Synchronisation des relevés avec ou sans champs additionnels
+  * Filtrage des champs additionnels selon le jeu de données sélectionné
+  * Gestion des valeurs décimales sur les champs additionnels de type `number`
+* Meilleure affichage des photos qu'elles soient prises en mode portrait ou en mode paysage (https://github.com/PnX-SI/gn_mobile_occtax/issues/84).
+* Affichage des taxons filtrés selon l'identifiant de liste provenant du jeu de données (https://github.com/PnX-SI/gn_mobile_core/issues/41) :
+  * Un jeu de données peut définir un identifiant de liste et celle-ci peut être `null` ou égale à `-1`
+  * Si l'identifiant de liste est non défini, on prend la valeur par défaut venant du paramétrage de
+    l'application (`sync.taxa_list_id`) pour filtrer la liste des taxons
+  * Si l'identifiant de liste est égale à `-1`, on n'applique aucun filtre sur les identifiants de
+    liste même si c'est configuré coté paramétrage
+
+### ⚠️ Notes de version
+
+* Code de version : 3299
+* Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
+  qui elle même nécessite au minimum la version  2.14.1 de GeoNature (pas encore disponible).
+
+## [2.7.0-rc7](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc7) (2024-03-05, pre-release)
+
+### 🐛 Corrections
+
+* Suppression de contrôles additionnels lors de la synchronisation des taxons ce qui permet
+  d'obtenir un gain non négligeable sur le temps de traitement (https://github.com/PnX-SI/gn_mobile_occtax/issues/247).
+* Petites corrections d'ordre ergonomique.
+
+### ⚠️ Notes de version
+
+* Code de version : 3271
+* Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
+  qui elle même nécessite au minimum la version  2.14 de GeoNature (pas encore disponible).
+
+## [2.7.0-rc6](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc6) (2024-02-14, pre-release)
+
+### 🐛 Corrections
+
+* Les valeurs numériques nulles en base n'étaient pas correctement interprétées depuis leurs
+  lectures via un cursor
+
+### ⚠️ Notes de version
+
+* Code de version : 3259
+* Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
+  qui elle même nécessite au minimum la version  2.14 de GeoNature (pas encore disponible).
+
+## [2.7.0-rc5](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc5) (2024-01-10, pre-release)
+
+### 🐛 Corrections
+
+* Erreur entraînant un plantage de l'application lors du chargement du jeu de données par défaut
+  suite aux changements des URIs du fournisseur de données sur la partie jeu de données.
+
+### ⚠️ Notes de version
+
+* Code de version : 3257
+* Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
+  qui elle même nécessite au minimum la version  2.14 de GeoNature (pas encore disponible).
+
+## [2.7.0-rc4](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc4) (2023-12-29, pre-release)
+
+### 🐛 Corrections
+
+* Utilisation de la nouvelle API pour la récupération des jeux de données (https://github.com/PnX-SI/gn_mobile_occtax/issues/239).
+
+### ⚠️ Notes de version
+
+* Code de version : 3253
+* Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
+  qui elle même nécessite au minimum la version  2.14 de GeoNature (pas encore disponible).
+
+## [2.7.0-rc3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc3) (2023-12-05, pre-release)
+
+### 🚀 Nouveautés
+
+* La liste des taxons est automatiquement filtrée selon le jeu de données sélectionné. Si ce dernier
+  n'est lié à aucune liste de taxons, la liste des taxons est filtrée selon la valeur du paramètre
+  `taxa_list_id`. Si ce paramètre n'est pas renseigné et que le jeu de donnée n'est lié à aucune 
+  liste de taxons, la liste des taxons ne sera pas filtrée (https://github.com/PnX-SI/gn_mobile_core/issues/41, https://github.com/PnX-SI/gn_mobile_occtax/issues/133).
+
+### ⚠️ Notes de version
+
+* Code de version : 3251
+* Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
+  qui elle même nécessite au minimum la version  2.14 de GeoNature (pas encore disponible).
+
+## [2.7.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc2) (2023-10-14, pre-release)
+
+### 🚀 Nouveautés
+
+* Ne pas synchroniser les taxons à chaque synchronisation (https://github.com/PnX-SI/gn_mobile_occtax/issues/133).
+
+### 🐛 Corrections
+
+* Erreur transparente lors de la synchronisation des données si le champ 'nom_valide' est non
+  renseigné coté taxref (https://github.com/PnX-SI/gn_mobile_occtax/issues/233).
+
+### ⚠️ Notes de version
+
+* Code de version : 3229
+
+## [2.7.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc1) (2023-09-13, pre-release)
+
+### 🐛 Corrections
+
+* Prise en compte du paramètre 'additional_fields' lors de la synchronisation des données concernant
+  les champs additionnels (https://github.com/PnX-SI/gn_mobile_occtax/issues/122).
+
+### ⚠️ Notes de version
+
+* Code de version : 3221
+
+## [2.7.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc0) (2023-09-03, pre-release)
+
+### 🚀 Nouveautés
+
+* Affichage des relevés en cours sur la carte (https://github.com/PnX-SI/gn_mobile_occtax/issues/224)
+  en plus de la vue sous forme de liste.
+* Possibilité de charger une couche cartographique locale non spécifiée dans la configuration (https://github.com/PnX-SI/gn_mobile_occtax/issues/170).
+* Support des champs additionnels, désactivé par défaut (https://github.com/PnX-SI/gn_mobile_occtax/issues/122).
+* Possibilité de surcharger la configuration (https://github.com/PnX-SI/gn_mobile_occtax/issues/95).
+
+### 🐛 Corrections
+
+* Prise en compte des caractères spéciaux lors de la recherche par nom depuis la liste des taxons (https://github.com/PnX-SI/gn_mobile_occtax/issues/230).
+* Prise en compte de la date et l'heure locale du terminal dans la gestion des relevés (https://github.com/PnX-SI/gn_mobile_occtax/issues/225).
+* Suppression du suffix du nom de l'application lors du build de l'APK (https://github.com/PnX-SI/gn_mobile_occtax/issues/134).
+
+### ⚠️ Notes de version
+
+* Code de version : 3217
+
 ## [2.6.2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.2) (2024-03-02, release)
 
 ### 🐛 Corrections

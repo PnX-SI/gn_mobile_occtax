@@ -71,7 +71,7 @@ class ObservationRecordJsonReaderTest {
                 status = ObservationRecord.Status.DRAFT
             ).apply {
                 comment.comment = "Global comment"
-                dataset.datasetId = 17L
+                dataset.setDatasetId(17L)
                 dates.start = toDate("2016-10-28T08:15:00Z")!!
                 dates.end = toDate("2016-10-29T09:00:00Z")!!
 
@@ -193,7 +193,7 @@ class ObservationRecordJsonReaderTest {
     @Test
     fun `should read an observation record from a JSON string`() {
         // given an observation record to read
-        val json = getFixture("observation_record_simple.json")
+        val json = getFixture("observation_record_with_invalid_additional_fields.json")
 
         // when parsing this file as ObservationRecord
         val observationRecord = ObservationRecordJsonReader().read(json)
@@ -212,7 +212,7 @@ class ObservationRecordJsonReaderTest {
                 status = ObservationRecord.Status.DRAFT
             ).apply {
                 comment.comment = "Global comment"
-                dataset.datasetId = 17L
+                dataset.setDatasetId(17L)
                 dates.start = toDate("2016-10-28T08:15:00Z")!!
                 dates.end = toDate("2016-10-29T09:00:00Z")!!
 
@@ -290,6 +290,35 @@ class ObservationRecordJsonReaderTest {
                         ).map { it.toPair() }
                             .forEach { properties[it.first] = it.second }
 
+                        additionalFields = listOf(
+                            PropertyValue.Text(
+                                "some_field_text",
+                                "some_value"
+                            ),
+                            PropertyValue.Number(
+                                "some_field_as_long",
+                                42L
+                            ),
+                            PropertyValue.Number(
+                                "some_field_as_double",
+                                3.14
+                            ),
+                            PropertyValue.StringArray(
+                                "some_field_array_string",
+                                arrayOf(
+                                    "val1",
+                                    "val2"
+                                )
+                            ),
+                            PropertyValue.NumberArray(
+                                "some_field_array_number",
+                                arrayOf(
+                                    3L,
+                                    8L
+                                )
+                            )
+                        )
+
                         counting.addOrUpdate(counting.create()
                             .apply {
                                 listOf(
@@ -323,6 +352,13 @@ class ObservationRecordJsonReaderTest {
                                     )
                                 ).map { it.toPair() }
                                     .forEach { properties[it.first] = it.second }
+
+                                additionalFields = listOf(
+                                    PropertyValue.Text(
+                                        "some_field_text",
+                                        "some_value"
+                                    )
+                                )
                             }
                         )
                     }
@@ -353,7 +389,7 @@ class ObservationRecordJsonReaderTest {
                 status = ObservationRecord.Status.DRAFT
             ).apply {
                 comment.comment = "Global comment"
-                dataset.datasetId = 17L
+                dataset.setDatasetId(17L)
                 dates.start = toDate("2016-10-28T08:15:00Z")!!
                 dates.end = toDate("2016-10-29T09:00:00Z")!!
 
@@ -410,7 +446,7 @@ class ObservationRecordJsonReaderTest {
                 status = ObservationRecord.Status.DRAFT
             ).apply {
                 comment.comment = "Global comment"
-                dataset.datasetId = 1L
+                dataset.setDatasetId(1L)
                 dates.start = toDate("2016-10-28")!!.set(
                     Calendar.HOUR_OF_DAY,
                     0

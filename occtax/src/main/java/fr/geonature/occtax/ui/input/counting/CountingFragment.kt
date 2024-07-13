@@ -26,7 +26,7 @@ import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.TaxonRecord
-import fr.geonature.occtax.settings.PropertySettings
+import fr.geonature.occtax.features.settings.domain.PropertySettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
 
 /**
@@ -207,15 +207,21 @@ class CountingFragment : AbstractInputFragment() {
 
     private fun launchEditCountingMetadataActivity(countingRecord: CountingRecord? = null) {
         val context = context ?: return
+        val datasetId = observationRecord?.dataset?.dataset?.datasetId
         val taxonRecord = observationRecord?.taxa?.selectedTaxonRecord ?: return
 
         editCountingResultLauncher.launch(
             EditCountingMetadataActivity.newIntent(
                 context,
+                datasetId,
                 taxonRecord,
                 countingRecord,
                 arguments?.getBoolean(
                     ARG_SAVE_DEFAULT_VALUES,
+                    false
+                ) ?: false,
+                arguments?.getBoolean(
+                    ARG_WITH_ADDITIONAL_FIELDS,
                     false
                 ) ?: false,
                 *(arguments?.getParcelableArrayCompat(ARG_PROPERTIES) ?: emptyArray())
@@ -282,6 +288,7 @@ class CountingFragment : AbstractInputFragment() {
     companion object {
 
         private const val ARG_SAVE_DEFAULT_VALUES = "arg_save_default_values"
+        private const val ARG_WITH_ADDITIONAL_FIELDS = "arg_with_additional_fields"
         private const val ARG_PROPERTIES = "arg_properties"
 
         /**
@@ -292,12 +299,17 @@ class CountingFragment : AbstractInputFragment() {
         @JvmStatic
         fun newInstance(
             saveDefaultValues: Boolean = false,
+            withAdditionalFields: Boolean = false,
             vararg propertySettings: PropertySettings
         ) = CountingFragment().apply {
             arguments = Bundle().apply {
                 putBoolean(
                     ARG_SAVE_DEFAULT_VALUES,
                     saveDefaultValues
+                )
+                putBoolean(
+                    ARG_WITH_ADDITIONAL_FIELDS,
+                    withAdditionalFields
                 )
                 putParcelableArray(
                     ARG_PROPERTIES,

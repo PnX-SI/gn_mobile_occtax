@@ -1,6 +1,7 @@
 package fr.geonature.occtax.features.record.domain
 
 import android.os.Parcel
+import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.util.add
@@ -12,6 +13,7 @@ import org.junit.runner.RunWith
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
 import org.robolectric.RobolectricTestRunner
+import java.time.Instant
 import java.util.Calendar
 import java.util.Date
 
@@ -69,10 +71,43 @@ class ObservationRecordTest {
     @Test
     fun `should set dataset`() {
         val record = ObservationRecord(internalId = 1234L)
-        record.dataset.datasetId = 17L
+        record.dataset.setDataset(
+            Dataset(
+                id = 17L,
+                name = "Jeu de données personnel de Auger Ariane",
+                description = "Jeu de données personnel de Auger Ariane",
+                active = true,
+                createdAt = Date.from(Instant.parse("2020-03-28T10:00:00Z")),
+                updatedAt = null,
+                100L
+            )
+        )
 
         assertEquals(
-            PropertyValue.Number(
+            PropertyValue.Dataset(
+                DatasetRecord.DATASET_ID_KEY,
+                17L,
+                100L
+            ),
+            record.properties[DatasetRecord.DATASET_ID_KEY]
+        )
+        assertEquals(
+            PropertyValue.Dataset(
+                DatasetRecord.DATASET_ID_KEY,
+                17L,
+                100L
+            ),
+            record.dataset.dataset
+        )
+    }
+
+    @Test
+    fun `should set dataset from ID`() {
+        val record = ObservationRecord(internalId = 1234L)
+        record.dataset.setDatasetId(17L)
+
+        assertEquals(
+            PropertyValue.Dataset(
                 DatasetRecord.DATASET_ID_KEY,
                 17L
             ),
@@ -80,7 +115,7 @@ class ObservationRecordTest {
         )
         assertEquals(
             17L,
-            record.dataset.datasetId
+            record.dataset.dataset?.datasetId
         )
     }
 
@@ -694,6 +729,10 @@ class ObservationRecordTest {
                     )
                 ),
                 properties = listOf(
+                    PropertyValue.AdditionalFields(
+                        TaxonRecord.ADDITIONAL_FIELDS_KEY,
+                        mapOf()
+                    ),
                     PropertyValue.Text(
                         "some_code",
                         "some_value"
@@ -720,6 +759,10 @@ class ObservationRecordTest {
                         )
                     ),
                     properties = listOf(
+                        PropertyValue.AdditionalFields(
+                            TaxonRecord.ADDITIONAL_FIELDS_KEY,
+                            mapOf()
+                        ),
                         PropertyValue.Text(
                             "some_code",
                             "some_value"

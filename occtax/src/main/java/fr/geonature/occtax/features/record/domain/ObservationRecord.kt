@@ -2,6 +2,7 @@ package fr.geonature.occtax.features.record.domain
 
 import android.os.Parcelable
 import fr.geonature.commons.data.entity.AbstractTaxon
+import fr.geonature.commons.data.entity.Dataset
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import org.locationtech.jts.geom.Geometry
@@ -38,24 +39,24 @@ data class ObservationRecord(
     /**
      * The main properties of this observation record
      */
-    val properties: SortedMap<String, PropertyValue> = sortedMapOf(),
+    val properties: SortedMap<String, PropertyValue> = sortedMapOf(
+        PropertyValue.Text(
+            "meta_device_entry",
+            "mobile"
+        )
+            .toPair(),
+        PropertyValue.AdditionalFields(
+            ADDITIONAL_FIELDS_KEY,
+            mapOf()
+        )
+            .toPair()
+    ),
 
     /**
      * The current status of this observation record.
      */
     val status: Status = Status.DRAFT
 ) : Parcelable {
-
-    init {
-        PropertyValue.Text(
-            "meta_device_entry",
-            "mobile"
-        )
-            .toPair()
-            .also {
-                properties[it.first] = it.second
-            }
-    }
 
     @IgnoredOnParcel
     val comment = CommentRecord(properties)
@@ -87,6 +88,10 @@ data class ObservationRecord(
         SYNC_IN_PROGRESS,
         SYNC_ERROR,
         SYNC_SUCCESSFUL
+    }
+
+    companion object {
+        const val ADDITIONAL_FIELDS_KEY = "additional_fields"
     }
 }
 
@@ -128,18 +133,35 @@ class DatasetRecord(private val properties: SortedMap<String, PropertyValue>) {
     /**
      * The current selected dataset of this observation record.
      */
-    var datasetId: Long?
-        get() = properties[DATASET_ID_KEY].takeIf { it is PropertyValue.Number }
-            ?.let { it as PropertyValue.Number }?.value?.toLong()
+    var dataset: PropertyValue.Dataset?
+        get() = properties[DATASET_ID_KEY].takeIf { it is PropertyValue.Dataset }
+            ?.let { it as PropertyValue.Dataset }
         set(value) {
-            PropertyValue.Number(
+            PropertyValue.Dataset(
                 DATASET_ID_KEY,
-                value
+                value?.datasetId,
+                value?.taxaListId
             )
                 .also {
-                    properties[it.code] = it
+                    if (it.isEmpty()) properties.remove(DATASET_ID_KEY)
+                    else properties[it.code] = it
                 }
         }
+
+    fun setDataset(dataset: Dataset?) {
+        this.dataset = PropertyValue.Dataset(
+            DATASET_ID_KEY,
+            dataset?.id,
+            dataset?.taxaListId
+        )
+    }
+
+    fun setDatasetId(datasetId: Long?) {
+        this.dataset = PropertyValue.Dataset(
+            DATASET_ID_KEY,
+            datasetId
+        )
+    }
 
     companion object {
         const val DATASET_ID_KEY = "id_dataset"

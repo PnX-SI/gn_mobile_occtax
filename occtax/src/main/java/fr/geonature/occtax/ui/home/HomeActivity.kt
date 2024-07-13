@@ -1,7 +1,11 @@
 package fr.geonature.occtax.ui.home
 
+import android.Manifest
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
@@ -19,7 +23,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.FileProvider
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
+import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import androidx.work.WorkInfo
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -29,6 +38,7 @@ import fr.geonature.commons.error.Failure
 import fr.geonature.commons.lifecycle.observe
 import fr.geonature.commons.lifecycle.observeOnce
 import fr.geonature.commons.lifecycle.observeUntil
+import fr.geonature.commons.lifecycle.onError
 import fr.geonature.commons.lifecycle.onFailure
 import fr.geonature.commons.util.ThemeUtils.getErrorColor
 import fr.geonature.commons.util.add
@@ -41,19 +51,26 @@ import fr.geonature.datasync.packageinfo.PackageInfo
 import fr.geonature.datasync.packageinfo.PackageInfoViewModel
 import fr.geonature.datasync.packageinfo.error.PackageInfoNotFoundFailure
 import fr.geonature.datasync.packageinfo.error.PackageInfoNotFoundFromRemoteFailure
+import fr.geonature.datasync.settings.AppSettingsFilename
 import fr.geonature.datasync.settings.error.DataSyncSettingsJsonParseFailure
 import fr.geonature.datasync.settings.error.DataSyncSettingsNotFoundFailure
 import fr.geonature.datasync.sync.DataSyncViewModel
 import fr.geonature.datasync.sync.ServerStatus
 import fr.geonature.datasync.ui.login.LoginActivity
+import fr.geonature.maps.ui.MapFragment
+import fr.geonature.maps.util.CheckPermissionLifecycleObserver
+import fr.geonature.maps.util.ManageExternalStoragePermissionLifecycleObserver
 import fr.geonature.occtax.BuildConfig
 import fr.geonature.occtax.MainApplication
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.ObservationRecord
-import fr.geonature.occtax.settings.AppSettings
-import fr.geonature.occtax.settings.AppSettingsViewModel
+import fr.geonature.occtax.features.settings.domain.AppSettings
+import fr.geonature.occtax.features.settings.error.AppSettingsException
+import fr.geonature.occtax.features.settings.presentation.AppSettingsViewModel
 import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
 import fr.geonature.occtax.ui.settings.PreferencesActivity
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.tinylog.Logger
 import java.io.File
 import java.text.DateFormat
@@ -61,6 +78,7 @@ import java.time.Instant
 import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
+import kotlin.coroutines.resume
 
 /**
  * Home screen Activity.
@@ -69,7 +87,8 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity(),
-    LastObservationRecordsFragment.OnLastObservationRecordsFragmentListener {
+    OnObservationRecordListener,
+    MapFragment.OnMapFragmentPermissionsListener {
 
     private val authLoginViewModel: AuthLoginViewModel by viewModels()
     private val appSettingsViewModel: AppSettingsViewModel by viewModels()
@@ -81,12 +100,23 @@ class HomeActivity : AppCompatActivity(),
     @Inject
     lateinit var geoNatureAPIClient: IGeoNatureAPIClient
 
+    @AppSettingsFilename
+    @Inject
+    lateinit var appSettingsFilename: String
+
+    private var manageExternalStoragePermissionLifecycleObserver: ManageExternalStoragePermissionLifecycleObserver? =
+        null
+    private var readExternalStoragePermissionLifecycleObserver: CheckPermissionLifecycleObserver? =
+        null
+    private var locationPermissionLifecycleObserver: CheckPermissionLifecycleObserver? = null
     private var loginLastnameTextView: TextView? = null
     private var loginFirstnameTextView: TextView? = null
     private var loginButton: Button? = null
     private var navMenuDataSync: DrawerMenuEntryView? = null
     private var navMenuLogout: DrawerMenuEntryView? = null
     private var homeContent: CoordinatorLayout? = null
+    private var viewPager: ViewPager2? = null
+    private var emptyTextView: TextView? = null
     private var progressSnackbar: Pair<Snackbar, CircularProgressIndicator>? = null
 
     private var appSettings: AppSettings? = null
@@ -107,6 +137,21 @@ class HomeActivity : AppCompatActivity(),
             setDisplayHomeAsUpEnabled(true)
             subtitle = getString(R.string.home_last_inputs)
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            manageExternalStoragePermissionLifecycleObserver =
+                ManageExternalStoragePermissionLifecycleObserver(this)
+        } else {
+            readExternalStoragePermissionLifecycleObserver = CheckPermissionLifecycleObserver(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+        }
+
+        locationPermissionLifecycleObserver = CheckPermissionLifecycleObserver(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val toggle =
@@ -147,6 +192,7 @@ class HomeActivity : AppCompatActivity(),
                 appSettings?.dataSyncSettings?.also { dataSyncSettings ->
                     dataSyncViewModel.startSync(
                         dataSyncSettings,
+                        appSettings?.nomenclatureSettings?.withAdditionalFields ?: false,
                         HomeActivity::class.java,
                         MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                     )
@@ -184,11 +230,29 @@ class HomeActivity : AppCompatActivity(),
         }
 
         homeContent = findViewById(R.id.homeContent)
+        emptyTextView = findViewById(android.R.id.empty)
+        viewPager = findViewById<ViewPager2>(R.id.pager)?.apply {
+            // FIXME: this is a workaround to keep MapView alive from ViewPager…
+            // see: https://github.com/osmdroid/osmdroid/issues/1581
+            offscreenPageLimit = 1
+
+            // disable swipe navigation
+            isUserInputEnabled = false
+
+            registerOnPageChangeCallback(object : OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    emptyTextView?.isGone = true
+                    invalidateOptionsMenu()
+                }
+            })
+        }
 
         configureAuthLoginViewModel()
         configureDataSyncViewModel()
         configureConfigureServerSettingsViewModel()
         configureUpdateSettingsViewModel()
+        configureAppSettingsViewModel()
 
         startSyncResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -201,6 +265,7 @@ class HomeActivity : AppCompatActivity(),
                         } else {
                             dataSyncViewModel.startSync(
                                 dataSyncSettings,
+                                appSettings?.nomenclatureSettings?.withAdditionalFields ?: false,
                                 HomeActivity::class.java,
                                 MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                             )
@@ -210,6 +275,41 @@ class HomeActivity : AppCompatActivity(),
             }
 
         updateSettingsViewModel.updateAppSettings()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(
+            R.menu.list_map,
+            menu
+        )
+
+        return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        menu?.findItem(android.R.id.toggle)
+            ?.apply {
+                setIcon(if (viewPager?.currentItem == 0) R.drawable.ic_map else R.drawable.ic_list)
+                setTitle(if (viewPager?.currentItem == 0) R.string.action_as_map else R.string.action_as_list)
+            }
+
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.toggle -> {
+                viewPager?.setCurrentItem(
+                    (viewPager?.currentItem?.plus(1)
+                        ?: 0).takeIf { it < (viewPager?.adapter?.itemCount ?: 0) } ?: 0,
+                    true
+                )
+
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onStartEditObservationRecord(selectedObservationRecord: ObservationRecord?) {
@@ -223,6 +323,29 @@ class HomeActivity : AppCompatActivity(),
             )
         )
     }
+
+    override suspend fun onStoragePermissionsGranted() =
+        suspendCancellableCoroutine { continuation ->
+            lifecycleScope.launch {
+                continuation.resume(
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        manageExternalStoragePermissionLifecycleObserver?.invoke()
+                    } else {
+                        readExternalStoragePermissionLifecycleObserver?.invoke(this@HomeActivity)
+                    } ?: false
+                )
+            }
+        }
+
+    override suspend fun onLocationPermissionGranted() =
+        suspendCancellableCoroutine { continuation ->
+            lifecycleScope.launch {
+                continuation.resume(
+                    locationPermissionLifecycleObserver?.invoke(this@HomeActivity)
+                        ?: false
+                )
+            }
+        }
 
     private fun configureAuthLoginViewModel() {
         authLoginViewModel.also { vm ->
@@ -270,6 +393,12 @@ class HomeActivity : AppCompatActivity(),
             vm.isSyncRunning.observe(
                 this@HomeActivity
             ) {
+                emptyTextView?.isVisible = it
+
+                if (it && dataSyncViewModel.lastSynchronizedDate.value?.second == null) {
+                    emptyTextView?.text = getString(R.string.home_first_sync)
+                }
+
                 navMenuDataSync?.apply {
                     isClickable = !it
                     setText1(R.string.action_data_sync)
@@ -295,6 +424,7 @@ class HomeActivity : AppCompatActivity(),
                         navMenuDataSync?.apply {
                             icon.clearAnimation()
                         }
+                        emptyTextView?.isVisible = false
                     }
 
                     it?.run {
@@ -336,6 +466,7 @@ class HomeActivity : AppCompatActivity(),
                                     icon.clearAnimation()
                                     setIcon(R.drawable.ic_sync)
                                 }
+                                emptyTextView?.isVisible = false
                             }
                         }
 
@@ -357,10 +488,89 @@ class HomeActivity : AppCompatActivity(),
         }
     }
 
+    private fun configureAppSettingsViewModel() {
+        with(appSettingsViewModel) {
+            observe(appSettings) {
+                this@HomeActivity.appSettings = it
+
+                viewPager?.adapter = ObservationRecordsPagerAdapter(
+                    this@HomeActivity,
+                    it
+                )
+
+                it.dataSyncSettings.also { dataSyncSettings ->
+                    dataSyncViewModel.configurePeriodicSync(
+                        dataSyncSettings,
+                        this@HomeActivity.appSettings?.nomenclatureSettings?.withAdditionalFields
+                            ?: false,
+                        HomeActivity::class.java,
+                        MainApplication.CHANNEL_DATA_SYNCHRONIZATION
+                    )
+
+                    if (dataSyncViewModel.lastSynchronizedDate.value?.second == null) {
+                        dataSyncViewModel.startSync(
+                            dataSyncSettings,
+                            this@HomeActivity.appSettings?.nomenclatureSettings?.withAdditionalFields
+                                ?: false,
+                            HomeActivity::class.java,
+                            MainApplication.CHANNEL_DATA_SYNCHRONIZATION
+                        )
+
+                        return@also
+                    }
+
+                    dataSyncViewModel.hasLocalData()
+                        .observeOnce(this@HomeActivity) { hasLocalData ->
+                            if (hasLocalData == true) {
+                                dataSyncViewModel.lastSynchronizedDate.value?.second?.also { lastDataSynchronization ->
+                                    if (
+                                        lastDataSynchronization.add(
+                                            Calendar.SECOND,
+                                            dataSyncSettings.dataSyncPeriodicity?.inWholeSeconds?.toInt()
+                                                ?: 0
+                                        )
+                                            .before(Date.from(Instant.now()))
+                                    ) {
+                                        Logger.info {
+                                            "the last data synchronization seems to be old (done on $lastDataSynchronization), restarting data synchronization..."
+                                        }
+
+                                        dataSyncViewModel.startSync(
+                                            dataSyncSettings,
+                                            this@HomeActivity.appSettings?.nomenclatureSettings?.withAdditionalFields
+                                                ?: false,
+                                            HomeActivity::class.java,
+                                            MainApplication.CHANNEL_DATA_SYNCHRONIZATION
+                                        )
+                                    }
+                                }
+                            } else {
+                                Logger.warn {
+                                    "no local data found locally, starting a new data synchronization..."
+                                }
+
+                                dataSyncViewModel.startSync(
+                                    dataSyncSettings,
+                                    this@HomeActivity.appSettings?.nomenclatureSettings?.withAdditionalFields
+                                        ?: false,
+                                    HomeActivity::class.java,
+                                    MainApplication.CHANNEL_DATA_SYNCHRONIZATION
+                                )
+                            }
+                        }
+                }
+            }
+            onError(
+                error,
+                ::handleError
+            )
+        }
+    }
+
     private fun configureConfigureServerSettingsViewModel() {
         with(configureServerSettingsViewModel) {
             observe(dataSyncSettingLoaded) {
-                loadAppSettings()
+                appSettingsViewModel.loadAppSettings()
             }
             onFailure(
                 failure,
@@ -382,63 +592,6 @@ class HomeActivity : AppCompatActivity(),
         }
     }
 
-    private fun loadAppSettings() {
-        appSettingsViewModel.loadAppSettings()
-            .observeOnce(this) {
-                if (it?.mapSettings == null) {
-                    Logger.info { "failed to load settings" }
-
-                    makeSnackbar(
-                        getString(
-                            if (it == null) R.string.snackbar_settings_not_found else R.string.snackbar_settings_map_invalid,
-                            appSettingsViewModel.getAppSettingsFilename()
-                        )
-                    )?.show()
-                } else {
-                    Logger.info { "app settings successfully loaded" }
-
-                    appSettings = it
-
-                    it.dataSyncSettings?.also { dataSyncSettings ->
-                        dataSyncViewModel.configurePeriodicSync(
-                            dataSyncSettings,
-                            HomeActivity::class.java,
-                            MainApplication.CHANNEL_DATA_SYNCHRONIZATION
-                        )
-
-                        if (dataSyncViewModel.lastSynchronizedDate.value?.second == null) {
-                            dataSyncViewModel.startSync(
-                                dataSyncSettings,
-                                HomeActivity::class.java,
-                                MainApplication.CHANNEL_DATA_SYNCHRONIZATION
-                            )
-
-                            return@also
-                        }
-
-                        dataSyncViewModel.lastSynchronizedDate.value?.second?.also { lastDataSynchronization ->
-                            if (
-                                lastDataSynchronization.add(
-                                    Calendar.SECOND,
-                                    dataSyncSettings.dataSyncPeriodicity?.inWholeSeconds?.toInt()
-                                        ?: 0
-                                )
-                                    .before(Date.from(Instant.now()))
-                            ) {
-                                Logger.info { "the last data synchronization seems to be old (done on $lastDataSynchronization), restarting data synchronization..." }
-
-                                dataSyncViewModel.startSync(
-                                    dataSyncSettings,
-                                    HomeActivity::class.java,
-                                    MainApplication.CHANNEL_DATA_SYNCHRONIZATION
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-    }
-
     private fun packageInfoUpdated(packageInfo: PackageInfo) {
         if (packageInfo.hasNewVersionAvailable()) {
             confirmBeforeUpgrade(this.packageName)
@@ -448,7 +601,31 @@ class HomeActivity : AppCompatActivity(),
             Logger.info { "reloading settings after update..." }
         }
 
-        loadAppSettings()
+        appSettingsViewModel.loadAppSettings()
+    }
+
+    private fun handleError(error: Throwable) {
+        when (error) {
+            is AppSettingsException.NotFoundException, is AppSettingsException.NoAppSettingsFoundLocallyException -> {
+                emptyTextView?.setText(R.string.home_no_settings)
+                makeSnackbar(
+                    getString(
+                        R.string.snackbar_settings_not_found,
+                        appSettingsFilename
+                    )
+                )?.show()
+            }
+
+            is AppSettingsException.JsonParseException, is AppSettingsException.MissingAttributeException -> {
+                makeSnackbar(
+                    getString(
+                        R.string.snackbar_settings_invalid
+                    )
+                )
+                    ?.setBackgroundTint(getErrorColor(this))
+                    ?.show()
+            }
+        }
     }
 
     private fun handleFailure(failure: Failure) {

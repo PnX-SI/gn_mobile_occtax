@@ -20,13 +20,14 @@ import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.lifecycle.observe
 import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.nomenclature.domain.EditableNomenclatureType
-import fr.geonature.occtax.features.nomenclature.presentation.EditableNomenclatureTypeAdapter
+import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.presentation.EditableFieldAdapter
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
 import fr.geonature.occtax.features.record.domain.MediaRecord
+import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.domain.TaxonRecord
-import fr.geonature.occtax.settings.PropertySettings
+import fr.geonature.occtax.features.settings.domain.PropertySettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
 
 /**
@@ -42,7 +43,7 @@ class InformationFragment : AbstractInputFragment() {
 
     private lateinit var savedState: Bundle
 
-    private var adapter: EditableNomenclatureTypeAdapter? = null
+    private var adapter: EditableFieldAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +53,7 @@ class InformationFragment : AbstractInputFragment() {
         with(nomenclatureViewModel) {
             observe(
                 editableNomenclatures,
-                ::handleEditableNomenclatureTypes
+                ::handleEditableFields
             )
         }
     }
@@ -83,8 +84,8 @@ class InformationFragment : AbstractInputFragment() {
         val progressBar = view.findViewById<ProgressBar>(android.R.id.progress)
             .apply { visibility = View.VISIBLE }
 
-        adapter = EditableNomenclatureTypeAdapter(object :
-            EditableNomenclatureTypeAdapter.OnEditableNomenclatureTypeAdapter {
+        adapter = EditableFieldAdapter(object :
+            EditableFieldAdapter.OnEditableFieldAdapter {
             override fun getLifecycleOwner(): LifecycleOwner {
                 return this@InformationFragment
             }
@@ -137,19 +138,29 @@ class InformationFragment : AbstractInputFragment() {
                 )
             }
 
-            override fun onUpdate(editableNomenclatureType: EditableNomenclatureType) {
-                editableNomenclatureType.value?.toPair()
-                    .also {
-                        if (it == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(editableNomenclatureType.code)
-                        else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
-                            editableNomenclatureType.code,
-                            it.second
-                        )
+            override fun onUpdate(editableField: EditableField) {
+                if (editableField.additionalField) {
+                    // as additional field
+                    observationRecord?.taxa?.selectedTaxonRecord?.also {
+                        it.additionalFields = it.additionalFields.filter { pv ->
+                            pv.toPair().first != editableField.code
+                        } + listOfNotNull(editableField.value)
                     }
+                } else {
+                    // as editable field
+                    editableField.value?.toPair()
+                        .also {
+                            if (it == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(editableField.code)
+                            else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
+                                editableField.code,
+                                it.second
+                            )
+                        }
+                }
 
-                val propertyValue = editableNomenclatureType.value
+                val propertyValue = editableField.value
 
-                if (propertyValue !== null && editableNomenclatureType.locked) propertyValueModel.setPropertyValue(
+                if (propertyValue !== null && editableField.locked) propertyValueModel.setPropertyValue(
                     observationRecord?.taxa?.selectedTaxonRecord?.taxon?.taxonomy
                         ?: Taxonomy(
                             Taxonomy.ANY,
@@ -162,7 +173,7 @@ class InformationFragment : AbstractInputFragment() {
                             Taxonomy.ANY,
                             Taxonomy.ANY
                         ),
-                    editableNomenclatureType.code
+                    editableField.code
                 )
             }
 
@@ -179,7 +190,7 @@ class InformationFragment : AbstractInputFragment() {
                 KEY_SHOW_ALL_NOMENCLATURE_TYPES,
                 false
             )
-        ) adapter?.showAllNomenclatureTypes() else adapter?.showDefaultNomenclatureTypes()
+        ) adapter?.showAllEditableFields() else adapter?.showDefaultEditableFields()
         adapter?.lockDefaultValues(arguments?.getBoolean(ARG_SAVE_DEFAULT_VALUES) == true)
 
         with(recyclerView) {
@@ -209,16 +220,21 @@ class InformationFragment : AbstractInputFragment() {
     }
 
     override fun refreshView() {
-        nomenclatureViewModel.getEditableNomenclatures(
-            EditableNomenclatureType.Type.INFORMATION,
+        nomenclatureViewModel.getEditableFields(
+            observationRecord?.dataset?.dataset?.datasetId,
+            arguments?.getBoolean(
+                ARG_WITH_ADDITIONAL_FIELDS,
+                false
+            ) ?: false,
+            EditableField.Type.INFORMATION,
             (arguments?.getParcelableArrayCompat<PropertySettings>(ARG_PROPERTIES)
                 ?.toList() ?: emptyList()),
             observationRecord?.taxa?.selectedTaxonRecord?.taxon?.taxonomy
         )
     }
 
-    private fun handleEditableNomenclatureTypes(editableNomenclatureTypes: List<EditableNomenclatureType>) {
-        editableNomenclatureTypes.filter { it.value != null }
+    private fun handleEditableFields(editableFields: List<EditableField>) {
+        editableFields.filter { it.value != null }
             .forEach {
                 if (observationRecord?.taxa?.selectedTaxonRecord?.properties?.containsKey(it.code) == true) return@forEach
 
@@ -233,17 +249,20 @@ class InformationFragment : AbstractInputFragment() {
             }
 
         adapter?.bind(
-            editableNomenclatureTypes,
-            *(observationRecord?.taxa?.selectedTaxonRecord?.properties?.values
+            editableFields,
+            *((observationRecord?.taxa?.selectedTaxonRecord?.properties?.values
                 ?.filterNotNull()
                 ?.filterNot { it.isEmpty() }
-                ?.toTypedArray() ?: emptyArray())
+                ?.filterNot { it is PropertyValue.AdditionalFields }
+                ?: emptyList()) + (observationRecord?.taxa?.selectedTaxonRecord?.additionalFields
+                ?: emptyList())).toTypedArray()
         )
     }
 
     companion object {
 
         private const val ARG_SAVE_DEFAULT_VALUES = "arg_save_default_values"
+        private const val ARG_WITH_ADDITIONAL_FIELDS = "arg_with_additional_fields"
         private const val ARG_PROPERTIES = "arg_properties"
         private const val KEY_SHOW_ALL_NOMENCLATURE_TYPES = "show_all_nomenclature_types"
 
@@ -255,12 +274,17 @@ class InformationFragment : AbstractInputFragment() {
         @JvmStatic
         fun newInstance(
             saveDefaultValues: Boolean = false,
+            withAdditionalFields: Boolean = false,
             vararg propertySettings: PropertySettings
         ) = InformationFragment().apply {
             arguments = Bundle().apply {
                 putBoolean(
                     ARG_SAVE_DEFAULT_VALUES,
                     saveDefaultValues
+                )
+                putBoolean(
+                    ARG_WITH_ADDITIONAL_FIELDS,
+                    withAdditionalFields
                 )
                 putParcelableArray(
                     ARG_PROPERTIES,

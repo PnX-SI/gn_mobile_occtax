@@ -6,6 +6,7 @@
     <item
         android:id="@+id/menu_sync"
         android:checkable="false"
+        android:orderInCategory="0"
         android:title="@string/action_input_sync"
         android:tooltipText="@string/action_input_sync_hint"
         app:iconTint="@color/actionbar_icon_tint"
@@ -14,6 +15,7 @@
     <item
         android:id="@+id/menu_sync_in_progress"
         android:checkable="false"
+        android:orderInCategory="0"
         android:title="@string/action_sync_in_progress"
         android:visible="false"
         app:actionViewClass="android.widget.ProgressBar"

@@ -5,13 +5,16 @@ import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.util.toDate
 import fr.geonature.commons.util.toIsoDateString
 import fr.geonature.commons.util.toMap
+import fr.geonature.datasync.settings.DataSyncSettings
+import fr.geonature.maps.settings.LayerSettings
+import fr.geonature.maps.settings.MapSettings
 import fr.geonature.occtax.FixtureHelper.getFixture
 import fr.geonature.occtax.features.record.domain.ModuleRecord
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
-import fr.geonature.occtax.settings.AppSettings
-import fr.geonature.occtax.settings.InputDateSettings
-import fr.geonature.occtax.settings.InputSettings
+import fr.geonature.occtax.features.settings.domain.AppSettings
+import fr.geonature.occtax.features.settings.domain.InputDateSettings
+import fr.geonature.occtax.features.settings.domain.InputSettings
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Before
@@ -22,6 +25,8 @@ import org.locationtech.jts.geom.GeometryFactory
 import org.robolectric.RobolectricTestRunner
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 /**
  * Unit tests about [ObservationRecordJsonWriter].
@@ -70,7 +75,7 @@ class ObservationRecordJsonWriterTest {
                 status = ObservationRecord.Status.DRAFT
             ).apply {
                 comment.comment = "Global comment"
-                dataset.datasetId = 17L
+                dataset.setDatasetId(17L)
                 dates.start = toDate("2016-10-28T08:15:00Z")!!
                 dates.end = toDate("2016-10-29T09:00:00Z")!!
 
@@ -148,6 +153,31 @@ class ObservationRecordJsonWriterTest {
                         ).map { it.toPair() }
                             .forEach { properties[it.first] = it.second }
 
+                        additionalFields = listOf(
+                            PropertyValue.Text(
+                                "some_field_text",
+                                "some_value"
+                            ),
+                            PropertyValue.Number(
+                                "some_field_number",
+                                42L
+                            ),
+                            PropertyValue.StringArray(
+                                "some_field_array_string",
+                                arrayOf(
+                                    "val1",
+                                    "val2"
+                                )
+                            ),
+                            PropertyValue.NumberArray(
+                                "some_field_array_number",
+                                arrayOf(
+                                    3L,
+                                    8L
+                                )
+                            )
+                        )
+
                         counting.addOrUpdate(counting.create()
                             .apply {
                                 listOf(
@@ -181,6 +211,17 @@ class ObservationRecordJsonWriterTest {
                                     )
                                 ).map { it.toPair() }
                                     .forEach { properties[it.first] = it.second }
+
+                                additionalFields = listOf(
+                                    PropertyValue.Text(
+                                        "some_field_text",
+                                        "some_value"
+                                    ),
+                                    PropertyValue.Number(
+                                        "some_field_number",
+                                        3.14
+                                    )
+                                )
                             }
                         )
                     }
@@ -189,14 +230,14 @@ class ObservationRecordJsonWriterTest {
 
         // then
         assertEquals(
-            getFixture("observation_record_simple.json"),
+            getFixture("observation_record_complete.json"),
             json
         )
     }
 
     @Test
     fun `should write an observation record with only start date defined`() {
-        // given an an observation record instance to write
+        // given an observation record instance to write
         val observationRecord = ObservationRecord(
             internalId = 1234L
         ).apply {
@@ -223,7 +264,7 @@ class ObservationRecordJsonWriterTest {
 
     @Test
     fun `should write an observation record with only start date defined following settings startDateSettings=DATE`() {
-        // given an an observation record instance to write
+        // given an observation record instance to write
         val observationRecord = ObservationRecord(
             internalId = 1234L
         ).apply {
@@ -234,6 +275,25 @@ class ObservationRecordJsonWriterTest {
         val json = ObservationRecordJsonWriter().write(
             observationRecord,
             AppSettings(
+                dataSyncSettings = DataSyncSettings(
+                    geoNatureServerUrl = "https://demo.geonature.fr/geonature",
+                    taxHubServerUrl = "https://demo.geonature.fr/taxhub",
+                    applicationId = 3,
+                    usersListId = 1,
+                    taxrefListId = 100,
+                    codeAreaType = "M10",
+                    pageSize = 1000,
+                    dataSyncPeriodicity = 30.toDuration(DurationUnit.MINUTES),
+                    essentialDataSyncPeriodicity = 20.toDuration(DurationUnit.MINUTES)
+                ),
+                mapSettings = MapSettings.Builder()
+                    .addLayer(
+                        LayerSettings.Builder.newInstance()
+                            .label("OSM")
+                            .addSource("https://a.tile.openstreetmap.org")
+                            .build()
+                    )
+                    .build(),
                 inputSettings = InputSettings(
                     dateSettings = InputDateSettings(
                         startDateSettings = InputDateSettings.DateSettings.DATE,
@@ -262,7 +322,7 @@ class ObservationRecordJsonWriterTest {
 
     @Test
     fun `should write an observation record with only start date defined following settings startDateSettings=DATETIME`() {
-        // given an an observation record instance to write
+        // given an observation record instance to write
         val observationRecord = ObservationRecord(
             internalId = 1234L
         ).apply {
@@ -273,6 +333,25 @@ class ObservationRecordJsonWriterTest {
         val json = ObservationRecordJsonWriter().write(
             observationRecord,
             AppSettings(
+                dataSyncSettings = DataSyncSettings(
+                    geoNatureServerUrl = "https://demo.geonature.fr/geonature",
+                    taxHubServerUrl = "https://demo.geonature.fr/taxhub",
+                    applicationId = 3,
+                    usersListId = 1,
+                    taxrefListId = 100,
+                    codeAreaType = "M10",
+                    pageSize = 1000,
+                    dataSyncPeriodicity = 30.toDuration(DurationUnit.MINUTES),
+                    essentialDataSyncPeriodicity = 20.toDuration(DurationUnit.MINUTES)
+                ),
+                mapSettings = MapSettings.Builder()
+                    .addLayer(
+                        LayerSettings.Builder.newInstance()
+                            .label("OSM")
+                            .addSource("https://a.tile.openstreetmap.org")
+                            .build()
+                    )
+                    .build(),
                 inputSettings = InputSettings(
                     dateSettings = InputDateSettings(
                         startDateSettings = InputDateSettings.DateSettings.DATETIME,
@@ -311,7 +390,7 @@ class ObservationRecordJsonWriterTest {
 
     @Test
     fun `should write an observation record with start and end date defined following settings startDateSettings=DATE, endDateSettings=DATE`() {
-        // given an an observation record instance to write
+        // given an observation record instance to write
         val observationRecord = ObservationRecord(
             internalId = 1234L
         ).apply {
@@ -323,6 +402,25 @@ class ObservationRecordJsonWriterTest {
         val json = ObservationRecordJsonWriter().write(
             observationRecord,
             AppSettings(
+                dataSyncSettings = DataSyncSettings(
+                    geoNatureServerUrl = "https://demo.geonature.fr/geonature",
+                    taxHubServerUrl = "https://demo.geonature.fr/taxhub",
+                    applicationId = 3,
+                    usersListId = 1,
+                    taxrefListId = 100,
+                    codeAreaType = "M10",
+                    pageSize = 1000,
+                    dataSyncPeriodicity = 30.toDuration(DurationUnit.MINUTES),
+                    essentialDataSyncPeriodicity = 20.toDuration(DurationUnit.MINUTES)
+                ),
+                mapSettings = MapSettings.Builder()
+                    .addLayer(
+                        LayerSettings.Builder.newInstance()
+                            .label("OSM")
+                            .addSource("https://a.tile.openstreetmap.org")
+                            .build()
+                    )
+                    .build(),
                 inputSettings = InputSettings(
                     dateSettings = InputDateSettings(
                         startDateSettings = InputDateSettings.DateSettings.DATE,
@@ -352,7 +450,7 @@ class ObservationRecordJsonWriterTest {
 
     @Test
     fun `should write an observation record with start and end date defined following settings startDateSettings=DATETIME, endDateSettings=DATETIME`() {
-        // given an an observation record instance to write
+        // given an observation record instance to write
         val observationRecord = ObservationRecord(
             internalId = 1234L
         ).apply {
@@ -364,6 +462,25 @@ class ObservationRecordJsonWriterTest {
         val json = ObservationRecordJsonWriter().write(
             observationRecord,
             AppSettings(
+                dataSyncSettings = DataSyncSettings(
+                    geoNatureServerUrl = "https://demo.geonature.fr/geonature",
+                    taxHubServerUrl = "https://demo.geonature.fr/taxhub",
+                    applicationId = 3,
+                    usersListId = 1,
+                    taxrefListId = 100,
+                    codeAreaType = "M10",
+                    pageSize = 1000,
+                    dataSyncPeriodicity = 30.toDuration(DurationUnit.MINUTES),
+                    essentialDataSyncPeriodicity = 20.toDuration(DurationUnit.MINUTES)
+                ),
+                mapSettings = MapSettings.Builder()
+                    .addLayer(
+                        LayerSettings.Builder.newInstance()
+                            .label("OSM")
+                            .addSource("https://a.tile.openstreetmap.org")
+                            .build()
+                    )
+                    .build(),
                 inputSettings = InputSettings(
                     dateSettings = InputDateSettings(
                         startDateSettings = InputDateSettings.DateSettings.DATETIME,
@@ -403,7 +520,7 @@ class ObservationRecordJsonWriterTest {
 
     @Test
     fun `should write an observation record with module name defined`() {
-        // given an an observation record instance to write
+        // given an observation record instance to write
         val observationRecord = ObservationRecord(
             internalId = 1234L
         ).apply {
