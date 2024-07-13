@@ -2,7 +2,7 @@
 
 ## [2.7.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0) (2024-07-13, release)
 
-* ### 🚀 Nouveautés
+### 🚀 Nouveautés
 
 * Nouveau mécanisme de synchronisation des taxons. On synchronise désormais tout Taxref mais seulement
   quand le champs `taxonomie.t_meta_taxref.update_date` indique que celui-ci a été mis à jour depuis 
