@@ -78,8 +78,8 @@
             android:name="fr.geonature.commons.data.MainContentProvider"
             android:authorities="${applicationId}.provider"
             android:exported="true"
-            android:readPermission="@string/permission_read"
-            android:writePermission="@string/permission_write" />
+            android:readPermission="${applicationId}.provider.permission.READ"
+            android:writePermission="${applicationId}.provider.permission.WRITE" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.file.provider"
