@@ -165,7 +165,7 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
                         ColorUtils.setAlphaComponent(
                             ThemeUtils.getColor(
                                 this,
-                                R.attr.colorOnSurface
+                                com.google.android.material.R.attr.colorOnSurface
                             ),
                             32
                         ),

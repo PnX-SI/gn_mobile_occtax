@@ -173,10 +173,10 @@ class PreferencesFragment : PreferenceFragmentCompat() {
         savedInstanceState: Bundle?,
         rootKey: String?
     ) {
-        addPreferencesFromResource(R.xml.preferences_servers)
+        addPreferencesFromResource(fr.geonature.datasync.R.xml.preferences_servers)
         addPreferencesFromResource(R.xml.preferences_dataset)
         addPreferencesFromResource(R.xml.preferences_observers)
-        addPreferencesFromResource(R.xml.map_preferences)
+        addPreferencesFromResource(fr.geonature.maps.R.xml.map_preferences)
         addPreferencesFromResource(R.xml.preferences_permissions)
         addPreferencesFromResource(R.xml.preferences_notifications)
         addPreferencesFromResource(R.xml.preferences_storage)
@@ -241,13 +241,13 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
     private fun setServerUrlsPreferences(serverUrls: IGeoNatureAPIClient.ServerUrls?) {
         val serverSettingsPreference: Preference =
-            preferenceScreen.findPreference(getString(R.string.preference_category_server_geonature_url_key))
+            preferenceScreen.findPreference(getString(fr.geonature.datasync.R.string.preference_category_server_geonature_url_key))
                 ?: return
 
         val serverUrl =
             PreferenceManager.getDefaultSharedPreferences(serverSettingsPreference.context)
                 .getString(
-                    getString(R.string.preference_category_server_geonature_url_key),
+                    getString(fr.geonature.datasync.R.string.preference_category_server_geonature_url_key),
                     serverUrls?.geoNatureBaseUrl
                 )
 
@@ -264,7 +264,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                                 .edit()
                                 .also {
                                     it.putString(
-                                        getString(R.string.preference_category_server_geonature_url_key),
+                                        getString(fr.geonature.datasync.R.string.preference_category_server_geonature_url_key),
                                         url
                                     )
 
@@ -287,11 +287,11 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             .edit()
             .also {
                 if (serverUrl.isNullOrBlank()) {
-                    it.remove(getString(R.string.preference_category_server_geonature_url_key))
-                    serverSettingsPreference.setSummary(R.string.preference_category_server_geonature_url_not_set)
+                    it.remove(getString(fr.geonature.datasync.R.string.preference_category_server_geonature_url_key))
+                    serverSettingsPreference.setSummary(fr.geonature.datasync.R.string.preference_category_server_geonature_url_not_set)
                 } else {
                     it.putString(
-                        getString(R.string.preference_category_server_geonature_url_key),
+                        getString(fr.geonature.datasync.R.string.preference_category_server_geonature_url_key),
                         serverUrl
                     )
                     serverSettingsPreference.summary = serverUrl

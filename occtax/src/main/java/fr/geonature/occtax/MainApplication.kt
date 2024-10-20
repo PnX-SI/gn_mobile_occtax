@@ -47,12 +47,11 @@ class MainApplication : Application(), Configuration.Provider {
         checkInputsToSynchronize()
     }
 
-    override fun getWorkManagerConfiguration(): Configuration {
-        return Configuration
+    override val workManagerConfiguration: Configuration
+        get() = Configuration
             .Builder()
             .setWorkerFactory(workerFactory)
             .build()
-    }
 
     private fun configureLogger() {
         val directoryForLogs: File = FileUtils.getFile(

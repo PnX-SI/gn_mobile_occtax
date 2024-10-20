@@ -110,7 +110,7 @@ open class ListItemActionView : ConstraintLayout {
 
     fun setVisibleItems(visibleItems: Int = 1) {
         val typedArray =
-            context.theme.obtainStyledAttributes(intArrayOf(R.attr.listPreferredItemHeight))
+            context.theme.obtainStyledAttributes(intArrayOf(com.google.android.material.R.attr.listPreferredItemHeight))
         val listPreferredItemHeight = typedArray.getDimension(
             0,
             0f

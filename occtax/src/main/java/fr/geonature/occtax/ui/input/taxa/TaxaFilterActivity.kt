@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
+import fr.geonature.compat.content.getParcelableArrayExtraCompat
 import fr.geonature.occtax.features.settings.domain.AppSettings
 
 /**
@@ -28,8 +29,7 @@ class TaxaFilterActivity : AppCompatActivity(), TaxaFilterFragment.OnTaxaFilterF
 
         if (savedInstanceState == null) {
             selectedFilters.addAll(
-                intent.getParcelableArrayExtra(EXTRA_SELECTED_FILTERS)?.map { it as Filter<*> }
-                    ?.toTypedArray() ?: emptyArray()
+                intent.getParcelableArrayExtraCompat<Filter<*>>(EXTRA_SELECTED_FILTERS) ?: emptyArray()
             )
 
             supportFragmentManager.beginTransaction()
@@ -61,7 +61,9 @@ class TaxaFilterActivity : AppCompatActivity(), TaxaFilterFragment.OnTaxaFilterF
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
+        super.onBackPressed()
         setResultAndFinish()
     }
 

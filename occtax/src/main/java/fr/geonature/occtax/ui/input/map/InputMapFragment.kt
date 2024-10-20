@@ -113,6 +113,7 @@ class InputMapFragment : MapFragment(),
         clearActiveSelection()
     }
 
+    @Deprecated("Deprecated in Java")
     @SuppressLint("RestrictedApi")
     override fun onCreateOptionsMenu(
         menu: Menu,
@@ -137,6 +138,7 @@ class InputMapFragment : MapFragment(),
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
 
@@ -167,6 +169,7 @@ class InputMapFragment : MapFragment(),
             }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_map_settings -> {

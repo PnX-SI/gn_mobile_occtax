@@ -167,6 +167,7 @@ class ObservationRecordsMapFragment : MapFragment() {
         )
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(
         menu: Menu,
         inflater: MenuInflater
@@ -188,6 +189,7 @@ class ObservationRecordsMapFragment : MapFragment() {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
 
@@ -224,6 +226,7 @@ class ObservationRecordsMapFragment : MapFragment() {
             }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_sync -> {
@@ -411,7 +414,7 @@ class ObservationRecordsMapFragment : MapFragment() {
                         setIndicatorColor(
                             getColor(
                                 context,
-                                R.attr.colorOnPrimary
+                                com.google.android.material.R.attr.colorOnPrimary
                             )
                         )
                     }.indeterminateDrawable?.apply {
@@ -422,7 +425,7 @@ class ObservationRecordsMapFragment : MapFragment() {
                 setTextColor(
                     getColor(
                         context,
-                        R.attr.colorOnPrimary
+                        com.google.android.material.R.attr.colorOnPrimary
                     )
                 )
             }

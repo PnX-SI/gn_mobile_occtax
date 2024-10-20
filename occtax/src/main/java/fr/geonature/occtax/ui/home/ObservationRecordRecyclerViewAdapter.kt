@@ -109,7 +109,7 @@ class ObservationRecordRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapt
                         setIndicatorColor(
                             getColor(
                                 context,
-                                R.attr.colorOnPrimary
+                                com.google.android.material.R.attr.colorOnPrimary
                             )
                         )
                     }.indeterminateDrawable?.apply {
@@ -120,7 +120,7 @@ class ObservationRecordRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapt
                 setTextColor(
                     getColor(
                         context,
-                        R.attr.colorOnPrimary
+                        com.google.android.material.R.attr.colorOnPrimary
                     )
                 )
             }
