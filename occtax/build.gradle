@@ -31,8 +31,8 @@ android {
         compileSdk 34
         minSdkVersion 26
         targetSdkVersion 34
-        versionCode 3310
-        versionName "2.7.0"
+        versionCode 3313
+        versionName "2.7.1-rc0"
         buildConfigField "String", "BUILD_DATE", "\"" + new Date().getTime() + "\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         archivesBaseName = project.name + "-" + versionName

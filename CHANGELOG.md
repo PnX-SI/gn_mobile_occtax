@@ -1,5 +1,25 @@
 # Changelog
 
+## [2.7.1-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc9) (2024-10-21, pre-release)
+
+### 🚀 Nouveautés
+
+* Support Android 14 (API 34).
+
+### 🐛 Corrections
+
+* Pouvoir surcharger l'identifiant de l'application (https://github.com/PnX-SI/gn_mobile_occtax/issues/264).
+* Ajout d'un paramètre `shown_by_default` coté [module cartographique](https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps#layer-properties)
+  permettant d'afficher par défaut ou non les couches vectorielles. Par défaut, l'ensemble des
+  couches vectorielles déclarées sont affichées par défaut (https://github.com/PnX-SI/gn_mobile_occtax/issues/262).
+* Support des nouveaux fonds IGN (https://github.com/PnX-SI/gn_mobile_occtax/issues/267). 
+
+### ⚠️ Notes de version
+
+* Code de version : **3313**
+* Cette version nécessite la version [1.13.1 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+
 ## [2.7.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0) (2024-07-13, release)
 
 ### 🚀 Nouveautés
@@ -70,7 +90,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3301
+* Code de version : **3301**
 * Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
   qui elle même nécessite au minimum la version  2.14.1 de GeoNature (pas encore disponible).
 
@@ -102,7 +122,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3299
+* Code de version : **3299**
 * Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
   qui elle même nécessite au minimum la version  2.14.1 de GeoNature (pas encore disponible).
 
@@ -116,7 +136,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3271
+* Code de version : **3271**
 * Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
   qui elle même nécessite au minimum la version  2.14 de GeoNature (pas encore disponible).
 
@@ -129,7 +149,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3259
+* Code de version : **3259**
 * Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
   qui elle même nécessite au minimum la version  2.14 de GeoNature (pas encore disponible).
 
@@ -142,7 +162,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3257
+* Code de version : **3257**
 * Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
   qui elle même nécessite au minimum la version  2.14 de GeoNature (pas encore disponible).
 
@@ -154,7 +174,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3253
+* Code de version : **3253**
 * Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
   qui elle même nécessite au minimum la version  2.14 de GeoNature (pas encore disponible).
 
@@ -169,7 +189,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3251
+* Code de version : **3251**
 * Cette version nécessite la version [1.13.1 de TaxHub](https://github.com/PnX-SI/TaxHub/releases/tag/1.13.1)
   qui elle même nécessite au minimum la version  2.14 de GeoNature (pas encore disponible).
 
@@ -186,7 +206,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3229
+* Code de version : **3229**
 
 ## [2.7.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc1) (2023-09-13, pre-release)
 
@@ -197,7 +217,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3221
+* Code de version : **3221**
 
 ## [2.7.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.0-rc0) (2023-09-03, pre-release)
 
@@ -217,7 +237,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3217
+* Code de version : **3217**
 
 ## [2.6.2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.2) (2024-03-02, release)
 
@@ -227,7 +247,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3220
+* Code de version : **3220**
 
 ## [2.6.1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.1) (2023-05-24, release)
 
@@ -241,7 +261,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3210
+* Code de version : **3210**
 
 ## [2.6.1-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.1-rc1) (2023-05-16, pre-release)
 
@@ -251,7 +271,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3209
+* Code de version : **3209**
 
 ## [2.6.1-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.1-rc0) (2023-05-13, pre-release)
 
@@ -263,7 +283,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3203
+* Code de version : **3203**
 
 ## [2.6.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.0) (2023-05-08, release)
 
@@ -302,7 +322,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3200
+* Code de version : **3200**
 * Depuis sa version 2.12.0, GeoNature permet de gérer le contenu de la table
   `gn_commons.t_mobile_apps` directement dans le back-office du module "Admin" de GeoNature (https://github.com/PnX-SI/gn_mobile_occtax/issues/214)
 * Dans cette même version, les médias (incluant le dossier `mobile/` comprenant les fichiers APK et
@@ -331,7 +351,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3191
+* Code de version : **3191**
 
 ## [2.6.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.0-rc1) (2023-04-19, pre-release)
 
@@ -357,7 +377,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3187
+* Code de version : **3187**
 
 ## [2.6.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.6.0-rc0) (2023-03-25, pre-release)
 
@@ -373,7 +393,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3181
+* Code de version : **3181**
 
 ## [2.5.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.5.0) (2023-03-21, release)
 
@@ -394,7 +414,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3170
+* Code de version : **3170**
 * Nécessite la version 2.10 (ou plus) de GeoNature.
 * Suite à la refonte sur la partie gestion des relevés, le paramétrage de la nomenclature en
   configuration avancée a évolué aussi (cf. [README.md](https://github.com/PnX-SI/gn_mobile_occtax#nomenclature-settings)),
@@ -410,7 +430,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3163
+* Code de version : **3163**
 
 ## [2.4.1-rc3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.1-rc3) (2023-02-15, pre-release)
 
@@ -420,7 +440,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3137
+* Code de version : **3137**
 
 ## [2.4.1-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.1-rc2) (2023-02-05, pre-release)
 
@@ -430,7 +450,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3121
+* Code de version : **3121**
 
 ## [2.4.1-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.1-rc1) (2023-02-04, pre-release)
 
@@ -440,7 +460,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : 3119
+* Code de version : **3119**
 
 ## [2.4.1-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.1-rc0) (2023-01-25, pre-release)
 
@@ -453,7 +473,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 3109
+* Code de version : **3109**
 
 ## [2.4.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.0) (2022-10-02, release)
 
@@ -488,7 +508,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 3090
+* Code de version : **3090**
 
 ## [2.4.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.0-rc2) (2022-09-26, pre-release)
 
@@ -499,7 +519,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 3083
+* Code de version : **3083**
 
 ## [2.4.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.0-rc1) (2022-09-10, pre-release)
 
@@ -510,7 +530,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 3079
+* Code de version : **3079**
 
 ## [2.4.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.4.0-rc0) (2022-09-07, pre-release)
 
@@ -537,7 +557,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 3075
+* Code de version : **3075**
 
 ## [2.3.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0) (2022-07-14, release)
 
@@ -560,7 +580,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 3070
+* Code de version : **3070**
 * L'application est officiellement compatible avec les terminaux tournant sur Android 8.0 au minimum.
 
 ## [2.3.0-rc4](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0-rc4) (2022-07-13, pre-release)
@@ -572,7 +592,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 3061
+* Code de version : **3061**
 
 ## [2.3.0-rc3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0-rc3) (2022-07-04, pre-release)
 
@@ -587,7 +607,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 3049
+* Code de version : **3049**
 
 ## [2.3.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0-rc2) (2022-06-29, pre-release)
 
@@ -602,7 +622,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 3041
+* Code de version : **3041**
 
 ## [2.3.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0-rc1) (2022-06-25, pre-release)
 
@@ -616,7 +636,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 3037
+* Code de version : **3037**
 
 ## [2.3.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.3.0-rc0) (2022-06-21, pre-release)
 
@@ -635,7 +655,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 3025
+* Code de version : **3025**
 * L'application est officiellement compatible avec les terminaux tournant sur Android 8.0 au minimum.
 
 ## [2.2.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0) (2022-05-31, release)
@@ -663,7 +683,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 3020
+* Code de version : **3020**
 
 ## [2.2.0-rc5](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc5) (2022-05-26, pre-release)
 
@@ -675,7 +695,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 3015
+* Code de version : **3015**
 
 ## [2.2.0-rc4](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc4) (2022-05-24, pre-release)
 
@@ -685,7 +705,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 2985
+* Code de version : **2985**
 
 ## [2.2.0-rc3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc3) (2022-05-24, pre-release)
 
@@ -697,7 +717,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 2965
+* Code de version : **2965**
 
 ## [2.2.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc2) (2022-05-23, pre-release)
 
@@ -711,7 +731,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 2945
+* Code de version : **2945**
 
 ## [2.2.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc1) (2022-05-18, pre-release)
 
@@ -726,7 +746,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 2905
+* Code de version : **2905**
 
 ## [2.2.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.2.0-rc0) (2022-05-16, pre-release)
 
@@ -739,7 +759,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 2870
+* Code de version : **2870**
 
 ## [2.1.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.1.0) (2022-05-05, release)
 
@@ -767,7 +787,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 2680
+* Code de version : **2680**
 * Le paramètre `uh_application_id` a été renommé `gn_application_id`. L'ancien nom du paramètre
   fonctionne toujours mais est déprécié. Il est donc conseillé de le renommer dans le fichier de
   paramétrage (`settings.json` côté GeoNature).
@@ -781,7 +801,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 2675
+* Code de version : **2675**
 
 ## [2.1.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.1.0-rc0) (2022-05-03, pre-release)
 
@@ -809,7 +829,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 2670
+* Code de version : **2670**
 * Le paramètre `uh_application_id` a été renommé `gn_application_id`. L'ancien nom du paramètre
   fonctionne toujours mais est déprécié. Il est donc conseillé de le renommer dans le fichier de
   paramétrage (`settings.json` côté GeoNature).
@@ -822,7 +842,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 2580
+* Code de version : **2580**
 
 ## [2.0.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.0.0) (2022-03-22, release)
 
@@ -836,7 +856,7 @@ dénombrement (https://github.com/PnX-SI/gn_mobile_occtax/issues/169).
 
 ### ⚠️ Notes de version
 
-* Code de version : 2570
+* Code de version : **2570**
 
 *Coté serveur pour les administrateurs :*
 
@@ -868,7 +888,7 @@ A partir de la version 2 d'Occtax-mobile, une seule application est nécessaire 
 
 * Cette version n'est compatible qu'avec les versions 2.5.x, 2.6.x et 2.7.5 (et plus) de GeoNature et ne fonctionne qu'avec la version [1.3.x](https://github.com/PnX-SI/gn_mobile_core/releases/tag/1.3.0) de "Sync".
 * Il est nécessaire de synchroniser tous les relevés en cours sur les terminaux avant d'effectuer la mise à jour. 
-* Code de version : 2350
+* Code de version : **2350**
 
 ## [1.3.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/1.3.0) (2021-07-29, release)
 
@@ -880,4 +900,4 @@ A partir de la version 2 d'Occtax-mobile, une seule application est nécessaire 
 
 * Cette version n'est compatible qu'avec les versions 2.5.x, 2.6.x et 2.7.5 (et plus) de GeoNature et ne fonctionne qu'avec la version [1.3.x](https://github.com/PnX-SI/gn_mobile_core/releases/tag/1.3.0) de "Sync".
 * Il est nécessaire de synchroniser tous les relevés en cours sur les terminaux avant d'effectuer la mise à jour. 
-* Code de version : 2290
+* Code de version : **2290**
