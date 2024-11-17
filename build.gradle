@@ -1,46 +1,18 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
-buildscript {
-    ext.klint_version = '11.3.1'
-    ext.kotlin_version = '1.8.0'
-    ext.androidx_hilt_version = '1.0.0'
-    ext.hilt_version = '2.44'
-    ext.retrofit_version = '2.9.0'
-    ext.room_version = '2.5.1'
-    ext.tinylog_version = '2.4.1'
-
-    repositories {
-        google()
-        mavenCentral()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
 plugins {
-    id 'com.google.dagger.hilt.android' version "$hilt_version" apply false
-    id 'org.jlleitschuh.gradle.ktlint' version "$klint_version"
-    id 'org.jlleitschuh.gradle.ktlint-idea' version "$klint_version"
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.dagger.hilt.android) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.parcelize) apply false
+    alias(libs.plugins.kapt) apply false
+    // TODO: Dagger’s KSP support is currently in alpha, see: https://dagger.dev/dev-guide/ksp
+    // alias(libs.plugins.ksp) apply false
 }
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    apply plugin: "org.jlleitschuh.gradle.ktlint"
-    apply plugin: "org.jlleitschuh.gradle.ktlint-idea"
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
+tasks.register('clean', Delete) {
+    delete rootProject.layout.buildDirectory
 }
 
 private File loadVersionPropertiesFile(String moduleName) {

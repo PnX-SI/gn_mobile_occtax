@@ -218,7 +218,9 @@ class MediaListActivity : AppCompatActivity() {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
+        super.onBackPressed()
         sendResult()
         finish()
     }

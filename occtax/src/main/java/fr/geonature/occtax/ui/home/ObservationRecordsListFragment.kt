@@ -178,6 +178,7 @@ class ObservationRecordsListFragment : Fragment(R.layout.fragment_recycler_view_
         )
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(
         menu: Menu,
         inflater: MenuInflater
@@ -199,6 +200,7 @@ class ObservationRecordsListFragment : Fragment(R.layout.fragment_recycler_view_
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
 
@@ -235,6 +237,7 @@ class ObservationRecordsListFragment : Fragment(R.layout.fragment_recycler_view_
             }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_sync -> {

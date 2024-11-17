@@ -238,6 +238,7 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(
         menu: Menu,
         inflater: MenuInflater
@@ -260,6 +261,7 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
 
@@ -267,6 +269,7 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
         dateMenuItem.isVisible = dateSettings.endDateSettings != null
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_date -> {

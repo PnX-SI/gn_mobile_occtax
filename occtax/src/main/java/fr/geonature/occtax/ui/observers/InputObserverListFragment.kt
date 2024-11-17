@@ -230,6 +230,7 @@ class InputObserverListFragment : Fragment() {
         super.onSaveInstanceState(savedState.apply { putAll(outState) })
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(
         menu: Menu,
         inflater: MenuInflater
@@ -250,6 +251,7 @@ class InputObserverListFragment : Fragment() {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
