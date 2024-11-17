@@ -1,5 +1,28 @@
 # Changelog
 
+## 2.7.1 (unreleased)
+
+### 🚀 Nouveautés
+
+* Support d'Android 14 (API 34).
+* Ajout d'un paramètre `shown_by_default` coté [module cartographique](https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps#layer-properties)
+  permettant d'afficher par défaut ou non les couches vectorielles. Par défaut, l'ensemble des
+  couches vectorielles déclarées sont affichées par défaut (https://github.com/PnX-SI/gn_mobile_occtax/issues/262).
+* Support des nouvelles URL des fonds IGN en ligne (https://github.com/PnX-SI/gn_mobile_occtax/issues/267).
+* Possibilité de surcharger l'identifiant de l'application (https://github.com/PnX-SI/gn_mobile_occtax/issues/264).
+
+### 🐛 Corrections
+
+* Correction d'une erreur lors de la synchronisation des champs additionnels, certains champs additionnels peuvent
+  être rattachés à des jeux de données non présents lors de la synchronisation. Ces champs
+  additionnels sont donc tout simplement ignorés lors de la synchronisation des données (https://github.com/PnX-SI/gn_mobile_occtax/issues/269).
+
+### ⚠️ Notes de version
+
+* Code de version : **xxxx**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+
 ## [2.7.1-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.1-rc1) (2024-11-16, pre-release)
 
 ### 🐛 Corrections
