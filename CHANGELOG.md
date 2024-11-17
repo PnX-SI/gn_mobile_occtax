@@ -19,8 +19,8 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : **3319**
-* Cette version nécessite la version [1.13.1 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+* Code de version : **xxxx**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
   qui elle-même nécessite au minimum la version 2.14 de GeoNature.
 
 ## [2.7.1-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.1-rc1) (2024-11-16, pre-release)
