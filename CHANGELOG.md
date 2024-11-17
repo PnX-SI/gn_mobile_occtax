@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.7.1 (unreleased)
+## [2.7.1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.1) (2024-11-17, release)
 
 ### 🚀 Nouveautés
 
@@ -13,13 +13,13 @@
 
 ### 🐛 Corrections
 
-* Correction d'une erreur lors de la synchronisation des champs additionnels, certains champs additionnels peuvent
-  être rattachés à des jeux de données non présents lors de la synchronisation. Ces champs
-  additionnels sont donc tout simplement ignorés lors de la synchronisation des données (https://github.com/PnX-SI/gn_mobile_occtax/issues/269).
+* Correction d'une erreur lors de la synchronisation des champs additionnels, certains champs
+  additionnels peuvent être rattachés à des jeux de données non présents lors de la synchronisation.
+  Ces champs additionnels sont donc tout simplement ignorés lors de la synchronisation des données (https://github.com/PnX-SI/gn_mobile_occtax/issues/269).
 
 ### ⚠️ Notes de version
 
-* Code de version : **xxxx**
+* Code de version : **3320**
 * Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
   qui elle-même nécessite au minimum la version 2.14 de GeoNature.
 
