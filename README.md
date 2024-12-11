@@ -29,7 +29,7 @@ This settings file `settings_occtax.json` can be found locally in the `Android/d
   "area_observation_duration": 365,
   "sync": {
     "geonature_url": "https://demo.geonature/geonature",
-    "taxhub_url": "https://demo.geonature/taxhub",
+    "taxhub_url": "https://demo.geonature.fr/geonature/api/taxhub",
     "gn_application_id": 3,
     "observers_list_id": 1,
     "taxa_list_id": 100,
