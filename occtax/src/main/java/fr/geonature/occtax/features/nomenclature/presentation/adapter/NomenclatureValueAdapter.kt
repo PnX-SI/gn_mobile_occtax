@@ -1,4 +1,4 @@
-package fr.geonature.occtax.features.nomenclature.presentation
+package fr.geonature.occtax.features.nomenclature.presentation.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -8,30 +8,29 @@ import android.widget.BaseAdapter
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
-import fr.geonature.occtax.features.record.domain.PropertyValue
+import fr.geonature.commons.data.entity.Nomenclature
 
 /**
- * Default Adapter about [PropertyValue.Text].
+ * Default Adapter about [Nomenclature] values.
  *
  * @author S. Grimault
  */
-class PropertyValueTextAdapter(context: Context) : BaseAdapter(), Filterable {
-
-    private val fieldValues = mutableListOf<PropertyValue.Text>()
-    private val filteredFieldValues = mutableListOf<PropertyValue.Text>()
+class NomenclatureValueAdapter(context: Context) : BaseAdapter(), Filterable {
+    private val nomenclatureValues = mutableListOf<Nomenclature>()
+    private val filteredNomenclatureValues = mutableListOf<Nomenclature>()
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
     private val defaultFilter = DefaultFilter()
 
     override fun getCount(): Int {
-        return filteredFieldValues.size
+        return filteredNomenclatureValues.size
     }
 
-    override fun getItem(position: Int): Any {
-        return filteredFieldValues[position].value ?: filteredFieldValues[position].code
+    override fun getItem(position: Int): String {
+        return filteredNomenclatureValues[position].defaultLabel
     }
 
     override fun getItemId(position: Int): Long {
-        return position.toLong()
+        return filteredNomenclatureValues[position].id
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
@@ -42,7 +41,7 @@ class PropertyValueTextAdapter(context: Context) : BaseAdapter(), Filterable {
                 false
             )
         view.findViewById<TextView>(android.R.id.text1).text =
-            filteredFieldValues[position].value ?: filteredFieldValues[position].code
+            filteredNomenclatureValues[position].defaultLabel
 
         return view
     }
@@ -51,18 +50,18 @@ class PropertyValueTextAdapter(context: Context) : BaseAdapter(), Filterable {
         return defaultFilter
     }
 
-    fun getPropertyValue(position: Int): PropertyValue {
-        return filteredFieldValues[position]
+    fun getNomenclatureValue(position: Int): Nomenclature {
+        return filteredNomenclatureValues[position]
     }
 
-    fun setPropertyValues(propertyValues: List<PropertyValue>) {
-        with(this.fieldValues) {
+    fun setNomenclatureValues(nomenclatureValues: List<Nomenclature>) {
+        with(this.nomenclatureValues) {
             clear()
-            addAll(propertyValues.filterIsInstance<PropertyValue.Text>())
+            addAll(nomenclatureValues)
         }
-        with(this.filteredFieldValues) {
+        with(this.filteredNomenclatureValues) {
             clear()
-            addAll(propertyValues.filterIsInstance<PropertyValue.Text>())
+            addAll(nomenclatureValues)
         }
 
         notifyDataSetChanged()
@@ -70,7 +69,7 @@ class PropertyValueTextAdapter(context: Context) : BaseAdapter(), Filterable {
 
     inner class DefaultFilter : Filter() {
         override fun performFiltering(constraint: CharSequence?): FilterResults {
-            return fieldValues
+            return nomenclatureValues
                 .let {
                     FilterResults().apply {
                         values = it
@@ -80,10 +79,10 @@ class PropertyValueTextAdapter(context: Context) : BaseAdapter(), Filterable {
         }
 
         override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-            with(filteredFieldValues) {
+            with(filteredNomenclatureValues) {
                 clear()
                 @Suppress("UNCHECKED_CAST")
-                addAll((results?.values as List<PropertyValue.Text>?) ?: emptyList())
+                addAll((results?.values as List<Nomenclature>?) ?: emptyList())
             }
 
             if (results?.count == 0) notifyDataSetInvalidated() else notifyDataSetChanged()

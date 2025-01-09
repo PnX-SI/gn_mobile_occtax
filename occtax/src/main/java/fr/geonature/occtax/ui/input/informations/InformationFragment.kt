@@ -21,7 +21,7 @@ import fr.geonature.commons.lifecycle.observe
 import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.EditableField
-import fr.geonature.occtax.features.nomenclature.presentation.EditableFieldAdapter
+import fr.geonature.occtax.features.nomenclature.presentation.adapter.EditableFieldAdapter
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
 import fr.geonature.occtax.features.record.domain.MediaRecord
