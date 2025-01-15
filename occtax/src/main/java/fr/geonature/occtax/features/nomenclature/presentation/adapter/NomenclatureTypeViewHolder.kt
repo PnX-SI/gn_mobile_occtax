@@ -8,7 +8,7 @@ import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.textfield.TextInputLayout
 import fr.geonature.commons.lifecycle.observeOnce
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
@@ -19,7 +19,7 @@ import fr.geonature.occtax.features.record.domain.PropertyValue
 class NomenclatureTypeViewHolder(
     parent: ViewGroup,
     private val listener: EditableFieldAdapter.OnEditableFieldAdapter
-) : EditableFieldAdapter.AbstractLockableViewHolder(
+) : EditableFieldAdapter.AbstractLockableViewHolder<FormField.NomenclatureType>(
     LayoutInflater.from(parent.context)
         .inflate(
             R.layout.view_action_select_simple,
@@ -34,33 +34,34 @@ class NomenclatureTypeViewHolder(
         (edit.editText as? AutoCompleteTextView)?.also {
             it.setAdapter(nomenclatureAdapter)
             it.setOnItemClickListener { _, _, position, _ ->
-                editableField?.run {
-                    value = nomenclatureAdapter.getNomenclatureValue(position)
-                        .let { nomenclature ->
-                            PropertyValue.Nomenclature(
-                                code,
-                                nomenclature.defaultLabel,
-                                nomenclature.id
+                formField
+                    ?.run {
+                        with(nomenclatureAdapter.getNomenclatureValue(position)) {
+                            setValue(
+                                PropertyValue.Nomenclature(
+                                    code = getValue().code,
+                                    label = defaultLabel,
+                                    value = id
+                                )
                             )
                         }
-                    listener.onUpdate(this)
-                }
+
+                        listener.onUpdate(this)
+                    }
             }
         }
     }
 
-    override fun onBind(editableField: EditableField, lockDefaultValues: Boolean) {
+    override fun onBind(formField: FormField.NomenclatureType, lockDefaultValues: Boolean) {
         if (!lockDefaultValues) {
-            editableField.locked = false
+            formField.locked = false
         }
 
-        listener.getNomenclatureValues(editableField.nomenclatureType ?: editableField.code)
+        listener.getNomenclatureValues(formField.nomenclatureType)
             .observeOnce(listener.getLifecycleOwner()) { nomenclatureValues ->
                 nomenclatureAdapter.setNomenclatureValues(nomenclatureValues ?: listOf())
-                (edit.editText as AutoCompleteTextView?)?.text = editableField.value
-                    ?.takeIf { it is PropertyValue.Nomenclature }
-                    ?.let { it as PropertyValue.Nomenclature }
-                    ?.let { pv -> nomenclatureValues?.firstOrNull { it.id == pv.value } }
+                (edit.editText as AutoCompleteTextView?)?.text = formField.value
+                    .let { pv -> nomenclatureValues?.firstOrNull { it.id == pv.value } }
                     ?.let { nomenclatureValue ->
                         Editable.Factory.getInstance()
                             .newEditable(nomenclatureValue.defaultLabel)
@@ -70,21 +71,21 @@ class NomenclatureTypeViewHolder(
         with(edit) {
             startIconDrawable = if (lockDefaultValues) ResourcesCompat.getDrawable(
                 itemView.resources,
-                if (editableField.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                if (formField.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
                 itemView.context.theme
             ) else null
             setStartIconOnClickListener {
                 if (!lockDefaultValues) return@setStartIconOnClickListener
 
-                editableField.locked = !editableField.locked
+                formField.locked = !formField.locked
                 startIconDrawable = ResourcesCompat.getDrawable(
                     itemView.resources,
-                    if (editableField.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                    if (formField.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
                     itemView.context.theme
                 )
-                listener.onUpdate(editableField)
+                listener.onUpdate(formField)
             }
-            hint = editableField.label ?: getDefaultLabel(editableField)
+            hint = formField.label
         }
     }
 }

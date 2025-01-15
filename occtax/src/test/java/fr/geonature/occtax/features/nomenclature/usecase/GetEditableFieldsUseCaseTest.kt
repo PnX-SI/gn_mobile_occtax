@@ -1,11 +1,14 @@
 package fr.geonature.occtax.features.nomenclature.usecase
 
+import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.core.app.ApplicationProvider
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.features.nomenclature.error.NomenclatureException
 import fr.geonature.commons.fp.Either.Right
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.R
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.nomenclature.repository.IAdditionalFieldRepository
 import fr.geonature.occtax.features.nomenclature.repository.IDefaultPropertyValueRepository
 import fr.geonature.occtax.features.nomenclature.repository.INomenclatureRepository
@@ -20,6 +23,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
 /**
  * Unit tests about [GetEditableFieldsUseCase].
@@ -27,6 +32,7 @@ import org.junit.Test
  * @author S. Grimault
  */
 @ExperimentalCoroutinesApi
+@RunWith(RobolectricTestRunner::class)
 class GetEditableFieldsUseCaseTest {
 
     @get:Rule
@@ -34,6 +40,8 @@ class GetEditableFieldsUseCaseTest {
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
+
+    private lateinit var application: Application
 
     @MockK
     private lateinit var nomenclatureRepository: INomenclatureRepository
@@ -50,6 +58,8 @@ class GetEditableFieldsUseCaseTest {
     fun setUp() {
         init(this)
 
+        application = ApplicationProvider.getApplicationContext()
+
         getEditableFieldsUseCase = GetEditableFieldsUseCase(
             nomenclatureRepository,
             additionalFieldRepository,
@@ -58,31 +68,31 @@ class GetEditableFieldsUseCaseTest {
     }
 
     @Test
-    fun `should get all editable fields with default value by nomenclature main type`() =
+    fun `should get all form fields with default value by nomenclature main type`() =
         runTest {
-            // given some editable fields
+            // given some form fields
             coEvery {
                 nomenclatureRepository.getEditableFields(any())
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "METH_OBS",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        label = "Méthodes d'observation"
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Méthodes d'observation",
+                        nomenclatureType = "METH_OBS",
+                        value = PropertyValue.Nomenclature(code = "METH_OBS")
                     ),
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "ETA_BIO",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        label = "Etat biologique de l'observation"
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Etat biologique de l'observation",
+                        nomenclatureType = "ETA_BIO",
+                        value = PropertyValue.Nomenclature(code = "ETA_BIO")
                     ),
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "STATUT_BIO",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
                         label = "Statut biologique",
+                        default = false,
                         visible = false,
+                        nomenclatureType = "STATUT_BIO",
                         value = PropertyValue.Nomenclature(
                             code = "STATUT_BIO",
                             label = "Non renseigné",
@@ -103,77 +113,75 @@ class GetEditableFieldsUseCaseTest {
             // and no default property values
             coEvery { defaultPropertyValueRepository.getPropertyValues() } returns Right(listOf())
 
-            // when fetching all editable fields with default value
+            // when fetching all form fields with default value
             val result = getEditableFieldsUseCase.run(
-                GetEditableFieldsUseCase.Params(type = EditableField.Type.INFORMATION)
+                GetEditableFieldsUseCase.Params(type = FormField.Type.INFORMATION)
             )
 
             // then
             assertEquals(
                 listOf(
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "METH_OBS",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        label = "Méthodes d'observation"
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Méthodes d'observation",
+                        nomenclatureType = "METH_OBS",
+                        value = PropertyValue.Nomenclature(code = "METH_OBS")
                     ),
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "ETA_BIO",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        label = "Etat biologique de l'observation"
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Etat biologique de l'observation",
+                        nomenclatureType = "ETA_BIO",
+                        value = PropertyValue.Nomenclature(code = "ETA_BIO")
                     ),
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "STATUT_BIO",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
                         label = "Statut biologique",
+                        default = false,
                         visible = false,
+                        nomenclatureType = "STATUT_BIO",
                         value = PropertyValue.Nomenclature(
                             code = "STATUT_BIO",
                             label = "Non renseigné",
                             value = 29L
                         )
                     )
-                ).sortedBy { it.code },
+                ),
                 result.getOrThrow()
-                    .sortedBy { it.code }
             )
         }
 
     @Test
-    fun `should get all editable fields with some property values defined by nomenclature main type`() =
+    fun `should get all form fields with some property values defined by nomenclature main type`() =
         runTest {
-            // given some editable fields
+            // given some form fields
             coEvery {
                 nomenclatureRepository.getEditableFields(any())
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "METH_OBS",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        label = "Méthodes d'observation"
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Méthodes d'observation",
+                        nomenclatureType = "METH_OBS",
+                        value = PropertyValue.Nomenclature(code = "METH_OBS")
                     ),
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "ETA_BIO",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        label = "Etat biologique de l'observation"
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Etat biologique de l'observation",
+                        nomenclatureType = "ETA_BIO",
+                        value = PropertyValue.Nomenclature(code = "ETA_BIO")
                     ),
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "DETERMINER",
-                        EditableField.ViewType.TEXT_SIMPLE,
+                    FormField.Text(
+                        type = FormField.Type.INFORMATION,
+                        label = application.getString(R.string.nomenclature_determiner),
+                        default = false,
                         visible = true,
-                        default = false
+                        value = PropertyValue.Text(code = "determiner")
                     ),
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "STATUT_BIO",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
                         label = "Statut biologique",
                         visible = false,
+                        nomenclatureType = "STATUT_BIO",
                         value = PropertyValue.Nomenclature(
                             code = "STATUT_BIO",
                             label = "Non renseigné",
@@ -207,17 +215,17 @@ class GetEditableFieldsUseCaseTest {
                         value = 33L
                     ),
                     PropertyValue.Text(
-                        "DETERMINER",
+                        "determiner",
                         "some_value"
                     )
                 )
             )
 
-            // when fetching all editable fields with values matching given taxonomy
+            // when fetching all form fields with values matching given taxonomy
             val result =
                 getEditableFieldsUseCase.run(
                     GetEditableFieldsUseCase.Params(
-                        type = EditableField.Type.INFORMATION,
+                        type = FormField.Type.INFORMATION,
                         taxonomy = Taxonomy(
                             kingdom = "Animalia",
                             group = "Oiseaux"
@@ -228,69 +236,66 @@ class GetEditableFieldsUseCaseTest {
             // then
             assertEquals(
                 listOf(
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "METH_OBS",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        label = "Méthodes d'observation"
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Méthodes d'observation",
+                        nomenclatureType = "METH_OBS",
+                        value = PropertyValue.Nomenclature(code = "METH_OBS")
                     ),
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "ETA_BIO",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        label = "Etat biologique de l'observation"
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Etat biologique de l'observation",
+                        nomenclatureType = "ETA_BIO",
+                        value = PropertyValue.Nomenclature(code = "ETA_BIO")
                     ),
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "DETERMINER",
-                        EditableField.ViewType.TEXT_SIMPLE,
-                        visible = true,
+                    FormField.Text(
+                        type = FormField.Type.INFORMATION,
+                        label = application.getString(R.string.nomenclature_determiner),
                         default = false,
+                        visible = true,
                         value = PropertyValue.Text(
-                            "DETERMINER",
-                            "some_value"
-                        ),
-                        locked = true
-                    ),
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "STATUT_BIO",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
+                            code = "determiner",
+                            value = "some_value"
+                        )
+                    )
+                        .apply { locked = true },
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
                         label = "Statut biologique",
                         visible = false,
+                        nomenclatureType = "STATUT_BIO",
                         value = PropertyValue.Nomenclature(
                             code = "STATUT_BIO",
                             label = "Hibernation",
                             value = 33L
-                        ),
-                        locked = true
+                        )
                     )
-                ).sortedBy { it.code },
+                        .apply { locked = true }
+                ),
                 result.getOrThrow()
-                    .sortedBy { it.code }
             )
         }
 
     @Test
-    fun `should get all editable fields with additional fields`() =
+    fun `should get all form fields with additional fields`() =
         runTest {
-            // given some editable fields
+            // given some form fields
             coEvery {
                 nomenclatureRepository.getEditableFields(any())
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "METH_OBS",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        label = "Méthodes d'observation"
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Méthodes d'observation",
+                        nomenclatureType = "METH_OBS",
+                        value = PropertyValue.Nomenclature(code = "METH_OBS")
                     ),
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "ETA_BIO",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
                         label = "Etat biologique de l'observation",
-                        visible = false
+                        visible = false,
+                        nomenclatureType = "ETA_BIO",
+                        value = PropertyValue.Nomenclature(code = "ETA_BIO")
                     )
                 )
             )
@@ -303,11 +308,11 @@ class GetEditableFieldsUseCaseTest {
                 )
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "as_text",
-                        EditableField.ViewType.TEXT_SIMPLE,
-                        label = "As text"
+                    FormField.Text(
+                        type = FormField.Type.INFORMATION,
+                        additionalField = true,
+                        label = "As text",
+                        value = PropertyValue.Text(code = "as_text")
                     )
                 )
             )
@@ -315,62 +320,61 @@ class GetEditableFieldsUseCaseTest {
             // and no default property values
             coEvery { defaultPropertyValueRepository.getPropertyValues() } returns Right(listOf())
 
-            // when fetching all editable fields with default value
+            // when fetching all form fields with default value
             val result = getEditableFieldsUseCase.run(
                 GetEditableFieldsUseCase.Params(
                     withAdditionalFields = true,
-                    type = EditableField.Type.INFORMATION
+                    type = FormField.Type.INFORMATION
                 )
             )
 
             // then
             assertEquals(
                 listOf(
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "METH_OBS",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        label = "Méthodes d'observation"
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Méthodes d'observation",
+                        nomenclatureType = "METH_OBS",
+                        value = PropertyValue.Nomenclature(code = "METH_OBS")
                     ),
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "ETA_BIO",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
                         label = "Etat biologique de l'observation",
-                        visible = false
+                        visible = false,
+                        nomenclatureType = "ETA_BIO",
+                        value = PropertyValue.Nomenclature(code = "ETA_BIO")
                     ),
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "as_text",
-                        EditableField.ViewType.TEXT_SIMPLE,
-                        label = "As text"
+                    FormField.Text(
+                        type = FormField.Type.INFORMATION,
+                        additionalField = true,
+                        label = "As text",
+                        value = PropertyValue.Text(code = "as_text")
                     )
-                ).sortedBy { it.code },
+                ),
                 result.getOrThrow()
-                    .sortedBy { it.code }
             )
         }
 
     @Test
-    fun `should get all editable fields with no additional fields`() =
+    fun `should get all form fields with no additional fields`() =
         runTest {
-            // given some editable fields
+            // given some form fields
             coEvery {
                 nomenclatureRepository.getEditableFields(any())
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "METH_OBS",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        label = "Méthodes d'observation"
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Méthodes d'observation",
+                        nomenclatureType = "METH_OBS",
+                        value = PropertyValue.Nomenclature(code = "METH_OBS")
                     ),
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "ETA_BIO",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
                         label = "Etat biologique de l'observation",
-                        visible = false
+                        visible = false,
+                        nomenclatureType = "ETA_BIO",
+                        value = PropertyValue.Nomenclature(code = "ETA_BIO")
                     )
                 )
             )
@@ -383,11 +387,11 @@ class GetEditableFieldsUseCaseTest {
                 )
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "as_text",
-                        EditableField.ViewType.TEXT_SIMPLE,
-                        label = "As text"
+                    FormField.Text(
+                        type = FormField.Type.INFORMATION,
+                        additionalField = true,
+                        label = "As text",
+                        value = PropertyValue.Text(code = "as_text")
                     )
                 )
             )
@@ -395,44 +399,43 @@ class GetEditableFieldsUseCaseTest {
             // and no default property values
             coEvery { defaultPropertyValueRepository.getPropertyValues() } returns Right(listOf())
 
-            // when fetching all editable fields with default value
+            // when fetching all form fields with default value
             val result = getEditableFieldsUseCase.run(
-                GetEditableFieldsUseCase.Params(type = EditableField.Type.INFORMATION)
+                GetEditableFieldsUseCase.Params(type = FormField.Type.INFORMATION)
             )
 
             // then
             assertEquals(
                 listOf(
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "METH_OBS",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        label = "Méthodes d'observation"
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Méthodes d'observation",
+                        nomenclatureType = "METH_OBS",
+                        value = PropertyValue.Nomenclature(code = "METH_OBS")
                     ),
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "ETA_BIO",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
                         label = "Etat biologique de l'observation",
-                        visible = false
+                        visible = false,
+                        nomenclatureType = "ETA_BIO",
+                        value = PropertyValue.Nomenclature(code = "ETA_BIO")
                     )
-                ).sortedBy { it.code },
+                ),
                 result.getOrThrow()
-                    .sortedBy { it.code }
             )
         }
 
     @Test
-    fun `should return NoNomenclatureTypeFoundLocallyFailure if no nomenclature types was found`() =
+    fun `should return NoNomenclatureTypeFoundException failure if no nomenclature types was found`() =
         runTest {
             // given some failure from repository
             coEvery {
-                nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
+                nomenclatureRepository.getEditableFields(FormField.Type.INFORMATION)
             } returns Result.failure(NomenclatureException.NoNomenclatureTypeFoundException)
 
-            // when fetching all editable fields with default value
+            // when fetching all form fields with default value
             val result = getEditableFieldsUseCase.run(
-                GetEditableFieldsUseCase.Params(type = EditableField.Type.INFORMATION)
+                GetEditableFieldsUseCase.Params(type = FormField.Type.INFORMATION)
             )
 
             // then

@@ -1,5 +1,6 @@
 package fr.geonature.occtax.ui.input.informations
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,10 +21,10 @@ import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.lifecycle.observe
 import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
-import fr.geonature.occtax.features.nomenclature.presentation.adapter.EditableFieldAdapter
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
+import fr.geonature.occtax.features.nomenclature.presentation.adapter.EditableFieldAdapter
 import fr.geonature.occtax.features.record.domain.MediaRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.domain.TaxonRecord
@@ -86,6 +87,10 @@ class InformationFragment : AbstractInputFragment() {
 
         adapter = EditableFieldAdapter(object :
             EditableFieldAdapter.OnEditableFieldAdapter {
+            override fun getContext(): Context {
+                return requireContext()
+            }
+
             override fun getLifecycleOwner(): LifecycleOwner {
                 return this@InformationFragment
             }
@@ -138,29 +143,29 @@ class InformationFragment : AbstractInputFragment() {
                 )
             }
 
-            override fun onUpdate(editableField: EditableField) {
+            override fun onUpdate(editableField: FormField.Editable) {
                 if (editableField.additionalField) {
                     // as additional field
                     observationRecord?.taxa?.selectedTaxonRecord?.also {
                         it.additionalFields = it.additionalFields.filter { pv ->
-                            pv.toPair().first != editableField.code
-                        } + listOfNotNull(editableField.value)
+                            pv.toPair().first != editableField.getValue().code
+                        } + listOfNotNull(editableField.getValue())
                     }
                 } else {
                     // as editable field
-                    editableField.value?.toPair()
+                    editableField.getValue().toPair()
                         .also {
-                            if (it == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(editableField.code)
+                            if (it.second.isEmpty()) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(editableField.getValue().code)
                             else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
-                                editableField.code,
+                                editableField.getValue().code,
                                 it.second
                             )
                         }
                 }
 
-                val propertyValue = editableField.value
+                val propertyValue = editableField.getValue()
 
-                if (propertyValue !== null && editableField.locked) propertyValueModel.setPropertyValue(
+                if (editableField.locked) propertyValueModel.setPropertyValue(
                     observationRecord?.taxa?.selectedTaxonRecord?.taxon?.taxonomy
                         ?: Taxonomy(
                             Taxonomy.ANY,
@@ -173,7 +178,7 @@ class InformationFragment : AbstractInputFragment() {
                             Taxonomy.ANY,
                             Taxonomy.ANY
                         ),
-                    editableField.code
+                    editableField.getValue().code
                 )
             }
 
@@ -190,7 +195,7 @@ class InformationFragment : AbstractInputFragment() {
                 KEY_SHOW_ALL_NOMENCLATURE_TYPES,
                 false
             )
-        ) adapter?.showAllEditableFields() else adapter?.showDefaultEditableFields()
+        ) adapter?.showAllFormFields() else adapter?.showDefaultFormFields()
         adapter?.lockDefaultValues(arguments?.getBoolean(ARG_SAVE_DEFAULT_VALUES) == true)
 
         with(recyclerView) {
@@ -226,25 +231,36 @@ class InformationFragment : AbstractInputFragment() {
                 ARG_WITH_ADDITIONAL_FIELDS,
                 false
             ) ?: false,
-            EditableField.Type.INFORMATION,
+            FormField.Type.INFORMATION,
             (arguments?.getParcelableArrayCompat<PropertySettings>(ARG_PROPERTIES)
                 ?.toList() ?: emptyList()),
             observationRecord?.taxa?.selectedTaxonRecord?.taxon?.taxonomy
         )
     }
 
-    private fun handleEditableFields(editableFields: List<EditableField>) {
-        editableFields.filter { it.value != null }
+    private fun handleEditableFields(editableFields: List<FormField>) {
+        editableFields.flatMap {
+            when (it) {
+                is FormField.Editable -> listOf(it)
+                else -> listOf(null)
+            }
+        }
+            .filterNotNull()
+            .map { it.getValue() }
             .forEach {
+                // if we have existing value to the current selected taxon, do nothing
                 if (observationRecord?.taxa?.selectedTaxonRecord?.properties?.containsKey(it.code) == true) return@forEach
 
-                it.value?.toPair()
+                it.toPair()
                     .also { pair ->
-                        if (pair == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(it.code)
-                        else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
-                            pair.first,
-                            pair.second
-                        )
+                        if (it.isEmpty()) {
+                            observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(pair.first)
+                        } else {
+                            observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
+                                pair.first,
+                                pair.second
+                            )
+                        }
                     }
             }
 

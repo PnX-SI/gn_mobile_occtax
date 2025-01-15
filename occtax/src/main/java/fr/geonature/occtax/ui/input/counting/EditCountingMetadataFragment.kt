@@ -30,10 +30,10 @@ import fr.geonature.compat.content.getParcelableExtraCompat
 import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.compat.os.getParcelableCompat
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
-import fr.geonature.occtax.features.nomenclature.presentation.adapter.EditableFieldAdapter
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
+import fr.geonature.occtax.features.nomenclature.presentation.adapter.EditableFieldAdapter
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.MediaRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
@@ -159,6 +159,10 @@ class EditCountingMetadataFragment : Fragment() {
         adapter = EditableFieldAdapter(object :
             EditableFieldAdapter.OnEditableFieldAdapter {
 
+            override fun getContext(): Context {
+                return requireContext()
+            }
+
             override fun getLifecycleOwner(): LifecycleOwner {
                 return this@EditCountingMetadataFragment
             }
@@ -212,39 +216,56 @@ class EditCountingMetadataFragment : Fragment() {
                 )
             }
 
-            override fun onUpdate(editableField: EditableField) {
+            override fun onUpdate(editableField: FormField.Editable) {
                 val countingRecord = countingRecord ?: return
 
-                if (editableField.additionalField) {
+                val notify = if (editableField.additionalField) {
+                    val notify =
+                        countingRecord.additionalFields.firstOrNull { it.code == editableField.getValue().code }
+                            ?.toPair()?.second != editableField.getValue()
+
                     // as additional field
-                    countingRecord.additionalFields =
-                        (countingRecord.additionalFields.filter {
-                            it.toPair().first != editableField.code
-                        } + listOfNotNull(editableField.value))
+                    if (notify) {
+                        countingRecord.additionalFields =
+                            (countingRecord.additionalFields.filter {
+                                it.code != editableField.getValue().code
+                            } + listOfNotNull(editableField.getValue()))
+                    }
+
+                    notify
                 } else {
+                    val notify =
+                        countingRecord.properties[editableField.getValue().code]?.toPair()?.second != editableField.getValue()
+
                     // as editable field
-                    editableField.value?.toPair()
-                        .also {
-                            if (it == null) countingRecord.properties.remove(editableField.code)
-                            else countingRecord.properties[editableField.code] =
-                                it.second
-                        }
+                    if (notify) {
+                        editableField.getValue().toPair()
+                            .also {
+                                if (it.second.isEmpty()) countingRecord.properties.remove(editableField.getValue().code)
+                                else countingRecord.properties[editableField.getValue().code] =
+                                    it.second
+                            }
+                    }
+
+                    notify
                 }
 
-                listener?.onCountingRecord(countingRecord)
+                if (notify) {
+                    listener?.onCountingRecord(countingRecord)
+                }
 
                 val taxonomy = taxonRecord?.taxon?.taxonomy ?: Taxonomy(
                     Taxonomy.ANY,
                     Taxonomy.ANY
                 )
-                val propertyValue = editableField.value
+                val propertyValue = editableField.getValue()
 
-                if (propertyValue !== null && editableField.locked) propertyValueModel.setPropertyValue(
+                if (editableField.locked) propertyValueModel.setPropertyValue(
                     taxonomy,
                     propertyValue
                 ) else propertyValueModel.clearPropertyValue(
                     taxonomy,
-                    editableField.code
+                    editableField.getValue().code
                 )
             }
 
@@ -346,25 +367,41 @@ class EditCountingMetadataFragment : Fragment() {
                 ARG_WITH_ADDITIONAL_FIELDS,
                 false
             ) ?: false,
-            EditableField.Type.COUNTING,
+            FormField.Type.COUNTING,
             (arguments?.getParcelableArrayCompat<PropertySettings>(ARG_PROPERTIES)
                 ?.toList() ?: emptyList()),
             taxonRecord.taxon.taxonomy
         )
     }
 
-    private fun handleEditableFields(editableFields: List<EditableField>) {
-        editableFields.filter { it.value != null }
+    private fun handleEditableFields(editableFields: List<FormField>) {
+        editableFields.flatMap {
+            when (it) {
+                is FormField.Editable -> listOf(it)
+                is FormField.MinMax -> listOf(
+                    it.min,
+                    it.max
+                )
+
+                else -> listOf(null)
+            }
+        }
+            .filterNotNull()
+            .map { it.getValue() }
             .forEach {
+                // if we have existing value to the current counting record, do nothing
                 if (countingRecord?.properties?.containsKey(it.code) == true) return@forEach
 
-                it.value?.toPair()
+                it.toPair()
                     .also { pair ->
-                        if (pair == null) countingRecord?.properties?.remove(it.code)
-                        else countingRecord?.properties?.set(
-                            pair.first,
-                            pair.second
-                        )
+                        if (it.isEmpty()) {
+                            countingRecord?.properties?.remove(pair.first)
+                        } else {
+                            countingRecord?.properties?.set(
+                                pair.first,
+                                pair.second
+                            )
+                        }
                     }
             }
 

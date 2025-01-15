@@ -11,6 +11,11 @@ import kotlinx.parcelize.Parcelize
 sealed class PropertyValue : Parcelable {
 
     /**
+     * The unique identifier of this [PropertyValue].
+     */
+    abstract val code: String
+
+    /**
      * Whether this property value is considered empty or not.
      */
     val isEmpty: () -> Boolean = {
@@ -50,19 +55,19 @@ sealed class PropertyValue : Parcelable {
      * As text.
      */
     @Parcelize
-    data class Text(val code: String, val value: String?) : PropertyValue()
+    data class Text(override val code: String, val value: String? = null) : PropertyValue()
 
     /**
      * As date.
      */
     @Parcelize
-    data class Date(val code: String, val value: java.util.Date?) : PropertyValue()
+    data class Date(override val code: String, val value: java.util.Date? = null) : PropertyValue()
 
     /**
      * As array of strings.
      */
     @Parcelize
-    data class StringArray(val code: String, val value: Array<String> = emptyArray()) :
+    data class StringArray(override val code: String, val value: Array<String> = emptyArray()) :
         PropertyValue() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -87,13 +92,16 @@ sealed class PropertyValue : Parcelable {
      * As number.
      */
     @Parcelize
-    data class Number(val code: String, val value: kotlin.Number?) : PropertyValue()
+    data class Number(override val code: String, val value: kotlin.Number? = null) : PropertyValue()
 
     /**
      * As array of numbers.
      */
     @Parcelize
-    data class NumberArray(val code: String, val value: Array<kotlin.Number> = emptyArray()) :
+    data class NumberArray(
+        override val code: String,
+        val value: Array<kotlin.Number> = emptyArray()
+    ) :
         PropertyValue() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -118,28 +126,40 @@ sealed class PropertyValue : Parcelable {
      * As dataset.
      */
     @Parcelize
-    data class Dataset(val code: String, val datasetId: Long?, val taxaListId: Long? = null) :
+    data class Dataset(
+        override val code: String,
+        val datasetId: Long? = null,
+        val taxaListId: Long? = null
+    ) :
         PropertyValue()
 
     /**
      * As nomenclature value.
      */
     @Parcelize
-    data class Nomenclature(val code: String, val label: String?, val value: Long?) :
+    data class Nomenclature(
+        override val code: String,
+        val label: String? = null,
+        val value: Long? = null
+    ) :
         PropertyValue()
 
     /**
      * As additional fields.
      */
     @Parcelize
-    data class AdditionalFields(val code: String, val value: Map<String, PropertyValue>) :
+    data class AdditionalFields(
+        override val code: String,
+        val value: Map<String, PropertyValue> = emptyMap()
+    ) :
         PropertyValue()
 
     /**
      * As array of [TaxonRecord].
      */
     @Parcelize
-    data class Taxa(val code: String, val value: Array<TaxonRecord>) : PropertyValue() {
+    data class Taxa(override val code: String, val value: Array<TaxonRecord> = emptyArray()) :
+        PropertyValue() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -163,7 +183,11 @@ sealed class PropertyValue : Parcelable {
      * As array of [CountingRecord].
      */
     @Parcelize
-    data class Counting(val code: String, val value: Array<CountingRecord>) : PropertyValue() {
+    data class Counting(
+        override val code: String,
+        val value: Array<CountingRecord> = emptyArray()
+    ) :
+        PropertyValue() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -187,7 +211,7 @@ sealed class PropertyValue : Parcelable {
      * As array of [MediaRecord].
      */
     @Parcelize
-    data class Media(val code: String, val value: Array<MediaRecord> = emptyArray()) :
+    data class Media(override val code: String, val value: Array<MediaRecord> = emptyArray()) :
         PropertyValue() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

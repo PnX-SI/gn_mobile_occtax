@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
@@ -21,7 +21,7 @@ class CheckboxViewHolder(
     parent: ViewGroup,
     private val listener: EditableFieldAdapter.OnEditableFieldAdapter
 ) :
-    EditableFieldAdapter.AbstractViewHolder(
+    EditableFieldAdapter.AbstractFormFieldViewHolder<FormField.Checkbox>(
         LayoutInflater.from(parent.context)
             .inflate(
                 R.layout.view_action_list,
@@ -69,23 +69,17 @@ class CheckboxViewHolder(
                     itemView.findViewById<CheckBox?>(android.R.id.checkbox)
                         .apply {
                             setOnClickListener { view ->
-                                editableField?.run {
-                                    value = value?.takeIf { it is PropertyValue.StringArray }
-                                        ?.let { it as PropertyValue.StringArray }
-                                        ?.let {
-                                            it.copy(
-                                                value = it.value.filter { value -> value != view.tag.toString() }
+                                formField
+                                    ?.run {
+                                        setValue(
+                                            PropertyValue.StringArray(
+                                                code = getValue().code,
+                                                value = value.value.filter { value -> value != view.tag.toString() }
                                                     .toTypedArray() + (
                                                     if (isChecked) arrayOf(view.tag.toString())
-                                                    else arrayOf()),
-                                            )
-                                        } ?: PropertyValue.StringArray(
-                                        code,
-                                        if (isChecked) arrayOf(view.tag.toString())
-                                        else arrayOf()
-                                    )
-                                    listener.onUpdate(this)
-                                }
+                                                    else arrayOf())))
+                                        listener.onUpdate(this)
+                                    }
                             }
                         }
 
@@ -109,22 +103,16 @@ class CheckboxViewHolder(
         }
     }
 
-    override fun onBind(editableField: EditableField) {
-        title.text = editableField.label
+    override fun onBind(formField: FormField.Checkbox) {
+        title.text = formField.label
 
-        val currentValues = editableField.value
-            .takeIf { it is PropertyValue.StringArray }
-            ?.let { it as PropertyValue.StringArray }?.value
+        val currentValues = formField.value.value
 
-        adapter.setItems(editableField.values.mapNotNull { pv ->
-            pv.takeIf { it is PropertyValue.Text }
-                ?.let { it as PropertyValue.Text }
-                ?.let {
-                    Pair(
-                        it,
-                        currentValues?.contains(it.code) == true
-                    )
-                }
+        adapter.setItems(formField.values.map { pv ->
+            Pair(
+                pv,
+                currentValues.contains(pv.code)
+            )
         })
     }
 }

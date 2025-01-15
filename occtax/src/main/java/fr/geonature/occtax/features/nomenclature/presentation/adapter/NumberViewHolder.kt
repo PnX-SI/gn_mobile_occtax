@@ -3,49 +3,44 @@ package fr.geonature.occtax.features.nomenclature.presentation.adapter
 import android.text.Editable
 import android.text.InputType
 import android.view.ViewGroup
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
  * [EditableFieldAdapter] view holder representing a numeric value.
  *
- * @see TextSimpleViewHolder
+ * @see AbstractFormFieldTextViewHolder
  * @author S. Grimault
  */
 class NumberViewHolder(
     parent: ViewGroup,
-    private val listener: EditableFieldAdapter.OnEditableFieldAdapter
+    listener: EditableFieldAdapter.OnEditableFieldAdapter
 ) :
-    TextSimpleViewHolder(
+    AbstractFormFieldTextViewHolder<FormField.Number>(
         parent,
         listener
     ) {
+
     init {
         edit.editText?.apply {
             inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         }
     }
 
+    override fun getValue(formField: FormField.Number): String? {
+        return formField.value.value?.toString()
+    }
+
     override fun afterTextChanged(s: Editable?) {
-        editableField?.run {
-            value = PropertyValue.Number(
-                code,
-                s?.toString()
-                    ?.toDoubleOrNull()
+        formField?.run {
+            setValue(
+                PropertyValue.Number(
+                    code = getValue().code,
+                    value = s?.toString()
+                        ?.toDoubleOrNull()
+                )
             )
             listener.onUpdate(this)
         }
-    }
-
-    override fun onBind(editableField: EditableField) {
-        super.onBind(editableField)
-
-        editableField.value
-            ?.takeIf { it is PropertyValue.Number && !it.isEmpty() }
-            ?.let { it as PropertyValue.Number }
-            ?.value
-            ?.also {
-                setText(it.toString())
-            }
     }
 }

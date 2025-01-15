@@ -7,7 +7,7 @@ import android.widget.AutoCompleteTextView
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.textfield.TextInputLayout
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
@@ -19,7 +19,7 @@ import fr.geonature.occtax.features.record.domain.PropertyValue
 class SelectSimpleViewHolder(
     parent: ViewGroup,
     private val listener: EditableFieldAdapter.OnEditableFieldAdapter
-) : EditableFieldAdapter.AbstractLockableViewHolder(
+) : EditableFieldAdapter.AbstractLockableViewHolder<FormField.Select>(
     LayoutInflater.from(parent.context)
         .inflate(
             R.layout.view_action_select_simple,
@@ -34,12 +34,12 @@ class SelectSimpleViewHolder(
         (edit.editText as? AutoCompleteTextView)?.also {
             it.setAdapter(propertyValueTextAdapter)
             it.setOnItemClickListener { _, _, position, _ ->
-                editableField?.run {
-                    value = PropertyValue.Text(
-                        code = code,
-                        propertyValueTextAdapter.getPropertyValue(position)
+                formField?.run {
+                    setValue(PropertyValue.Text(code = getValue().code,
+                        value = propertyValueTextAdapter.getPropertyValue(position)
                             .takeIf { pv -> pv is PropertyValue.Text }
                             ?.let { pv -> pv as PropertyValue.Text }?.code
+                    )
                     )
                     listener.onUpdate(this)
                 }
@@ -47,37 +47,34 @@ class SelectSimpleViewHolder(
         }
     }
 
-    override fun onBind(editableField: EditableField, lockDefaultValues: Boolean) {
+    override fun onBind(formField: FormField.Select, lockDefaultValues: Boolean) {
         if (!lockDefaultValues) {
-            editableField.locked = false
+            formField.locked = false
         }
 
-        propertyValueTextAdapter.setPropertyValues(editableField.values)
+        propertyValueTextAdapter.setPropertyValues(formField.values)
 
         with(edit) {
             startIconDrawable = if (lockDefaultValues) ResourcesCompat.getDrawable(
                 itemView.resources,
-                if (editableField.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                if (formField.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
                 itemView.context.theme
             ) else null
             setStartIconOnClickListener {
                 if (!lockDefaultValues) return@setStartIconOnClickListener
 
-                editableField.locked = !editableField.locked
+                formField.locked = !formField.locked
                 startIconDrawable = ResourcesCompat.getDrawable(
                     itemView.resources,
-                    if (editableField.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
+                    if (formField.locked) R.drawable.ic_lock else R.drawable.ic_lock_open,
                     itemView.context.theme
                 )
-                listener.onUpdate(editableField)
+                listener.onUpdate(formField)
             }
-            hint = editableField.label ?: getDefaultLabel(editableField)
+            hint = formField.label
             (editText as? AutoCompleteTextView)?.apply {
-                text = editableField.value
-                    ?.takeIf { it is PropertyValue.Text }
-                    ?.let { it as PropertyValue.Text }
-                    ?.let { pv -> editableField.values.firstOrNull { it is PropertyValue.Text && it.code == pv.value } }
-                    ?.let { it as PropertyValue.Text }
+                text = formField.value
+                    .let { pv -> formField.values.firstOrNull { it.code == pv.value } }
                     ?.let {
                         Editable.Factory.getInstance()
                             .newEditable(it.value ?: it.code)

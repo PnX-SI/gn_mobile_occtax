@@ -4,7 +4,7 @@ import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.features.nomenclature.error.NomenclatureException
 import fr.geonature.commons.fp.getOrElse
 import fr.geonature.commons.interactor.BaseResultUseCase
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.nomenclature.repository.IAdditionalFieldRepository
 import fr.geonature.occtax.features.nomenclature.repository.IDefaultPropertyValueRepository
 import fr.geonature.occtax.features.nomenclature.repository.INomenclatureRepository
@@ -22,8 +22,8 @@ class GetEditableFieldsUseCase @Inject constructor(
     private val additionalFieldRepository: IAdditionalFieldRepository,
     private val defaultPropertyValueRepository: IDefaultPropertyValueRepository
 ) :
-    BaseResultUseCase<List<EditableField>, GetEditableFieldsUseCase.Params>() {
-    override suspend fun run(params: Params): Result<List<EditableField>> {
+    BaseResultUseCase<List<FormField>, GetEditableFieldsUseCase.Params>() {
+    override suspend fun run(params: Params): Result<List<FormField>> {
         Logger.info { "loading editable fields of type '${params.type.name}'${if (params.withAdditionalFields) " with additional fields" else ""}${params.datasetId?.let { " matching dataset ID $it" } ?: ""}..." }
 
         val editableNomenclatures = (nomenclatureRepository.getEditableFields(
@@ -46,8 +46,8 @@ class GetEditableFieldsUseCase @Inject constructor(
 
             // set media type at last position
             .sortedWith { a, b ->
-                if (a.viewType == EditableField.ViewType.MEDIA) 1
-                else if (b.viewType == EditableField.ViewType.MEDIA) -1
+                if (a is FormField.Media) 1
+                else if (b is FormField.Media) -1
                 else 0
             }
 
@@ -58,15 +58,17 @@ class GetEditableFieldsUseCase @Inject constructor(
         return Result.success(
             editableNomenclatures.map
             { editableNomenclature ->
-                editableNomenclature.copy(
-                    value = defaultPropertyValues.firstOrNull {
-                        it.toPair().first == editableNomenclature.code
+                when (editableNomenclature) {
+                    is FormField.Editable -> editableNomenclature.apply {
+                        locked = defaultPropertyValues.any {
+                            it.code == editableNomenclature.getValue().code
+                        }
+                        setValue(defaultPropertyValues.firstOrNull { it.code == editableNomenclature.getValue().code }
+                            ?: editableNomenclature.getValue())
                     }
-                        ?: editableNomenclature.value,
-                    locked = defaultPropertyValues.any {
-                        it.toPair().first == editableNomenclature.code
-                    }
-                )
+
+                    else -> editableNomenclature
+                }
             }
         )
     }
@@ -74,7 +76,7 @@ class GetEditableFieldsUseCase @Inject constructor(
     data class Params(
         val datasetId: Long? = null,
         val withAdditionalFields: Boolean = false,
-        val type: EditableField.Type,
+        val type: FormField.Type,
         val settings: List<PropertySettings> = listOf(),
         val taxonomy: Taxonomy? = null
     )

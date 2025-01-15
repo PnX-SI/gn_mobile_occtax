@@ -13,7 +13,7 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.MediaRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import java.io.File
@@ -27,7 +27,7 @@ import java.io.File
 class MediaViewHolder(
     parent: ViewGroup,
     private val listener: EditableFieldAdapter.OnEditableFieldAdapter
-) : EditableFieldAdapter.AbstractViewHolder(
+) : EditableFieldAdapter.AbstractFormFieldViewHolder<FormField.Media>(
     LayoutInflater.from(parent.context)
         .inflate(
             R.layout.view_action_media,
@@ -49,15 +49,11 @@ class MediaViewHolder(
         }
     }
 
-    override fun onBind(editableField: EditableField) {
-        title.text = editableField.label ?: getDefaultLabel(editableField)
-        adapter.setItems(editableField.value
-            .takeIf { it is PropertyValue.Media }
-            ?.let { it as PropertyValue.Media }?.value
-            ?.filterIsInstance<MediaRecord.File>()
-            ?.map { it.path }
-            ?.mapNotNull { runCatching { File(it) }.getOrNull() }
-            ?: emptyList())
+    override fun onBind(formField: FormField.Media) {
+        title.text = formField.label
+        adapter.setItems(formField.value.value.filterIsInstance<MediaRecord.File>()
+            .map { it.path }
+            .mapNotNull { runCatching { File(it) }.getOrNull() })
     }
 
     private inner class MediaAdapter :
@@ -172,15 +168,16 @@ class MediaViewHolder(
         }
 
         fun onUpdate() {
-            editableField?.also {
-                listener.onUpdate(it.apply {
-                    value = PropertyValue.Media(
-                        it.code,
-                        items.map { file -> MediaRecord.File(file.absolutePath) }
-                            .toTypedArray()
-                    )
-                })
-            }
+            formField
+                ?.also {
+                    listener.onUpdate(it.apply {
+                        setValue(
+                            PropertyValue.Media(
+                                code = getValue().code,
+                                value = items.map { file -> MediaRecord.File(file.absolutePath) }
+                                    .toTypedArray()))
+                    })
+                }
         }
 
         abstract inner class AbstractViewHolder(itemView: View) :
@@ -228,7 +225,7 @@ class MediaViewHolder(
             override fun onBind(file: File?) {
                 itemView.findViewById<MaterialButton>(android.R.id.button1)
                     .setOnClickListener {
-                        editableField?.code?.also {
+                        formField?.value?.code?.also {
                             listener.onAddMedia(it)
                         }
                     }

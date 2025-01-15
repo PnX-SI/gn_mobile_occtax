@@ -1,6 +1,8 @@
 package fr.geonature.occtax.features.nomenclature.data
 
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import android.content.Context
+import fr.geonature.occtax.R
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.AllMediaRecord
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
@@ -11,149 +13,167 @@ import fr.geonature.occtax.features.settings.domain.PropertySettings
  *
  * @author S. Grimault
  */
-class NomenclatureSettingsLocalDataSourceImpl :
+class NomenclatureSettingsLocalDataSourceImpl(context: Context) :
     INomenclatureSettingsLocalDataSource {
 
     private val defaultNomenclatureTypes = listOf(
-        EditableField(
-            type = EditableField.Type.DEFAULT,
-            code = "TYP_GRP",
-            viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-            nomenclatureType = "TYP_GRP"
+        FormField.NomenclatureType(
+            type = FormField.Type.DEFAULT,
+            label = context.getString(R.string.nomenclature_typ_grp),
+            nomenclatureType = "TYP_GRP",
+            value = PropertyValue.Nomenclature(code = "TYP_GRP")
         ),
-        EditableField(
-            type = EditableField.Type.INFORMATION,
-            code = "METH_OBS",
-            viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-            nomenclatureType = "METH_OBS"
+        FormField.NomenclatureType(
+            type = FormField.Type.INFORMATION,
+            label = context.getString(R.string.nomenclature_meth_obs),
+            nomenclatureType = "METH_OBS",
+            value = PropertyValue.Nomenclature(code = "METH_OBS")
         ),
-        EditableField(
-            type = EditableField.Type.INFORMATION,
-            code = "ETA_BIO",
-            viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-            nomenclatureType = "ETA_BIO"
+        FormField.NomenclatureType(
+            type = FormField.Type.INFORMATION,
+            label = context.getString(R.string.nomenclature_eta_bio),
+            nomenclatureType = "ETA_BIO",
+            value = PropertyValue.Nomenclature(code = "ETA_BIO")
         ),
-        EditableField(
-            type = EditableField.Type.INFORMATION,
-            code = "METH_DETERMIN",
-            viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+        FormField.NomenclatureType(
+            type = FormField.Type.INFORMATION,
+            label = context.getString(R.string.nomenclature_meth_determin),
+            default = false,
             nomenclatureType = "METH_DETERMIN",
-            default = false
+            value = PropertyValue.Nomenclature(code = "METH_DETERMIN")
         ),
-        EditableField(
-            type = EditableField.Type.INFORMATION,
-            code = "determiner",
-            viewType = EditableField.ViewType.TEXT_SIMPLE,
-            default = false
+        FormField.Text(
+            type = FormField.Type.INFORMATION,
+            label = context.getString(R.string.nomenclature_determiner),
+            default = false,
+            value = PropertyValue.Text(code = "determiner")
         ),
-        EditableField(
-            type = EditableField.Type.INFORMATION,
-            code = "STATUT_BIO",
-            viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+        FormField.NomenclatureType(
+            type = FormField.Type.INFORMATION,
+            label = context.getString(R.string.nomenclature_statut_bio),
+            default = false,
             nomenclatureType = "STATUT_BIO",
-            default = false
+            value = PropertyValue.Nomenclature(code = "STATUT_BIO")
         ),
-        EditableField(
-            type = EditableField.Type.INFORMATION,
-            code = "OCC_COMPORTEMENT",
-            viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+        FormField.NomenclatureType(
+            type = FormField.Type.INFORMATION,
+            label = context.getString(R.string.nomenclature_occ_comportement),
+            default = false,
             nomenclatureType = "OCC_COMPORTEMENT",
-            default = false
+            value = PropertyValue.Nomenclature(code = "OCC_COMPORTEMENT")
         ),
-        EditableField(
-            type = EditableField.Type.INFORMATION,
-            code = "NATURALITE",
-            viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+        FormField.NomenclatureType(
+            type = FormField.Type.INFORMATION,
+            label = context.getString(R.string.nomenclature_naturalite),
+            default = false,
             nomenclatureType = "NATURALITE",
-            default = false
+            value = PropertyValue.Nomenclature(code = "NATURALITE")
         ),
-        EditableField(
-            type = EditableField.Type.INFORMATION,
-            code = "PREUVE_EXIST",
-            viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+        FormField.NomenclatureType(
+            type = FormField.Type.INFORMATION,
+            label = context.getString(R.string.nomenclature_preuve_exist),
+            default = false,
             nomenclatureType = "PREUVE_EXIST",
-            default = false
+            value = PropertyValue.Nomenclature(code = "PREUVE_EXIST")
         ),
-        EditableField(
-            type = EditableField.Type.INFORMATION,
-            code = "comment",
-            viewType = EditableField.ViewType.TEXT_MULTIPLE,
-            default = false
+        FormField.TextMultiple(
+            type = FormField.Type.INFORMATION,
+            label = context.getString(R.string.nomenclature_comment),
+            default = false,
+            value = PropertyValue.Text(code = "comment")
         ),
-        EditableField(
-            type = EditableField.Type.COUNTING,
-            code = "STADE_VIE",
-            viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-            nomenclatureType = "STADE_VIE"
+        FormField.NomenclatureType(
+            type = FormField.Type.COUNTING,
+            label = context.getString(R.string.nomenclature_stade_vie),
+            nomenclatureType = "STADE_VIE",
+            value = PropertyValue.Nomenclature(code = "STADE_VIE")
         ),
-        EditableField(
-            type = EditableField.Type.COUNTING,
-            code = "SEXE",
-            viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-            nomenclatureType = "SEXE"
+        FormField.NomenclatureType(
+            type = FormField.Type.COUNTING,
+            label = context.getString(R.string.nomenclature_sexe),
+            nomenclatureType = "SEXE",
+            value = PropertyValue.Nomenclature(code = "SEXE")
         ),
-        EditableField(
-            type = EditableField.Type.COUNTING,
-            code = "OBJ_DENBR",
-            viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-            nomenclatureType = "OBJ_DENBR"
+        FormField.NomenclatureType(
+            type = FormField.Type.COUNTING,
+            label = context.getString(R.string.nomenclature_obj_denbr),
+            nomenclatureType = "OBJ_DENBR",
+            value = PropertyValue.Nomenclature(code = "OBJ_DENBR")
         ),
-        EditableField(
-            type = EditableField.Type.COUNTING,
-            code = "TYP_DENBR",
-            viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-            nomenclatureType = "TYP_DENBR"
+        FormField.NomenclatureType(
+            type = FormField.Type.COUNTING,
+            label = context.getString(R.string.nomenclature_typ_denbr),
+            nomenclatureType = "TYP_DENBR",
+            value = PropertyValue.Nomenclature(code = "TYP_DENBR")
         ),
-        EditableField(
-            type = EditableField.Type.COUNTING,
-            code = CountingRecord.MIN_KEY,
-            viewType = EditableField.ViewType.MIN_MAX
-        ).apply {
-            value = PropertyValue.Number(
-                code,
-                1
-            )
-        },
-        EditableField(
-            type = EditableField.Type.COUNTING,
-            code = CountingRecord.MAX_KEY,
-            viewType = EditableField.ViewType.MIN_MAX
-        ).apply {
-            value = PropertyValue.Number(
-                code,
-                1
-            )
-        },
-        EditableField(
-            type = EditableField.Type.COUNTING,
-            code = AllMediaRecord.MEDIAS_KEY,
-            viewType = EditableField.ViewType.MEDIA
-        ).apply {
-            value = PropertyValue.Media(code)
-        }
+        FormField.MinMax(
+            type = FormField.Type.COUNTING,
+            label = "",
+            min = FormField.Number(
+                type = FormField.Type.COUNTING,
+                label = context.getString(R.string.nomenclature_count_min),
+                value = PropertyValue.Number(
+                    CountingRecord.MIN_KEY,
+                    1
+                )
+            ),
+            max = FormField.Number(
+                type = FormField.Type.COUNTING,
+                label = context.getString(R.string.nomenclature_count_max),
+                value = PropertyValue.Number(
+                    CountingRecord.MAX_KEY,
+                    1
+                )
+            ),
+        ),
+        FormField.Media(
+            type = FormField.Type.COUNTING,
+            label = context.getString(R.string.nomenclature_media),
+            value = PropertyValue.Media(AllMediaRecord.MEDIAS_KEY)
+        )
     )
 
     override suspend fun getNomenclatureTypeSettings(
-        type: EditableField.Type,
+        type: FormField.Type,
         vararg defaultPropertySettings: PropertySettings
-    ): List<EditableField> {
-        if (defaultPropertySettings.isEmpty() || type == EditableField.Type.DEFAULT) {
+    ): List<FormField> {
+        if (defaultPropertySettings.isEmpty() || type == FormField.Type.DEFAULT) {
             return defaultNomenclatureTypes.filter { it.type == type }
         }
 
         return defaultPropertySettings
             .mapNotNull { property ->
-                defaultNomenclatureTypes.find { it.code == property.key }
+                defaultNomenclatureTypes.find {
+                    when (it) {
+                        is FormField.Editable -> it.getValue().code == property.key
+                        is FormField.MinMax -> arrayOf(
+                            it.min,
+                            it.max
+                        ).any { ff -> ff.value.code == property.key }
+
+                        else -> false
+                    }
+                }
                     ?.let {
-                        EditableField(
-                            type = it.type,
-                            code = it.code,
-                            viewType = it.viewType,
-                            nomenclatureType = it.nomenclatureType,
-                            visible = property.visible,
-                            default = property.default,
-                            value = it.value
-                        )
+                        when (it) {
+                            is FormField.Editable -> it.update(
+                                visible = property.visible,
+                                default = property.default
+                            )
+
+                            is FormField.MinMax -> it.copy(
+                                min = if (it.min.value.code == property.key) it.min.copy(
+                                    visible = property.visible,
+                                    default = property.default
+                                ) else it.min,
+                                max = if (it.max.value.code == property.key) it.max.copy(
+                                    visible = property.visible,
+                                    default = property.default
+                                ) else it.max
+                            )
+
+                            else -> null
+                        }
                     }
             }
     }

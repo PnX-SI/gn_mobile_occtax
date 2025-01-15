@@ -2,7 +2,7 @@ package fr.geonature.occtax.features.record.usecase
 
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.interactor.BaseResultUseCase
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.nomenclature.repository.IAdditionalFieldRepository
 import fr.geonature.occtax.features.nomenclature.repository.INomenclatureRepository
 import fr.geonature.occtax.features.record.domain.ObservationRecord
@@ -26,9 +26,10 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
 
         // load default property values from editable fields of type DEFAULT
         val defaultNomenclatureValues =
-            nomenclatureRepository.getEditableFields(EditableField.Type.DEFAULT)
+            nomenclatureRepository.getEditableFields(FormField.Type.DEFAULT)
                 .getOrElse { emptyList() }
-                .mapNotNull { it.value }
+                .filterIsInstance<FormField.Editable>()
+                .mapNotNull { it.getValue().takeIf { pv -> !pv.isEmpty() } }
 
         defaultNomenclatureValues.map { it.toPair() }
             .forEach {
@@ -46,16 +47,16 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
         }
 
         val editableFieldsInformation =
-            nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
+            (nomenclatureRepository.getEditableFields(FormField.Type.INFORMATION)
                 .getOrElse { emptyList() } + if (params.withAdditionalFields) additionalFieldRepository.getAllAdditionalFields(
                 observationRecord.dataset.dataset?.datasetId,
-                EditableField.Type.INFORMATION
+                FormField.Type.INFORMATION
             )
-                .getOrElse { emptyList() } else emptyList()
+                .getOrElse { emptyList() } else emptyList()).filterIsInstance<FormField.Editable>()
 
         if (editableFieldsInformation.isEmpty()) {
             Logger.warn {
-                "no editable fields of type '${EditableField.Type.INFORMATION.name}' found"
+                "no editable fields of type '${FormField.Type.INFORMATION.name}' found"
             }
 
             return Result.failure(
@@ -66,16 +67,16 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
         }
 
         val editableFieldsCounting =
-            nomenclatureRepository.getEditableFields(EditableField.Type.COUNTING)
+            (nomenclatureRepository.getEditableFields(FormField.Type.COUNTING)
                 .getOrElse { emptyList() } + if (params.withAdditionalFields) additionalFieldRepository.getAllAdditionalFields(
                 observationRecord.dataset.dataset?.datasetId,
-                EditableField.Type.COUNTING
+                FormField.Type.COUNTING
             )
-                .getOrElse { emptyList() } else emptyList()
+                .getOrElse { emptyList() } else emptyList()).filterIsInstance<FormField.Editable>()
 
         if (editableFieldsCounting.isEmpty()) {
             Logger.warn {
-                "no editable fields of type '${EditableField.Type.COUNTING.name}' found"
+                "no editable fields of type '${FormField.Type.COUNTING.name}' found"
             }
 
             return Result.failure(
@@ -116,7 +117,7 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
 
     private suspend fun mapPropertyValuesFromNomenclature(
         taxonomy: Taxonomy,
-        editableFields: List<EditableField>,
+        editableFields: List<FormField.Editable>,
         propertyValues: List<PropertyValue>
     ): List<PropertyValue> {
         return propertyValues.map {
@@ -132,29 +133,28 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
                 }
 
                 else -> {
-                    editableFields.firstOrNull { editableField -> editableField.code == it.toPair().first }
-                        ?.takeIf { editableField -> editableField.viewType == EditableField.ViewType.NOMENCLATURE_TYPE }
+                    editableFields.firstOrNull { editableField -> editableField.getValue().code == it.code }
+                        ?.takeIf { editableField -> editableField is FormField.NomenclatureType }
+                        ?.let { editableField -> editableField as FormField.NomenclatureType }
                         ?.let { editableField ->
                             when (it) {
                                 is PropertyValue.Number -> it.value
                                 is PropertyValue.Nomenclature -> it.value
                                 else -> null
                             }?.let { currentValue ->
-                                editableField.nomenclatureType?.let { nomenclatureType ->
-                                    nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
-                                        nomenclatureType,
-                                        taxonomy
-                                    )
-                                        .getOrDefault(emptyList())
-                                        .firstOrNull { nomenclatureValue -> nomenclatureValue.id == currentValue }
-                                        ?.let { nomenclatureValue ->
-                                            PropertyValue.Nomenclature(
-                                                code = editableField.code,
-                                                label = nomenclatureValue.defaultLabel,
-                                                value = nomenclatureValue.id
-                                            )
-                                        }
-                                }
+                                nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
+                                    editableField.nomenclatureType,
+                                    taxonomy
+                                )
+                                    .getOrDefault(emptyList())
+                                    .firstOrNull { nomenclatureValue -> nomenclatureValue.id == currentValue }
+                                    ?.let { nomenclatureValue ->
+                                        PropertyValue.Nomenclature(
+                                            code = editableField.value.code,
+                                            label = nomenclatureValue.defaultLabel,
+                                            value = nomenclatureValue.id
+                                        )
+                                    }
                             }
                         } ?: it
                 }

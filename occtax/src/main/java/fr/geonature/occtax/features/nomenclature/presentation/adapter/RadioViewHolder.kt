@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
@@ -21,7 +21,7 @@ import fr.geonature.occtax.features.record.domain.PropertyValue
 class RadioViewHolder(
     parent: ViewGroup,
     private val listener: EditableFieldAdapter.OnEditableFieldAdapter
-) : EditableFieldAdapter.AbstractViewHolder(
+) : EditableFieldAdapter.AbstractFormFieldViewHolder<FormField.Radio>(
     LayoutInflater.from(parent.context)
         .inflate(
             R.layout.view_action_list,
@@ -69,14 +69,13 @@ class RadioViewHolder(
                     itemView.findViewById<RadioButton?>(android.R.id.checkbox)
                         .apply {
                             setOnClickListener { view ->
-                                editableField?.run {
-                                    value = (view as CompoundButton).takeIf { it.isChecked }
-                                        ?.let {
-                                            PropertyValue.Text(
-                                                code,
-                                                it.tag.toString()
-                                            )
-                                        }
+                                formField?.run {
+                                    setValue(
+                                        PropertyValue.Text(
+                                            code = getValue().code,
+                                            value = (view as CompoundButton).takeIf { it.isChecked }?.tag.toString()
+                                        )
+                                    )
                                     listener.onUpdate(this)
                                 }
 
@@ -111,19 +110,16 @@ class RadioViewHolder(
         }
     }
 
-    override fun onBind(editableField: EditableField) {
-        title.text = editableField.label
+    override fun onBind(formField: FormField.Radio) {
+        title.text = formField.label
 
-        adapter.setItems(editableField.values.mapNotNull { pv ->
-            pv.takeIf { it is PropertyValue.Text }
-                ?.let { it as PropertyValue.Text }
-                ?.let {
-                    Pair(
-                        it,
-                        editableField.value?.let { value -> value is PropertyValue.Text && value.value == it.code }
-                            ?: false
-                    )
-                }
+        adapter.setItems(formField.values.map { pv ->
+            pv.let {
+                Pair(
+                    it,
+                    formField.value.let { value -> value.value == it.code }
+                )
+            }
         })
     }
 }

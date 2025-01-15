@@ -1,11 +1,8 @@
 package fr.geonature.occtax.features.nomenclature.presentation.adapter
 
-import android.annotation.SuppressLint
-import android.view.LayoutInflater
+import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import android.widget.NumberPicker
-import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -13,23 +10,20 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
-import fr.geonature.occtax.features.record.domain.CountingRecord
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.MediaRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
-import fr.geonature.occtax.ui.shared.view.setOnValueChangedListener
-import kotlin.math.ceil
 
 /**
- * Default RecyclerView Adapter about [EditableField].
+ * Default RecyclerView Adapter about [FormField].
  *
  * @author S. Grimault
  */
 class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
     RecyclerView.Adapter<EditableFieldAdapter.AbstractViewHolder>() {
 
-    private val availableEditableFields = mutableListOf<EditableField>()
-    private val selectedEditableFields = mutableListOf<EditableField>()
+    private val availableEditableFields = mutableListOf<FormField>()
+    private val selectedEditableFields = mutableListOf<FormField>()
     private var showAll = false
     private var lockDefaultValues = false
 
@@ -81,79 +75,78 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AbstractViewHolder {
         return when (viewType) {
-            EditableField.ViewType.NONE.ordinal -> ShowMoreViewHolder(
+            ViewType.BUTTON.ordinal -> FormFieldButtonViewHolder(
                 parent,
-                object : ShowMoreViewHolder.OnMoreViewHolderListener {
-                    override fun showMore() {
-                        showAllEditableFields()
-                        listener.showMore()
+                object : FormFieldButtonViewHolder.OnFormFieldButtonViewHolderListener {
+                    override fun onClick(button: FormField.Button) {
+                        if (button.label == listener.getContext()
+                                .getString(R.string.nomenclature_more)
+                        ) {
+                            showAllFormFields()
+                            listener.showMore()
+                        }
                     }
                 })
 
-            EditableField.ViewType.CHECKBOX.ordinal -> CheckboxViewHolder(
+            ViewType.CHECKBOX.ordinal -> CheckboxViewHolder(
                 parent,
                 listener
             )
 
-            EditableField.ViewType.MIN_MAX.ordinal -> MinMaxViewHolder(parent)
-            EditableField.ViewType.MEDIA.ordinal -> MediaViewHolder(
+            ViewType.MEDIA.ordinal -> MediaViewHolder(
                 parent,
                 listener
             )
 
-            EditableField.ViewType.NOMENCLATURE_TYPE.ordinal -> NomenclatureTypeViewHolder(
+            ViewType.MIN_MAX.ordinal -> MinMaxViewHolder(
                 parent,
                 listener
             )
 
-            EditableField.ViewType.RADIO.ordinal -> RadioViewHolder(
+            ViewType.NOMENCLATURE_TYPE.ordinal -> NomenclatureTypeViewHolder(
                 parent,
                 listener
             )
 
-            EditableField.ViewType.SELECT_SIMPLE.ordinal -> SelectSimpleViewHolder(
+            ViewType.NUMBER.ordinal -> NumberViewHolder(
                 parent,
                 listener
             )
 
-            EditableField.ViewType.SELECT_MULTIPLE.ordinal -> SelectMultipleViewHolder(
+            ViewType.RADIO.ordinal -> RadioViewHolder(
                 parent,
                 listener
             )
 
-            EditableField.ViewType.TEXT_MULTIPLE.ordinal -> TextMultipleViewHolder(
+            ViewType.SELECT.ordinal -> SelectSimpleViewHolder(
                 parent,
                 listener
             )
 
-            EditableField.ViewType.NUMBER.ordinal -> NumberViewHolder(
+            ViewType.SELECT_MULTIPLE.ordinal -> SelectMultipleViewHolder(
                 parent,
                 listener
             )
 
-            else -> TextSimpleViewHolder(
+            ViewType.TEXT.ordinal -> TextSimpleViewHolder(
                 parent,
                 listener
             )
+
+            ViewType.TEXT_MULTIPLE.ordinal -> TextMultipleViewHolder(
+                parent,
+                listener
+            )
+
+            // not supported
+            else -> NoneViewHolder(parent)
         }
     }
 
     override fun onBindViewHolder(holder: AbstractViewHolder, position: Int) {
-        selectedEditableFields.fold(listOf<EditableField>()) { acc, editableField ->
-            acc + if (editableField.viewType == EditableField.ViewType.MIN_MAX && acc.any { it.viewType == EditableField.ViewType.MIN_MAX }) listOf() else listOf(editableField)
-        }
-            .sortedWith { o1, o2 ->
-                val i1 = selectedEditableFields.indexOfFirst { it == o1 }
-                val i2 = selectedEditableFields.indexOfFirst { it == o2 }
-
-                when {
-                    i1 == -1 -> 1
-                    i2 == -1 -> -1
-                    else -> i1 - i2
-                }
-            }[position].also {
+        selectedEditableFields[position].also {
             when (holder) {
-                is AbstractLockableViewHolder -> holder.bind(
+                is AbstractLockableViewHolder<*> -> holder.bind(
                     it,
                     lockDefaultValues
                 )
@@ -164,43 +157,61 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
     }
 
     override fun getItemCount(): Int {
-        return selectedEditableFields.filter { it.viewType != EditableField.ViewType.MIN_MAX }.size +
-            selectedEditableFields.filter { it.viewType == EditableField.ViewType.MIN_MAX }.size.coerceAtMost(1)
+        return selectedEditableFields.size
     }
 
     override fun getItemViewType(position: Int): Int {
-        return selectedEditableFields.fold(listOf<EditableField>()) { acc, editableField ->
-            acc + if (editableField.viewType == EditableField.ViewType.MIN_MAX && acc.any { it.viewType == EditableField.ViewType.MIN_MAX }) listOf() else listOf(editableField)
+        return when (selectedEditableFields[position]) {
+            is FormField.Button -> ViewType.BUTTON.ordinal
+            is FormField.Checkbox -> ViewType.CHECKBOX.ordinal
+            is FormField.Media -> ViewType.MEDIA.ordinal
+            is FormField.MinMax -> ViewType.MIN_MAX.ordinal
+            is FormField.NomenclatureType -> ViewType.NOMENCLATURE_TYPE.ordinal
+            is FormField.Number -> ViewType.NUMBER.ordinal
+            is FormField.Radio -> ViewType.RADIO.ordinal
+            is FormField.Select -> ViewType.SELECT.ordinal
+            is FormField.SelectMultiple -> ViewType.SELECT_MULTIPLE.ordinal
+            is FormField.Text -> ViewType.TEXT.ordinal
+            is FormField.TextMultiple -> ViewType.TEXT_MULTIPLE.ordinal
+            // not supported
+            else -> -1
         }
-            .sortedWith { o1, o2 ->
-                val i1 = selectedEditableFields.indexOfFirst { it == o1 }
-                val i2 = selectedEditableFields.indexOfFirst { it == o2 }
-
-                when {
-                    i1 == -1 -> 1
-                    i2 == -1 -> -1
-                    else -> i1 - i2
-                }
-            }[position].viewType.ordinal
     }
 
     fun bind(
-        editableFields: List<EditableField>,
+        formFields: List<FormField>,
         vararg propertyValue: PropertyValue
     ) {
         availableEditableFields.clear()
         availableEditableFields.addAll(
-            editableFields.filter { it.visible }
+            formFields.filter { it.visible }
                 .map {
-                    it.copy(value = propertyValue.firstOrNull { propertyValue -> propertyValue.toPair().first == it.code }
-                        ?: it.value)
+                    when (it) {
+                        is FormField.Editable -> it.apply {
+                            setValue(propertyValue.firstOrNull { pv -> pv.code == it.getValue().code }
+                                ?: it.getValue())
+                        }
+
+                        is FormField.MinMax -> it.copy(
+                            min = it.min.copy(
+                                value = propertyValue.filterIsInstance<PropertyValue.Number>()
+                                    .firstOrNull { pv -> pv.code == it.min.value.code }
+                                    ?: it.min.value),
+                            max = it.min.copy(
+                                value = propertyValue.filterIsInstance<PropertyValue.Number>()
+                                    .firstOrNull { pv -> pv.code == it.max.value.code }
+                                    ?: it.max.value)
+                        )
+
+                        else -> it
+                    }
                 }
         )
 
-        if (showAll) showAllEditableFields(notify = true) else showDefaultEditableFields(notify = true)
+        if (showAll) showAllFormFields(notify = true) else showDefaultFormFields(notify = true)
     }
 
-    fun showDefaultEditableFields(notify: Boolean = false) {
+    fun showDefaultFormFields(notify: Boolean = false) {
         showAll = false
 
         if (availableEditableFields.isEmpty()) return
@@ -209,16 +220,15 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
             .run {
                 if (isEmpty()) {
                     // nothing to show by default: show everything
-                    showAllEditableFields(notify)
+                    showAllFormFields(notify)
                 } else {
-                    setEditableFields(
+                    setFormFields(
                         // show 'MORE' button only if we have some other editable field to show
                         this + if (this.size < availableEditableFields.size) listOf(
-                            EditableField(
-                                type = EditableField.Type.INFORMATION,
-                                code = "MORE",
-                                viewType = EditableField.ViewType.NONE,
-                                visible = true
+                            FormField.Button(
+                                type = FormField.Type.INFORMATION,
+                                label = listener.getContext()
+                                    .getString(R.string.nomenclature_more)
                             )
                         ) else emptyList()
                     )
@@ -226,9 +236,9 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
             }
     }
 
-    fun showAllEditableFields(notify: Boolean = false) {
+    fun showAllFormFields(notify: Boolean = false) {
         showAll = true
-        setEditableFields(
+        setFormFields(
             availableEditableFields,
             notify
         )
@@ -240,57 +250,73 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
 
     fun setPropertyValues(vararg propertyValue: PropertyValue) {
         availableEditableFields.map {
-            it.copy(value = propertyValue.firstOrNull { propertyValue -> propertyValue.toPair().first == it.code }
-                ?: it.value)
+            when (it) {
+                is FormField.Editable -> it.apply {
+                    setValue(propertyValue.firstOrNull { pv -> pv.code == it.getValue().code }
+                        ?: it.getValue())
+                }
+
+                is FormField.MinMax -> it.copy(
+                    min = it.min.copy(
+                        value = propertyValue.filterIsInstance<PropertyValue.Number>()
+                            .firstOrNull { pv -> pv.code == it.min.value.code }
+                            ?: it.min.value),
+                    max = it.min.copy(
+                        value = propertyValue.filterIsInstance<PropertyValue.Number>()
+                            .firstOrNull { pv -> pv.code == it.max.value.code }
+                            ?: it.max.value)
+                )
+
+                else -> it
+            }
         }
             .also {
                 availableEditableFields.clear()
                 availableEditableFields.addAll(it)
             }
 
-        if (showAll) showAllEditableFields(notify = true) else showDefaultEditableFields(notify = true)
+        if (showAll) showAllFormFields(notify = true) else showDefaultFormFields(notify = true)
     }
 
-    private fun setEditableFields(
-        editableFields: List<EditableField>,
+    private fun setFormFields(
+        formFields: List<FormField>,
         notify: Boolean = false
     ) {
-        val oldKeys = selectedEditableFields.map { it.code }
-        val newKeys = editableFields.map { it.code }
-
-        if (notify && oldKeys.isEmpty() && newKeys.isEmpty()) {
+        if (notify && selectedEditableFields.isEmpty() && formFields.isEmpty()) {
             listener.showEmptyTextView(true)
 
             return
         }
 
         val checkMedia =
-            selectedEditableFields.firstOrNull { it.viewType == EditableField.ViewType.MEDIA }?.value == editableFields.firstOrNull { it.viewType == EditableField.ViewType.MEDIA }?.value
+            selectedEditableFields
+                .firstOrNull { it is FormField.Media }
+                ?.let { it as FormField.Media }
+                ?.value == formFields
+                .firstOrNull { it is FormField.Media }
+                ?.let { it as FormField.Media }
+                ?.value
 
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun getOldListSize(): Int = oldKeys.size
+            override fun getOldListSize(): Int = selectedEditableFields.size
 
-            override fun getNewListSize(): Int = newKeys.size
+            override fun getNewListSize(): Int = formFields.size
 
             override fun areItemsTheSame(
                 oldItemPosition: Int,
                 newItemPosition: Int
-            ) = oldKeys.elementAtOrNull(oldItemPosition) == newKeys.elementAtOrNull(newItemPosition)
+            ) =
+                selectedEditableFields.elementAtOrNull(oldItemPosition) == formFields.elementAtOrNull(newItemPosition)
 
             override fun areContentsTheSame(
                 oldItemPosition: Int,
                 newItemPosition: Int
             ) =
-                checkMedia &&
-                    (oldKeys.elementAtOrNull(oldItemPosition)
-                        ?.let { code -> selectedEditableFields.firstOrNull { it.code == code } }
-                        ?.value?.toPair()?.second == newKeys.elementAtOrNull(newItemPosition)
-                        ?.let { code -> editableFields.firstOrNull { it.code == code } }
-                        ?.value?.toPair()?.second)
+                checkMedia && selectedEditableFields.elementAtOrNull(oldItemPosition) == formFields.elementAtOrNull(newItemPosition)
         })
 
         selectedEditableFields.clear()
-        selectedEditableFields.addAll(editableFields)
+        selectedEditableFields.addAll(formFields)
 
         diffResult.dispatchUpdatesTo(this)
     }
@@ -299,39 +325,36 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
      * Base [ViewHolder][RecyclerView.ViewHolder] used by this adapter.
      */
     abstract class AbstractViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal var editableField: EditableField? = null
+        abstract fun bind(formField: FormField)
+    }
 
-        fun bind(editableField: EditableField) {
-            this.editableField = editableField
+    /**
+     * Base [ViewHolder][RecyclerView.ViewHolder] used by this adapter embedding a [FormField].
+     */
+    abstract class AbstractFormFieldViewHolder<FF : FormField>(itemView: View) :
+        AbstractViewHolder(itemView) {
+        internal var formField: FF? = null
 
-            onBind(editableField)
+        override fun bind(formField: FormField) {
+            @Suppress("UNCHECKED_CAST")
+            this.formField = formField as FF
+
+            onBind(formField)
         }
 
-        abstract fun onBind(editableField: EditableField)
-
-        /**
-         * Build the default label for given editable field as fallback.
-         */
-        @SuppressLint("DiscouragedApi")
-        fun getDefaultLabel(editableField: EditableField): String {
-            return editableField.label ?: itemView.resources.getIdentifier(
-                "nomenclature_${editableField.code.lowercase()}",
-                "string",
-                itemView.context.packageName
-            )
-                .takeIf { it > 0 }
-                ?.let { itemView.context.getString(it) } ?: editableField.code
-        }
+        abstract fun onBind(formField: FF)
     }
 
     /**
      * Base [ViewHolder][RecyclerView.ViewHolder] used by this adapter with the option of locking
-     * the [EditableField].
+     * the [FormField].
      */
-    abstract class AbstractLockableViewHolder(itemView: View) : AbstractViewHolder(itemView) {
+    abstract class AbstractLockableViewHolder<FF : FormField>(itemView: View) :
+        AbstractFormFieldViewHolder<FF>(itemView) {
 
-        fun bind(editableField: EditableField, lockDefaultValues: Boolean = false) {
-            this.editableField = editableField
+        fun bind(editableField: FormField, lockDefaultValues: Boolean = false) {
+            @Suppress("UNCHECKED_CAST")
+            this.formField = editableField as FF
 
             onBind(
                 editableField,
@@ -339,139 +362,83 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
             )
         }
 
-        override fun onBind(editableField: EditableField) {
+        override fun onBind(formField: FF) {
             onBind(
-                editableField,
+                formField,
                 false
             )
         }
 
-        abstract fun onBind(editableField: EditableField, lockDefaultValues: Boolean = false)
+        abstract fun onBind(formField: FF, lockDefaultValues: Boolean = false)
     }
 
     /**
-     * [EditableFieldAdapter] view holder representing a bounded numerical value.
+     * Describes a form field's view type.
      */
-    inner class MinMaxViewHolder(parent: ViewGroup) : AbstractViewHolder(
-        LayoutInflater.from(parent.context)
-            .inflate(
-                R.layout.view_action_min_max,
-                parent,
-                false
-            )
-    ) {
-        private val defaultMaxValueOffset = 50
-        private var editMinLabel: TextView = itemView.findViewById(R.id.editMinLabel)
-        private var editMaxLabel: TextView = itemView.findViewById(R.id.editMaxLabel)
-        private var editMinPicker: NumberPicker = itemView.findViewById(R.id.editMinPicker)
-        private var editMaxPicker: NumberPicker = itemView.findViewById(R.id.editMaxPicker)
+    enum class ViewType {
 
-        private var minEditableField: EditableField? = null
-        private var maxEditableField: EditableField? = null
+        /**
+         * As button.
+         */
+        BUTTON,
 
-        init {
-            with(editMinPicker) {
-                minValue = 0
-                maxValue = defaultMaxValueOffset
-                setOnValueChangedListener(defaultMaxValueOffset) { oldValue, newValue ->
-                    if (editMaxPicker.value < newValue) {
-                        editMaxPicker.maxValue = editMinPicker.maxValue
-                        editMaxPicker.value = newValue
-                    }
+        /**
+         * As list of checkboxes.
+         */
+        CHECKBOX,
 
-                    if (editMaxPicker.value == oldValue) {
-                        editMaxPicker.value = newValue
-                    }
+        /**
+         * As media file.
+         */
+        MEDIA,
 
-                    minEditableField?.also { editableField ->
-                        editableField.value = PropertyValue.Number(
-                            editableField.code,
-                            newValue
-                        )
-                        listener.onUpdate(editableField)
-                    }
-                    maxEditableField?.also { editableField ->
-                        editableField.value = PropertyValue.Number(
-                            editableField.code,
-                            editMaxPicker.value
-                        )
-                        listener.onUpdate(editableField)
-                    }
-                }
-            }
+        /**
+         * As a bounded numerical value.
+         */
+        MIN_MAX,
 
-            with(editMaxPicker) {
-                minValue = 0
-                maxValue = defaultMaxValueOffset
-                setOnValueChangedListener(defaultMaxValueOffset) { _, newValue ->
-                    editMinPicker.maxValue = editMaxPicker.maxValue
+        /**
+         * As dropdown nomenclature items.
+         */
+        NOMENCLATURE_TYPE,
 
-                    if (editMinPicker.value > newValue) editMinPicker.value = newValue
+        /**
+         * As number text field.
+         */
+        NUMBER,
 
-                    minEditableField?.also { editableField ->
-                        editableField.value = PropertyValue.Number(
-                            editableField.code,
-                            editMinPicker.value
-                        )
-                        listener.onUpdate(editableField)
-                    }
-                    maxEditableField?.also { editableField ->
-                        editableField.value = PropertyValue.Number(
-                            editableField.code,
-                            newValue
-                        )
-                        listener.onUpdate(editableField)
-                    }
-                }
-            }
-        }
+        /**
+         * As radio group.
+         */
+        RADIO,
 
-        override fun onBind(editableField: EditableField) {
-            minEditableField =
-                selectedEditableFields.firstOrNull { it.viewType == EditableField.ViewType.MIN_MAX && it.code == CountingRecord.MIN_KEY }
-            maxEditableField =
-                selectedEditableFields.firstOrNull { it.viewType == EditableField.ViewType.MIN_MAX && it.code == CountingRecord.MAX_KEY }
+        /**
+         * As a single select.
+         */
+        SELECT,
 
-            with(if (minEditableField != null) View.VISIBLE else View.GONE) {
-                editMinLabel.visibility = this
-                editMinPicker.visibility = this
-            }
+        /**
+         * As multiselect.
+         */
+        SELECT_MULTIPLE,
 
-            with(if (maxEditableField != null) View.VISIBLE else View.GONE) {
-                editMaxLabel.visibility = this
-                editMaxPicker.visibility = this
-            }
+        /**
+         * As a single text field.
+         */
+        TEXT,
 
-            minEditableField?.value?.takeIf { it is PropertyValue.Number }
-                ?.let { it as PropertyValue.Number }?.value?.toInt()
-                ?.also {
-                    if (it > editMinPicker.maxValue) {
-                        editMinPicker.maxValue =
-                            (ceil((it.toDouble() / defaultMaxValueOffset)) * defaultMaxValueOffset).toInt()
-                        editMaxPicker.maxValue = editMinPicker.maxValue
-                    }
-
-                    editMinPicker.value = it
-                }
-
-            maxEditableField?.value?.takeIf { it is PropertyValue.Number }
-                ?.let { it as PropertyValue.Number }?.value?.toInt()
-                ?.also {
-                    if (it > editMaxPicker.maxValue) {
-                        editMaxPicker.maxValue =
-                            (ceil((it.toDouble() / defaultMaxValueOffset)) * defaultMaxValueOffset).toInt()
-                        editMinPicker.maxValue = editMaxPicker.maxValue
-                    }
-
-                    editMaxPicker.value = it
-                }
-        }
+        /**
+         * As multi-lines text field.
+         */
+        TEXT_MULTIPLE
     }
 
     /**
      * Callback used by [EditableFieldAdapter].
      */
     interface OnEditableFieldAdapter {
+
+        fun getContext(): Context
 
         fun getLifecycleOwner(): LifecycleOwner
 
@@ -493,11 +460,11 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
         fun getNomenclatureValues(nomenclatureTypeMnemonic: String): LiveData<List<Nomenclature>>
 
         /**
-         * Called when an [EditableField] has been updated.
+         * Called when an [FormField.Editable] has been updated.
          *
-         * @param editableField the [EditableField] updated
+         * @param editableField the [FormField.Editable] updated
          */
-        fun onUpdate(editableField: EditableField)
+        fun onUpdate(editableField: FormField.Editable)
 
         /**
          * Called when we want to add media.
