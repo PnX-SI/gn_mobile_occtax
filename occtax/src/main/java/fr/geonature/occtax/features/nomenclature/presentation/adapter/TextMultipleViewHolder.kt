@@ -29,7 +29,7 @@ class TextMultipleViewHolder(
         }
     }
 
-    override fun getValue(formField: FormField.TextMultiple): String? {
+    override fun getValue(formField: FormField.TextMultiple): CharSequence? {
         return formField.value.value
     }
 

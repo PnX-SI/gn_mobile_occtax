@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.DiffUtil
@@ -93,6 +94,11 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
                 listener
             )
 
+            ViewType.DATE.ordinal -> FormFieldDateViewHolder(
+                parent,
+                listener
+            )
+
             ViewType.MEDIA.ordinal -> MediaViewHolder(
                 parent,
                 listener
@@ -164,6 +170,7 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
         return when (selectedEditableFields[position]) {
             is FormField.Button -> ViewType.BUTTON.ordinal
             is FormField.Checkbox -> ViewType.CHECKBOX.ordinal
+            is FormField.Date -> ViewType.DATE.ordinal
             is FormField.Media -> ViewType.MEDIA.ordinal
             is FormField.MinMax -> ViewType.MIN_MAX.ordinal
             is FormField.NomenclatureType -> ViewType.NOMENCLATURE_TYPE.ordinal
@@ -388,6 +395,11 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
         CHECKBOX,
 
         /**
+         * As a date.
+         */
+        DATE,
+
+        /**
          * As media file.
          */
         MEDIA,
@@ -443,6 +455,11 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
         fun getLifecycleOwner(): LifecycleOwner
 
         fun getCoordinatorLayout(): CoordinatorLayout?
+
+        /**
+         * Return the FragmentManager for interacting with fragments associated with this adapter views.
+         */
+        fun fragmentManager(): FragmentManager?
 
         /**
          * Whether to show an empty text view when data changed.

@@ -27,7 +27,7 @@ class NumberViewHolder(
         }
     }
 
-    override fun getValue(formField: FormField.Number): String? {
+    override fun getValue(formField: FormField.Number): CharSequence? {
         return formField.value.value?.toString()
     }
 

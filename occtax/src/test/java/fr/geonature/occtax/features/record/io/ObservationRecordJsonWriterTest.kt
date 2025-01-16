@@ -158,6 +158,10 @@ class ObservationRecordJsonWriterTest {
                                 "some_field_text",
                                 "some_value"
                             ),
+                            PropertyValue.Date(
+                                "some_field_date",
+                                toDate("2016-10-28")
+                            ),
                             PropertyValue.Number(
                                 "some_field_number",
                                 42L
@@ -216,6 +220,10 @@ class ObservationRecordJsonWriterTest {
                                     PropertyValue.Text(
                                         "some_field_text",
                                         "some_value"
+                                    ),
+                                    PropertyValue.Date(
+                                        "some_field_date_counting",
+                                        toDate("2009-01-03")
                                     ),
                                     PropertyValue.Number(
                                         "some_field_number",

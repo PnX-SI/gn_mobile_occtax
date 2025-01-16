@@ -89,7 +89,7 @@ abstract class AbstractFormFieldTextViewHolder<FF : FormField.Editable>(
         getValue(formField)?.also { setText(it) }
     }
 
-    abstract fun getValue(formField: FF): String?
+    abstract fun getValue(formField: FF): CharSequence?
     abstract fun afterTextChanged(s: Editable?)
 
     private fun setText(charSequence: CharSequence) {

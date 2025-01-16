@@ -10,6 +10,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -97,6 +98,10 @@ class InformationFragment : AbstractInputFragment() {
 
             override fun getCoordinatorLayout(): CoordinatorLayout? {
                 return null
+            }
+
+            override fun fragmentManager(): FragmentManager? {
+                return activity?.supportFragmentManager
             }
 
             override fun showEmptyTextView(show: Boolean) {

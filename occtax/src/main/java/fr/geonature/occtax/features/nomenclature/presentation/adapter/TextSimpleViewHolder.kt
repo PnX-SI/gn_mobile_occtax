@@ -18,7 +18,7 @@ open class TextSimpleViewHolder(
     parent,
     listener
 ) {
-    override fun getValue(formField: FormField.Text): String? {
+    override fun getValue(formField: FormField.Text): CharSequence? {
         return formField.value.value
     }
 

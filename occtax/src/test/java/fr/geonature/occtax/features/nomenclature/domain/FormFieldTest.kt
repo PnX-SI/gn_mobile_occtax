@@ -117,6 +117,50 @@ class FormFieldTest {
         )
 
         assertEquals(
+            FormField.Date(
+                type = FormField.Type.INFORMATION,
+                label = "updated label",
+                value = PropertyValue.Date(code = "some_code")
+            ),
+            FormField.Date(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Date(code = "some_code")
+            )
+                .update(label = "updated label")
+        )
+        assertEquals(
+            FormField.Date(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                visible = false,
+                value = PropertyValue.Date(code = "some_code")
+            ),
+            FormField.Date(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                visible = true,
+                value = PropertyValue.Date(code = "some_code")
+            )
+                .update(visible = false)
+        )
+        assertEquals(
+            FormField.Date(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                default = false,
+                value = PropertyValue.Date(code = "some_code")
+            ),
+            FormField.Date(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                default = true,
+                value = PropertyValue.Date(code = "some_code")
+            )
+                .update(default = false)
+        )
+
+        assertEquals(
             FormField.Media(
                 type = FormField.Type.INFORMATION,
                 label = "updated label",
@@ -644,6 +688,30 @@ class FormFieldTest {
                                 "value1",
                                 "value2"
                             )
+                        )
+                    )
+                }
+        )
+
+        assertEquals(
+            FormField.Date(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Date(
+                    code = "some_code",
+                    value = toDate("2016-10-28T10:15:00Z")
+                )
+            ),
+            FormField.Date(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Date(code = "some_code")
+            )
+                .apply {
+                    setValue(
+                        PropertyValue.Date(
+                            code = "some_code",
+                            value = toDate("2016-10-28T10:15:00Z")
                         )
                     )
                 }

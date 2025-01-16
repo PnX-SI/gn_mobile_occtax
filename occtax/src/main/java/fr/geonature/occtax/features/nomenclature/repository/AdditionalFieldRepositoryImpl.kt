@@ -57,6 +57,20 @@ class AdditionalFieldRepositoryImpl(
                             )
                         }
 
+                        AdditionalField.FieldType.DATE -> {
+                            FormField.Date(
+                                type = type,
+                                label = it.additionalField.label,
+                                visible = true,
+                                default = true,
+                                additionalField = true,
+                                value = PropertyValue.Date(
+                                    it.additionalField.name,
+                                    value = null
+                                )
+                            )
+                        }
+
                         AdditionalField.FieldType.MULTISELECT -> {
                             if (it.values.isEmpty()) {
                                 Logger.warn {

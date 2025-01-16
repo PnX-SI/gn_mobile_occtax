@@ -73,6 +73,12 @@ sealed interface FormField : Parcelable {
                 default = default
             )
 
+            is Date -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default
+            )
+
             is Media -> ff.copy(
                 label = label,
                 visible = visible,
@@ -159,6 +165,7 @@ sealed interface FormField : Parcelable {
          */
         fun getValue(): PropertyValue = when (this) {
             is Checkbox -> value
+            is Date -> value
             is Media -> value
             is NomenclatureType -> value
             is Number -> value
@@ -175,6 +182,9 @@ sealed interface FormField : Parcelable {
         fun setValue(value: PropertyValue) = when (val ff = this@Editable) {
             is Checkbox -> ff.value =
                 if (value is PropertyValue.StringArray) value.copy(ff.value.code) else ff.value
+
+            is Date -> ff.value =
+                if (value is PropertyValue.Date) value.copy(ff.value.code) else ff.value
 
             is Media -> ff.value =
                 if (value is PropertyValue.Media) value.copy(ff.value.code) else ff.value
@@ -243,6 +253,20 @@ sealed interface FormField : Parcelable {
         val values: List<PropertyValue.Text> = emptyList(),
 
         var value: PropertyValue.StringArray
+    ) : Editable()
+
+    /**
+     * As a date field.
+     */
+    @Parcelize
+    data class Date(
+        override val parent: Section? = null,
+        override val type: Type,
+        override val label: String,
+        override val default: Boolean = true,
+        override val visible: Boolean = true,
+        override val additionalField: Boolean = false,
+        var value: PropertyValue.Date
     ) : Editable()
 
     /**
