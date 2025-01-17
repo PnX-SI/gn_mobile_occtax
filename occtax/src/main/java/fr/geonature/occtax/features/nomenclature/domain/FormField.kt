@@ -138,6 +138,12 @@ sealed interface FormField : Parcelable {
                 visible = visible,
                 default = default
             )
+
+            is Time -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default
+            )
         }
 
     /**
@@ -174,6 +180,7 @@ sealed interface FormField : Parcelable {
             is SelectMultiple -> value
             is Text -> value
             is TextMultiple -> value
+            is Time -> value
         }
 
         /**
@@ -209,6 +216,9 @@ sealed interface FormField : Parcelable {
 
             is TextMultiple -> ff.value =
                 if (value is PropertyValue.Text) value.copy(ff.value.code) else ff.value
+
+            is Time -> ff.value =
+                if (value is PropertyValue.Time) value.copy(ff.value.code) else ff.value
         }
     }
 
@@ -419,5 +429,20 @@ sealed interface FormField : Parcelable {
         override val additionalField: Boolean = false,
 
         var value: PropertyValue.Text
+    ) : Editable()
+
+    /**
+     * As a time field.
+     */
+    @Parcelize
+    data class Time(
+        override val parent: Section? = null,
+        override val type: Type,
+        override val label: String,
+        override val default: Boolean = true,
+        override val visible: Boolean = true,
+        override val additionalField: Boolean = false,
+
+        var value: PropertyValue.Time
     ) : Editable()
 }

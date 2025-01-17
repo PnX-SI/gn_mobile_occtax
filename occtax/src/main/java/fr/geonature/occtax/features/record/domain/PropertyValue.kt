@@ -22,6 +22,7 @@ sealed class PropertyValue : Parcelable {
         when (this) {
             is Text -> value.isNullOrEmpty()
             is Date -> value == null
+            is Time -> hour == null && minute == null
             is StringArray -> value.isEmpty()
             is Number -> value == null
             is NumberArray -> value.isEmpty()
@@ -40,6 +41,7 @@ sealed class PropertyValue : Parcelable {
     fun toPair(): Pair<String, PropertyValue> = (when (this) {
         is Text -> code
         is Date -> code
+        is Time -> code
         is StringArray -> code
         is Number -> code
         is NumberArray -> code
@@ -62,6 +64,58 @@ sealed class PropertyValue : Parcelable {
      */
     @Parcelize
     data class Date(override val code: String, val value: java.util.Date? = null) : PropertyValue()
+
+    /**
+     * As time.
+     */
+    @Parcelize
+    data class Time(
+        override val code: String,
+        val hour: Int? = null,
+        val minute: Int? = null
+    ) : PropertyValue() {
+
+        /**
+         * Returns a string representation of the local time.
+         */
+        fun toTimeString(): String? {
+            if (isEmpty()) return null
+
+            return "${"%02d".format(hour ?: 0)}:${"%02d".format(minute ?: 0)}"
+        }
+
+        companion object {
+
+            /**
+             * Tries to parse a string representation of a local time as [PropertyValue.Time].
+             */
+            fun parse(code: String, time: String?): Time {
+                if (time.isNullOrBlank()) return Time(code)
+
+                val matchResult = """^(?<hour>\d{1,2}):(?<minute>\d{1,2})$""".toRegex()
+                    .find(time)
+                val hour = matchResult?.groups?.get("hour")?.value?.toInt()
+                    ?.coerceIn(
+                        0,
+                        23
+                    )
+
+                val minute = matchResult?.groups?.get("minute")?.value?.toInt()
+                    ?.coerceIn(
+                        0,
+                        59
+                    )
+
+                if (hour == null || minute == null) return Time(code)
+
+                return Time(
+                    code,
+                    hour,
+                    minute
+                )
+            }
+        }
+    }
 
     /**
      * As array of strings.

@@ -212,6 +212,17 @@ class AdditionalFieldRepositoryImpl(
                             )
                         )
 
+                        AdditionalField.FieldType.TIME -> {
+                            FormField.Time(
+                                type = type,
+                                label = it.additionalField.label,
+                                visible = true,
+                                default = true,
+                                additionalField = true,
+                                value = PropertyValue.Time(it.additionalField.name)
+                            )
+                        }
+
                         else -> {
                             Logger.warn {
                                 "additional field of type '${it.additionalField.fieldType}' is not supported"

@@ -144,6 +144,11 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
                 listener
             )
 
+            ViewType.TIME.ordinal -> FormFieldTimeViewHolder(
+                parent,
+                listener
+            )
+
             // not supported
             else -> NoneViewHolder(parent)
         }
@@ -180,6 +185,7 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
             is FormField.SelectMultiple -> ViewType.SELECT_MULTIPLE.ordinal
             is FormField.Text -> ViewType.TEXT.ordinal
             is FormField.TextMultiple -> ViewType.TEXT_MULTIPLE.ordinal
+            is FormField.Time -> ViewType.TIME.ordinal
             // not supported
             else -> -1
         }
@@ -204,7 +210,7 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
                                 value = propertyValue.filterIsInstance<PropertyValue.Number>()
                                     .firstOrNull { pv -> pv.code == it.min.value.code }
                                     ?: it.min.value),
-                            max = it.min.copy(
+                            max = it.max.copy(
                                 value = propertyValue.filterIsInstance<PropertyValue.Number>()
                                     .firstOrNull { pv -> pv.code == it.max.value.code }
                                     ?: it.max.value)
@@ -268,7 +274,7 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
                         value = propertyValue.filterIsInstance<PropertyValue.Number>()
                             .firstOrNull { pv -> pv.code == it.min.value.code }
                             ?: it.min.value),
-                    max = it.min.copy(
+                    max = it.max.copy(
                         value = propertyValue.filterIsInstance<PropertyValue.Number>()
                             .firstOrNull { pv -> pv.code == it.max.value.code }
                             ?: it.max.value)
@@ -442,7 +448,12 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
         /**
          * As multi-lines text field.
          */
-        TEXT_MULTIPLE
+        TEXT_MULTIPLE,
+
+        /**
+         * As a time field.
+         */
+        TIME
     }
 
     /**

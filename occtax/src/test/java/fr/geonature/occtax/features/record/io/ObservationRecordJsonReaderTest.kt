@@ -299,6 +299,11 @@ class ObservationRecordJsonReaderTest {
                                 "some_field_date",
                                 toDate("2016-10-28")
                             ),
+                            PropertyValue.Time(
+                                code = "some_field_time",
+                                hour = 8,
+                                minute = 15
+                            ),
                             PropertyValue.Number(
                                 "some_field_as_long",
                                 42L
@@ -365,6 +370,11 @@ class ObservationRecordJsonReaderTest {
                                     PropertyValue.Date(
                                         "some_field_date_counting",
                                         toDate("2009-01-03")
+                                    ),
+                                    PropertyValue.Time(
+                                        code = "some_field_time_counting",
+                                        hour = 13,
+                                        minute = 0
                                     )
                                 )
                             }

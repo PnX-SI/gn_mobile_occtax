@@ -349,7 +349,11 @@ class TaxonRecordJsonReader {
             )
         }
 
-        return toDate(value)?.let {
+        return PropertyValue.Time.parse(
+            code,
+            value
+        )
+            .takeIf { !it.isEmpty() } ?: toDate(value)?.let {
             PropertyValue.Date(
                 code,
                 it

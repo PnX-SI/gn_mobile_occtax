@@ -310,6 +310,9 @@ class TaxonRecordJsonWriter {
                 is PropertyValue.Text -> writer.name(it.code)
                     .value(it.value)
 
+                is PropertyValue.Time -> writer.name(it.code)
+                    .value(it.toTimeString())
+
                 else -> {}
             }
         }

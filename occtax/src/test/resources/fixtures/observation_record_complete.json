@@ -42,6 +42,7 @@
         "additional_fields": {
           "some_field_text": "some_value",
           "some_field_date": "2016-10-28",
+          "some_field_time": "08:15",
           "some_field_number": 42,
           "some_field_array_string": [
             "val1",
@@ -62,6 +63,7 @@
             "additional_fields": {
               "some_field_text": "some_value",
               "some_field_date_counting": "2009-01-03",
+              "some_field_time_counting": "13:00",
               "some_field_number": 3.14
             },
             "count_max": 2,

@@ -659,6 +659,50 @@ class FormFieldTest {
             )
                 .update(default = false)
         )
+
+        assertEquals(
+            FormField.Time(
+                type = FormField.Type.INFORMATION,
+                label = "updated label",
+                value = PropertyValue.Time(code = "some_code")
+            ),
+            FormField.Time(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Time(code = "some_code")
+            )
+                .update(label = "updated label")
+        )
+        assertEquals(
+            FormField.Time(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                visible = false,
+                value = PropertyValue.Time(code = "some_code")
+            ),
+            FormField.Time(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                visible = true,
+                value = PropertyValue.Time(code = "some_code")
+            )
+                .update(visible = false)
+        )
+        assertEquals(
+            FormField.Time(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                default = false,
+                value = PropertyValue.Time(code = "some_code")
+            ),
+            FormField.Time(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                default = true,
+                value = PropertyValue.Time(code = "some_code")
+            )
+                .update(default = false)
+        )
     }
 
     @Test
@@ -906,6 +950,32 @@ class FormFieldTest {
                         PropertyValue.Text(
                             code = "some_code",
                             value = "some_value"
+                        )
+                    )
+                }
+        )
+
+        assertEquals(
+            FormField.Time(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Time(
+                    code = "some_code",
+                    hour = 8,
+                    minute = 15
+                )
+            ),
+            FormField.Time(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Time(code = "some_code")
+            )
+                .apply {
+                    setValue(
+                        PropertyValue.Time(
+                            code = "some_code",
+                            hour = 8,
+                            minute = 15
                         )
                     )
                 }
