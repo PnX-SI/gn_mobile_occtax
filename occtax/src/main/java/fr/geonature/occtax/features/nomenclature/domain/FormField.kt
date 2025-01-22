@@ -10,7 +10,7 @@ import kotlinx.parcelize.Parcelize
  *
  * @author S. Grimault
  */
-sealed interface FormField : Parcelable {
+sealed interface FormField : Parcelable, Comparable<FormField> {
 
     /**
      * The main category of this form field.
@@ -33,6 +33,135 @@ sealed interface FormField : Parcelable {
     val default: Boolean
 
     /**
+     * The display order of this form field.
+     */
+    val order: Int?
+
+    override fun compareTo(other: FormField): Int {
+        return when {
+            this == other -> 0
+            this is Editable && other is Editable && !this.additionalField && !other.additionalField -> (order
+                ?: Int.MAX_VALUE) - (other.order ?: Int.MAX_VALUE)
+
+            this is Editable && other is Editable && this.additionalField && other.additionalField -> (order
+                ?: Int.MAX_VALUE) - (other.order ?: Int.MAX_VALUE)
+
+            this is Editable && other is Editable && !this.additionalField && other.additionalField -> -1
+            this is Editable && other is Editable && this.additionalField && !other.additionalField -> 1
+            else -> (order ?: Int.MAX_VALUE) - (other.order ?: Int.MAX_VALUE)
+        }
+    }
+
+    /**
+     * Updates this editable field by copy and alter some of its properties.
+     */
+    fun update(
+        label: String = this.label,
+        visible: Boolean = this.visible,
+        default: Boolean = this.default,
+        order: Int? = this.order
+    ): FormField =
+        when (val ff = this@FormField) {
+            is Button -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default,
+                order = order
+            )
+
+            is Checkbox -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default,
+                order = order
+            )
+
+            is Date -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default,
+                order = order
+            )
+
+            is Media -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default,
+                order = order
+            )
+
+            is MinMax -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default,
+                order = order
+            )
+
+            is NomenclatureType -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default,
+                order = order
+            )
+
+            is Number -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default,
+                order = order
+            )
+
+            is Radio -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default,
+                order = order
+            )
+
+            is Section -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default,
+                order = order
+            )
+
+            is Select -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default,
+                order = order
+            )
+
+            is SelectMultiple -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default,
+                order = order
+            )
+
+            is Text -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default,
+                order = order
+            )
+
+            is TextMultiple -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default,
+                order = order
+            )
+
+            is Time -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default,
+                order = order
+            )
+        }
+
+    /**
      * Describes the main category of a form field.
      */
     enum class Type {
@@ -51,100 +180,6 @@ sealed interface FormField : Parcelable {
          */
         COUNTING
     }
-
-    /**
-     * Updates this editable field by copy and alter some of its properties.
-     */
-    fun update(
-        label: String = this.label,
-        visible: Boolean = this.visible,
-        default: Boolean = this.default
-    ): FormField =
-        when (val ff = this@FormField) {
-            is Button -> ff.copy(
-                label = label,
-                visible = visible,
-                default = default
-            )
-
-            is Checkbox -> ff.copy(
-                label = label,
-                visible = visible,
-                default = default
-            )
-
-            is Date -> ff.copy(
-                label = label,
-                visible = visible,
-                default = default
-            )
-
-            is Media -> ff.copy(
-                label = label,
-                visible = visible,
-                default = default
-            )
-
-            is MinMax -> ff.copy(
-                label = label,
-                visible = visible,
-                default = default
-            )
-
-            is NomenclatureType -> ff.copy(
-                label = label,
-                visible = visible,
-                default = default
-            )
-
-            is Number -> ff.copy(
-                label = label,
-                visible = visible,
-                default = default
-            )
-
-            is Radio -> ff.copy(
-                label = label,
-                visible = visible,
-                default = default
-            )
-
-            is Section -> ff.copy(
-                label = label,
-                visible = visible,
-                default = default
-            )
-
-            is Select -> ff.copy(
-                label = label,
-                visible = visible,
-                default = default
-            )
-
-            is SelectMultiple -> ff.copy(
-                label = label,
-                visible = visible,
-                default = default
-            )
-
-            is Text -> ff.copy(
-                label = label,
-                visible = visible,
-                default = default
-            )
-
-            is TextMultiple -> ff.copy(
-                label = label,
-                visible = visible,
-                default = default
-            )
-
-            is Time -> ff.copy(
-                label = label,
-                visible = visible,
-                default = default
-            )
-        }
 
     /**
      * As an editable field that embeds a [PropertyValue].
@@ -231,6 +266,7 @@ sealed interface FormField : Parcelable {
         override val label: String,
         override val default: Boolean = true,
         override val visible: Boolean = true,
+        override val order: Int? = null,
         val code: String
     ) : FormField
 
@@ -242,7 +278,8 @@ sealed interface FormField : Parcelable {
         override val type: Type,
         override val label: String,
         override val default: Boolean = true,
-        override val visible: Boolean = true
+        override val visible: Boolean = true,
+        override val order: Int? = null,
     ) : FormField
 
     /**
@@ -255,6 +292,7 @@ sealed interface FormField : Parcelable {
         override val label: String,
         override val default: Boolean = true,
         override val visible: Boolean = true,
+        override val order: Int? = null,
         override val additionalField: Boolean = false,
 
         /**
@@ -275,6 +313,7 @@ sealed interface FormField : Parcelable {
         override val label: String,
         override val default: Boolean = true,
         override val visible: Boolean = true,
+        override val order: Int? = null,
         override val additionalField: Boolean = false,
         var value: PropertyValue.Date
     ) : Editable()
@@ -289,6 +328,7 @@ sealed interface FormField : Parcelable {
         override val label: String,
         override val default: Boolean = true,
         override val visible: Boolean = true,
+        override val order: Int? = null,
         override val additionalField: Boolean = false,
         var value: PropertyValue.Media
     ) : Editable()
@@ -302,6 +342,7 @@ sealed interface FormField : Parcelable {
         override val label: String,
         override val default: Boolean = true,
         override val visible: Boolean = true,
+        override val order: Int? = null,
         val min: Number,
         val max: Number
     ) : FormField
@@ -316,6 +357,7 @@ sealed interface FormField : Parcelable {
         override val label: String,
         override val default: Boolean = true,
         override val visible: Boolean = true,
+        override val order: Int? = null,
         override val additionalField: Boolean = false,
 
         /**
@@ -337,6 +379,7 @@ sealed interface FormField : Parcelable {
         override val label: String,
         override val default: Boolean = true,
         override val visible: Boolean = true,
+        override val order: Int? = null,
         override val additionalField: Boolean = false,
         var value: PropertyValue.Number
     ) : Editable()
@@ -351,6 +394,7 @@ sealed interface FormField : Parcelable {
         override val label: String,
         override val default: Boolean = true,
         override val visible: Boolean = true,
+        override val order: Int? = null,
         override val additionalField: Boolean = false,
 
         /**
@@ -371,6 +415,7 @@ sealed interface FormField : Parcelable {
         override val label: String,
         override val default: Boolean = true,
         override val visible: Boolean = true,
+        override val order: Int? = null,
         override val additionalField: Boolean = false,
 
         /**
@@ -391,6 +436,7 @@ sealed interface FormField : Parcelable {
         override val label: String,
         override val default: Boolean = true,
         override val visible: Boolean = true,
+        override val order: Int? = null,
         override val additionalField: Boolean = false,
 
         /**
@@ -411,6 +457,7 @@ sealed interface FormField : Parcelable {
         override val label: String,
         override val default: Boolean = true,
         override val visible: Boolean = true,
+        override val order: Int? = null,
         override val additionalField: Boolean = false,
 
         var value: PropertyValue.Text
@@ -426,6 +473,7 @@ sealed interface FormField : Parcelable {
         override val label: String,
         override val default: Boolean = true,
         override val visible: Boolean = true,
+        override val order: Int? = null,
         override val additionalField: Boolean = false,
 
         var value: PropertyValue.Text
@@ -441,6 +489,7 @@ sealed interface FormField : Parcelable {
         override val label: String,
         override val default: Boolean = true,
         override val visible: Boolean = true,
+        override val order: Int? = null,
         override val additionalField: Boolean = false,
 
         var value: PropertyValue.Time

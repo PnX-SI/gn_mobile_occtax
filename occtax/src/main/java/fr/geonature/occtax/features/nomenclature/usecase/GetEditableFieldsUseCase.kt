@@ -43,13 +43,7 @@ class GetEditableFieldsUseCase @Inject constructor(
                 params.type
             )
                 .getOrDefault(emptyList()) else emptyList())
-
-            // set media type at last position
-            .sortedWith { a, b ->
-                if (a is FormField.Media) 1
-                else if (b is FormField.Media) -1
-                else 0
-            }
+            .sorted()
 
         val defaultPropertyValues =
             defaultPropertyValueRepository.getPropertyValues(params.taxonomy)

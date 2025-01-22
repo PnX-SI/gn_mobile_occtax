@@ -46,6 +46,7 @@ class AdditionalFieldRepositoryImpl(
                                 label = it.additionalField.label,
                                 visible = true,
                                 default = true,
+                                order = it.additionalField.order,
                                 additionalField = true,
                                 values = it.values.map { fieldValue ->
                                     PropertyValue.Text(
@@ -63,6 +64,7 @@ class AdditionalFieldRepositoryImpl(
                                 label = it.additionalField.label,
                                 visible = true,
                                 default = true,
+                                order = it.additionalField.order,
                                 additionalField = true,
                                 value = PropertyValue.Date(
                                     it.additionalField.name,
@@ -85,6 +87,7 @@ class AdditionalFieldRepositoryImpl(
                                 label = it.additionalField.label,
                                 visible = true,
                                 default = true,
+                                order = it.additionalField.order,
                                 additionalField = true,
                                 values = it.values.map { fieldValue ->
                                     PropertyValue.Text(
@@ -104,6 +107,7 @@ class AdditionalFieldRepositoryImpl(
                                     nomenclatureType = mnemonic,
                                     visible = true,
                                     default = true,
+                                    order = it.additionalField.order,
                                     additionalField = true,
                                     value = PropertyValue.Nomenclature(
                                         code = it.additionalField.name,
@@ -125,6 +129,7 @@ class AdditionalFieldRepositoryImpl(
                             label = it.additionalField.label,
                             visible = true,
                             default = true,
+                            order = it.additionalField.order,
                             additionalField = true,
                             value = PropertyValue.Number(
                                 code = it.additionalField.name,
@@ -146,6 +151,7 @@ class AdditionalFieldRepositoryImpl(
                                 label = it.additionalField.label,
                                 visible = true,
                                 default = true,
+                                order = it.additionalField.order,
                                 additionalField = true,
                                 values = it.values.map { fieldValue ->
                                     PropertyValue.Text(
@@ -174,6 +180,7 @@ class AdditionalFieldRepositoryImpl(
                                 label = it.additionalField.label,
                                 visible = true,
                                 default = true,
+                                order = it.additionalField.order,
                                 additionalField = true,
                                 values = it.values.map { fieldValue ->
                                     PropertyValue.Text(
@@ -193,6 +200,7 @@ class AdditionalFieldRepositoryImpl(
                             label = it.additionalField.label,
                             visible = true,
                             default = true,
+                            order = it.additionalField.order,
                             additionalField = true,
                             value = PropertyValue.Text(
                                 code = it.additionalField.name,
@@ -205,6 +213,7 @@ class AdditionalFieldRepositoryImpl(
                             label = it.additionalField.label,
                             visible = true,
                             default = true,
+                            order = it.additionalField.order,
                             additionalField = true,
                             value = PropertyValue.Text(
                                 code = it.additionalField.name,
@@ -218,6 +227,7 @@ class AdditionalFieldRepositoryImpl(
                                 label = it.additionalField.label,
                                 visible = true,
                                 default = true,
+                                order = it.additionalField.order,
                                 additionalField = true,
                                 value = PropertyValue.Time(it.additionalField.name)
                             )

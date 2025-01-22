@@ -219,6 +219,7 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
                         else -> it
                     }
                 }
+                .sorted()
         )
 
         if (showAll) showAllFormFields(notify = true) else showDefaultFormFields(notify = true)

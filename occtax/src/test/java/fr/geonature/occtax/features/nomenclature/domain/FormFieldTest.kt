@@ -12,6 +12,7 @@ import fr.geonature.occtax.features.record.domain.PropertyValue
 import kotlinx.parcelize.parcelableCreator
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,6 +34,200 @@ class FormFieldTest {
     }
 
     @Test
+    fun `should compare two form fields`() {
+        assertTrue(
+            FormField.Button(
+                type = FormField.Type.INFORMATION,
+                label = "some label"
+            ) ==
+                FormField.Button(
+                    type = FormField.Type.INFORMATION,
+                    label = "some label"
+                )
+        )
+        assertTrue(
+            FormField.Button(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                order = 1
+            ) <
+                FormField.Button(
+                    type = FormField.Type.INFORMATION,
+                    label = "some label"
+                )
+        )
+        assertTrue(
+            FormField.Button(
+                type = FormField.Type.INFORMATION,
+                label = "some label"
+            ) >
+                FormField.Button(
+                    type = FormField.Type.INFORMATION,
+                    label = "some label",
+                    order = 1
+                )
+        )
+        assertTrue(
+            FormField.Button(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                order = 1
+            ) <
+                FormField.Button(
+                    type = FormField.Type.INFORMATION,
+                    label = "some label",
+                    order = 2
+                )
+        )
+
+        assertTrue(
+            FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Text(code = "field_text")
+            ) == FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Text(code = "field_text")
+            )
+        )
+        assertTrue(
+            FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                order = 1,
+                value = PropertyValue.Text(code = "field_text")
+            ) < FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Text(code = "field_text")
+            )
+        )
+        assertTrue(
+            FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Text(code = "field_text")
+            ) > FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                order = 1,
+                value = PropertyValue.Text(code = "field_text")
+            )
+        )
+        assertTrue(
+            FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                order = 1,
+                value = PropertyValue.Text(code = "field_text")
+            ) < FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                order = 2,
+                value = PropertyValue.Text(code = "field_text")
+            )
+        )
+
+        assertTrue(
+            FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Text(code = "field_text")
+            ) < FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                additionalField = true,
+                value = PropertyValue.Text(code = "field_text")
+            )
+        )
+        assertTrue(
+            FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Text(code = "field_text")
+            ) < FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                order = 1,
+                additionalField = true,
+                value = PropertyValue.Text(code = "field_text")
+            )
+        )
+        assertTrue(
+            FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                order = 2,
+                value = PropertyValue.Text(code = "field_text")
+            ) < FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                order = 1,
+                additionalField = true,
+                value = PropertyValue.Text(code = "field_text")
+            )
+        )
+
+        assertTrue(
+            FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                additionalField = true,
+                value = PropertyValue.Text(code = "field_text")
+            ) == FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                additionalField = true,
+                value = PropertyValue.Text(code = "field_text")
+            )
+        )
+        assertTrue(
+            FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                order = 1,
+                additionalField = true,
+                value = PropertyValue.Text(code = "field_text")
+            ) < FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                additionalField = true,
+                value = PropertyValue.Text(code = "field_text")
+            )
+        )
+        assertTrue(
+            FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                additionalField = true,
+                value = PropertyValue.Text(code = "field_text")
+            ) > FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                order = 1,
+                additionalField = true,
+                value = PropertyValue.Text(code = "field_text")
+            )
+        )
+        assertTrue(
+            FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                order = 1,
+                additionalField = true,
+                value = PropertyValue.Text(code = "field_text")
+            ) < FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                order = 2,
+                additionalField = true,
+                value = PropertyValue.Text(code = "field_text")
+            )
+        )
+    }
+
+    @Test
     fun `should update existing form field`() {
         assertEquals(
             FormField.Button(
@@ -49,27 +244,36 @@ class FormFieldTest {
             FormField.Button(
                 type = FormField.Type.INFORMATION,
                 label = "some label",
-                visible = false
+                visible = false,
+                order = 1
             ),
             FormField.Button(
                 type = FormField.Type.INFORMATION,
                 label = "some label",
                 visible = true
             )
-                .update(visible = false)
+                .update(
+                    visible = false,
+                    order = 1
+                )
         )
         assertEquals(
             FormField.Button(
                 type = FormField.Type.INFORMATION,
                 label = "some label",
-                default = false
+                default = false,
+                order = 2
             ),
             FormField.Button(
                 type = FormField.Type.INFORMATION,
                 label = "some label",
-                default = true
+                default = true,
+                order = 1
             )
-                .update(default = false)
+                .update(
+                    default = false,
+                    order = 2
+                )
         )
 
         assertEquals(
@@ -90,6 +294,7 @@ class FormFieldTest {
                 type = FormField.Type.INFORMATION,
                 label = "some label",
                 visible = false,
+                order = 1,
                 value = PropertyValue.StringArray(code = "some_code")
             ),
             FormField.Checkbox(
@@ -98,22 +303,30 @@ class FormFieldTest {
                 visible = true,
                 value = PropertyValue.StringArray(code = "some_code")
             )
-                .update(visible = false)
+                .update(
+                    visible = false,
+                    order = 1
+                )
         )
         assertEquals(
             FormField.Checkbox(
                 type = FormField.Type.INFORMATION,
                 label = "some label",
                 default = false,
+                order = 2,
                 value = PropertyValue.StringArray(code = "some_code")
             ),
             FormField.Checkbox(
                 type = FormField.Type.INFORMATION,
                 label = "some label",
                 default = true,
+                order = 1,
                 value = PropertyValue.StringArray(code = "some_code")
             )
-                .update(default = false)
+                .update(
+                    default = false,
+                    order = 2
+                )
         )
 
         assertEquals(
@@ -134,6 +347,7 @@ class FormFieldTest {
                 type = FormField.Type.INFORMATION,
                 label = "some label",
                 visible = false,
+                order = 1,
                 value = PropertyValue.Date(code = "some_code")
             ),
             FormField.Date(
@@ -142,22 +356,30 @@ class FormFieldTest {
                 visible = true,
                 value = PropertyValue.Date(code = "some_code")
             )
-                .update(visible = false)
+                .update(
+                    visible = false,
+                    order = 1
+                )
         )
         assertEquals(
             FormField.Date(
                 type = FormField.Type.INFORMATION,
                 label = "some label",
                 default = false,
+                order = 2,
                 value = PropertyValue.Date(code = "some_code")
             ),
             FormField.Date(
                 type = FormField.Type.INFORMATION,
                 label = "some label",
                 default = true,
+                order = 1,
                 value = PropertyValue.Date(code = "some_code")
             )
-                .update(default = false)
+                .update(
+                    default = false,
+                    order = 2
+                )
         )
 
         assertEquals(
@@ -178,6 +400,7 @@ class FormFieldTest {
                 type = FormField.Type.INFORMATION,
                 label = "some label",
                 visible = false,
+                order = 1,
                 value = PropertyValue.Media(code = "some_code")
             ),
             FormField.Media(
@@ -186,22 +409,30 @@ class FormFieldTest {
                 visible = true,
                 value = PropertyValue.Media(code = "some_code")
             )
-                .update(visible = false)
+                .update(
+                    visible = false,
+                    order = 1
+                )
         )
         assertEquals(
             FormField.Media(
                 type = FormField.Type.INFORMATION,
                 label = "some label",
                 default = false,
+                order = 2,
                 value = PropertyValue.Media(code = "some_code")
             ),
             FormField.Media(
                 type = FormField.Type.INFORMATION,
                 label = "some label",
                 default = true,
+                order = 1,
                 value = PropertyValue.Media(code = "some_code")
             )
-                .update(default = false)
+                .update(
+                    default = false,
+                    order = 2
+                )
         )
 
         assertEquals(

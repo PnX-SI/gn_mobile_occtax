@@ -287,12 +287,14 @@ class GetEditableFieldsUseCaseTest {
                     FormField.NomenclatureType(
                         type = FormField.Type.INFORMATION,
                         label = "Méthodes d'observation",
+                        order = 2,
                         nomenclatureType = "METH_OBS",
                         value = PropertyValue.Nomenclature(code = "METH_OBS")
                     ),
                     FormField.NomenclatureType(
                         type = FormField.Type.INFORMATION,
                         label = "Etat biologique de l'observation",
+                        order = 1,
                         visible = false,
                         nomenclatureType = "ETA_BIO",
                         value = PropertyValue.Nomenclature(code = "ETA_BIO")
@@ -310,8 +312,9 @@ class GetEditableFieldsUseCaseTest {
                 listOf(
                     FormField.Text(
                         type = FormField.Type.INFORMATION,
-                        additionalField = true,
                         label = "As text",
+                        order = 1,
+                        additionalField = true,
                         value = PropertyValue.Text(code = "as_text")
                     )
                 )
@@ -333,21 +336,24 @@ class GetEditableFieldsUseCaseTest {
                 listOf(
                     FormField.NomenclatureType(
                         type = FormField.Type.INFORMATION,
-                        label = "Méthodes d'observation",
-                        nomenclatureType = "METH_OBS",
-                        value = PropertyValue.Nomenclature(code = "METH_OBS")
-                    ),
-                    FormField.NomenclatureType(
-                        type = FormField.Type.INFORMATION,
                         label = "Etat biologique de l'observation",
                         visible = false,
+                        order = 1,
                         nomenclatureType = "ETA_BIO",
                         value = PropertyValue.Nomenclature(code = "ETA_BIO")
                     ),
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Méthodes d'observation",
+                        order = 2,
+                        nomenclatureType = "METH_OBS",
+                        value = PropertyValue.Nomenclature(code = "METH_OBS")
+                    ),
                     FormField.Text(
                         type = FormField.Type.INFORMATION,
-                        additionalField = true,
                         label = "As text",
+                        order = 1,
+                        additionalField = true,
                         value = PropertyValue.Text(code = "as_text")
                     )
                 ),

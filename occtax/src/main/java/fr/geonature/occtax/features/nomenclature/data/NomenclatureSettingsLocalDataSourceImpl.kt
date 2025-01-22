@@ -139,42 +139,58 @@ class NomenclatureSettingsLocalDataSourceImpl(context: Context) :
     ): List<FormField> {
         if (defaultPropertySettings.isEmpty() || type == FormField.Type.DEFAULT) {
             return defaultNomenclatureTypes.filter { it.type == type }
+                .mapIndexed { index, formField ->
+                    formField.update(order = index)
+                }
         }
 
-        return defaultPropertySettings
-            .mapNotNull { property ->
-                defaultNomenclatureTypes.find {
-                    when (it) {
-                        is FormField.Editable -> it.getValue().code == property.key
-                        is FormField.MinMax -> arrayOf(
-                            it.min,
-                            it.max
-                        ).any { ff -> ff.value.code == property.key }
-
-                        else -> false
-                    }
-                }
+        return defaultNomenclatureTypes.mapNotNull { ff ->
+            when (ff) {
+                is FormField.Editable -> defaultPropertySettings.indexOfFirst { property -> ff.getValue().code == property.key }
+                    .takeIf { it >= 0 }
                     ?.let {
-                        when (it) {
-                            is FormField.Editable -> it.update(
-                                visible = property.visible,
-                                default = property.default
-                            )
-
-                            is FormField.MinMax -> it.copy(
-                                min = if (it.min.value.code == property.key) it.min.copy(
-                                    visible = property.visible,
-                                    default = property.default
-                                ) else it.min,
-                                max = if (it.max.value.code == property.key) it.max.copy(
-                                    visible = property.visible,
-                                    default = property.default
-                                ) else it.max
-                            )
-
-                            else -> null
-                        }
+                        ff.update(
+                            visible = defaultPropertySettings[it].visible,
+                            default = defaultPropertySettings[it].default,
+                            order = it
+                        )
                     }
+
+                is FormField.MinMax -> defaultPropertySettings.indexOfFirst { propertySettings ->
+                    arrayOf(
+                        ff.min,
+                        ff.max
+                    ).any { it.value.code == propertySettings.key }
+                }
+                    .takeIf { it >= 0 }
+                    ?.let {
+                        ff.copy(
+                            order = it,
+                            min = defaultPropertySettings.find { property -> ff.min.value.code == property.key }
+                                ?.let { property ->
+                                    ff.min.copy(
+                                        visible = property.visible,
+                                        default = property.default
+                                    )
+                                } ?: ff.min.copy(
+                                visible = false,
+                                default = false
+                            ),
+                            max = defaultPropertySettings.find { property -> ff.max.value.code == property.key }
+                                ?.let { property ->
+                                    ff.max.copy(
+                                        visible = property.visible,
+                                        default = property.default
+                                    )
+                                } ?: ff.max.copy(
+                                visible = false,
+                                default = false
+                            )
+                        )
+                    }
+
+                else -> null
             }
+        }
     }
 }
