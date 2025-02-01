@@ -48,6 +48,7 @@ class AdditionalFieldRepositoryImpl(
                                 default = true,
                                 order = it.additionalField.order,
                                 additionalField = true,
+                                mandatory = it.additionalField.mandatory,
                                 values = it.values.map { fieldValue ->
                                     PropertyValue.Text(
                                         fieldValue.value,
@@ -66,6 +67,7 @@ class AdditionalFieldRepositoryImpl(
                                 default = true,
                                 order = it.additionalField.order,
                                 additionalField = true,
+                                mandatory = it.additionalField.mandatory,
                                 value = PropertyValue.Date(
                                     it.additionalField.name,
                                     value = null
@@ -89,6 +91,7 @@ class AdditionalFieldRepositoryImpl(
                                 default = true,
                                 order = it.additionalField.order,
                                 additionalField = true,
+                                mandatory = it.additionalField.mandatory,
                                 values = it.values.map { fieldValue ->
                                     PropertyValue.Text(
                                         fieldValue.value,
@@ -109,6 +112,7 @@ class AdditionalFieldRepositoryImpl(
                                     default = true,
                                     order = it.additionalField.order,
                                     additionalField = true,
+                                    mandatory = it.additionalField.mandatory,
                                     value = PropertyValue.Nomenclature(
                                         code = it.additionalField.name,
                                         label = null,
@@ -131,6 +135,7 @@ class AdditionalFieldRepositoryImpl(
                             default = true,
                             order = it.additionalField.order,
                             additionalField = true,
+                            mandatory = it.additionalField.mandatory,
                             value = PropertyValue.Number(
                                 code = it.additionalField.name,
                                 value = null
@@ -153,6 +158,7 @@ class AdditionalFieldRepositoryImpl(
                                 default = true,
                                 order = it.additionalField.order,
                                 additionalField = true,
+                                mandatory = it.additionalField.mandatory,
                                 values = it.values.map { fieldValue ->
                                     PropertyValue.Text(
                                         fieldValue.value,
@@ -182,6 +188,7 @@ class AdditionalFieldRepositoryImpl(
                                 default = true,
                                 order = it.additionalField.order,
                                 additionalField = true,
+                                mandatory = it.additionalField.mandatory,
                                 values = it.values.map { fieldValue ->
                                     PropertyValue.Text(
                                         fieldValue.value,
@@ -202,6 +209,7 @@ class AdditionalFieldRepositoryImpl(
                             default = true,
                             order = it.additionalField.order,
                             additionalField = true,
+                            mandatory = it.additionalField.mandatory,
                             value = PropertyValue.Text(
                                 code = it.additionalField.name,
                                 value = null
@@ -215,6 +223,7 @@ class AdditionalFieldRepositoryImpl(
                             default = true,
                             order = it.additionalField.order,
                             additionalField = true,
+                            mandatory = it.additionalField.mandatory,
                             value = PropertyValue.Text(
                                 code = it.additionalField.name,
                                 value = null
@@ -229,6 +238,7 @@ class AdditionalFieldRepositoryImpl(
                                 default = true,
                                 order = it.additionalField.order,
                                 additionalField = true,
+                                mandatory = it.additionalField.mandatory,
                                 value = PropertyValue.Time(it.additionalField.name)
                             )
                         }

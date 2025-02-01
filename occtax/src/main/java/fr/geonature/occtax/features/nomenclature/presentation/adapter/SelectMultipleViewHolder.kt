@@ -60,6 +60,12 @@ class SelectMultipleViewHolder(
             formField.locked = false
         }
 
+        if (formField.mandatory && formField.getValue()
+                .isEmpty()
+        ) {
+            edit.error = itemView.context.getString(R.string.form_field_error_mandatory)
+        }
+
         with(edit) {
             startIconDrawable = if (lockDefaultValues) ResourcesCompat.getDrawable(
                 itemView.resources,
@@ -136,6 +142,9 @@ class SelectMultipleViewHolder(
                         .toTypedArray()
                 )
                     .also { propertyValue ->
+                        edit.error =
+                            if (editableField.mandatory && propertyValue.isEmpty()) itemView.context.getString(R.string.form_field_error_mandatory) else null
+
                         editableField.setValue(propertyValue)
                         editText.text = propertyValue
                             .let { stringArray ->

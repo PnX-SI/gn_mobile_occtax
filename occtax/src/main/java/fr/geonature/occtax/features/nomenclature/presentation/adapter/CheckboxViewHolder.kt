@@ -30,6 +30,7 @@ class CheckboxViewHolder(
             )
     ) {
     private var title: TextView = itemView.findViewById(android.R.id.title)
+    private var errorHint: TextView = itemView.findViewById(android.R.id.hint)
     private var recyclerView: RecyclerView = itemView.findViewById(android.R.id.list)
     private var adapter =
         object : AbstractListItemRecyclerViewAdapter<Pair<PropertyValue.Text, Boolean>>() {
@@ -78,6 +79,7 @@ class CheckboxViewHolder(
                                                     .toTypedArray() + (
                                                     if (isChecked) arrayOf(view.tag.toString())
                                                     else arrayOf())))
+                                        this@CheckboxViewHolder.setError(this)
                                         listener.onUpdate(this)
                                     }
                             }
@@ -106,6 +108,8 @@ class CheckboxViewHolder(
     override fun onBind(formField: FormField.Checkbox) {
         title.text = formField.label
 
+        setError(formField)
+
         val currentValues = formField.value.value
 
         adapter.setItems(formField.values.map { pv ->
@@ -114,5 +118,13 @@ class CheckboxViewHolder(
                 currentValues.contains(pv.code)
             )
         })
+    }
+
+    private fun setError(formField: FormField.Checkbox) {
+        with(errorHint) {
+            text = if (formField.mandatory && formField.getValue()
+                    .isEmpty()
+            ) context.getString(R.string.form_field_error_mandatory) else null
+        }
     }
 }

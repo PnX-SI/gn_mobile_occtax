@@ -149,6 +149,8 @@ class InformationFragment : AbstractInputFragment() {
             }
 
             override fun onUpdate(editableField: FormField.Editable) {
+                listener.validateCurrentPage()
+
                 if (editableField.additionalField) {
                     // as additional field
                     observationRecord?.taxa?.selectedTaxonRecord?.also {
@@ -226,7 +228,7 @@ class InformationFragment : AbstractInputFragment() {
     }
 
     override fun validate(): Boolean {
-        return this.observationRecord?.taxa?.selectedTaxonRecord != null
+        return this.observationRecord?.taxa?.selectedTaxonRecord != null && (adapter?.hasErrors() == false)
     }
 
     override fun refreshView() {
@@ -278,6 +280,8 @@ class InformationFragment : AbstractInputFragment() {
                 ?: emptyList()) + (observationRecord?.taxa?.selectedTaxonRecord?.additionalFields
                 ?: emptyList())).toTypedArray()
         )
+
+        listener.validateCurrentPage()
     }
 
     companion object {

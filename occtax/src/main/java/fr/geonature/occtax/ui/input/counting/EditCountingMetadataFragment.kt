@@ -62,7 +62,7 @@ class EditCountingMetadataFragment : Fragment() {
 
     private var takePhotoLifecycleObserver: TakePhotoLifecycleObserver? = null
     private var content: CoordinatorLayout? = null
-    private var fab: ExtendedFloatingActionButton? = null
+    private var saveFab: ExtendedFloatingActionButton? = null
 
     private var listener: OnEditCountingMetadataFragmentListener? = null
     private var adapter: EditableFieldAdapter? = null
@@ -140,7 +140,7 @@ class EditCountingMetadataFragment : Fragment() {
         val progressBar = view.findViewById<ProgressBar>(android.R.id.progress)
             .apply { visibility = View.VISIBLE }
 
-        fab = view.findViewById<ExtendedFloatingActionButton?>(R.id.fab)
+        saveFab = view.findViewById<ExtendedFloatingActionButton?>(R.id.fab)
             ?.apply {
                 text = getString(R.string.action_save)
                 extend()
@@ -244,7 +244,8 @@ class EditCountingMetadataFragment : Fragment() {
 
                     // as editable field
                     if (notify) {
-                        editableField.getValue().toPair()
+                        editableField.getValue()
+                            .toPair()
                             .also {
                                 if (it.second.isEmpty()) countingRecord.properties.remove(editableField.getValue().code)
                                 else countingRecord.properties[editableField.getValue().code] =
@@ -257,6 +258,13 @@ class EditCountingMetadataFragment : Fragment() {
 
                 if (notify) {
                     listener?.onCountingRecord(countingRecord)
+                }
+
+                if (adapter?.hasErrors() == true) {
+                    saveFab?.hide()
+                }
+                else {
+                    saveFab?.show()
                 }
 
                 val taxonomy = taxonRecord?.taxon?.taxonomy ?: Taxonomy(
@@ -418,6 +426,13 @@ class EditCountingMetadataFragment : Fragment() {
                 ?.filterNot { it is PropertyValue.AdditionalFields }
                 ?: emptyList()) + (countingRecord?.additionalFields ?: emptyList())).toTypedArray()
         )
+
+        if (adapter?.hasErrors() == true) {
+            saveFab?.hide()
+        }
+        else {
+            saveFab?.extend()
+        }
     }
 
     private fun launchMediaActivity(selectedMedia: MediaRecord? = null) {

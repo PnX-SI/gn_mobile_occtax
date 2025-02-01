@@ -35,6 +35,7 @@ class SelectSimpleViewHolder(
             it.setAdapter(propertyValueTextAdapter)
             it.setOnItemClickListener { _, _, position, _ ->
                 formField?.run {
+                    edit.error = null
                     setValue(PropertyValue.Text(code = getValue().code,
                         value = propertyValueTextAdapter.getPropertyValue(position)
                             .takeIf { pv -> pv is PropertyValue.Text }
@@ -50,6 +51,12 @@ class SelectSimpleViewHolder(
     override fun onBind(formField: FormField.Select, lockDefaultValues: Boolean) {
         if (!lockDefaultValues) {
             formField.locked = false
+        }
+
+        if (formField.mandatory && formField.getValue()
+                .isEmpty()
+        ) {
+            edit.error = itemView.context.getString(R.string.form_field_error_mandatory)
         }
 
         propertyValueTextAdapter.setPropertyValues(formField.values)

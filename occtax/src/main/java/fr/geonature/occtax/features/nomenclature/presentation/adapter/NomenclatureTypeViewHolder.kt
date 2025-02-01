@@ -36,6 +36,7 @@ class NomenclatureTypeViewHolder(
             it.setOnItemClickListener { _, _, position, _ ->
                 formField
                     ?.run {
+                        edit.error = null
                         with(nomenclatureAdapter.getNomenclatureValue(position)) {
                             setValue(
                                 PropertyValue.Nomenclature(
@@ -55,6 +56,12 @@ class NomenclatureTypeViewHolder(
     override fun onBind(formField: FormField.NomenclatureType, lockDefaultValues: Boolean) {
         if (!lockDefaultValues) {
             formField.locked = false
+        }
+
+        if (formField.mandatory && formField.getValue()
+                .isEmpty()
+        ) {
+            edit.error = itemView.context.getString(R.string.form_field_error_mandatory)
         }
 
         listener.getNomenclatureValues(formField.nomenclatureType)

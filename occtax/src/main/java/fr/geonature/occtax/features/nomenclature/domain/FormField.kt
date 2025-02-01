@@ -197,6 +197,11 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
         abstract val additionalField: Boolean
 
         /**
+         * Whether this property is mandatory (default: `false`).
+         */
+        abstract val mandatory: Boolean
+
+        /**
          * Whether this property is locked for modification (default: `false`).
          */
         var locked: Boolean = false
@@ -294,6 +299,7 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
         override val visible: Boolean = true,
         override val order: Int? = null,
         override val additionalField: Boolean = false,
+        override val mandatory: Boolean = false,
 
         /**
          * Available values for this property.
@@ -315,6 +321,7 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
         override val visible: Boolean = true,
         override val order: Int? = null,
         override val additionalField: Boolean = false,
+        override val mandatory: Boolean = false,
         var value: PropertyValue.Date
     ) : Editable()
 
@@ -330,6 +337,7 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
         override val visible: Boolean = true,
         override val order: Int? = null,
         override val additionalField: Boolean = false,
+        override val mandatory: Boolean = false,
         var value: PropertyValue.Media
     ) : Editable()
 
@@ -359,6 +367,7 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
         override val visible: Boolean = true,
         override val order: Int? = null,
         override val additionalField: Boolean = false,
+        override val mandatory: Boolean = false,
 
         /**
          * The nomenclature type code on which to retrieve all available nomenclature values on
@@ -381,6 +390,7 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
         override val visible: Boolean = true,
         override val order: Int? = null,
         override val additionalField: Boolean = false,
+        override val mandatory: Boolean = false,
         var value: PropertyValue.Number
     ) : Editable()
 
@@ -396,6 +406,7 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
         override val visible: Boolean = true,
         override val order: Int? = null,
         override val additionalField: Boolean = false,
+        override val mandatory: Boolean = false,
 
         /**
          * Available values for this property.
@@ -417,6 +428,7 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
         override val visible: Boolean = true,
         override val order: Int? = null,
         override val additionalField: Boolean = false,
+        override val mandatory: Boolean = false,
 
         /**
          * Available values for this property.
@@ -438,6 +450,7 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
         override val visible: Boolean = true,
         override val order: Int? = null,
         override val additionalField: Boolean = false,
+        override val mandatory: Boolean = false,
 
         /**
          * Available values for this property.
@@ -459,6 +472,7 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
         override val visible: Boolean = true,
         override val order: Int? = null,
         override val additionalField: Boolean = false,
+        override val mandatory: Boolean = false,
 
         var value: PropertyValue.Text
     ) : Editable()
@@ -475,6 +489,7 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
         override val visible: Boolean = true,
         override val order: Int? = null,
         override val additionalField: Boolean = false,
+        override val mandatory: Boolean = false,
 
         var value: PropertyValue.Text
     ) : Editable()
@@ -491,6 +506,7 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
         override val visible: Boolean = true,
         override val order: Int? = null,
         override val additionalField: Boolean = false,
+        override val mandatory: Boolean = false,
 
         var value: PropertyValue.Time
     ) : Editable()

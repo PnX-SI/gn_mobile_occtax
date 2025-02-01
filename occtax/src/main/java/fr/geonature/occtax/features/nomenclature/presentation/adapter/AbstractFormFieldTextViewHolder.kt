@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.textfield.TextInputLayout
 import fr.geonature.commons.util.KeyboardUtils
+import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.FormField
 
@@ -46,6 +47,14 @@ abstract class AbstractFormFieldTextViewHolder<FF : FormField.Editable>(
 
         override fun afterTextChanged(s: Editable?) {
             this@AbstractFormFieldTextViewHolder.afterTextChanged(s)
+
+            edit.error = null
+
+            formField?.also {
+                edit.error = if (it.mandatory && (s == null || s.toString()
+                        .isBlank())
+                ) itemView.context.getString(R.string.form_field_error_mandatory) else null
+            }
         }
     }
 
@@ -55,7 +64,7 @@ abstract class AbstractFormFieldTextViewHolder<FF : FormField.Editable>(
             setOnFocusChangeListener { v, hasFocus ->
                 if (!hasFocus) {
                     // workaround to force hide the soft keyboard
-                    KeyboardUtils.hideSoftKeyboard(v)
+                    hideSoftKeyboard(v)
                 }
             }
         }
@@ -87,6 +96,12 @@ abstract class AbstractFormFieldTextViewHolder<FF : FormField.Editable>(
         }
 
         getValue(formField)?.also { setText(it) }
+
+        if (formField.mandatory && formField.getValue()
+                .isEmpty()
+        ) {
+            edit.error = itemView.context.getString(R.string.form_field_error_mandatory)
+        }
     }
 
     abstract fun getValue(formField: FF): CharSequence?

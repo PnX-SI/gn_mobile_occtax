@@ -292,6 +292,17 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
         if (showAll) showAllFormFields(notify = true) else showDefaultFormFields(notify = true)
     }
 
+    /**
+     * Whether at least one [FormField.Editable] contains error.
+     */
+    fun hasErrors(): Boolean {
+        return availableEditableFields.filterIsInstance<FormField.Editable>()
+            .any {
+                it.mandatory && it.getValue()
+                    .isEmpty()
+            }
+    }
+
     private fun setFormFields(
         formFields: List<FormField>,
         notify: Boolean = false

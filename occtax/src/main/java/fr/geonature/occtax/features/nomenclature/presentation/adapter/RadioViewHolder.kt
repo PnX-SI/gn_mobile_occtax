@@ -30,6 +30,7 @@ class RadioViewHolder(
         )
 ) {
     private var title: TextView = itemView.findViewById(android.R.id.title)
+    private var errorHint: TextView = itemView.findViewById(android.R.id.hint)
     private var recyclerView: RecyclerView = itemView.findViewById(android.R.id.list)
     private var adapter =
         object : AbstractListItemRecyclerViewAdapter<Pair<PropertyValue.Text, Boolean>>() {
@@ -76,6 +77,7 @@ class RadioViewHolder(
                                             value = (view as CompoundButton).takeIf { it.isChecked }?.tag.toString()
                                         )
                                     )
+                                    this@RadioViewHolder.setError(this)
                                     listener.onUpdate(this)
                                 }
 
@@ -113,6 +115,8 @@ class RadioViewHolder(
     override fun onBind(formField: FormField.Radio) {
         title.text = formField.label
 
+        setError(formField)
+
         adapter.setItems(formField.values.map { pv ->
             pv.let {
                 Pair(
@@ -121,5 +125,13 @@ class RadioViewHolder(
                 )
             }
         })
+    }
+
+    private fun setError(formField: FormField.Radio) {
+        with(errorHint) {
+            text = if (formField.mandatory && formField.getValue()
+                    .isEmpty()
+            ) context.getString(R.string.form_field_error_mandatory) else null
+        }
     }
 }
