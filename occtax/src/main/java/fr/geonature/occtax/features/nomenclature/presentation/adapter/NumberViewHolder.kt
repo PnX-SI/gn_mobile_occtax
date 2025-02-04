@@ -37,7 +37,7 @@ class NumberViewHolder(
                 PropertyValue.Number(
                     code = getValue().code,
                     value = s?.toString()
-                        ?.toDoubleOrNull()
+                        ?.toLongOrNull()
                 )
             )
             listener.onUpdate(this)

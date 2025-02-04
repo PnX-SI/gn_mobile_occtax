@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.textfield.TextInputLayout
-import fr.geonature.commons.util.KeyboardUtils
 import fr.geonature.commons.util.KeyboardUtils.hideSoftKeyboard
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.FormField
@@ -95,7 +94,9 @@ abstract class AbstractFormFieldTextViewHolder<FF : FormField.Editable>(
             hint = formField.label
         }
 
-        getValue(formField)?.also { setText(it) }
+        edit.post {
+            getValue(formField)?.also { setText(it) }
+        }
 
         if (formField.mandatory && formField.getValue()
                 .isEmpty()
