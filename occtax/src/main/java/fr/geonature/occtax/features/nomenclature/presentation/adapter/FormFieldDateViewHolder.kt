@@ -19,14 +19,14 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 /**
- * [EditableFieldAdapter] [FormField.Date] view holder representing a textual value of a date.
+ * [FormFieldAdapter] [FormField.Date] view holder representing a textual value of a date.
  *
  * @see AbstractFormFieldTextViewHolder
  * @author S. Grimault
  */
 class FormFieldDateViewHolder(
     parent: ViewGroup,
-    listener: EditableFieldAdapter.OnEditableFieldAdapter
+    listener: FormFieldAdapter.OnEditableFieldAdapter
 ) :
     AbstractFormFieldTextViewHolder<FormField.Date>(
         parent,

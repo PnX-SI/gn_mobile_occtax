@@ -7,14 +7,14 @@ import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
- * [EditableFieldAdapter] view holder representing a numeric value.
+ * [FormFieldAdapter] view holder representing a numeric value.
  *
  * @see AbstractFormFieldTextViewHolder
  * @author S. Grimault
  */
-class NumberViewHolder(
+class FormFieldNumberViewHolder(
     parent: ViewGroup,
-    listener: EditableFieldAdapter.OnEditableFieldAdapter
+    listener: FormFieldAdapter.OnEditableFieldAdapter
 ) :
     AbstractFormFieldTextViewHolder<FormField.Number>(
         parent,

@@ -11,15 +11,15 @@ import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
- * [EditableFieldAdapter] view holder representing a simple dropdown list allowing only a single
+ * [FormFieldAdapter] view holder representing a simple dropdown list allowing only a single
  * selection.
  *
  * @author S. Grimault
  */
-class SelectSimpleViewHolder(
+class FormFieldSelectSimpleViewHolder(
     parent: ViewGroup,
-    private val listener: EditableFieldAdapter.OnEditableFieldAdapter
-) : EditableFieldAdapter.AbstractLockableViewHolder<FormField.Select>(
+    private val listener: FormFieldAdapter.OnEditableFieldAdapter
+) : FormFieldAdapter.AbstractLockableViewHolder<FormField.Select>(
     LayoutInflater.from(parent.context)
         .inflate(
             R.layout.view_action_select_simple,

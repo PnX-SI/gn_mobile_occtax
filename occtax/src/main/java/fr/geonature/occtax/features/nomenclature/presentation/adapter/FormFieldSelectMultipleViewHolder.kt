@@ -14,15 +14,15 @@ import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
- * [EditableFieldAdapter] view holder representing a simple dropdown list allowing multiple
+ * [FormFieldAdapter] view holder representing a simple dropdown list allowing multiple
  * selection.
  *
  * @author S. Grimault
  */
-class SelectMultipleViewHolder(
+class FormFieldSelectMultipleViewHolder(
     parent: ViewGroup,
-    private val listener: EditableFieldAdapter.OnEditableFieldAdapter
-) : EditableFieldAdapter.AbstractLockableViewHolder<FormField.SelectMultiple>(
+    private val listener: FormFieldAdapter.OnEditableFieldAdapter
+) : FormFieldAdapter.AbstractLockableViewHolder<FormField.SelectMultiple>(
     LayoutInflater.from(parent.context)
         .inflate(
             R.layout.view_action_select_simple,

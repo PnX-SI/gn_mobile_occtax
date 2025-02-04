@@ -12,12 +12,12 @@ import fr.geonature.occtax.ui.shared.view.setOnValueChangedListener
 import kotlin.math.ceil
 
 /**
- * [EditableFieldAdapter] view holder representing a bounded numerical value.
+ * [FormFieldAdapter] view holder representing a bounded numerical value.
  */
-class MinMaxViewHolder(
+class FormFieldMinMaxViewHolder(
     parent: ViewGroup,
-    private val listener: EditableFieldAdapter.OnEditableFieldAdapter
-) : EditableFieldAdapter.AbstractFormFieldViewHolder<FormField.MinMax>(
+    private val listener: FormFieldAdapter.OnEditableFieldAdapter
+) : FormFieldAdapter.AbstractFormFieldViewHolder<FormField.MinMax>(
     LayoutInflater.from(parent.context)
         .inflate(
             R.layout.view_action_min_max,

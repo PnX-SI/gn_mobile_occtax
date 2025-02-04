@@ -12,14 +12,14 @@ import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
- * [EditableFieldAdapter] view holder representing a nomenclature values as simple dropdown list.
+ * [FormFieldAdapter] view holder representing a nomenclature values as simple dropdown list.
  *
  * @author S. Grimault
  */
-class NomenclatureTypeViewHolder(
+class FormFieldNomenclatureTypeViewHolder(
     parent: ViewGroup,
-    private val listener: EditableFieldAdapter.OnEditableFieldAdapter
-) : EditableFieldAdapter.AbstractLockableViewHolder<FormField.NomenclatureType>(
+    private val listener: FormFieldAdapter.OnEditableFieldAdapter
+) : FormFieldAdapter.AbstractLockableViewHolder<FormField.NomenclatureType>(
     LayoutInflater.from(parent.context)
         .inflate(
             R.layout.view_action_select_simple,

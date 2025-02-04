@@ -19,15 +19,15 @@ import fr.geonature.occtax.features.record.domain.PropertyValue
 import java.io.File
 
 /**
- * [EditableFieldAdapter] view holder representing a list of media (i.e. a list of images or photos
+ * [FormFieldAdapter] view holder representing a list of media (i.e. a list of images or photos
  * taken).
  *
  * @author S. Grimault
  */
-class MediaViewHolder(
+class FormFieldMediaViewHolder(
     parent: ViewGroup,
-    private val listener: EditableFieldAdapter.OnEditableFieldAdapter
-) : EditableFieldAdapter.AbstractFormFieldViewHolder<FormField.Media>(
+    private val listener: FormFieldAdapter.OnEditableFieldAdapter
+) : FormFieldAdapter.AbstractFormFieldViewHolder<FormField.Media>(
     LayoutInflater.from(parent.context)
         .inflate(
             R.layout.view_action_media,
@@ -45,7 +45,7 @@ class MediaViewHolder(
                 context,
                 2
             )
-            adapter = this@MediaViewHolder.adapter
+            adapter = this@FormFieldMediaViewHolder.adapter
         }
     }
 

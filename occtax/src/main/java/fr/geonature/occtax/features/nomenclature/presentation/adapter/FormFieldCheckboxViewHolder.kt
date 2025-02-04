@@ -3,8 +3,7 @@ package fr.geonature.occtax.features.nomenclature.presentation.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
-import android.widget.RadioButton
+import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,21 +13,22 @@ import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
- * [EditableFieldAdapter] view holder representing a list of radio buttons.
+ * [FormFieldAdapter] view holder representing a list of checkboxes.
  *
  * @author S. Grimault
  */
-class RadioViewHolder(
+class FormFieldCheckboxViewHolder(
     parent: ViewGroup,
-    private val listener: EditableFieldAdapter.OnEditableFieldAdapter
-) : EditableFieldAdapter.AbstractFormFieldViewHolder<FormField.Radio>(
-    LayoutInflater.from(parent.context)
-        .inflate(
-            R.layout.view_action_list,
-            parent,
-            false
-        )
-) {
+    private val listener: FormFieldAdapter.OnEditableFieldAdapter
+) :
+    FormFieldAdapter.AbstractFormFieldViewHolder<FormField.Checkbox>(
+        LayoutInflater.from(parent.context)
+            .inflate(
+                R.layout.view_action_list,
+                parent,
+                false
+            )
+    ) {
     private var title: TextView = itemView.findViewById(android.R.id.title)
     private var errorHint: TextView = itemView.findViewById(android.R.id.hint)
     private var recyclerView: RecyclerView = itemView.findViewById(android.R.id.list)
@@ -42,7 +42,7 @@ class RadioViewHolder(
                 position: Int,
                 item: Pair<PropertyValue.Text, Boolean>
             ): Int {
-                return R.layout.list_item_radio
+                return R.layout.list_item_checkbox
             }
 
             override fun areItemsTheSame(
@@ -66,34 +66,27 @@ class RadioViewHolder(
             inner class ViewHolder(itemView: View) :
                 AbstractViewHolder(itemView) {
 
-                private val radioButton: RadioButton =
-                    itemView.findViewById<RadioButton?>(android.R.id.checkbox)
+                private val checkbox: CheckBox =
+                    itemView.findViewById<CheckBox?>(android.R.id.checkbox)
                         .apply {
                             setOnClickListener { view ->
-                                formField?.run {
-                                    setValue(
-                                        PropertyValue.Text(
-                                            code = getValue().code,
-                                            value = (view as CompoundButton).takeIf { it.isChecked }?.tag.toString()
-                                        )
-                                    )
-                                    this@RadioViewHolder.setError(this)
-                                    listener.onUpdate(this)
-                                }
-
-                                if (isChecked) {
-                                    setItems(items.map {
-                                        Pair(
-                                            it.first,
-                                            it.first.code == view.tag.toString()
-                                        )
-                                    })
-                                }
+                                formField
+                                    ?.run {
+                                        setValue(
+                                            PropertyValue.StringArray(
+                                                code = getValue().code,
+                                                value = value.value.filter { value -> value != view.tag.toString() }
+                                                    .toTypedArray() + (
+                                                    if (isChecked) arrayOf(view.tag.toString())
+                                                    else arrayOf())))
+                                        this@FormFieldCheckboxViewHolder.setError(this)
+                                        listener.onUpdate(this)
+                                    }
                             }
                         }
 
                 override fun onBind(item: Pair<PropertyValue.Text, Boolean>) {
-                    with(radioButton) {
+                    with(checkbox) {
                         tag = item.first.code
                         text = item.first.value ?: item.first.code
                         isChecked = item.second
@@ -108,26 +101,26 @@ class RadioViewHolder(
                 context,
                 2
             )
-            adapter = this@RadioViewHolder.adapter
+            adapter = this@FormFieldCheckboxViewHolder.adapter
         }
     }
 
-    override fun onBind(formField: FormField.Radio) {
+    override fun onBind(formField: FormField.Checkbox) {
         title.text = formField.label
 
         setError(formField)
 
+        val currentValues = formField.value.value
+
         adapter.setItems(formField.values.map { pv ->
-            pv.let {
-                Pair(
-                    it,
-                    formField.value.let { value -> value.value == it.code }
-                )
-            }
+            Pair(
+                pv,
+                currentValues.contains(pv.code)
+            )
         })
     }
 
-    private fun setError(formField: FormField.Radio) {
+    private fun setError(formField: FormField.Checkbox) {
         with(errorHint) {
             text = if (formField.mandatory && formField.getValue()
                     .isEmpty()

@@ -25,7 +25,7 @@ import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
-import fr.geonature.occtax.features.nomenclature.presentation.adapter.EditableFieldAdapter
+import fr.geonature.occtax.features.nomenclature.presentation.adapter.FormFieldAdapter
 import fr.geonature.occtax.features.record.domain.MediaRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.domain.TaxonRecord
@@ -45,7 +45,7 @@ class InformationFragment : AbstractInputFragment() {
 
     private lateinit var savedState: Bundle
 
-    private var adapter: EditableFieldAdapter? = null
+    private var adapter: FormFieldAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,8 +86,8 @@ class InformationFragment : AbstractInputFragment() {
         val progressBar = view.findViewById<ProgressBar>(android.R.id.progress)
             .apply { visibility = View.VISIBLE }
 
-        adapter = EditableFieldAdapter(object :
-            EditableFieldAdapter.OnEditableFieldAdapter {
+        adapter = FormFieldAdapter(object :
+            FormFieldAdapter.OnEditableFieldAdapter {
             override fun getContext(): Context {
                 return requireContext()
             }

@@ -7,14 +7,14 @@ import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
- * [EditableFieldAdapter] view holder representing a textual value across several lines.
+ * [FormFieldAdapter] view holder representing a textual value across several lines.
  *
- * @see TextSimpleViewHolder
+ * @see FormFieldTextSimpleViewHolder
  * @author S. Grimault
  */
-class TextMultipleViewHolder(
+class FormFieldTextMultipleViewHolder(
     parent: ViewGroup,
-    listener: EditableFieldAdapter.OnEditableFieldAdapter
+    listener: FormFieldAdapter.OnEditableFieldAdapter
 ) : AbstractFormFieldTextViewHolder<FormField.TextMultiple>(
     parent,
     listener

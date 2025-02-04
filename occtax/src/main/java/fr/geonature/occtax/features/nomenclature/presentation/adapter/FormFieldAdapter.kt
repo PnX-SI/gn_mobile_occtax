@@ -20,8 +20,8 @@ import fr.geonature.occtax.features.record.domain.PropertyValue
  *
  * @author S. Grimault
  */
-class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
-    RecyclerView.Adapter<EditableFieldAdapter.AbstractViewHolder>() {
+class FormFieldAdapter(private val listener: OnEditableFieldAdapter) :
+    RecyclerView.Adapter<FormFieldAdapter.AbstractViewHolder>() {
 
     private val availableEditableFields = mutableListOf<FormField>()
     private val selectedEditableFields = mutableListOf<FormField>()
@@ -89,7 +89,7 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
                     }
                 })
 
-            ViewType.CHECKBOX.ordinal -> CheckboxViewHolder(
+            ViewType.CHECKBOX.ordinal -> FormFieldCheckboxViewHolder(
                 parent,
                 listener
             )
@@ -99,47 +99,47 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
                 listener
             )
 
-            ViewType.MEDIA.ordinal -> MediaViewHolder(
+            ViewType.MEDIA.ordinal -> FormFieldMediaViewHolder(
                 parent,
                 listener
             )
 
-            ViewType.MIN_MAX.ordinal -> MinMaxViewHolder(
+            ViewType.MIN_MAX.ordinal -> FormFieldMinMaxViewHolder(
                 parent,
                 listener
             )
 
-            ViewType.NOMENCLATURE_TYPE.ordinal -> NomenclatureTypeViewHolder(
+            ViewType.NOMENCLATURE_TYPE.ordinal -> FormFieldNomenclatureTypeViewHolder(
                 parent,
                 listener
             )
 
-            ViewType.NUMBER.ordinal -> NumberViewHolder(
+            ViewType.NUMBER.ordinal -> FormFieldNumberViewHolder(
                 parent,
                 listener
             )
 
-            ViewType.RADIO.ordinal -> RadioViewHolder(
+            ViewType.RADIO.ordinal -> FormFieldRadioViewHolder(
                 parent,
                 listener
             )
 
-            ViewType.SELECT.ordinal -> SelectSimpleViewHolder(
+            ViewType.SELECT.ordinal -> FormFieldSelectSimpleViewHolder(
                 parent,
                 listener
             )
 
-            ViewType.SELECT_MULTIPLE.ordinal -> SelectMultipleViewHolder(
+            ViewType.SELECT_MULTIPLE.ordinal -> FormFieldSelectMultipleViewHolder(
                 parent,
                 listener
             )
 
-            ViewType.TEXT.ordinal -> TextSimpleViewHolder(
+            ViewType.TEXT.ordinal -> FormFieldTextSimpleViewHolder(
                 parent,
                 listener
             )
 
-            ViewType.TEXT_MULTIPLE.ordinal -> TextMultipleViewHolder(
+            ViewType.TEXT_MULTIPLE.ordinal -> FormFieldTextMultipleViewHolder(
                 parent,
                 listener
             )
@@ -469,7 +469,7 @@ class EditableFieldAdapter(private val listener: OnEditableFieldAdapter) :
     }
 
     /**
-     * Callback used by [EditableFieldAdapter].
+     * Callback used by [FormFieldAdapter].
      */
     interface OnEditableFieldAdapter {
 

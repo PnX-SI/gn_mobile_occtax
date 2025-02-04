@@ -34,7 +34,7 @@ import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
-import fr.geonature.occtax.features.nomenclature.presentation.adapter.EditableFieldAdapter
+import fr.geonature.occtax.features.nomenclature.presentation.adapter.FormFieldAdapter
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.MediaRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
@@ -65,7 +65,7 @@ class EditCountingMetadataFragment : Fragment() {
     private var saveFab: ExtendedFloatingActionButton? = null
 
     private var listener: OnEditCountingMetadataFragmentListener? = null
-    private var adapter: EditableFieldAdapter? = null
+    private var adapter: FormFieldAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -157,8 +157,8 @@ class EditCountingMetadataFragment : Fragment() {
             }
 
         // Set the adapter
-        adapter = EditableFieldAdapter(object :
-            EditableFieldAdapter.OnEditableFieldAdapter {
+        adapter = FormFieldAdapter(object :
+            FormFieldAdapter.OnEditableFieldAdapter {
 
             override fun getContext(): Context {
                 return requireContext()

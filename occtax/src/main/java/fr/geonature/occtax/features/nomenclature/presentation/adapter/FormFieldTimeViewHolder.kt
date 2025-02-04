@@ -20,14 +20,14 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 /**
- * [EditableFieldAdapter] [FormField.Time] view holder representing a textual value of a local time.
+ * [FormFieldAdapter] [FormField.Time] view holder representing a textual value of a local time.
  *
  * @see AbstractFormFieldTextViewHolder
  * @author S. Grimault
  */
 class FormFieldTimeViewHolder(
     parent: ViewGroup,
-    listener: EditableFieldAdapter.OnEditableFieldAdapter
+    listener: FormFieldAdapter.OnEditableFieldAdapter
 ) :
     AbstractFormFieldTextViewHolder<FormField.Time>(
         parent,

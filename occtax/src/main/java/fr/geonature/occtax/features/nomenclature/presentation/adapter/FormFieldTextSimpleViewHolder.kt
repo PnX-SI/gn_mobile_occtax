@@ -6,14 +6,14 @@ import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.PropertyValue
 
 /**
- * [EditableFieldAdapter] view holder representing a textual value.
+ * [FormFieldAdapter] view holder representing a textual value.
  *
  * @see AbstractFormFieldTextViewHolder
  * @author S. Grimault
  */
-open class TextSimpleViewHolder(
+open class FormFieldTextSimpleViewHolder(
     parent: ViewGroup,
-    listener: EditableFieldAdapter.OnEditableFieldAdapter
+    listener: FormFieldAdapter.OnEditableFieldAdapter
 ) : AbstractFormFieldTextViewHolder<FormField.Text>(
     parent,
     listener

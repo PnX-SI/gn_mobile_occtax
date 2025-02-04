@@ -11,14 +11,14 @@ import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.FormField
 
 /**
- * [EditableFieldAdapter] view holder representing a textual value.
+ * [FormFieldAdapter] view holder representing a textual value.
  *
  * @author S. Grimault
  */
 abstract class AbstractFormFieldTextViewHolder<FF : FormField.Editable>(
     parent: ViewGroup,
-    internal val listener: EditableFieldAdapter.OnEditableFieldAdapter
-) : EditableFieldAdapter.AbstractLockableViewHolder<FF>(
+    internal val listener: FormFieldAdapter.OnEditableFieldAdapter
+) : FormFieldAdapter.AbstractLockableViewHolder<FF>(
     LayoutInflater.from(parent.context)
         .inflate(
             R.layout.view_action_edit_text,

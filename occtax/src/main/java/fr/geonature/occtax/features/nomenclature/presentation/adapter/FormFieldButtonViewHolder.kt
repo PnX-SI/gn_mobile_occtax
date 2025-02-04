@@ -7,14 +7,14 @@ import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.FormField
 
 /**
- * [EditableFieldAdapter] [FormField.Button] view holder representing a simple button.
+ * [FormFieldAdapter] [FormField.Button] view holder representing a simple button.
  *
  * @author S. Grimault
  */
 class FormFieldButtonViewHolder(
     parent: ViewGroup,
     private val listener: OnFormFieldButtonViewHolderListener
-) : EditableFieldAdapter.AbstractFormFieldViewHolder<FormField.Button>(
+) : FormFieldAdapter.AbstractFormFieldViewHolder<FormField.Button>(
     LayoutInflater.from(parent.context)
         .inflate(
             R.layout.list_item_formfield_button,

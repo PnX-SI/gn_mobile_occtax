@@ -6,13 +6,13 @@ import android.widget.LinearLayout.LayoutParams
 import fr.geonature.occtax.features.nomenclature.domain.FormField
 
 /**
- * [EditableFieldAdapter] view holder representing nothing and show only an empty view
+ * [FormFieldAdapter] view holder representing nothing and show only an empty view
  * (i.e. a non supported [FormField]).
  *
  * @author S. Grimault
  */
 class NoneViewHolder(parent: ViewGroup) :
-    EditableFieldAdapter.AbstractViewHolder(LinearLayout(parent.context).apply {
+    FormFieldAdapter.AbstractViewHolder(LinearLayout(parent.context).apply {
         layoutParams = ViewGroup.LayoutParams(
             LayoutParams.MATCH_PARENT,
             0
