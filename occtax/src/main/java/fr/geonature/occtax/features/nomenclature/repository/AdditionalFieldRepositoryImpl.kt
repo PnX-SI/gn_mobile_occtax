@@ -2,6 +2,7 @@ package fr.geonature.occtax.features.nomenclature.repository
 
 import fr.geonature.commons.data.entity.AdditionalField
 import fr.geonature.commons.features.nomenclature.data.IAdditionalFieldLocalDataSource
+import fr.geonature.commons.util.toDate
 import fr.geonature.occtax.features.nomenclature.domain.AdditionalFieldType
 import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.PropertyValue
@@ -55,8 +56,20 @@ class AdditionalFieldRepositoryImpl(
                                         fieldValue.label
                                     )
                                 },
-                                value = PropertyValue.StringArray(it.additionalField.name)
+                                value = PropertyValue.StringArray(code = it.additionalField.name)
                             )
+                                .also { ff ->
+                                    val defaultValue =
+                                        it.additionalField.defaultValue ?: return@also
+
+                                    if (ff.values.map { pv -> pv.code }
+                                            .any { code -> code == defaultValue }) {
+                                        ff.value = PropertyValue.StringArray(
+                                            code = it.additionalField.name,
+                                            value = arrayOf(defaultValue)
+                                        )
+                                    }
+                                }
                         }
 
                         AdditionalField.FieldType.DATE -> {
@@ -70,7 +83,7 @@ class AdditionalFieldRepositoryImpl(
                                 mandatory = it.additionalField.mandatory,
                                 value = PropertyValue.Date(
                                     it.additionalField.name,
-                                    value = null
+                                    value = it.additionalField.defaultValue?.let { defaultValue -> toDate(defaultValue) }
                                 )
                             )
                         }
@@ -100,6 +113,18 @@ class AdditionalFieldRepositoryImpl(
                                 },
                                 value = PropertyValue.StringArray(it.additionalField.name)
                             )
+                                .also { ff ->
+                                    val defaultValue =
+                                        it.additionalField.defaultValue ?: return@also
+
+                                    if (ff.values.map { pv -> pv.code }
+                                            .any { code -> code == defaultValue }) {
+                                        ff.value = PropertyValue.StringArray(
+                                            code = it.additionalField.name,
+                                            value = arrayOf(defaultValue)
+                                        )
+                                    }
+                                }
                         }
 
                         AdditionalField.FieldType.NOMENCLATURE -> {
@@ -116,7 +141,7 @@ class AdditionalFieldRepositoryImpl(
                                     value = PropertyValue.Nomenclature(
                                         code = it.additionalField.name,
                                         label = null,
-                                        value = null
+                                        value = it.additionalField.defaultValue?.toLongOrNull()
                                     )
                                 )
                             } ?: run {
@@ -138,7 +163,7 @@ class AdditionalFieldRepositoryImpl(
                             mandatory = it.additionalField.mandatory,
                             value = PropertyValue.Number(
                                 code = it.additionalField.name,
-                                value = null
+                                value = it.additionalField.defaultValue?.toLongOrNull()
                             )
                         )
 
@@ -170,6 +195,18 @@ class AdditionalFieldRepositoryImpl(
                                     value = null
                                 )
                             )
+                                .also { ff ->
+                                    val defaultValue =
+                                        it.additionalField.defaultValue ?: return@also
+
+                                    if (ff.values.map { pv -> pv.code }
+                                            .any { code -> code == defaultValue }) {
+                                        ff.value = PropertyValue.Text(
+                                            code = it.additionalField.name,
+                                            value = defaultValue
+                                        )
+                                    }
+                                }
                         }
 
                         AdditionalField.FieldType.SELECT -> {
@@ -200,6 +237,18 @@ class AdditionalFieldRepositoryImpl(
                                     value = null
                                 )
                             )
+                                .also { ff ->
+                                    val defaultValue =
+                                        it.additionalField.defaultValue ?: return@also
+
+                                    if (ff.values.map { pv -> pv.code }
+                                            .any { code -> code == defaultValue }) {
+                                        ff.value = PropertyValue.Text(
+                                            code = it.additionalField.name,
+                                            value = defaultValue
+                                        )
+                                    }
+                                }
                         }
 
                         AdditionalField.FieldType.TEXT -> FormField.Text(
@@ -212,7 +261,7 @@ class AdditionalFieldRepositoryImpl(
                             mandatory = it.additionalField.mandatory,
                             value = PropertyValue.Text(
                                 code = it.additionalField.name,
-                                value = null
+                                value = it.additionalField.defaultValue
                             )
                         )
 
@@ -226,7 +275,7 @@ class AdditionalFieldRepositoryImpl(
                             mandatory = it.additionalField.mandatory,
                             value = PropertyValue.Text(
                                 code = it.additionalField.name,
-                                value = null
+                                value = it.additionalField.defaultValue
                             )
                         )
 
@@ -239,7 +288,12 @@ class AdditionalFieldRepositoryImpl(
                                 order = it.additionalField.order,
                                 additionalField = true,
                                 mandatory = it.additionalField.mandatory,
-                                value = PropertyValue.Time(it.additionalField.name)
+                                value = it.additionalField.defaultValue?.let { defaultValue ->
+                                    PropertyValue.Time.parse(
+                                        it.additionalField.name,
+                                        defaultValue
+                                    )
+                                } ?: PropertyValue.Time(it.additionalField.name)
                             )
                         }
 
