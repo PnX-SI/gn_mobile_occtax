@@ -5,6 +5,7 @@ import android.text.format.DateFormat
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import androidx.fragment.app.FragmentManager
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import fr.geonature.commons.util.get
@@ -27,7 +28,7 @@ import kotlin.coroutines.suspendCoroutine
  */
 class FormFieldTimeViewHolder(
     parent: ViewGroup,
-    listener: FormFieldAdapter.OnEditableFieldAdapter
+    override val listener: OnFormFieldTimeViewHolderListener
 ) :
     AbstractFormFieldTextViewHolder<FormField.Time>(
         parent,
@@ -112,4 +113,15 @@ class FormFieldTimeViewHolder(
                 )
             }
         }
+
+    /**
+     * Callback used by [FormFieldTimeViewHolder].
+     */
+    interface OnFormFieldTimeViewHolderListener: OnAbstractFormFieldTextViewHolderViewHolderListener<FormField.Time> {
+
+        /**
+         * Return the FragmentManager for interacting with fragments associated with this adapter views.
+         */
+        fun fragmentManager(): FragmentManager?
+    }
 }

@@ -14,7 +14,7 @@ import fr.geonature.occtax.features.record.domain.PropertyValue
  */
 class FormFieldTextMultipleViewHolder(
     parent: ViewGroup,
-    listener: FormFieldAdapter.OnEditableFieldAdapter
+    listener: OnAbstractFormFieldTextViewHolderViewHolderListener<FormField.TextMultiple>
 ) : AbstractFormFieldTextViewHolder<FormField.TextMultiple>(
     parent,
     listener

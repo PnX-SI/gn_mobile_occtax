@@ -2,6 +2,7 @@ package fr.geonature.occtax.features.nomenclature.domain
 
 import android.os.Parcelable
 import fr.geonature.occtax.features.record.domain.PropertyValue
+import fr.geonature.occtax.features.settings.domain.InputDateSettings
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -139,6 +140,13 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
                 order = order
             )
 
+            is StartEnd -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default,
+                order = order
+            )
+
             is Text -> ff.copy(
                 label = label,
                 visible = visible,
@@ -205,6 +213,11 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
          * Whether this property is locked for modification (default: `false`).
          */
         var locked: Boolean = false
+
+        /**
+         * Whether this editable field contains errors or not (default: `null`).
+         */
+        var error: CharSequence? = null
 
         /**
          * The current [PropertyValue] of this editable field.
@@ -459,6 +472,21 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
 
         var value: PropertyValue.StringArray
     ) : Editable()
+
+    /**
+     * As a group of start and end dates.
+     */
+    @Parcelize
+    data class StartEnd(
+        override val type: Type,
+        override val label: String,
+        override val default: Boolean = true,
+        override val visible: Boolean = true,
+        override val order: Int? = null,
+        val settings: InputDateSettings = InputDateSettings.DEFAULT,
+        val start: Date,
+        val end: Date
+    ) : FormField
 
     /**
      * As a single text field.

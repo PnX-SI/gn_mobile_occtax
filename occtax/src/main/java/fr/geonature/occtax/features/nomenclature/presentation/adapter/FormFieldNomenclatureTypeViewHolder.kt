@@ -5,7 +5,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.AutoCompleteTextView
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import com.google.android.material.textfield.TextInputLayout
+import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.lifecycle.observeOnce
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.FormField
@@ -18,7 +21,7 @@ import fr.geonature.occtax.features.record.domain.PropertyValue
  */
 class FormFieldNomenclatureTypeViewHolder(
     parent: ViewGroup,
-    private val listener: FormFieldAdapter.OnEditableFieldAdapter
+    private val listener: OnFormFieldNomenclatureTypeViewHolderListener
 ) : FormFieldAdapter.AbstractLockableViewHolder<FormField.NomenclatureType>(
     LayoutInflater.from(parent.context)
         .inflate(
@@ -37,6 +40,7 @@ class FormFieldNomenclatureTypeViewHolder(
                 formField
                     ?.run {
                         edit.error = null
+                        error = null
                         with(nomenclatureAdapter.getNomenclatureValue(position)) {
                             setValue(
                                 PropertyValue.Nomenclature(
@@ -62,6 +66,8 @@ class FormFieldNomenclatureTypeViewHolder(
                 .isEmpty()
         ) {
             edit.error = itemView.context.getString(R.string.form_field_error_mandatory)
+            formField.error = edit.error
+            listener.onUpdate(formField)
         }
 
         listener.getNomenclatureValues(formField.nomenclatureType)
@@ -94,5 +100,25 @@ class FormFieldNomenclatureTypeViewHolder(
             }
             hint = formField.label
         }
+    }
+
+    /**
+     * Callback used by [FormFieldNomenclatureTypeViewHolder].
+     */
+    interface OnFormFieldNomenclatureTypeViewHolderListener {
+
+        fun getLifecycleOwner(): LifecycleOwner
+
+        /**
+         * Requests showing all available nomenclature values from given nomenclature type.
+         */
+        fun getNomenclatureValues(nomenclatureTypeMnemonic: String): LiveData<List<Nomenclature>>
+
+        /**
+         * Called when an [FormField.Editable] has been updated.
+         *
+         * @param editableField the [FormField.Editable] updated
+         */
+        fun onUpdate(editableField: FormField.NomenclatureType)
     }
 }

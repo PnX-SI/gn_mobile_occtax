@@ -18,7 +18,7 @@ import fr.geonature.occtax.features.record.domain.PropertyValue
  */
 class FormFieldSelectSimpleViewHolder(
     parent: ViewGroup,
-    private val listener: FormFieldAdapter.OnEditableFieldAdapter
+    private val listener: OnFormFieldSelectSimpleViewHolderListener
 ) : FormFieldAdapter.AbstractLockableViewHolder<FormField.Select>(
     LayoutInflater.from(parent.context)
         .inflate(
@@ -36,6 +36,7 @@ class FormFieldSelectSimpleViewHolder(
             it.setOnItemClickListener { _, _, position, _ ->
                 formField?.run {
                     edit.error = null
+                    error = edit.error
                     setValue(PropertyValue.Text(code = getValue().code,
                         value = propertyValueTextAdapter.getPropertyValue(position)
                             .takeIf { pv -> pv is PropertyValue.Text }
@@ -57,6 +58,8 @@ class FormFieldSelectSimpleViewHolder(
                 .isEmpty()
         ) {
             edit.error = itemView.context.getString(R.string.form_field_error_mandatory)
+            formField.error = edit.error
+            listener.onUpdate(formField)
         }
 
         propertyValueTextAdapter.setPropertyValues(formField.values)
@@ -88,5 +91,18 @@ class FormFieldSelectSimpleViewHolder(
                     }
             }
         }
+    }
+
+    /**
+     * Callback used by [FormFieldSelectSimpleViewHolder].
+     */
+    interface OnFormFieldSelectSimpleViewHolderListener {
+
+        /**
+         * Called when an [FormField.Editable] has been updated.
+         *
+         * @param editableField the [FormField.Editable] updated
+         */
+        fun onUpdate(editableField: FormField.Select)
     }
 }

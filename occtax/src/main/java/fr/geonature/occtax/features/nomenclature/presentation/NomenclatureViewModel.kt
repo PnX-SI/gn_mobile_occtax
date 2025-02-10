@@ -10,6 +10,7 @@ import fr.geonature.commons.lifecycle.BaseViewModel
 import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.nomenclature.usecase.GetEditableFieldsUseCase
 import fr.geonature.occtax.features.nomenclature.usecase.GetNomenclatureValuesByTypeAndTaxonomyUseCase
+import fr.geonature.occtax.features.settings.domain.InputDateSettings
 import fr.geonature.occtax.features.settings.domain.PropertySettings
 import org.tinylog.Logger
 import javax.inject.Inject
@@ -42,7 +43,8 @@ class NomenclatureViewModel @Inject constructor(
         withAdditionalFields: Boolean = false,
         type: FormField.Type,
         defaultPropertySettings: List<PropertySettings> = listOf(),
-        taxonomy: Taxonomy? = null
+        taxonomy: Taxonomy? = null,
+        dateSettings: InputDateSettings = InputDateSettings.DEFAULT
     ) {
         getEditableFieldsUseCase(
             GetEditableFieldsUseCase.Params(
@@ -50,7 +52,8 @@ class NomenclatureViewModel @Inject constructor(
                 withAdditionalFields,
                 type,
                 defaultPropertySettings,
-                taxonomy
+                taxonomy,
+                dateSettings
             ),
             viewModelScope
         ) {

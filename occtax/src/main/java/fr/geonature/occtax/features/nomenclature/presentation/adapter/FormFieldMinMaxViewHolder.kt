@@ -13,6 +13,8 @@ import kotlin.math.ceil
 
 /**
  * [FormFieldAdapter] view holder representing a bounded numerical value.
+ *
+ * @author S. Grimault
  */
 class FormFieldMinMaxViewHolder(
     parent: ViewGroup,

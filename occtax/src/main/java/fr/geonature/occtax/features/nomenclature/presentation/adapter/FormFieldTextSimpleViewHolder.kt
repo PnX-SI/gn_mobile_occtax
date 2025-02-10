@@ -13,7 +13,7 @@ import fr.geonature.occtax.features.record.domain.PropertyValue
  */
 open class FormFieldTextSimpleViewHolder(
     parent: ViewGroup,
-    listener: FormFieldAdapter.OnEditableFieldAdapter
+    listener: OnAbstractFormFieldTextViewHolderViewHolderListener<FormField.Text>
 ) : AbstractFormFieldTextViewHolder<FormField.Text>(
     parent,
     listener

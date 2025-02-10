@@ -17,7 +17,7 @@ import fr.geonature.occtax.features.nomenclature.domain.FormField
  */
 abstract class AbstractFormFieldTextViewHolder<FF : FormField.Editable>(
     parent: ViewGroup,
-    internal val listener: FormFieldAdapter.OnEditableFieldAdapter
+    internal open val listener: OnAbstractFormFieldTextViewHolderViewHolderListener<FF>
 ) : FormFieldAdapter.AbstractLockableViewHolder<FF>(
     LayoutInflater.from(parent.context)
         .inflate(
@@ -45,15 +45,15 @@ abstract class AbstractFormFieldTextViewHolder<FF : FormField.Editable>(
         }
 
         override fun afterTextChanged(s: Editable?) {
-            this@AbstractFormFieldTextViewHolder.afterTextChanged(s)
-
             edit.error = null
 
             formField?.also {
                 edit.error = if (it.mandatory && (s == null || s.toString()
                         .isBlank())
                 ) itemView.context.getString(R.string.form_field_error_mandatory) else null
+                it.error = edit.error
             }
+            this@AbstractFormFieldTextViewHolder.afterTextChanged(s)
         }
     }
 
@@ -102,6 +102,8 @@ abstract class AbstractFormFieldTextViewHolder<FF : FormField.Editable>(
                 .isEmpty()
         ) {
             edit.error = itemView.context.getString(R.string.form_field_error_mandatory)
+            formField.error = edit.error
+            listener.onUpdate(formField)
         }
     }
 
@@ -113,5 +115,18 @@ abstract class AbstractFormFieldTextViewHolder<FF : FormField.Editable>(
         edit.editText?.text = Editable.Factory.getInstance()
             .newEditable(charSequence)
         edit.editText?.addTextChangedListener(textWatcher)
+    }
+
+    /**
+     * Callback used by [AbstractFormFieldTextViewHolder].
+     */
+    interface OnAbstractFormFieldTextViewHolderViewHolderListener<FF : FormField.Editable> {
+
+        /**
+         * Called when an [FormField.Editable] has been updated.
+         *
+         * @param editableField the [FormField.Editable] updated
+         */
+        fun onUpdate(editableField: FF)
     }
 }

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import androidx.fragment.app.FragmentManager
 import com.google.android.material.datepicker.MaterialDatePicker
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.FormField
@@ -26,7 +27,7 @@ import kotlin.coroutines.suspendCoroutine
  */
 class FormFieldDateViewHolder(
     parent: ViewGroup,
-    listener: FormFieldAdapter.OnEditableFieldAdapter
+    override val listener: OnFormFieldDateViewHolderListener
 ) :
     AbstractFormFieldTextViewHolder<FormField.Date>(
         parent,
@@ -129,11 +130,22 @@ class FormFieldDateViewHolder(
                 }
                 show(
                     fragmentManager,
-                    "date_picker_dialog_fragment${
+                    "date_picker_dialog_fragment_${
                         formField?.value?.code ?: UUID.randomUUID()
                             .toString()
                     }"
                 )
             }
         }
+
+    /**
+     * Callback used by [FormFieldDateViewHolder].
+     */
+    interface OnFormFieldDateViewHolderListener: OnAbstractFormFieldTextViewHolderViewHolderListener<FormField.Date> {
+
+        /**
+         * Return the FragmentManager for interacting with fragments associated with this adapter views.
+         */
+        fun fragmentManager(): FragmentManager?
+    }
 }

@@ -5,6 +5,7 @@ import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.AllMediaRecord
 import fr.geonature.occtax.features.record.domain.CountingRecord
+import fr.geonature.occtax.features.record.domain.DatesRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.settings.domain.PropertySettings
 
@@ -21,7 +22,23 @@ class NomenclatureSettingsLocalDataSourceImpl(context: Context) :
             type = FormField.Type.DEFAULT,
             label = context.getString(R.string.nomenclature_typ_grp),
             nomenclatureType = "TYP_GRP",
+            visible = false,
+            mandatory = true,
             value = PropertyValue.Nomenclature(code = "TYP_GRP")
+        ),
+        FormField.StartEnd(
+            type = FormField.Type.DEFAULT,
+            label = context.getString(R.string.input_date_hint),
+            start = FormField.Date(
+                type = FormField.Type.DEFAULT,
+                label = context.getString(R.string.input_date_start_hint),
+                value = PropertyValue.Date(code = DatesRecord.DATE_MIN_KEY)
+            ),
+            end = FormField.Date(
+                type = FormField.Type.DEFAULT,
+                label = context.getString(R.string.input_date_end_hint),
+                value = PropertyValue.Date(code = DatesRecord.DATE_MAX_KEY)
+            ),
         ),
         FormField.NomenclatureType(
             type = FormField.Type.INFORMATION,

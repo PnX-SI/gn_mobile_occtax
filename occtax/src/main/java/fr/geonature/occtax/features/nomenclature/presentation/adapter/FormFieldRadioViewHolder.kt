@@ -20,7 +20,7 @@ import fr.geonature.occtax.features.record.domain.PropertyValue
  */
 class FormFieldRadioViewHolder(
     parent: ViewGroup,
-    private val listener: FormFieldAdapter.OnEditableFieldAdapter
+    private val listener: OnFormFieldRadioViewHolderListener
 ) : FormFieldAdapter.AbstractFormFieldViewHolder<FormField.Radio>(
     LayoutInflater.from(parent.context)
         .inflate(
@@ -115,7 +115,10 @@ class FormFieldRadioViewHolder(
     override fun onBind(formField: FormField.Radio) {
         title.text = formField.label
 
-        setError(formField)
+        setError(
+            formField,
+            notify = true
+        )
 
         adapter.setItems(formField.values.map { pv ->
             pv.let {
@@ -127,11 +130,26 @@ class FormFieldRadioViewHolder(
         })
     }
 
-    private fun setError(formField: FormField.Radio) {
+    private fun setError(formField: FormField.Radio, notify: Boolean = false) {
         with(errorHint) {
             text = if (formField.mandatory && formField.getValue()
                     .isEmpty()
             ) context.getString(R.string.form_field_error_mandatory) else null
+            formField.error = text
+            if (notify) listener.onUpdate(formField)
         }
+    }
+
+    /**
+     * Callback used by [FormFieldRadioViewHolder].
+     */
+    interface OnFormFieldRadioViewHolderListener {
+
+        /**
+         * Called when an [FormField.Editable] has been updated.
+         *
+         * @param editableField the [FormField.Editable] updated
+         */
+        fun onUpdate(editableField: FormField.Radio)
     }
 }

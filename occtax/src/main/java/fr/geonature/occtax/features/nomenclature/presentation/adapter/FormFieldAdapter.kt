@@ -91,12 +91,29 @@ class FormFieldAdapter(private val listener: OnEditableFieldAdapter) :
 
             ViewType.CHECKBOX.ordinal -> FormFieldCheckboxViewHolder(
                 parent,
-                listener
+                object :
+                    FormFieldCheckboxViewHolder.OnFormFieldCheckboxViewHolderListener {
+                    override fun onUpdate(editableField: FormField.Checkbox) {
+                        availableEditableFields[availableEditableFields.indexOfFirst { ff -> ff is FormField.Checkbox && ff.value.code == editableField.value.code }] =
+                            editableField
+                        listener.onUpdate(editableField)
+                    }
+                }
             )
 
             ViewType.DATE.ordinal -> FormFieldDateViewHolder(
                 parent,
-                listener
+                object : FormFieldDateViewHolder.OnFormFieldDateViewHolderListener {
+                    override fun onUpdate(editableField: FormField.Date) {
+                        availableEditableFields[availableEditableFields.indexOfFirst { ff -> ff is FormField.Date && ff.value.code == editableField.value.code }] =
+                            editableField
+                        listener.onUpdate(editableField)
+                    }
+
+                    override fun fragmentManager(): FragmentManager? {
+                        return listener.fragmentManager()
+                    }
+                }
             )
 
             ViewType.MEDIA.ordinal -> FormFieldMediaViewHolder(
@@ -111,42 +128,123 @@ class FormFieldAdapter(private val listener: OnEditableFieldAdapter) :
 
             ViewType.NOMENCLATURE_TYPE.ordinal -> FormFieldNomenclatureTypeViewHolder(
                 parent,
-                listener
+                object :
+                    FormFieldNomenclatureTypeViewHolder.OnFormFieldNomenclatureTypeViewHolderListener {
+                    override fun getLifecycleOwner(): LifecycleOwner {
+                        return listener.getLifecycleOwner()
+                    }
+
+                    override fun getNomenclatureValues(nomenclatureTypeMnemonic: String): LiveData<List<Nomenclature>> {
+                        return listener.getNomenclatureValues(nomenclatureTypeMnemonic)
+                    }
+
+                    override fun onUpdate(editableField: FormField.NomenclatureType) {
+                        availableEditableFields[availableEditableFields.indexOfFirst { ff -> ff is FormField.NomenclatureType && ff.value.code == editableField.value.code }] =
+                            editableField
+                        listener.onUpdate(editableField)
+                    }
+                }
             )
 
             ViewType.NUMBER.ordinal -> FormFieldNumberViewHolder(
                 parent,
-                listener
+                object :
+                    AbstractFormFieldTextViewHolder.OnAbstractFormFieldTextViewHolderViewHolderListener<FormField.Number> {
+                    override fun onUpdate(editableField: FormField.Number) {
+                        availableEditableFields[availableEditableFields.indexOfFirst { ff -> ff is FormField.Number && ff.value.code == editableField.value.code }] =
+                            editableField
+                        listener.onUpdate(editableField)
+                    }
+                }
             )
 
             ViewType.RADIO.ordinal -> FormFieldRadioViewHolder(
                 parent,
-                listener
+                object : FormFieldRadioViewHolder.OnFormFieldRadioViewHolderListener {
+                    override fun onUpdate(editableField: FormField.Radio) {
+                        availableEditableFields[availableEditableFields.indexOfFirst { ff -> ff is FormField.Radio && ff.value.code == editableField.value.code }] =
+                            editableField
+                        listener.onUpdate(editableField)
+                    }
+                }
             )
 
             ViewType.SELECT.ordinal -> FormFieldSelectSimpleViewHolder(
                 parent,
-                listener
+                object : FormFieldSelectSimpleViewHolder.OnFormFieldSelectSimpleViewHolderListener {
+                    override fun onUpdate(editableField: FormField.Select) {
+                        availableEditableFields[availableEditableFields.indexOfFirst { ff -> ff is FormField.Select && ff.value.code == editableField.value.code }] =
+                            editableField
+                        listener.onUpdate(editableField)
+                    }
+                }
             )
 
             ViewType.SELECT_MULTIPLE.ordinal -> FormFieldSelectMultipleViewHolder(
                 parent,
-                listener
+                object :
+                    FormFieldSelectMultipleViewHolder.OnFormFieldSelectMultipleViewHolderListener {
+                    override fun onUpdate(editableField: FormField.SelectMultiple) {
+                        availableEditableFields[availableEditableFields.indexOfFirst { ff -> ff is FormField.SelectMultiple && ff.value.code == editableField.value.code }] =
+                            editableField
+                        listener.onUpdate(editableField)
+                    }
+                }
+            )
+
+            ViewType.START_END.ordinal -> FormFieldStartEndViewHolder(
+                parent,
+                object : FormFieldStartEndViewHolder.OnFormFieldStartEndViewHolderListener {
+                    override fun fragmentManager(): FragmentManager? {
+                        return listener.fragmentManager()
+                    }
+
+                    override fun onUpdate(formField: FormField.StartEnd) {
+                        availableEditableFields[availableEditableFields.indexOfFirst { ff -> ff is FormField.StartEnd }] =
+                            formField
+                        listener.onUpdate(formField.start)
+                        listener.onUpdate(formField.end)
+                    }
+                }
             )
 
             ViewType.TEXT.ordinal -> FormFieldTextSimpleViewHolder(
                 parent,
-                listener
+                object :
+                    AbstractFormFieldTextViewHolder.OnAbstractFormFieldTextViewHolderViewHolderListener<FormField.Text> {
+                    override fun onUpdate(editableField: FormField.Text) {
+                        availableEditableFields[availableEditableFields.indexOfFirst { ff -> ff is FormField.Text && ff.value.code == editableField.value.code }] =
+                            editableField
+                        listener.onUpdate(editableField)
+                    }
+                }
             )
 
             ViewType.TEXT_MULTIPLE.ordinal -> FormFieldTextMultipleViewHolder(
                 parent,
-                listener
+                object :
+                    AbstractFormFieldTextViewHolder.OnAbstractFormFieldTextViewHolderViewHolderListener<FormField.TextMultiple> {
+                    override fun onUpdate(editableField: FormField.TextMultiple) {
+                        availableEditableFields[availableEditableFields.indexOfFirst { ff -> ff is FormField.TextMultiple && ff.value.code == editableField.value.code }] =
+                            editableField
+                        listener.onUpdate(editableField)
+                    }
+                }
             )
 
             ViewType.TIME.ordinal -> FormFieldTimeViewHolder(
                 parent,
-                listener
+                object : FormFieldTimeViewHolder.OnFormFieldTimeViewHolderListener {
+                    override fun onUpdate(editableField: FormField.Time) {
+                        availableEditableFields[availableEditableFields.indexOfFirst { ff -> ff is FormField.Time && ff.value.code == editableField.value.code }] =
+                            editableField
+                        listener.onUpdate(editableField)
+                    }
+
+                    override fun fragmentManager(): FragmentManager? {
+                        return listener.fragmentManager()
+                    }
+                }
             )
 
             // not supported
@@ -183,6 +281,7 @@ class FormFieldAdapter(private val listener: OnEditableFieldAdapter) :
             is FormField.Radio -> ViewType.RADIO.ordinal
             is FormField.Select -> ViewType.SELECT.ordinal
             is FormField.SelectMultiple -> ViewType.SELECT_MULTIPLE.ordinal
+            is FormField.StartEnd -> ViewType.START_END.ordinal
             is FormField.Text -> ViewType.TEXT.ordinal
             is FormField.TextMultiple -> ViewType.TEXT_MULTIPLE.ordinal
             is FormField.Time -> ViewType.TIME.ordinal
@@ -214,6 +313,16 @@ class FormFieldAdapter(private val listener: OnEditableFieldAdapter) :
                                 value = propertyValue.filterIsInstance<PropertyValue.Number>()
                                     .firstOrNull { pv -> pv.code == it.max.value.code }
                                     ?: it.max.value)
+                        )
+
+                        is FormField.StartEnd -> it.copy(
+                            start = it.start.copy(value = propertyValue.filterIsInstance<PropertyValue.Date>()
+                                .firstOrNull { pv -> pv.code == it.start.value.code }
+                                ?: it.start.value),
+                            end = it.end.copy(
+                                value = propertyValue.filterIsInstance<PropertyValue.Date>()
+                                    .firstOrNull { pv -> pv.code == it.end.value.code }
+                                    ?: it.end.value)
                         )
 
                         else -> it
@@ -298,9 +407,15 @@ class FormFieldAdapter(private val listener: OnEditableFieldAdapter) :
     fun hasErrors(): Boolean {
         return availableEditableFields.filterIsInstance<FormField.Editable>()
             .any {
-                it.mandatory && it.getValue()
-                    .isEmpty()
+                it.error?.isNotBlank() == true
+            } || availableEditableFields.filterIsInstance<FormField.StartEnd>()
+            .flatMap {
+                listOf(
+                    it.start,
+                    it.end
+                )
             }
+            .any { it.error?.isNotBlank() == true }
     }
 
     private fun setFormFields(
@@ -372,9 +487,9 @@ class FormFieldAdapter(private val listener: OnEditableFieldAdapter) :
 
     /**
      * Base [ViewHolder][RecyclerView.ViewHolder] used by this adapter with the option of locking
-     * the [FormField].
+     * the [FormField.Editable].
      */
-    abstract class AbstractLockableViewHolder<FF : FormField>(itemView: View) :
+    abstract class AbstractLockableViewHolder<FF : FormField.Editable>(itemView: View) :
         AbstractFormFieldViewHolder<FF>(itemView) {
 
         fun bind(editableField: FormField, lockDefaultValues: Boolean = false) {
@@ -451,6 +566,11 @@ class FormFieldAdapter(private val listener: OnEditableFieldAdapter) :
          * As multiselect.
          */
         SELECT_MULTIPLE,
+
+        /**
+         * As a group of start and end dates.
+         */
+        START_END,
 
         /**
          * As a single text field.

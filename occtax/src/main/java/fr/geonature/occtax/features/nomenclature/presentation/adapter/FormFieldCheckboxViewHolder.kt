@@ -19,7 +19,7 @@ import fr.geonature.occtax.features.record.domain.PropertyValue
  */
 class FormFieldCheckboxViewHolder(
     parent: ViewGroup,
-    private val listener: FormFieldAdapter.OnEditableFieldAdapter
+    private val listener: OnFormFieldCheckboxViewHolderListener
 ) :
     FormFieldAdapter.AbstractFormFieldViewHolder<FormField.Checkbox>(
         LayoutInflater.from(parent.context)
@@ -108,7 +108,10 @@ class FormFieldCheckboxViewHolder(
     override fun onBind(formField: FormField.Checkbox) {
         title.text = formField.label
 
-        setError(formField)
+        setError(
+            formField,
+            notify = true
+        )
 
         val currentValues = formField.value.value
 
@@ -120,11 +123,26 @@ class FormFieldCheckboxViewHolder(
         })
     }
 
-    private fun setError(formField: FormField.Checkbox) {
+    private fun setError(formField: FormField.Checkbox, notify: Boolean = false) {
         with(errorHint) {
             text = if (formField.mandatory && formField.getValue()
                     .isEmpty()
             ) context.getString(R.string.form_field_error_mandatory) else null
+            formField.error = text
+            if (notify) listener.onUpdate(formField)
         }
+    }
+
+    /**
+     * Callback used by [FormFieldCheckboxViewHolder].
+     */
+    interface OnFormFieldCheckboxViewHolderListener {
+
+        /**
+         * Called when an [FormField.Editable] has been updated.
+         *
+         * @param editableField the [FormField.Editable] updated
+         */
+        fun onUpdate(editableField: FormField.Checkbox)
     }
 }

@@ -21,7 +21,7 @@ import fr.geonature.occtax.features.record.domain.PropertyValue
  */
 class FormFieldSelectMultipleViewHolder(
     parent: ViewGroup,
-    private val listener: FormFieldAdapter.OnEditableFieldAdapter
+    private val listener: OnFormFieldSelectMultipleViewHolderListener
 ) : FormFieldAdapter.AbstractLockableViewHolder<FormField.SelectMultiple>(
     LayoutInflater.from(parent.context)
         .inflate(
@@ -64,6 +64,8 @@ class FormFieldSelectMultipleViewHolder(
                 .isEmpty()
         ) {
             edit.error = itemView.context.getString(R.string.form_field_error_mandatory)
+            formField.error = edit.error
+            listener.onUpdate(formField)
         }
 
         with(edit) {
@@ -144,6 +146,7 @@ class FormFieldSelectMultipleViewHolder(
                     .also { propertyValue ->
                         edit.error =
                             if (editableField.mandatory && propertyValue.isEmpty()) itemView.context.getString(R.string.form_field_error_mandatory) else null
+                        editableField.error = edit.error
 
                         editableField.setValue(propertyValue)
                         editText.text = propertyValue
@@ -170,5 +173,18 @@ class FormFieldSelectMultipleViewHolder(
                 selectedItems[which] = checked
             }
             .show()
+    }
+
+    /**
+     * Callback used by [FormFieldSelectMultipleViewHolder].
+     */
+    interface OnFormFieldSelectMultipleViewHolderListener {
+
+        /**
+         * Called when an [FormField.Editable] has been updated.
+         *
+         * @param editableField the [FormField.Editable] updated
+         */
+        fun onUpdate(editableField: FormField.SelectMultiple)
     }
 }

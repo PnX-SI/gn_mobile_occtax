@@ -8,6 +8,7 @@ import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.nomenclature.repository.IAdditionalFieldRepository
 import fr.geonature.occtax.features.nomenclature.repository.IDefaultPropertyValueRepository
 import fr.geonature.occtax.features.nomenclature.repository.INomenclatureRepository
+import fr.geonature.occtax.features.settings.domain.InputDateSettings
 import fr.geonature.occtax.features.settings.domain.PropertySettings
 import org.tinylog.Logger
 import javax.inject.Inject
@@ -31,7 +32,13 @@ class GetEditableFieldsUseCase @Inject constructor(
             *params.settings.toTypedArray()
         )
             .let {
-                it.getOrNull() ?: return run {
+                it.getOrNull()
+                    ?.map { ff ->
+                        when (ff) {
+                            is FormField.StartEnd -> ff.copy(settings = params.dateSettings)
+                            else -> ff
+                        }
+                    } ?: return run {
                     Result.failure(
                         it.exceptionOrNull()
                             ?: NomenclatureException.NoNomenclatureTypeFoundException
@@ -72,6 +79,7 @@ class GetEditableFieldsUseCase @Inject constructor(
         val withAdditionalFields: Boolean = false,
         val type: FormField.Type,
         val settings: List<PropertySettings> = listOf(),
-        val taxonomy: Taxonomy? = null
+        val taxonomy: Taxonomy? = null,
+        val dateSettings: InputDateSettings = InputDateSettings.DEFAULT
     )
 }
