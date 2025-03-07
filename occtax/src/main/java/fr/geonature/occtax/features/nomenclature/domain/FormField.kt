@@ -98,6 +98,20 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
                 order = order
             )
 
+            is Modal -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default,
+                order = order
+            )
+
+            is ModalMultiple -> ff.copy(
+                label = label,
+                visible = visible,
+                default = default,
+                order = order
+            )
+
             is NomenclatureType -> ff.copy(
                 label = label,
                 visible = visible,
@@ -226,6 +240,8 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
             is Checkbox -> value
             is Date -> value
             is Media -> value
+            is Modal -> value
+            is ModalMultiple -> value
             is NomenclatureType -> value
             is Number -> value
             is Radio -> value
@@ -248,6 +264,12 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
 
             is Media -> ff.value =
                 if (value is PropertyValue.Media) value.copy(ff.value.code) else ff.value
+
+            is Modal -> ff.value =
+                if (value is PropertyValue.Number) value.copy(ff.value.code) else ff.value
+
+            is ModalMultiple -> ff.value =
+                if (value is PropertyValue.NumberArray) value.copy(ff.value.code) else ff.value
 
             is NomenclatureType -> ff.value =
                 if (value is PropertyValue.Nomenclature) value.copy(ff.value.code) else ff.value
@@ -367,6 +389,45 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
         val min: Number,
         val max: Number
     ) : FormField
+
+    /**
+     * As modal with single value.
+     */
+    @Parcelize
+    data class Modal(
+        override val parent: Section? = null,
+        override val type: Type,
+        override val label: String,
+        override val default: Boolean = true,
+        override val visible: Boolean = true,
+        override val order: Int? = null,
+        override val additionalField: Boolean = false,
+        override val mandatory: Boolean = false,
+        var emptyText: String? = null,
+        var value: PropertyValue.Number,
+        var item: Pair<String, String?>? = null
+    ) : Editable()
+
+    /**
+     * As modal with multiple values.
+     */
+    @Parcelize
+    data class ModalMultiple(
+        override val parent: Section? = null,
+        override val type: Type,
+        override val label: String,
+        override val default: Boolean = true,
+        override val visible: Boolean = true,
+        override val order: Int? = null,
+        override val additionalField: Boolean = false,
+        override val mandatory: Boolean = false,
+        var emptyText: String? = null,
+        var actionText: String? = null,
+        var actionEmptyText: String? = null,
+        var visibleItems: Int = 2,
+        var value: PropertyValue.NumberArray,
+        var items: List<Pair<String, String?>> = emptyList()
+    ) : Editable()
 
     /**
      * As dropdown nomenclature items.

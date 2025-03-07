@@ -105,7 +105,8 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
         pageFragmentViewModel.set(
             R.string.pager_fragment_observers_and_date_input_title to ObserversAndDateInputFragment.newInstance(
                 dateSettings = appSettings.inputSettings.dateSettings,
-                saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues ?: false
+                withAdditionalFields = appSettings.nomenclatureSettings?.withAdditionalFields
+                    ?: false
             ),
             R.string.pager_fragment_map_title to InputMapFragment.newInstance(
                 MapSettings.Builder()

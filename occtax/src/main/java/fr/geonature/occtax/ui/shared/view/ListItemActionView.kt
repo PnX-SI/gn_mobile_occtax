@@ -2,7 +2,6 @@ package fr.geonature.occtax.ui.shared.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Pair
 import android.view.View
 import android.view.animation.AnimationUtils.loadAnimation
 import android.widget.Button
@@ -29,11 +28,8 @@ open class ListItemActionView : ConstraintLayout {
     private lateinit var adapter: EditListItemViewRecyclerViewAdapter
     private var listener: OnListItemActionViewListener? = null
 
-    @StringRes
-    private var actionText: Int = 0
-
-    @StringRes
-    private var actionEmptyText: Int = 0
+    private var actionText: String? = null
+    private var actionEmptyText: String? = null
 
     constructor(context: Context) : super(context) {
         init(
@@ -84,7 +80,11 @@ open class ListItemActionView : ConstraintLayout {
     }
 
     fun setEmptyText(@StringRes emptyTextResourceId: Int) {
-        emptyTextView.setText(if (emptyTextResourceId == 0) R.string.no_data else emptyTextResourceId)
+        setEmptyText(context.getString(if (emptyTextResourceId == 0) R.string.no_data else emptyTextResourceId))
+    }
+
+    fun setEmptyText(emptyText: String?) {
+        emptyTextView.text = emptyText ?: context.getString(R.string.no_data)
     }
 
     fun enableActionButton(enabled: Boolean = true) {
@@ -96,8 +96,14 @@ open class ListItemActionView : ConstraintLayout {
             return
         }
 
-        actionText = actionResourceId
-        actionEmptyText = actionResourceId
+        setActionText(context.getString(actionResourceId))
+    }
+
+    fun setActionText(actionText: String?) {
+        if (actionText?.isBlank() == true) return
+
+        this.actionText = actionText
+        this.actionEmptyText = actionText
     }
 
     fun setActionEmptyText(@StringRes actionResourceId: Int) {
@@ -105,7 +111,13 @@ open class ListItemActionView : ConstraintLayout {
             return
         }
 
-        actionEmptyText = actionResourceId
+        setActionEmptyText(context.getString(actionResourceId))
+    }
+
+    fun setActionEmptyText(actionEmptyText:String?) {
+        if (actionEmptyText?.isBlank() == true) return
+
+        this.actionEmptyText = actionEmptyText
     }
 
     fun setVisibleItems(visibleItems: Int = 1) {
@@ -117,7 +129,8 @@ open class ListItemActionView : ConstraintLayout {
         )
 
         if (listPreferredItemHeight > 0) {
-            recyclerView.layoutParams.height = visibleItems * (listPreferredItemHeight.toInt() + visibleItems)
+            recyclerView.layoutParams.height =
+                visibleItems * (listPreferredItemHeight.toInt() + visibleItems)
         }
 
         typedArray.recycle()
@@ -186,9 +199,10 @@ open class ListItemActionView : ConstraintLayout {
             0
         )
 
-        ta.getString(R.styleable.ListItemActionView_title)?.also {
-            setTitle(it)
-        }
+        ta.getString(R.styleable.ListItemActionView_title)
+            ?.also {
+                setTitle(it)
+            }
         setTitle(
             ta.getResourceId(
                 R.styleable.ListItemActionView_title,

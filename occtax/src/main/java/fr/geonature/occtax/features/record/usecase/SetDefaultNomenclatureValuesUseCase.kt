@@ -49,7 +49,7 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
         val editableFieldsInformation =
             (nomenclatureRepository.getEditableFields(FormField.Type.INFORMATION)
                 .getOrElse { emptyList() } + if (params.withAdditionalFields) additionalFieldRepository.getAllAdditionalFields(
-                observationRecord.dataset.dataset?.datasetId,
+                observationRecord.dataset.dataset?.value?.id,
                 FormField.Type.INFORMATION
             )
                 .getOrElse { emptyList() } else emptyList()).filterIsInstance<FormField.Editable>()
@@ -69,7 +69,7 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
         val editableFieldsCounting =
             (nomenclatureRepository.getEditableFields(FormField.Type.COUNTING)
                 .getOrElse { emptyList() } + if (params.withAdditionalFields) additionalFieldRepository.getAllAdditionalFields(
-                observationRecord.dataset.dataset?.datasetId,
+                observationRecord.dataset.dataset?.value?.id,
                 FormField.Type.COUNTING
             )
                 .getOrElse { emptyList() } else emptyList()).filterIsInstance<FormField.Editable>()

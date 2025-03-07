@@ -26,6 +26,7 @@ import fr.geonature.occtax.features.settings.domain.InputDateSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.temporal.ChronoUnit
 import java.util.Calendar
 import java.util.Date
 import java.util.UUID
@@ -107,6 +108,15 @@ class FormFieldStartEndViewHolder(
                                     value = startDate
                                 )
                             )
+
+                            if (dateSettings.endDateSettings == null) {
+                                end.setValue(
+                                    PropertyValue.Date(
+                                        code = end.getValue().code,
+                                        value = startDate
+                                    )
+                                )
+                            }
                         }
                         listener.onUpdate(this)
                     }
@@ -258,7 +268,7 @@ class FormFieldStartEndViewHolder(
                         )
 
                     if (!withTime) {
-                        continuation.resume(selectedDate)
+                        continuation.resume(Date.from(selectedDate.toInstant().truncatedTo(ChronoUnit.DAYS)))
 
                         return@addOnPositiveButtonClickListener
                     }

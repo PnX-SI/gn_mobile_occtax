@@ -160,7 +160,8 @@ class InformationFragment : AbstractInputFragment() {
                     }
                 } else {
                     // as editable field
-                    editableField.getValue().toPair()
+                    editableField.getValue()
+                        .toPair()
                         .also {
                             if (it.second.isEmpty()) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(editableField.getValue().code)
                             else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
@@ -187,6 +188,10 @@ class InformationFragment : AbstractInputFragment() {
                         ),
                     editableField.getValue().code
                 )
+            }
+
+            override fun onAction(formField: FormField) {
+                // nothing to do…
             }
 
             override fun onAddMedia(nomenclatureTypeMnemonic: String) {
@@ -233,7 +238,7 @@ class InformationFragment : AbstractInputFragment() {
 
     override fun refreshView() {
         nomenclatureViewModel.getEditableFields(
-            observationRecord?.dataset?.dataset?.datasetId,
+            observationRecord?.dataset?.dataset?.value?.id,
             arguments?.getBoolean(
                 ARG_WITH_ADDITIONAL_FIELDS,
                 false
@@ -246,30 +251,7 @@ class InformationFragment : AbstractInputFragment() {
     }
 
     private fun handleEditableFields(editableFields: List<FormField>) {
-        editableFields.flatMap {
-            when (it) {
-                is FormField.Editable -> listOf(it)
-                else -> listOf(null)
-            }
-        }
-            .filterNotNull()
-            .map { it.getValue() }
-            .forEach {
-                // if we have existing value to the current selected taxon, do nothing
-                if (observationRecord?.taxa?.selectedTaxonRecord?.properties?.containsKey(it.code) == true) return@forEach
-
-                it.toPair()
-                    .also { pair ->
-                        if (it.isEmpty()) {
-                            observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(pair.first)
-                        } else {
-                            observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
-                                pair.first,
-                                pair.second
-                            )
-                        }
-                    }
-            }
+        mapDefaultValueToTaxonRecord(editableFields)
 
         adapter?.bind(
             editableFields,
@@ -282,6 +264,34 @@ class InformationFragment : AbstractInputFragment() {
         )
 
         listener.validateCurrentPage()
+    }
+
+    private fun mapDefaultValueToTaxonRecord(editableFields: List<FormField>) {
+        // map editable form fields existing values to the given taxon record
+        editableFields
+            .filterIsInstance<FormField.Editable>()
+            .forEach { ff ->
+                // if we have existing value from taxon record, do nothing
+                if (!ff.additionalField && observationRecord?.taxa?.selectedTaxonRecord?.properties?.containsKey(ff.getValue().code) == true) return
+                if (ff.additionalField && observationRecord?.taxa?.selectedTaxonRecord?.additionalFields?.associateBy { pv -> pv.code }
+                        ?.containsKey(ff.getValue().code) == true) return
+
+                // set default value from editable field to the given taxon record
+                if (!ff.additionalField) {
+                    observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
+                        ff.getValue().code,
+                        ff.getValue()
+                    )
+                }
+
+                if (ff.additionalField) {
+                    observationRecord?.taxa?.selectedTaxonRecord?.also { record ->
+                        record.additionalFields = record.additionalFields.filter { pv ->
+                            pv.toPair().first != ff.getValue().code
+                        } + listOfNotNull(ff.getValue())
+                    }
+                }
+            }
     }
 
     companion object {

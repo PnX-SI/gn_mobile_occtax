@@ -2,6 +2,7 @@ package fr.geonature.occtax.features.record.domain
 
 import android.os.Parcel
 import fr.geonature.commons.data.entity.Dataset
+import fr.geonature.commons.data.entity.InputObserver
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.util.add
@@ -86,16 +87,30 @@ class ObservationRecordTest {
         assertEquals(
             PropertyValue.Dataset(
                 DatasetRecord.DATASET_ID_KEY,
-                17L,
-                100L
+                Dataset(
+                    id = 17L,
+                    name = "Jeu de données personnel de Auger Ariane",
+                    description = "Jeu de données personnel de Auger Ariane",
+                    active = true,
+                    createdAt = Date.from(Instant.parse("2020-03-28T10:00:00Z")),
+                    updatedAt = null,
+                    100L
+                )
             ),
             record.properties[DatasetRecord.DATASET_ID_KEY]
         )
         assertEquals(
             PropertyValue.Dataset(
                 DatasetRecord.DATASET_ID_KEY,
-                17L,
-                100L
+                Dataset(
+                    id = 17L,
+                    name = "Jeu de données personnel de Auger Ariane",
+                    description = "Jeu de données personnel de Auger Ariane",
+                    active = true,
+                    createdAt = Date.from(Instant.parse("2020-03-28T10:00:00Z")),
+                    updatedAt = null,
+                    100L
+                )
             ),
             record.dataset.dataset
         )
@@ -109,13 +124,17 @@ class ObservationRecordTest {
         assertEquals(
             PropertyValue.Dataset(
                 DatasetRecord.DATASET_ID_KEY,
-                17L
+                Dataset(
+                    id = 17L,
+                    name = "",
+                    createdAt = record.dataset.dataset?.value?.createdAt ?: Date()
+                )
             ),
             record.properties[DatasetRecord.DATASET_ID_KEY]
         )
         assertEquals(
             17L,
-            record.dataset.dataset?.datasetId
+            record.dataset.dataset?.value?.id
         )
     }
 
@@ -261,8 +280,20 @@ class ObservationRecordTest {
     fun `should set the primary observer`() {
         // given an observation record with some observers
         val record = ObservationRecord(internalId = 1234L).apply {
-            observers.addObserverId(8L)
-            observers.addObserverId(6L)
+            observers.setObservers(
+                listOf(
+                    InputObserver(
+                        id = 8L,
+                        lastname = "Li",
+                        firstname = "Andy"
+                    ),
+                    InputObserver(
+                        id = 4L,
+                        lastname = "Jenkins",
+                        firstname = "Noor"
+                    )
+                )
+            )
         }
 
         // then
@@ -280,7 +311,7 @@ class ObservationRecordTest {
         assertArrayEquals(
             arrayOf(
                 8L,
-                6L
+                4L
             ),
             record.observers.getAllObserverIds()
                 .toTypedArray()
@@ -305,7 +336,7 @@ class ObservationRecordTest {
             arrayOf(
                 7L,
                 8L,
-                6L
+                4L
             ),
             record.observers.getAllObserverIds()
                 .toTypedArray()

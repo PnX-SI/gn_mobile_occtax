@@ -282,6 +282,10 @@ class EditCountingMetadataFragment : Fragment() {
                 )
             }
 
+            override fun onAction(formField: FormField) {
+                // nothing to do…
+            }
+
             override fun onAddMedia(nomenclatureTypeMnemonic: String) {
                 val context = context ?: run {
                     Logger.warn { "missing context to pick media: abort" }
@@ -388,35 +392,7 @@ class EditCountingMetadataFragment : Fragment() {
     }
 
     private fun handleEditableFields(editableFields: List<FormField>) {
-        editableFields.flatMap {
-            when (it) {
-                is FormField.Editable -> listOf(it)
-                is FormField.MinMax -> listOf(
-                    it.min,
-                    it.max
-                )
-
-                else -> listOf(null)
-            }
-        }
-            .filterNotNull()
-            .map { it.getValue() }
-            .forEach {
-                // if we have existing value to the current counting record, do nothing
-                if (countingRecord?.properties?.containsKey(it.code) == true) return@forEach
-
-                it.toPair()
-                    .also { pair ->
-                        if (it.isEmpty()) {
-                            countingRecord?.properties?.remove(pair.first)
-                        } else {
-                            countingRecord?.properties?.set(
-                                pair.first,
-                                pair.second
-                            )
-                        }
-                    }
-            }
+        mapDefaultValueToCountingRecord(editableFields)
 
         adapter?.bind(
             editableFields,
@@ -433,6 +409,44 @@ class EditCountingMetadataFragment : Fragment() {
         else {
             saveFab?.extend()
         }
+    }
+
+    private fun mapDefaultValueToCountingRecord(editableFields: List<FormField>) {
+        // map editable form fields existing values to the given counting record
+        editableFields.flatMap { ff ->
+            when (ff) {
+                is FormField.Editable -> listOf(ff)
+                is FormField.MinMax -> listOf(
+                    ff.min,
+                    ff.max
+                )
+
+                else -> listOf(null)
+            }
+        }
+            .filterNotNull()
+            .forEach { ff ->
+                // if we have existing value from counting record, do nothing
+                if (!ff.additionalField && countingRecord?.properties?.containsKey(ff.getValue().code) == true) return
+                if (ff.additionalField && countingRecord?.additionalFields?.associateBy { pv -> pv.code }
+                        ?.containsKey(ff.getValue().code) == true) return
+
+                // set default value from editable field to the given counting record
+                if (!ff.additionalField) {
+                    countingRecord?.properties?.set(
+                        ff.getValue().code,
+                        ff.getValue()
+                    )
+                }
+
+                if (ff.additionalField) {
+                    countingRecord?.also { record ->
+                        record.additionalFields = record.additionalFields.filter { pv ->
+                            pv.toPair().first != ff.getValue().code
+                        } + listOfNotNull(ff.getValue())
+                    }
+                }
+            }
     }
 
     private fun launchMediaActivity(selectedMedia: MediaRecord? = null) {

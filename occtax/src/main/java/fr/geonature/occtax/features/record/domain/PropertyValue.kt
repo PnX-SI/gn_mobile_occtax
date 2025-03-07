@@ -1,10 +1,11 @@
 package fr.geonature.occtax.features.record.domain
 
 import android.os.Parcelable
+import fr.geonature.commons.data.entity.InputObserver
 import kotlinx.parcelize.Parcelize
 
 /**
- * Property value of an an observation record.
+ * Property value of an observation record.
  *
  * @author S. Grimault
  */
@@ -26,7 +27,8 @@ sealed class PropertyValue : Parcelable {
             is StringArray -> value.isEmpty()
             is Number -> value == null
             is NumberArray -> value.isEmpty()
-            is Dataset -> datasetId == null
+            is Observers -> value.isEmpty()
+            is Dataset -> value == null
             is Nomenclature -> value == null
             is AdditionalFields -> value.all { it.value.isEmpty() }
             is Taxa -> value.all { taxon -> taxon.properties.all { it.value.isEmpty() } }
@@ -45,6 +47,7 @@ sealed class PropertyValue : Parcelable {
         is StringArray -> code
         is Number -> code
         is NumberArray -> code
+        is Observers -> code
         is Dataset -> code
         is Nomenclature -> code
         is AdditionalFields -> code
@@ -177,13 +180,41 @@ sealed class PropertyValue : Parcelable {
     }
 
     /**
+     * As observer.
+     */
+    @Parcelize
+    data class Observers(
+        override val code: String,
+        val value: Array<InputObserver> = emptyArray()
+    ) :
+        PropertyValue() {
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Observers
+
+            if (code != other.code) return false
+            if (!value.contentEquals(other.value)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = code.hashCode()
+            result = 31 * result + value.contentHashCode()
+            return result
+        }
+    }
+
+    /**
      * As dataset.
      */
     @Parcelize
     data class Dataset(
         override val code: String,
-        val datasetId: Long? = null,
-        val taxaListId: Long? = null
+        val value: fr.geonature.commons.data.entity.Dataset? = null
     ) :
         PropertyValue()
 

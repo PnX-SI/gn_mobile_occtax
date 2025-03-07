@@ -3,6 +3,7 @@ package fr.geonature.occtax.features.record.domain
 import android.os.Parcelable
 import fr.geonature.commons.data.entity.AbstractTaxon
 import fr.geonature.commons.data.entity.Dataset
+import fr.geonature.commons.data.entity.InputObserver
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import org.locationtech.jts.geom.Geometry
@@ -82,6 +83,25 @@ data class ObservationRecord(
         properties
     )
 
+    /**
+     * Additional fields of this observation record.
+     */
+    @IgnoredOnParcel
+    var additionalFields: List<PropertyValue>
+        get() = properties[ADDITIONAL_FIELDS_KEY]
+            ?.takeIf { it is PropertyValue.AdditionalFields }
+            ?.let { it as PropertyValue.AdditionalFields }?.value?.values?.toList()
+            ?: emptyList()
+        set(value) {
+            PropertyValue.AdditionalFields(
+                ADDITIONAL_FIELDS_KEY,
+                value.associate { it.toPair() }
+            )
+                .also {
+                    properties[it.code] = it
+                }
+        }
+
     enum class Status {
         DRAFT,
         TO_SYNC,
@@ -139,8 +159,7 @@ class DatasetRecord(private val properties: SortedMap<String, PropertyValue>) {
         set(value) {
             PropertyValue.Dataset(
                 DATASET_ID_KEY,
-                value?.datasetId,
-                value?.taxaListId
+                value?.value
             )
                 .also {
                     if (it.isEmpty()) properties.remove(DATASET_ID_KEY)
@@ -151,15 +170,19 @@ class DatasetRecord(private val properties: SortedMap<String, PropertyValue>) {
     fun setDataset(dataset: Dataset?) {
         this.dataset = PropertyValue.Dataset(
             DATASET_ID_KEY,
-            dataset?.id,
-            dataset?.taxaListId
+            dataset
         )
     }
 
     fun setDatasetId(datasetId: Long?) {
         this.dataset = PropertyValue.Dataset(
             DATASET_ID_KEY,
-            datasetId
+            datasetId?.let {
+                Dataset(
+                    id = it,
+                    name = ""
+                )
+            }
         )
     }
 
@@ -285,6 +308,39 @@ class ModuleRecord(private val properties: SortedMap<String, PropertyValue>) {
 class ObserversRecord(private val properties: SortedMap<String, PropertyValue>) {
 
     /**
+     * All observers of this observation record.
+     */
+    var observers: PropertyValue.Observers?
+        get() = properties[OBSERVERS_KEY].takeIf { it is PropertyValue.Observers }
+            ?.let { it as PropertyValue.Observers }
+        set(value) {
+            // the "primary" observer at first position
+            PropertyValue.Number(
+                DIGITISER_KEY,
+                value?.value?.firstOrNull()?.id
+            )
+                .also {
+                    if (it.isEmpty()) properties.remove(DIGITISER_KEY)
+                    properties[it.code] = it
+                }
+            PropertyValue.Observers(
+                OBSERVERS_KEY,
+                value?.value ?: emptyArray()
+            )
+                .also {
+                    if (it.isEmpty()) properties.remove(OBSERVERS_KEY)
+                    else properties[it.code] = it
+                }
+        }
+
+    fun setObservers(inputObservers: List<InputObserver>) {
+        observers = PropertyValue.Observers(
+            OBSERVERS_KEY,
+            value = inputObservers.toTypedArray()
+        )
+    }
+
+    /**
      * Gets the primary observer of this observation record.
      */
     fun getPrimaryObserverId(): Long? {
@@ -297,9 +353,9 @@ class ObserversRecord(private val properties: SortedMap<String, PropertyValue>) 
      */
     fun getAllObserverIds(): Set<Long> {
         return properties[OBSERVERS_KEY]
-            ?.takeIf { it is PropertyValue.NumberArray }
-            ?.let { it as PropertyValue.NumberArray }
-            ?.value?.map { it.toLong() }
+            ?.takeIf { it is PropertyValue.Observers }
+            ?.let { it as PropertyValue.Observers }
+            ?.value?.map { it.id }
             ?.toSet() ?: emptySet()
     }
 
@@ -314,16 +370,11 @@ class ObserversRecord(private val properties: SortedMap<String, PropertyValue>) 
             .also {
                 properties[it.code] = it
             }
-        PropertyValue.NumberArray(
+
+        PropertyValue.Observers(
             OBSERVERS_KEY,
-            getAllObserverIds().toMutableList()
-                .also {
-                    it.add(
-                        0,
-                        id
-                    )
-                }
-                .toTypedArray()
+            observers?.let { arrayOf(InputObserver(id)) + it.value.filterNot { inputObserver -> inputObserver.id == id } }
+                ?: arrayOf(InputObserver(id))
         )
             .also {
                 properties[it.code] = it
@@ -344,13 +395,10 @@ class ObserversRecord(private val properties: SortedMap<String, PropertyValue>) 
                 }
         }
 
-        PropertyValue.NumberArray(
+        PropertyValue.Observers(
             OBSERVERS_KEY,
-            getAllObserverIds().toMutableList()
-                .also {
-                    it.add(id)
-                }
-                .toTypedArray()
+            observers?.let { it.value.filterNot { inputObserver -> inputObserver.id == id }.toTypedArray() + arrayOf(InputObserver(id)) }
+                ?: arrayOf(InputObserver(id))
         )
             .also {
                 properties[it.code] = it

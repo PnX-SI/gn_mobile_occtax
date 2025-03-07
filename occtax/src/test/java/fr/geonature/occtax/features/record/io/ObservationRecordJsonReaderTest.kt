@@ -1,5 +1,6 @@
 package fr.geonature.occtax.features.record.io
 
+import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.util.set
@@ -71,7 +72,13 @@ class ObservationRecordJsonReaderTest {
                 status = ObservationRecord.Status.DRAFT
             ).apply {
                 comment.comment = "Global comment"
-                dataset.setDatasetId(17L)
+                dataset.setDataset(
+                    Dataset(
+                        id = 17L,
+                        name = "",
+                        createdAt = observationRecord.dataset.dataset?.value?.createdAt!!
+                    )
+                )
                 dates.start = toDate("2016-10-28T08:15:00Z")!!
                 dates.end = toDate("2016-10-29T09:00:00Z")!!
 
@@ -212,7 +219,13 @@ class ObservationRecordJsonReaderTest {
                 status = ObservationRecord.Status.DRAFT
             ).apply {
                 comment.comment = "Global comment"
-                dataset.setDatasetId(17L)
+                dataset.setDataset(
+                    Dataset(
+                        id = 17L,
+                        name = "",
+                        createdAt = observationRecord.dataset.dataset?.value?.createdAt!!
+                    )
+                )
                 dates.start = toDate("2016-10-28T08:15:00Z")!!
                 dates.end = toDate("2016-10-29T09:00:00Z")!!
 
@@ -407,7 +420,13 @@ class ObservationRecordJsonReaderTest {
                 status = ObservationRecord.Status.DRAFT
             ).apply {
                 comment.comment = "Global comment"
-                dataset.setDatasetId(17L)
+                dataset.setDataset(
+                    Dataset(
+                        id = 17L,
+                        name = "",
+                        createdAt = observationRecord.dataset.dataset?.value?.createdAt!!
+                    )
+                )
                 dates.start = toDate("2016-10-28T08:15:00Z")!!
                 dates.end = toDate("2016-10-29T09:00:00Z")!!
 
@@ -464,7 +483,13 @@ class ObservationRecordJsonReaderTest {
                 status = ObservationRecord.Status.DRAFT
             ).apply {
                 comment.comment = "Global comment"
-                dataset.setDatasetId(1L)
+                dataset.setDataset(
+                    Dataset(
+                        id = 1L,
+                        name = "",
+                        createdAt = observationRecord.dataset.dataset?.value?.createdAt!!
+                    )
+                )
                 dates.start = toDate("2016-10-28")!!.set(
                     Calendar.HOUR_OF_DAY,
                     0
@@ -588,7 +613,15 @@ class ObservationRecordJsonReaderTest {
 
         assertEquals(
             observationRecordFromLegacy,
-            observationRecord
+            observationRecord.apply {
+                dataset.setDataset(
+                    Dataset(
+                        id = 17L,
+                        name = "",
+                        createdAt = observationRecordFromLegacy.dataset.dataset?.value?.createdAt!!
+                    )
+                )
+            }
         )
     }
 }

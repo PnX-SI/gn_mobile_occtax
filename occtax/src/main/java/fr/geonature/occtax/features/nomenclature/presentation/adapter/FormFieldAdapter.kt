@@ -126,6 +126,24 @@ class FormFieldAdapter(private val listener: OnEditableFieldAdapter) :
                 listener
             )
 
+            ViewType.MODAL.ordinal -> FormFieldModalViewHolder(
+                parent,
+                object : FormFieldModalViewHolder.OnFormFieldModalViewHolder {
+                    override fun onAction(formField: FormField.Modal) {
+                        listener.onAction(formField)
+                    }
+                }
+            )
+
+            ViewType.MODAL_MULTIPLE.ordinal -> FormFieldModalMultipleViewHolder(
+                parent,
+                object : FormFieldModalMultipleViewHolder.OnFormFieldModalMultipleViewHolder {
+                    override fun onAction(formField: FormField.ModalMultiple) {
+                        listener.onAction(formField)
+                    }
+                }
+            )
+
             ViewType.NOMENCLATURE_TYPE.ordinal -> FormFieldNomenclatureTypeViewHolder(
                 parent,
                 object :
@@ -276,6 +294,8 @@ class FormFieldAdapter(private val listener: OnEditableFieldAdapter) :
             is FormField.Date -> ViewType.DATE.ordinal
             is FormField.Media -> ViewType.MEDIA.ordinal
             is FormField.MinMax -> ViewType.MIN_MAX.ordinal
+            is FormField.Modal -> ViewType.MODAL.ordinal
+            is FormField.ModalMultiple -> ViewType.MODAL_MULTIPLE.ordinal
             is FormField.NomenclatureType -> ViewType.NOMENCLATURE_TYPE.ordinal
             is FormField.Number -> ViewType.NUMBER.ordinal
             is FormField.Radio -> ViewType.RADIO.ordinal
@@ -332,6 +352,33 @@ class FormFieldAdapter(private val listener: OnEditableFieldAdapter) :
         )
 
         if (showAll) showAllFormFields(notify = true) else showDefaultFormFields(notify = true)
+    }
+
+    fun updateEditableField(vararg formField: FormField.Editable) {
+        availableEditableFields.map { ff ->
+            when (ff) {
+                is FormField.Editable -> formField.firstOrNull { it.getValue().code == ff.getValue().code }
+                    ?: ff
+
+                else -> ff
+            }
+        }
+            .also {
+                availableEditableFields.clear()
+                availableEditableFields.addAll(it)
+            }
+
+        setFormFields(
+            selectedEditableFields.map { ff ->
+                when (ff) {
+                    is FormField.Editable -> formField.firstOrNull { it.getValue().code == ff.getValue().code }
+                        ?: ff
+
+                    else -> ff
+                }
+            },
+            notify = true
+        )
     }
 
     fun showDefaultFormFields(notify: Boolean = false) {
@@ -543,6 +590,16 @@ class FormFieldAdapter(private val listener: OnEditableFieldAdapter) :
         MIN_MAX,
 
         /**
+         * As selectable item from modal.
+         */
+        MODAL,
+
+        /**
+         * As list of selectable items from modal.
+         */
+        MODAL_MULTIPLE,
+
+        /**
          * As dropdown nomenclature items.
          */
         NOMENCLATURE_TYPE,
@@ -625,6 +682,12 @@ class FormFieldAdapter(private val listener: OnEditableFieldAdapter) :
          * @param editableField the [FormField.Editable] updated
          */
         fun onUpdate(editableField: FormField.Editable)
+
+        /**
+         * Called when the action button has been clicked from [FormFieldModalMultipleViewHolder].
+         * Should show the modal of selectable items.
+         */
+        fun onAction(formField: FormField)
 
         /**
          * Called when we want to add media.

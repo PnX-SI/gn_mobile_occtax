@@ -7,8 +7,11 @@ import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.AllMediaRecord
+import fr.geonature.occtax.features.record.domain.CommentRecord
 import fr.geonature.occtax.features.record.domain.CountingRecord
+import fr.geonature.occtax.features.record.domain.DatasetRecord
 import fr.geonature.occtax.features.record.domain.DatesRecord
+import fr.geonature.occtax.features.record.domain.ObserversRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.settings.domain.PropertySettings
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -56,10 +59,29 @@ class NomenclatureSettingsLocalDataSourceTest {
                     nomenclatureType = "TYP_GRP",
                     value = PropertyValue.Nomenclature(code = "TYP_GRP")
                 ),
+                FormField.ModalMultiple(
+                    type = FormField.Type.DEFAULT,
+                    label = application.getString(R.string.observers_and_date_selected_observers),
+                    mandatory = true,
+                    order = 1,
+                    emptyText = application.getString(R.string.observers_and_date_selected_observers_no_data),
+                    actionText = application.getString(R.string.action_edit),
+                    actionEmptyText = application.getString(R.string.action_add),
+                    visibleItems = 2,
+                    value = PropertyValue.NumberArray(code = ObserversRecord.OBSERVERS_KEY)
+                ),
+                FormField.Modal(
+                    type = FormField.Type.DEFAULT,
+                    label = application.getString(R.string.observers_and_date_dataset),
+                    mandatory = true,
+                    order = 2,
+                    emptyText = application.getString(R.string.no_data),
+                    value = PropertyValue.Number(code = DatasetRecord.DATASET_ID_KEY)
+                ),
                 FormField.StartEnd(
                     type = FormField.Type.DEFAULT,
                     label = application.getString(R.string.input_date_hint),
-                    order = 1,
+                    order = 3,
                     start = FormField.Date(
                         type = FormField.Type.DEFAULT,
                         label = application.getString(R.string.input_date_start_hint),
@@ -70,6 +92,12 @@ class NomenclatureSettingsLocalDataSourceTest {
                         label = application.getString(R.string.input_date_end_hint),
                         value = PropertyValue.Date(code = DatesRecord.DATE_MAX_KEY)
                     ),
+                ),
+                FormField.TextMultiple(
+                    type = FormField.Type.DEFAULT,
+                    label = application.getString(R.string.input_comment_add_hint),
+                    order = 4,
+                    value = PropertyValue.Text(code = CommentRecord.COMMENT_KEY)
                 )
             ),
             nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(FormField.Type.DEFAULT)
@@ -225,10 +253,29 @@ class NomenclatureSettingsLocalDataSourceTest {
                         nomenclatureType = "TYP_GRP",
                         value = PropertyValue.Nomenclature(code = "TYP_GRP")
                     ),
+                    FormField.ModalMultiple(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.observers_and_date_selected_observers),
+                        mandatory = true,
+                        order = 1,
+                        emptyText = application.getString(R.string.observers_and_date_selected_observers_no_data),
+                        actionText = application.getString(R.string.action_edit),
+                        actionEmptyText = application.getString(R.string.action_add),
+                        visibleItems = 2,
+                        value = PropertyValue.NumberArray(code = ObserversRecord.OBSERVERS_KEY)
+                    ),
+                    FormField.Modal(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.observers_and_date_dataset),
+                        mandatory = true,
+                        order = 2,
+                        emptyText = application.getString(R.string.no_data),
+                        value = PropertyValue.Number(code = DatasetRecord.DATASET_ID_KEY)
+                    ),
                     FormField.StartEnd(
                         type = FormField.Type.DEFAULT,
                         label = application.getString(R.string.input_date_hint),
-                        order = 1,
+                        order = 3,
                         start = FormField.Date(
                             type = FormField.Type.DEFAULT,
                             label = application.getString(R.string.input_date_start_hint),
@@ -239,6 +286,12 @@ class NomenclatureSettingsLocalDataSourceTest {
                             label = application.getString(R.string.input_date_end_hint),
                             value = PropertyValue.Date(code = DatesRecord.DATE_MAX_KEY)
                         ),
+                    ),
+                    FormField.TextMultiple(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.input_comment_add_hint),
+                        order = 4,
+                        value = PropertyValue.Text(code = CommentRecord.COMMENT_KEY)
                     )
                 ),
                 nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(FormField.Type.DEFAULT)
@@ -255,10 +308,29 @@ class NomenclatureSettingsLocalDataSourceTest {
                         nomenclatureType = "TYP_GRP",
                         value = PropertyValue.Nomenclature(code = "TYP_GRP")
                     ),
+                    FormField.ModalMultiple(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.observers_and_date_selected_observers),
+                        mandatory = true,
+                        order = 1,
+                        emptyText = application.getString(R.string.observers_and_date_selected_observers_no_data),
+                        actionText = application.getString(R.string.action_edit),
+                        actionEmptyText = application.getString(R.string.action_add),
+                        visibleItems = 2,
+                        value = PropertyValue.NumberArray(code = ObserversRecord.OBSERVERS_KEY)
+                    ),
+                    FormField.Modal(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.observers_and_date_dataset),
+                        mandatory = true,
+                        order = 2,
+                        emptyText = application.getString(R.string.no_data),
+                        value = PropertyValue.Number(code = DatasetRecord.DATASET_ID_KEY)
+                    ),
                     FormField.StartEnd(
                         type = FormField.Type.DEFAULT,
                         label = application.getString(R.string.input_date_hint),
-                        order = 1,
+                        order = 3,
                         start = FormField.Date(
                             type = FormField.Type.DEFAULT,
                             label = application.getString(R.string.input_date_start_hint),
@@ -269,6 +341,12 @@ class NomenclatureSettingsLocalDataSourceTest {
                             label = application.getString(R.string.input_date_end_hint),
                             value = PropertyValue.Date(code = DatesRecord.DATE_MAX_KEY)
                         ),
+                    ),
+                    FormField.TextMultiple(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.input_comment_add_hint),
+                        order = 4,
+                        value = PropertyValue.Text(code = CommentRecord.COMMENT_KEY)
                     )
                 ),
                 nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(

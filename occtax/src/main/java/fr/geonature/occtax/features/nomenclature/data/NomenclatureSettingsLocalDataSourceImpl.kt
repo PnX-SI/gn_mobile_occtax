@@ -4,8 +4,11 @@ import android.content.Context
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.AllMediaRecord
+import fr.geonature.occtax.features.record.domain.CommentRecord
 import fr.geonature.occtax.features.record.domain.CountingRecord
+import fr.geonature.occtax.features.record.domain.DatasetRecord
 import fr.geonature.occtax.features.record.domain.DatesRecord
+import fr.geonature.occtax.features.record.domain.ObserversRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.settings.domain.PropertySettings
 
@@ -26,6 +29,23 @@ class NomenclatureSettingsLocalDataSourceImpl(context: Context) :
             mandatory = true,
             value = PropertyValue.Nomenclature(code = "TYP_GRP")
         ),
+        FormField.ModalMultiple(
+            type = FormField.Type.DEFAULT,
+            label = context.getString(R.string.observers_and_date_selected_observers),
+            mandatory = true,
+            emptyText = context.getString(R.string.observers_and_date_selected_observers_no_data),
+            actionText = context.getString(R.string.action_edit),
+            actionEmptyText = context.getString(R.string.action_add),
+            visibleItems = 2,
+            value = PropertyValue.NumberArray(code = ObserversRecord.OBSERVERS_KEY)
+        ),
+        FormField.Modal(
+            type = FormField.Type.DEFAULT,
+            label = context.getString(R.string.observers_and_date_dataset),
+            mandatory = true,
+            emptyText = context.getString(R.string.no_data),
+            value = PropertyValue.Number(code = DatasetRecord.DATASET_ID_KEY)
+        ),
         FormField.StartEnd(
             type = FormField.Type.DEFAULT,
             label = context.getString(R.string.input_date_hint),
@@ -38,7 +58,12 @@ class NomenclatureSettingsLocalDataSourceImpl(context: Context) :
                 type = FormField.Type.DEFAULT,
                 label = context.getString(R.string.input_date_end_hint),
                 value = PropertyValue.Date(code = DatesRecord.DATE_MAX_KEY)
-            ),
+            )
+        ),
+        FormField.TextMultiple(
+            type = FormField.Type.DEFAULT,
+            label = context.getString(R.string.input_comment_add_hint),
+            value = PropertyValue.Text(code = CommentRecord.COMMENT_KEY)
         ),
         FormField.NomenclatureType(
             type = FormField.Type.INFORMATION,

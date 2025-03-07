@@ -534,6 +534,50 @@ class FormFieldTest {
         )
 
         assertEquals(
+            FormField.Modal(
+                type = FormField.Type.INFORMATION,
+                label = "updated label",
+                value = PropertyValue.Number(code = "some_code")
+            ),
+            FormField.Modal(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Number(code = "some_code")
+            )
+                .update(label = "updated label")
+        )
+        assertEquals(
+            FormField.Modal(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                visible = false,
+                value = PropertyValue.Number(code = "some_code")
+            ),
+            FormField.Modal(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                visible = true,
+                value = PropertyValue.Number(code = "some_code")
+            )
+                .update(visible = false)
+        )
+        assertEquals(
+            FormField.Modal(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                default = false,
+                value = PropertyValue.Number(code = "some_code")
+            ),
+            FormField.Modal(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                default = true,
+                value = PropertyValue.Number(code = "some_code")
+            )
+                .update(default = false)
+        )
+
+        assertEquals(
             FormField.NomenclatureType(
                 type = FormField.Type.INFORMATION,
                 label = "updated label",
@@ -1011,6 +1055,30 @@ class FormFieldTest {
                         PropertyValue.Media(
                             code = "some_code",
                             value = arrayOf(MediaRecord.File(path = "/some/path/to/file"))
+                        )
+                    )
+                }
+        )
+
+        assertEquals(
+            FormField.Modal(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Number(
+                    code = "some_code",
+                    value = 8L
+                )
+            ),
+            FormField.Modal(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Number(code = "some_code")
+            )
+                .apply {
+                    setValue(
+                        PropertyValue.Number(
+                            code = "some_code",
+                            value = 8L
                         )
                     )
                 }
