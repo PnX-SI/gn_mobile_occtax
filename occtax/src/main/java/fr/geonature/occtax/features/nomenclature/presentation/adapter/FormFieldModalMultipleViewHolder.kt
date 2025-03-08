@@ -50,9 +50,18 @@ class FormFieldModalMultipleViewHolder(
             setItems(formField.items)
         }
 
-        if (formField.mandatory && formField.getValue().isEmpty()) {
-            (itemView as ValidationCardView).hasErrors = true
-            formField.error = itemView.context.getString(R.string.form_field_error_mandatory)
+        setError(formField)
+    }
+
+    private fun setError(formField: FormField.ModalMultiple) {
+        with(listItemActionView) {
+            setError(
+                if (formField.mandatory && formField.getValue()
+                        .isEmpty()
+                ) context.getString(R.string.form_field_error_mandatory) else null
+            )
+            formField.error = getError()
+            (itemView as ValidationCardView).hasErrors = getError()?.isNotBlank() == true
         }
     }
 

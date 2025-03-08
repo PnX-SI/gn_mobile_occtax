@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.occtax.R
+import androidx.core.content.withStyledAttributes
+import androidx.core.view.isVisible
 
 /**
  * Generic [View] about selected list items.
@@ -25,6 +27,7 @@ open class ListItemActionView : ConstraintLayout {
     private lateinit var recyclerView: RecyclerView
     private lateinit var actionButton: Button
     private lateinit var emptyTextView: TextView
+    private lateinit var errorMessageTextView: TextView
     private lateinit var adapter: EditListItemViewRecyclerViewAdapter
     private var listener: OnListItemActionViewListener? = null
 
@@ -87,6 +90,10 @@ open class ListItemActionView : ConstraintLayout {
         emptyTextView.text = emptyText ?: context.getString(R.string.no_data)
     }
 
+    fun setError(error: CharSequence?) {
+        errorMessageTextView.text = error
+    }
+
     fun enableActionButton(enabled: Boolean = true) {
         actionButton.isEnabled = enabled
     }
@@ -114,7 +121,7 @@ open class ListItemActionView : ConstraintLayout {
         setActionEmptyText(context.getString(actionResourceId))
     }
 
-    fun setActionEmptyText(actionEmptyText:String?) {
+    fun setActionEmptyText(actionEmptyText: String?) {
         if (actionEmptyText?.isBlank() == true) return
 
         this.actionEmptyText = actionEmptyText
@@ -147,6 +154,10 @@ open class ListItemActionView : ConstraintLayout {
         )
     }
 
+    fun getError(): CharSequence? {
+        return errorMessageTextView.text
+    }
+
     private fun init(
         attrs: AttributeSet?,
         defStyle: Int
@@ -162,6 +173,7 @@ open class ListItemActionView : ConstraintLayout {
         actionButton = findViewById(android.R.id.button1)
         actionButton.setOnClickListener { listener?.onAction() }
         emptyTextView = findViewById(android.R.id.empty)
+        errorMessageTextView = findViewById(android.R.id.message)
 
         adapter = EditListItemViewRecyclerViewAdapter(object :
             AbstractListItemRecyclerViewAdapter.OnListItemRecyclerViewAdapterListener<Pair<String, String?>> {
@@ -192,64 +204,62 @@ open class ListItemActionView : ConstraintLayout {
         }
 
         // load attributes
-        val ta = context.obtainStyledAttributes(
+        context.withStyledAttributes(
             attrs,
             R.styleable.ListItemActionView,
             defStyle,
             0
-        )
-
-        ta.getString(R.styleable.ListItemActionView_title)
-            ?.also {
-                setTitle(it)
-            }
-        setTitle(
-            ta.getResourceId(
-                R.styleable.ListItemActionView_title,
-                0
+        ) {
+            getString(R.styleable.ListItemActionView_title)
+                ?.also {
+                    setTitle(it)
+                }
+            setTitle(
+                getResourceId(
+                    R.styleable.ListItemActionView_title,
+                    0
+                )
             )
-        )
 
-        setEmptyText(
-            ta.getResourceId(
-                R.styleable.ListItemActionView_no_data,
-                R.string.no_data
+            setEmptyText(
+                getResourceId(
+                    R.styleable.ListItemActionView_no_data,
+                    R.string.no_data
+                )
             )
-        )
 
-        enableActionButton(
-            ta.getBoolean(
-                R.styleable.ListItemActionView_action_enabled,
-                true
+            enableActionButton(
+                getBoolean(
+                    R.styleable.ListItemActionView_action_enabled,
+                    true
+                )
             )
-        )
 
-        setActionText(
-            ta.getResourceId(
-                R.styleable.ListItemActionView_action,
-                0
+            setActionText(
+                getResourceId(
+                    R.styleable.ListItemActionView_action,
+                    0
+                )
             )
-        )
-        setActionEmptyText(
-            ta.getResourceId(
-                R.styleable.ListItemActionView_action_empty,
-                0
+            setActionEmptyText(
+                getResourceId(
+                    R.styleable.ListItemActionView_action_empty,
+                    0
+                )
             )
-        )
-        actionButton.setText(if (adapter.itemCount == 0) actionEmptyText else actionText)
+            actionButton.setText(if (adapter.itemCount == 0) actionEmptyText else actionText)
 
-        setVisibleItems(
-            ta.getInteger(
-                R.styleable.ListItemActionView_visible_items,
-                1
+            setVisibleItems(
+                getInteger(
+                    R.styleable.ListItemActionView_visible_items,
+                    1
+                )
             )
-        )
-
-        ta.recycle()
+        }
     }
 
     private fun showEmptyTextView(show: Boolean) {
-        if (emptyTextView.visibility == View.VISIBLE == show) {
+        if (emptyTextView.isVisible == show) {
             return
         }
 
