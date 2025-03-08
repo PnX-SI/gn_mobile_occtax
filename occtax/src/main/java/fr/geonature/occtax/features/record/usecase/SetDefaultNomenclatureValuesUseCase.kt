@@ -25,20 +25,20 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
         val observationRecord = params.observationRecord
 
         // load default property values from editable fields of type DEFAULT
-        val defaultNomenclatureValues =
-            nomenclatureRepository.getEditableFields(FormField.Type.DEFAULT)
-                .getOrElse { emptyList() }
-                .filterIsInstance<FormField.Editable>()
-                .mapNotNull { it.getValue().takeIf { pv -> !pv.isEmpty() } }
-
-        defaultNomenclatureValues.map { it.toPair() }
-            .forEach {
-                observationRecord.properties[it.first] = it.second
-            }
+        val editableFieldsDefault =
+            (nomenclatureRepository.getEditableFields(FormField.Type.DEFAULT)
+                .getOrElse { emptyList() } + if (params.withAdditionalFields) additionalFieldRepository.getAllAdditionalFields(
+                observationRecord.dataset.dataset?.value?.id,
+                FormField.Type.DEFAULT
+            )
+                .getOrElse { emptyList() } else emptyList()).filterIsInstance<FormField.Editable>()
 
         // no default nomenclature values found: abort
-        if (observationRecord.properties.filterValues { it is PropertyValue.Nomenclature }
-                .isEmpty()) {
+        if (editableFieldsDefault.isEmpty()) {
+            Logger.warn {
+                "no editable fields of type '${FormField.Type.DEFAULT.name}' found"
+            }
+
             return Result.failure(
                 ObservationRecordException.NoDefaultNomenclatureValuesFoundException(
                     observationRecord.internalId
@@ -46,6 +46,7 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
             )
         }
 
+        // load default property values from editable fields of type INFORMATION
         val editableFieldsInformation =
             (nomenclatureRepository.getEditableFields(FormField.Type.INFORMATION)
                 .getOrElse { emptyList() } + if (params.withAdditionalFields) additionalFieldRepository.getAllAdditionalFields(
@@ -54,6 +55,7 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
             )
                 .getOrElse { emptyList() } else emptyList()).filterIsInstance<FormField.Editable>()
 
+        // no nomenclature values found: abort
         if (editableFieldsInformation.isEmpty()) {
             Logger.warn {
                 "no editable fields of type '${FormField.Type.INFORMATION.name}' found"
@@ -66,6 +68,7 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
             )
         }
 
+        // load default property values from editable fields of type COUNTING
         val editableFieldsCounting =
             (nomenclatureRepository.getEditableFields(FormField.Type.COUNTING)
                 .getOrElse { emptyList() } + if (params.withAdditionalFields) additionalFieldRepository.getAllAdditionalFields(
@@ -74,6 +77,7 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
             )
                 .getOrElse { emptyList() } else emptyList()).filterIsInstance<FormField.Editable>()
 
+        // no nomenclature values found: abort
         if (editableFieldsCounting.isEmpty()) {
             Logger.warn {
                 "no editable fields of type '${FormField.Type.COUNTING.name}' found"
@@ -86,12 +90,21 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
             )
         }
 
+        mapPropertyValuesFromNomenclature(
+            editableFieldsDefault,
+            observationRecord.properties.values.toList()
+        )
+            .map { it.toPair() }
+            .forEach {
+                observationRecord.properties[it.first] = it.second
+            }
+
         observationRecord.taxa.taxa.forEach { taxonRecord ->
             // load property values from nomenclature values for each taxon added
             mapPropertyValuesFromNomenclature(
-                taxonRecord.taxon.taxonomy,
                 editableFieldsInformation,
-                taxonRecord.properties.values.toList()
+                taxonRecord.properties.values.toList(),
+                taxonRecord.taxon.taxonomy
             )
                 .map { it.toPair() }
                 .forEach {
@@ -101,9 +114,9 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
             // load property values from nomenclature values for each counting added
             taxonRecord.counting.counting.forEach { countingRecord ->
                 mapPropertyValuesFromNomenclature(
-                    taxonRecord.taxon.taxonomy,
                     editableFieldsCounting,
-                    countingRecord.properties.values.toList()
+                    countingRecord.properties.values.toList(),
+                    taxonRecord.taxon.taxonomy
                 )
                     .map { it.toPair() }
                     .forEach {
@@ -116,30 +129,30 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
     }
 
     private suspend fun mapPropertyValuesFromNomenclature(
-        taxonomy: Taxonomy,
         editableFields: List<FormField.Editable>,
-        propertyValues: List<PropertyValue>
+        propertyValues: List<PropertyValue>,
+        taxonomy: Taxonomy? = null
     ): List<PropertyValue> {
-        return propertyValues.map {
-            when (it) {
+        return propertyValues.map { pv ->
+            when (pv) {
                 is PropertyValue.AdditionalFields -> {
                     PropertyValue.AdditionalFields(
-                        it.code,
+                        pv.code,
                         mapPropertyValuesFromNomenclature(
-                            taxonomy,
                             editableFields,
-                            it.value.values.toList()
-                        ).associate { pv -> pv.toPair() })
+                            pv.value.values.toList(),
+                            taxonomy
+                        ).associate { it.toPair() })
                 }
 
                 else -> {
-                    editableFields.firstOrNull { editableField -> editableField.getValue().code == it.code }
+                    editableFields.firstOrNull { editableField -> editableField.getValue().code == pv.code }
                         ?.takeIf { editableField -> editableField is FormField.NomenclatureType }
                         ?.let { editableField -> editableField as FormField.NomenclatureType }
                         ?.let { editableField ->
-                            when (it) {
-                                is PropertyValue.Number -> it.value
-                                is PropertyValue.Nomenclature -> it.value
+                            when (pv) {
+                                is PropertyValue.Number -> pv.value
+                                is PropertyValue.Nomenclature -> pv.value
                                 else -> null
                             }?.let { currentValue ->
                                 nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
@@ -156,7 +169,7 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
                                         )
                                     }
                             }
-                        } ?: it
+                        } ?: pv
                 }
             }
         }

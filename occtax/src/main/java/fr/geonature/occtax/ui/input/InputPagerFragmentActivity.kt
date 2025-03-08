@@ -100,7 +100,10 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
 
         Logger.info { "loading observation record: ${observationRecord.id}" }
 
-        observationRecordViewModel.startEdit(observationRecord)
+        observationRecordViewModel.startEdit(
+            observationRecord,
+            appSettings.nomenclatureSettings?.withAdditionalFields ?: false
+        )
 
         pageFragmentViewModel.set(
             R.string.pager_fragment_observers_and_date_input_title to ObserversAndDateInputFragment.newInstance(
