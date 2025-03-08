@@ -15,17 +15,18 @@
         android:clickable="false"
         android:cursorVisible="false"
         android:ellipsize="end"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:gravity="top"
-        android:imeOptions="actionDone"
+        android:imeOptions="actionNone"
         android:importantForAutofill="no"
-        android:inputType="textMultiLine|textNoSuggestions"
+        android:inputType="none"
         android:maxLines="3"
         android:minLines="3"
         android:scrollHorizontally="false"
         android:selectAllOnFocus="true"
         android:singleLine="false"
+        android:textIsSelectable="false"
         tools:ignore="SpeakableTextPresentCheck,TextContrastCheck" />
 
 </com.google.android.material.textfield.TextInputLayout>

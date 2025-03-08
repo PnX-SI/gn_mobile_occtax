@@ -2,6 +2,7 @@ package fr.geonature.occtax.features.nomenclature.presentation.adapter
 
 import android.text.Editable
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.core.text.HtmlCompat
 import com.google.android.material.textfield.TextInputLayout
@@ -30,6 +31,15 @@ class FormFieldModalViewHolder(
 
     init {
         edit.editText?.apply {
+            showSoftInputOnFocus = false
+            keyListener = null
+            setOnTouchListener { v, event ->
+                if (MotionEvent.ACTION_UP == event.action) {
+                    v.requestFocus()
+                    v.performClick()
+                }
+                false
+            }
             setOnClickListener {
                 formField?.also {
                     listener.onAction(it)
@@ -53,12 +63,10 @@ class FormFieldModalViewHolder(
             }
         }
 
-        if (formField.mandatory && formField.getValue()
+        edit.error = if (formField.mandatory && formField.getValue()
                 .isEmpty()
-        ) {
-            edit.error = itemView.context.getString(R.string.form_field_error_mandatory)
-            formField.error = edit.error
-        }
+        ) itemView.context.getString(R.string.form_field_error_mandatory) else null
+        formField.error = edit.error
     }
 
     /**
