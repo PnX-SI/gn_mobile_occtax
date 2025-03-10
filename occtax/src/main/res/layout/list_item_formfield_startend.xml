@@ -35,11 +35,16 @@
             android:clickable="false"
             android:cursorVisible="false"
             android:ellipsize="end"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:inputType="textNoSuggestions"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:gravity="top"
+            android:imeOptions="actionNone"
+            android:importantForAutofill="no"
+            android:inputType="none"
             android:scrollHorizontally="false"
+            android:selectAllOnFocus="false"
             android:singleLine="true"
+            android:textIsSelectable="false"
             tools:ignore="TextContrastCheck" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -63,10 +68,16 @@
             android:clickable="false"
             android:cursorVisible="false"
             android:ellipsize="end"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:inputType="textNoSuggestions"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:gravity="top"
+            android:imeOptions="actionNone"
+            android:importantForAutofill="no"
+            android:inputType="none"
+            android:scrollHorizontally="false"
+            android:selectAllOnFocus="false"
             android:singleLine="true"
+            android:textIsSelectable="false"
             tools:ignore="TextContrastCheck" />
 
     </com.google.android.material.textfield.TextInputLayout>

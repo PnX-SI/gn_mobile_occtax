@@ -298,8 +298,6 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
     }
 
     private fun handleEditableFields(editableFields: List<FormField>) {
-        mapDefaultValueToObservationRecord(editableFields)
-
         adapter?.bind(
             editableFields.map {
                 when (it) {
@@ -366,44 +364,6 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
         )
 
         listener.validateCurrentPage()
-    }
-
-    private fun mapDefaultValueToObservationRecord(editableFields: List<FormField>) {
-        // map editable form fields existing values to the given observation record
-        editableFields.flatMap { ff ->
-            when (ff) {
-                is FormField.Editable -> listOf(ff)
-                is FormField.StartEnd -> listOf(
-                    ff.start,
-                    ff.end
-                )
-
-                else -> listOf(null)
-            }
-        }
-            .filterNotNull()
-            .forEach { ff ->
-                // if we have existing value from observation record, do nothing
-                if (!ff.additionalField && observationRecord?.properties?.containsKey(ff.getValue().code) == true) return
-                if (ff.additionalField && observationRecord?.additionalFields?.associateBy { pv -> pv.code }
-                        ?.containsKey(ff.getValue().code) == true) return
-
-                // set default value from editable field to the given observation record
-                if (!ff.additionalField) {
-                    observationRecord?.properties?.set(
-                        ff.getValue().code,
-                        ff.getValue()
-                    )
-                }
-
-                if (ff.additionalField) {
-                    observationRecord?.also { record ->
-                        record.additionalFields = record.additionalFields.filter { pv ->
-                            pv.toPair().first != ff.getValue().code
-                        } + listOfNotNull(ff.getValue())
-                    }
-                }
-            }
     }
 
     private fun updateSelectedObservers(selectedInputObservers: List<InputObserver>) {

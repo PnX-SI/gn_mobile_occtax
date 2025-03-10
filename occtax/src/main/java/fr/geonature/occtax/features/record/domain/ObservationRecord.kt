@@ -198,12 +198,17 @@ class DatasetRecord(private val properties: SortedMap<String, PropertyValue>) {
  */
 class DatesRecord(private val properties: SortedMap<String, PropertyValue>) {
 
+    init {
+        start
+        end
+    }
+
     /**
      * The start date of this observation record.
      */
     var start: Date
         get() = properties[DATE_MIN_KEY].takeIf { it is PropertyValue.Date }
-            ?.let { it as PropertyValue.Date }?.value ?: Date()
+            ?.let { it as PropertyValue.Date }?.value ?: Date().also { start = it }
         set(value) {
             PropertyValue.Date(
                 DATE_MIN_KEY,
@@ -223,7 +228,7 @@ class DatesRecord(private val properties: SortedMap<String, PropertyValue>) {
      */
     var end: Date
         get() = properties[DATE_MAX_KEY].takeIf { it is PropertyValue.Date }
-            ?.let { it as PropertyValue.Date }?.value ?: start
+            ?.let { it as PropertyValue.Date }?.value ?: start.also { end = it }
         set(value) {
             PropertyValue.Date(
                 DATE_MAX_KEY,

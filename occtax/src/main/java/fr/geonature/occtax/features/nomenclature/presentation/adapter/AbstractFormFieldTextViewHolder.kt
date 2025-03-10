@@ -60,7 +60,7 @@ abstract class AbstractFormFieldTextViewHolder<FF : FormField.Editable>(
     init {
         with(edit) {
             editText?.addTextChangedListener(textWatcher)
-            setOnFocusChangeListener { v, hasFocus ->
+            editText?.setOnFocusChangeListener { v, hasFocus ->
                 if (!hasFocus) {
                     // workaround to force hide the soft keyboard
                     hideSoftKeyboard(v)

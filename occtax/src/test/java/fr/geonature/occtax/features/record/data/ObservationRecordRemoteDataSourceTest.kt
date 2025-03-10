@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.util.add
+import fr.geonature.commons.util.toDate
 import fr.geonature.datasync.auth.ICookieManager
 import fr.geonature.datasync.settings.DataSyncSettings
 import fr.geonature.maps.settings.LayerSettings
@@ -94,6 +95,8 @@ class ObservationRecordRemoteDataSourceTest {
             internalId = 1240L,
             status = ObservationRecord.Status.TO_SYNC
         ).apply {
+            dates.start = toDate("2016-10-28")!!
+            dates.end = toDate("2016-10-29")!!
             comment.comment = "some comment"
             taxa.add(
                 Taxon(
@@ -158,6 +161,8 @@ class ObservationRecordRemoteDataSourceTest {
                 id = 492L,
                 status = ObservationRecord.Status.TO_SYNC
             ).apply {
+                dates.start = toDate("2016-10-28")!!
+                dates.end = toDate("2016-10-29")!!
                 comment.comment = "some comment"
                 taxa.add(
                     Taxon(

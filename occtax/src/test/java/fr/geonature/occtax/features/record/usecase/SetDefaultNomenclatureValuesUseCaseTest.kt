@@ -124,6 +124,12 @@ class SetDefaultNomenclatureValuesUseCaseTest {
             coEvery {
                 additionalFieldRepository.getAllAdditionalFields(
                     any(),
+                    FormField.Type.DEFAULT
+                )
+            } returns Result.success(listOf())
+            coEvery {
+                additionalFieldRepository.getAllAdditionalFields(
+                    any(),
                     FormField.Type.INFORMATION
                 )
             } returns Result.success(listOf())
@@ -135,8 +141,9 @@ class SetDefaultNomenclatureValuesUseCaseTest {
             } returns Result.success(
                 listOf(
                     FormField.NomenclatureType(
-                        type = FormField.Type.INFORMATION,
+                        type = FormField.Type.COUNTING,
                         label = "Protocole",
+                        additionalField = true,
                         nomenclatureType = "TYPE_PROTOCOLE",
                         value = PropertyValue.Nomenclature(
                             code = "as_TYPE_PROTOCOLE",
@@ -155,6 +162,8 @@ class SetDefaultNomenclatureValuesUseCaseTest {
             assertTrue(result.isSuccess)
             assertEquals(
                 ObservationRecord(internalId = 1234).apply {
+                    dates.start = observationRecord.dates.start
+                    dates.end = observationRecord.dates.end
                     listOf(
                         PropertyValue.Nomenclature(
                             "TYP_GRP",
@@ -173,7 +182,7 @@ class SetDefaultNomenclatureValuesUseCaseTest {
     @Test
     fun `should return an observation records with all property values with additional fields`() =
         runTest {
-            // given some observation record
+            // given some observation record with one taxon and one counting
             val observationRecord = ObservationRecord(internalId = 1234).apply {
                 taxa.add(
                     Taxon(
@@ -282,6 +291,12 @@ class SetDefaultNomenclatureValuesUseCaseTest {
             coEvery {
                 additionalFieldRepository.getAllAdditionalFields(
                     any(),
+                    FormField.Type.DEFAULT
+                )
+            } returns Result.success(listOf())
+            coEvery {
+                additionalFieldRepository.getAllAdditionalFields(
+                    any(),
                     FormField.Type.INFORMATION
                 )
             } returns Result.success(listOf())
@@ -293,8 +308,9 @@ class SetDefaultNomenclatureValuesUseCaseTest {
             } returns Result.success(
                 listOf(
                     FormField.NomenclatureType(
-                        type = FormField.Type.INFORMATION,
+                        type = FormField.Type.COUNTING,
                         label = "Protocole",
+                        additionalField = true,
                         nomenclatureType = "TYPE_PROTOCOLE",
                         value = PropertyValue.Nomenclature(code = "as_TYPE_PROTOCOLE")
                     )
@@ -385,6 +401,8 @@ class SetDefaultNomenclatureValuesUseCaseTest {
             assertTrue(result.isSuccess)
             assertEquals(
                 ObservationRecord(internalId = 1234).apply {
+                    dates.start = observationRecord.dates.start
+                    dates.end = observationRecord.dates.end
                     listOf(
                         PropertyValue.Nomenclature(
                             "TYP_GRP",
@@ -568,6 +586,12 @@ class SetDefaultNomenclatureValuesUseCaseTest {
             coEvery {
                 additionalFieldRepository.getAllAdditionalFields(
                     any(),
+                    FormField.Type.DEFAULT
+                )
+            } returns Result.success(listOf())
+            coEvery {
+                additionalFieldRepository.getAllAdditionalFields(
+                    any(),
                     FormField.Type.INFORMATION
                 )
             } returns Result.success(listOf())
@@ -579,8 +603,9 @@ class SetDefaultNomenclatureValuesUseCaseTest {
             } returns Result.success(
                 listOf(
                     FormField.NomenclatureType(
-                        type = FormField.Type.INFORMATION,
+                        type = FormField.Type.COUNTING,
                         label = "Protocole",
+                        additionalField = true,
                         nomenclatureType = "TYPE_PROTOCOLE",
                         value = PropertyValue.Nomenclature(code = "as_TYPE_PROTOCOLE")
                     )
@@ -658,7 +683,7 @@ class SetDefaultNomenclatureValuesUseCaseTest {
                 )
             )
 
-            // when loading all default nomenclature values from use case
+            // when loading all default nomenclature values with no additional fields from use case
             val result = setDefaultNomenclatureValuesUseCase.run(
                 SetDefaultNomenclatureValuesUseCase.Params(observationRecord)
             )
@@ -667,6 +692,8 @@ class SetDefaultNomenclatureValuesUseCaseTest {
             assertTrue(result.isSuccess)
             assertEquals(
                 ObservationRecord(internalId = 1234).apply {
+                    dates.start = observationRecord.dates.start
+                    dates.end = observationRecord.dates.end
                     listOf(
                         PropertyValue.Nomenclature(
                             "TYP_GRP",

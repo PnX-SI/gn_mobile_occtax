@@ -1,8 +1,10 @@
 package fr.geonature.occtax.features.nomenclature.presentation.adapter
 
+import android.annotation.SuppressLint
 import android.text.Editable
 import android.text.format.DateFormat
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
@@ -38,6 +40,7 @@ import kotlin.coroutines.suspendCoroutine
  *
  * @author S. Grimault
  */
+@SuppressLint("ClickableViewAccessibility")
 class FormFieldStartEndViewHolder(
     parent: ViewGroup,
     private val listener: OnFormFieldStartEndViewHolderListener
@@ -58,140 +61,164 @@ class FormFieldStartEndViewHolder(
 
     init {
         with(dateStartTextInputLayout) {
-            editText?.afterTextChanged {
-                error = checkStartDateConstraints()
-                dateEndTextInputLayout.error = checkEndDateConstraints()
+            editText?.apply {
+                showSoftInputOnFocus = false
+                keyListener = null
+                afterTextChanged {
+                    error = checkStartDateConstraints()
+                    dateEndTextInputLayout.error = checkEndDateConstraints()
 
-                formField?.also {
-                    it.start.error = error
-                    it.end.error = dateEndTextInputLayout.error
-                    listener.onUpdate(it)
-                }
-            }
-            editText?.setOnClickListener {
-                CoroutineScope(Dispatchers.Main).launch {
-                    val startDate = selectDateTime(
-                        CalendarConstraints
-                            .Builder()
-                            .setValidator(DateValidatorPointBackward.now())
-                            .build(),
-                        dateSettings.startDateSettings == InputDateSettings.DateSettings.DATETIME,
-                        startDate
-                    )
-
-                    this@FormFieldStartEndViewHolder.startDate = startDate
-
-                    if (dateSettings.endDateSettings == null) {
-                        this@FormFieldStartEndViewHolder.endDate = startDate
+                    formField?.also {
+                        it.start.error = error
+                        it.end.error = dateEndTextInputLayout.error
+                        listener.onUpdate(it)
                     }
-
-                    dateStartTextInputLayout.editText?.apply {
-                        updateDateEditText(
-                            this,
-                            dateSettings.startDateSettings ?: InputDateSettings.DateSettings.DATE,
+                }
+                // workaround to request focus on a non editable field...
+                setOnTouchListener { v, event ->
+                    if (MotionEvent.ACTION_UP == event.action) {
+                        v.requestFocus()
+                    }
+                    false
+                }
+                setOnClickListener {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val startDate = selectDateTime(
+                            CalendarConstraints
+                                .Builder()
+                                .setValidator(DateValidatorPointBackward.now())
+                                .build(),
+                            dateSettings.startDateSettings == InputDateSettings.DateSettings.DATETIME,
                             startDate
                         )
-                    }
-                    dateEndTextInputLayout.editText?.apply {
-                        updateDateEditText(
-                            this,
-                            dateSettings.endDateSettings ?: InputDateSettings.DateSettings.DATE,
-                            endDate
-                        )
-                    }
 
-                    formField?.run {
-                        if (start.error == null && dateEndTextInputLayout.editText?.error == null) {
-                            start.setValue(
-                                PropertyValue.Date(
-                                    code = start.getValue().code,
-                                    value = startDate
-                                )
+                        this@FormFieldStartEndViewHolder.startDate = startDate
+
+                        if (dateSettings.endDateSettings == null) {
+                            this@FormFieldStartEndViewHolder.endDate = startDate
+                        }
+
+                        dateStartTextInputLayout.editText?.apply {
+                            updateDateEditText(
+                                this,
+                                dateSettings.startDateSettings
+                                    ?: InputDateSettings.DateSettings.DATE,
+                                startDate
                             )
+                        }
+                        dateEndTextInputLayout.editText?.apply {
+                            updateDateEditText(
+                                this,
+                                dateSettings.endDateSettings ?: InputDateSettings.DateSettings.DATE,
+                                endDate
+                            )
+                        }
 
-                            if (dateSettings.endDateSettings == null) {
-                                end.setValue(
+                        formField?.run {
+                            if (start.error == null && dateEndTextInputLayout.editText?.error == null) {
+                                start.setValue(
                                     PropertyValue.Date(
-                                        code = end.getValue().code,
+                                        code = start.getValue().code,
                                         value = startDate
                                     )
                                 )
+
+                                if (dateSettings.endDateSettings == null) {
+                                    end.setValue(
+                                        PropertyValue.Date(
+                                            code = end.getValue().code,
+                                            value = startDate
+                                        )
+                                    )
+                                }
                             }
+                            listener.onUpdate(this)
                         }
-                        listener.onUpdate(this)
                     }
                 }
             }
         }
 
         with(dateEndTextInputLayout) {
-            editText?.afterTextChanged {
-                error = checkEndDateConstraints()
-                dateStartTextInputLayout.error = checkStartDateConstraints()
+            editText?.apply {
+                showSoftInputOnFocus = false
+                keyListener = null
+                afterTextChanged {
+                    error = checkEndDateConstraints()
+                    dateStartTextInputLayout.error = checkStartDateConstraints()
 
-                formField?.also {
-                    it.start.error = dateStartTextInputLayout.error
-                    it.end.error = error
-                    listener.onUpdate(it)
-                }
-            }
-            editText?.setOnClickListener {
-                CoroutineScope(Dispatchers.Main).launch {
-                    val endDate = selectDateTime(
-                        CalendarConstraints
-                            .Builder()
-                            .setValidator(
-                                DateValidatorPointForward.from(
-                                    startDate
-                                        .set(
-                                            Calendar.HOUR_OF_DAY,
-                                            0
-                                        )
-                                        .set(
-                                            Calendar.MINUTE,
-                                            0
-                                        )
-                                        .set(
-                                            Calendar.SECOND,
-                                            0
-                                        )
-                                        .set(
-                                            Calendar.MILLISECOND,
-                                            0
-                                        ).time
-                                )
-                            )
-                            .build(),
-                        dateSettings.endDateSettings == InputDateSettings.DateSettings.DATETIME,
-                        endDate
-                    )
-
-                    this@FormFieldStartEndViewHolder.endDate = endDate
-                    dateStartTextInputLayout.editText?.apply {
-                        updateDateEditText(
-                            this,
-                            dateSettings.startDateSettings ?: InputDateSettings.DateSettings.DATE,
-                            startDate
-                        )
+                    formField?.also {
+                        it.start.error = dateStartTextInputLayout.error
+                        it.end.error = error
+                        listener.onUpdate(it)
                     }
-                    dateEndTextInputLayout.editText?.apply {
-                        updateDateEditText(
-                            this,
-                            dateSettings.endDateSettings ?: InputDateSettings.DateSettings.DATE,
+                }
+                // workaround to request focus on a non editable field...
+                setOnTouchListener { v, event ->
+                    if (MotionEvent.ACTION_UP == event.action) {
+                        v.requestFocus()
+                    }
+                    false
+                }
+                setOnClickListener {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val endDate = selectDateTime(
+                            CalendarConstraints
+                                .Builder()
+                                .setValidator(
+                                    DateValidatorPointForward.from(
+                                        startDate
+                                            .set(
+                                                Calendar.HOUR_OF_DAY,
+                                                0
+                                            )
+                                            .set(
+                                                Calendar.MINUTE,
+                                                0
+                                            )
+                                            .set(
+                                                Calendar.SECOND,
+                                                0
+                                            )
+                                            .set(
+                                                Calendar.MILLISECOND,
+                                                0
+                                            ).time
+                                    )
+                                )
+                                .build(),
+                            dateSettings.endDateSettings == InputDateSettings.DateSettings.DATETIME,
                             endDate
                         )
-                    }
 
-                    formField?.run {
-                        if (end.error == null && dateStartTextInputLayout.editText?.error == null) {
-                            end.setValue(
-                                PropertyValue.Date(
-                                    code = end.getValue().code,
-                                    value = endDate
-                                )
+                        this@FormFieldStartEndViewHolder.endDate = endDate
+                        dateStartTextInputLayout.editText?.apply {
+                            updateDateEditText(
+                                this,
+                                dateSettings.startDateSettings
+                                    ?: InputDateSettings.DateSettings.DATE,
+                                startDate
                             )
                         }
-                        listener.onUpdate(this)
+                        dateEndTextInputLayout.editText?.apply {
+                            updateDateEditText(
+                                this,
+                                dateSettings.endDateSettings ?: InputDateSettings.DateSettings.DATE,
+                                endDate
+                            )
+                        }
+
+                        formField?.run {
+                            if (end.error == null && dateStartTextInputLayout.editText?.error == null) {
+                                end.setValue(
+                                    PropertyValue.Date(
+                                        code = end.getValue().code,
+                                        value = endDate
+                                    )
+                                )
+                            }
+                            listener.onUpdate(this)
+                        }
                     }
                 }
             }
@@ -268,7 +295,12 @@ class FormFieldStartEndViewHolder(
                         )
 
                     if (!withTime) {
-                        continuation.resume(Date.from(selectedDate.toInstant().truncatedTo(ChronoUnit.DAYS)))
+                        continuation.resume(
+                            Date.from(
+                                selectedDate.toInstant()
+                                    .truncatedTo(ChronoUnit.DAYS)
+                            )
+                        )
 
                         return@addOnPositiveButtonClickListener
                     }

@@ -133,46 +133,58 @@ class SetDefaultNomenclatureValuesUseCase @Inject constructor(
         propertyValues: List<PropertyValue>,
         taxonomy: Taxonomy? = null
     ): List<PropertyValue> {
-        return propertyValues.map { pv ->
-            when (pv) {
-                is PropertyValue.AdditionalFields -> {
-                    PropertyValue.AdditionalFields(
-                        pv.code,
-                        mapPropertyValuesFromNomenclature(
-                            editableFields,
-                            pv.value.values.toList(),
+        val editableFieldsWithValue = editableFields
+            .filterIsInstance<FormField.NomenclatureType>()
+            .map { ff ->
+                propertyValues
+                    .flatMap { pv ->
+                        when (pv) {
+                            is PropertyValue.AdditionalFields -> pv.value.values
+                            else -> listOf(pv)
+                        }
+                    }
+                    .firstOrNull { pv -> pv.code == ff.value.code }
+                    ?.let { pv ->
+                        when (pv) {
+                            is PropertyValue.Nomenclature -> pv.value
+                            is PropertyValue.Number -> pv.value
+                            else -> null
+                        }
+                    }
+                    ?.let { currentValue ->
+                        nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
+                            ff.nomenclatureType,
                             taxonomy
-                        ).associate { it.toPair() })
-                }
-
-                else -> {
-                    editableFields.firstOrNull { editableField -> editableField.getValue().code == pv.code }
-                        ?.takeIf { editableField -> editableField is FormField.NomenclatureType }
-                        ?.let { editableField -> editableField as FormField.NomenclatureType }
-                        ?.let { editableField ->
-                            when (pv) {
-                                is PropertyValue.Number -> pv.value
-                                is PropertyValue.Nomenclature -> pv.value
-                                else -> null
-                            }?.let { currentValue ->
-                                nomenclatureRepository.getNomenclatureValuesByTypeAndTaxonomy(
-                                    editableField.nomenclatureType,
-                                    taxonomy
+                        )
+                            .getOrDefault(emptyList())
+                            .firstOrNull { nomenclatureValue -> nomenclatureValue.id == currentValue }
+                            ?.let { nomenclatureValue ->
+                                PropertyValue.Nomenclature(
+                                    code = ff.value.code,
+                                    label = nomenclatureValue.defaultLabel,
+                                    value = nomenclatureValue.id
                                 )
-                                    .getOrDefault(emptyList())
-                                    .firstOrNull { nomenclatureValue -> nomenclatureValue.id == currentValue }
-                                    ?.let { nomenclatureValue ->
-                                        PropertyValue.Nomenclature(
-                                            code = editableField.value.code,
-                                            label = nomenclatureValue.defaultLabel,
-                                            value = nomenclatureValue.id
-                                        )
-                                    }
                             }
-                        } ?: pv
-                }
+                    }
+                    ?.let {
+                        ff.value = it
+                        ff
+                    } ?: ff
             }
-        }
+
+        return editableFieldsWithValue
+            .filter { !it.additionalField }
+            .map { it.value } + listOfNotNull(
+            propertyValues
+                .firstOrNull { pv -> pv is PropertyValue.AdditionalFields }
+                ?.let { pv -> pv as PropertyValue.AdditionalFields }
+                ?.let { pv ->
+                    pv.copy(
+                        value = pv.value + editableFieldsWithValue
+                            .filter { it.additionalField }
+                            .map { it.value }
+                            .associate { it.toPair() })
+                })
     }
 
     data class Params(

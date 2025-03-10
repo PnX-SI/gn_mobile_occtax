@@ -1,5 +1,6 @@
 package fr.geonature.occtax.features.nomenclature.presentation.adapter
 
+import android.annotation.SuppressLint
 import android.text.Editable
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -14,6 +15,7 @@ import fr.geonature.occtax.features.nomenclature.domain.FormField
  *
  * @author S. Grimault
  */
+@SuppressLint("ClickableViewAccessibility")
 class FormFieldModalViewHolder(
     parent: ViewGroup,
     private val listener: OnFormFieldModalViewHolder
@@ -33,10 +35,10 @@ class FormFieldModalViewHolder(
         edit.editText?.apply {
             showSoftInputOnFocus = false
             keyListener = null
+            // workaround to request focus on a non editable field...
             setOnTouchListener { v, event ->
                 if (MotionEvent.ACTION_UP == event.action) {
                     v.requestFocus()
-                    v.performClick()
                 }
                 false
             }

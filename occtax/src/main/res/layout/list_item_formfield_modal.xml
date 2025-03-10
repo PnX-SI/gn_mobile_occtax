@@ -24,7 +24,7 @@
         android:maxLines="3"
         android:minLines="3"
         android:scrollHorizontally="false"
-        android:selectAllOnFocus="true"
+        android:selectAllOnFocus="false"
         android:singleLine="false"
         android:textIsSelectable="false"
         tools:ignore="SpeakableTextPresentCheck,TextContrastCheck" />
