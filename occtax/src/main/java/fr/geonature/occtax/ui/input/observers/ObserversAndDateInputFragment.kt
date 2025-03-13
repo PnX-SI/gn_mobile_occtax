@@ -25,7 +25,6 @@ import fr.geonature.commons.data.ContentProviderAuthority
 import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.entity.InputObserver
 import fr.geonature.commons.data.entity.Nomenclature
-import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.lifecycle.observe
 import fr.geonature.compat.content.getParcelableArrayExtraCompat
 import fr.geonature.compat.content.getParcelableExtraCompat
@@ -181,14 +180,7 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
             }
 
             override fun getNomenclatureValues(nomenclatureTypeMnemonic: String): LiveData<List<Nomenclature>> {
-                return nomenclatureViewModel.getNomenclatureValuesByTypeAndTaxonomy(
-                    nomenclatureTypeMnemonic,
-                    observationRecord?.taxa?.selectedTaxonRecord?.taxon?.taxonomy
-                        ?: Taxonomy(
-                            Taxonomy.ANY,
-                            Taxonomy.ANY
-                        )
-                )
+                return nomenclatureViewModel.getNomenclatureValuesByTypeAndTaxonomy(nomenclatureTypeMnemonic)
             }
 
             override fun onUpdate(editableField: FormField.Editable) {
@@ -291,7 +283,6 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                     false
                 ) ?: false,
                 type = FormField.Type.DEFAULT,
-                taxonomy = observationRecord?.taxa?.selectedTaxonRecord?.taxon?.taxonomy,
                 dateSettings = dateSettings
             )
         }
