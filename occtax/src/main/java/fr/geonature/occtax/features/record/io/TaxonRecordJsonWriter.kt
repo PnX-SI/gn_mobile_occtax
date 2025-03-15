@@ -284,6 +284,9 @@ class TaxonRecordJsonWriter {
 
         additionalFields.value.values.forEach {
             when (it) {
+                is PropertyValue.Date -> writer.name(it.code)
+                    .value(it.value?.format("yyyy-MM-dd"))
+
                 is PropertyValue.Nomenclature -> writer.name(it.code)
                     .value(it.value)
 
@@ -306,6 +309,9 @@ class TaxonRecordJsonWriter {
 
                 is PropertyValue.Text -> writer.name(it.code)
                     .value(it.value)
+
+                is PropertyValue.Time -> writer.name(it.code)
+                    .value(it.toTimeString())
 
                 else -> {}
             }

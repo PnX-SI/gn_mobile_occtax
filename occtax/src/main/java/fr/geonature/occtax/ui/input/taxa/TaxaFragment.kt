@@ -436,7 +436,7 @@ class TaxaFragment : AbstractInputFragment() {
         )
 
         // set the current taxa list ID from selected dataset or from global settings as fallback
-        (observationRecord?.dataset?.dataset?.taxaListId ?: arguments?.getLong(
+        (observationRecord?.dataset?.dataset?.value?.taxaListId ?: arguments?.getLong(
             KEY_TAXA_LIST_ID,
             -1L
         ))?.also {

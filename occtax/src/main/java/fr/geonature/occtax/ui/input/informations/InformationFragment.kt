@@ -1,5 +1,6 @@
 package fr.geonature.occtax.ui.input.informations
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -20,10 +22,10 @@ import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.lifecycle.observe
 import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
-import fr.geonature.occtax.features.nomenclature.presentation.EditableFieldAdapter
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
+import fr.geonature.occtax.features.nomenclature.presentation.adapter.FormFieldAdapter
 import fr.geonature.occtax.features.record.domain.MediaRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.domain.TaxonRecord
@@ -43,7 +45,7 @@ class InformationFragment : AbstractInputFragment() {
 
     private lateinit var savedState: Bundle
 
-    private var adapter: EditableFieldAdapter? = null
+    private var adapter: FormFieldAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,14 +86,22 @@ class InformationFragment : AbstractInputFragment() {
         val progressBar = view.findViewById<ProgressBar>(android.R.id.progress)
             .apply { visibility = View.VISIBLE }
 
-        adapter = EditableFieldAdapter(object :
-            EditableFieldAdapter.OnEditableFieldAdapter {
+        adapter = FormFieldAdapter(object :
+            FormFieldAdapter.OnEditableFieldAdapter {
+            override fun getContext(): Context {
+                return requireContext()
+            }
+
             override fun getLifecycleOwner(): LifecycleOwner {
                 return this@InformationFragment
             }
 
             override fun getCoordinatorLayout(): CoordinatorLayout? {
                 return null
+            }
+
+            override fun fragmentManager(): FragmentManager? {
+                return activity?.supportFragmentManager
             }
 
             override fun showEmptyTextView(show: Boolean) {
@@ -138,29 +148,32 @@ class InformationFragment : AbstractInputFragment() {
                 )
             }
 
-            override fun onUpdate(editableField: EditableField) {
+            override fun onUpdate(editableField: FormField.Editable) {
+                listener.validateCurrentPage()
+
                 if (editableField.additionalField) {
                     // as additional field
                     observationRecord?.taxa?.selectedTaxonRecord?.also {
                         it.additionalFields = it.additionalFields.filter { pv ->
-                            pv.toPair().first != editableField.code
-                        } + listOfNotNull(editableField.value)
+                            pv.toPair().first != editableField.getValue().code
+                        } + listOfNotNull(editableField.getValue())
                     }
                 } else {
                     // as editable field
-                    editableField.value?.toPair()
+                    editableField.getValue()
+                        .toPair()
                         .also {
-                            if (it == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(editableField.code)
+                            if (it.second.isEmpty()) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(editableField.getValue().code)
                             else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
-                                editableField.code,
+                                editableField.getValue().code,
                                 it.second
                             )
                         }
                 }
 
-                val propertyValue = editableField.value
+                val propertyValue = editableField.getValue()
 
-                if (propertyValue !== null && editableField.locked) propertyValueModel.setPropertyValue(
+                if (editableField.locked) propertyValueModel.setPropertyValue(
                     observationRecord?.taxa?.selectedTaxonRecord?.taxon?.taxonomy
                         ?: Taxonomy(
                             Taxonomy.ANY,
@@ -173,8 +186,12 @@ class InformationFragment : AbstractInputFragment() {
                             Taxonomy.ANY,
                             Taxonomy.ANY
                         ),
-                    editableField.code
+                    editableField.getValue().code
                 )
+            }
+
+            override fun onAction(formField: FormField) {
+                // nothing to do…
             }
 
             override fun onAddMedia(nomenclatureTypeMnemonic: String) {
@@ -190,7 +207,7 @@ class InformationFragment : AbstractInputFragment() {
                 KEY_SHOW_ALL_NOMENCLATURE_TYPES,
                 false
             )
-        ) adapter?.showAllEditableFields() else adapter?.showDefaultEditableFields()
+        ) adapter?.showAllFormFields() else adapter?.showDefaultFormFields()
         adapter?.lockDefaultValues(arguments?.getBoolean(ARG_SAVE_DEFAULT_VALUES) == true)
 
         with(recyclerView) {
@@ -216,37 +233,25 @@ class InformationFragment : AbstractInputFragment() {
     }
 
     override fun validate(): Boolean {
-        return this.observationRecord?.taxa?.selectedTaxonRecord != null
+        return this.observationRecord?.taxa?.selectedTaxonRecord != null && (adapter?.hasErrors() == false)
     }
 
     override fun refreshView() {
         nomenclatureViewModel.getEditableFields(
-            observationRecord?.dataset?.dataset?.datasetId,
+            observationRecord?.dataset?.dataset?.value?.id,
             arguments?.getBoolean(
                 ARG_WITH_ADDITIONAL_FIELDS,
                 false
             ) ?: false,
-            EditableField.Type.INFORMATION,
+            FormField.Type.INFORMATION,
             (arguments?.getParcelableArrayCompat<PropertySettings>(ARG_PROPERTIES)
                 ?.toList() ?: emptyList()),
             observationRecord?.taxa?.selectedTaxonRecord?.taxon?.taxonomy
         )
     }
 
-    private fun handleEditableFields(editableFields: List<EditableField>) {
-        editableFields.filter { it.value != null }
-            .forEach {
-                if (observationRecord?.taxa?.selectedTaxonRecord?.properties?.containsKey(it.code) == true) return@forEach
-
-                it.value?.toPair()
-                    .also { pair ->
-                        if (pair == null) observationRecord?.taxa?.selectedTaxonRecord?.properties?.remove(it.code)
-                        else observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
-                            pair.first,
-                            pair.second
-                        )
-                    }
-            }
+    private fun handleEditableFields(editableFields: List<FormField>) {
+        mapDefaultValueToTaxonRecord(editableFields)
 
         adapter?.bind(
             editableFields,
@@ -257,6 +262,36 @@ class InformationFragment : AbstractInputFragment() {
                 ?: emptyList()) + (observationRecord?.taxa?.selectedTaxonRecord?.additionalFields
                 ?: emptyList())).toTypedArray()
         )
+
+        listener.validateCurrentPage()
+    }
+
+    private fun mapDefaultValueToTaxonRecord(editableFields: List<FormField>) {
+        // map editable form fields existing values to the given taxon record
+        editableFields
+            .filterIsInstance<FormField.Editable>()
+            .forEach { ff ->
+                // if we have existing value from taxon record, do nothing
+                if (!ff.additionalField && observationRecord?.taxa?.selectedTaxonRecord?.properties?.containsKey(ff.getValue().code) == true) return
+                if (ff.additionalField && observationRecord?.taxa?.selectedTaxonRecord?.additionalFields?.associateBy { pv -> pv.code }
+                        ?.containsKey(ff.getValue().code) == true) return
+
+                // set default value from editable field to the given taxon record
+                if (!ff.additionalField) {
+                    observationRecord?.taxa?.selectedTaxonRecord?.properties?.set(
+                        ff.getValue().code,
+                        ff.getValue()
+                    )
+                }
+
+                if (ff.additionalField) {
+                    observationRecord?.taxa?.selectedTaxonRecord?.also { record ->
+                        record.additionalFields = record.additionalFields.filter { pv ->
+                            pv.toPair().first != ff.getValue().code
+                        } + listOfNotNull(ff.getValue())
+                    }
+                }
+            }
     }
 
     companion object {

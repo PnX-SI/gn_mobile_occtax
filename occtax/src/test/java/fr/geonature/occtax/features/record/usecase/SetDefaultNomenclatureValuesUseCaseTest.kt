@@ -1,11 +1,14 @@
 package fr.geonature.occtax.features.record.usecase
 
+import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.core.app.ApplicationProvider
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.R
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.nomenclature.repository.IAdditionalFieldRepository
 import fr.geonature.occtax.features.nomenclature.repository.INomenclatureRepository
 import fr.geonature.occtax.features.record.domain.ObservationRecord
@@ -21,6 +24,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
 /**
  * Unit tests about [SetDefaultNomenclatureValuesUseCase].
@@ -28,6 +33,7 @@ import org.junit.Test
  * @author S. Grimault
  */
 @ExperimentalCoroutinesApi
+@RunWith(RobolectricTestRunner::class)
 class SetDefaultNomenclatureValuesUseCaseTest {
 
     @get:Rule
@@ -35,6 +41,8 @@ class SetDefaultNomenclatureValuesUseCaseTest {
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
+
+    private lateinit var application: Application
 
     @MockK
     private lateinit var nomenclatureRepository: INomenclatureRepository
@@ -47,6 +55,8 @@ class SetDefaultNomenclatureValuesUseCaseTest {
     @Before
     fun setUp() {
         init(this)
+
+        application = ApplicationProvider.getApplicationContext()
 
         setDefaultNomenclatureValuesUseCase =
             SetDefaultNomenclatureValuesUseCase(
@@ -63,84 +73,84 @@ class SetDefaultNomenclatureValuesUseCaseTest {
 
             // and some default nomenclature values
             coEvery {
-                nomenclatureRepository.getEditableFields(EditableField.Type.DEFAULT)
+                nomenclatureRepository.getEditableFields(FormField.Type.DEFAULT)
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.DEFAULT,
-                        "TYP_GRP",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        "TYP_GRP"
-                    ).apply {
+                    FormField.NomenclatureType(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.nomenclature_typ_grp),
+                        nomenclatureType = "TYP_GRP",
                         value = PropertyValue.Nomenclature(
-                            "TYP_GRP",
-                            "NSP",
-                            129L
+                            code = "TYP_GRP",
+                            label = "NSP",
+                            value = 129L
                         )
-                    }
+                    )
                 )
             )
             coEvery {
-                nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
+                nomenclatureRepository.getEditableFields(FormField.Type.INFORMATION)
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "ETA_BIO",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        "ETA_BIO",
-                    ).apply {
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Etat biologique de l'observation",
+                        nomenclatureType = "ETA_BIO",
                         value = PropertyValue.Nomenclature(
-                            "ETA_BIO",
-                            "NSP",
-                            152L
+                            code = "ETA_BIO",
+                            label = "NSP",
+                            value = 152L
                         )
-                    }
+                    )
                 )
             )
             coEvery {
-                nomenclatureRepository.getEditableFields(EditableField.Type.COUNTING)
+                nomenclatureRepository.getEditableFields(FormField.Type.COUNTING)
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.COUNTING,
-                        "STADE_VIE",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        "STADE_VIE",
-                    ).apply {
+                    FormField.NomenclatureType(
+                        type = FormField.Type.COUNTING,
+                        label = application.getString(R.string.nomenclature_stade_vie),
+                        default = false,
+                        nomenclatureType = "STADE_VIE",
                         value = PropertyValue.Nomenclature(
-                            "STADE_VIE",
-                            "Indéterminé",
-                            2L
+                            code = "STADE_VIE",
+                            label = "Indéterminé",
+                            value = 2L
                         )
-                    }
+                    )
                 )
             )
             coEvery {
                 additionalFieldRepository.getAllAdditionalFields(
                     any(),
-                    EditableField.Type.INFORMATION
+                    FormField.Type.DEFAULT
                 )
             } returns Result.success(listOf())
             coEvery {
                 additionalFieldRepository.getAllAdditionalFields(
                     any(),
-                    EditableField.Type.COUNTING
+                    FormField.Type.INFORMATION
+                )
+            } returns Result.success(listOf())
+            coEvery {
+                additionalFieldRepository.getAllAdditionalFields(
+                    any(),
+                    FormField.Type.COUNTING
                 )
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "as_TYPE_PROTOCOLE",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        "TYPE_PROTOCOLE",
-                    ).apply {
+                    FormField.NomenclatureType(
+                        type = FormField.Type.COUNTING,
+                        label = "Protocole",
+                        additionalField = true,
+                        nomenclatureType = "TYPE_PROTOCOLE",
                         value = PropertyValue.Nomenclature(
-                            "as_TYPE_PROTOCOLE",
-                            "Inconnu",
-                            387L
+                            code = "as_TYPE_PROTOCOLE",
+                            label = "Inconnu",
+                            value = 387L
                         )
-                    }
+                    )
                 )
             )
 
@@ -152,6 +162,8 @@ class SetDefaultNomenclatureValuesUseCaseTest {
             assertTrue(result.isSuccess)
             assertEquals(
                 ObservationRecord(internalId = 1234).apply {
+                    dates.start = observationRecord.dates.start
+                    dates.end = observationRecord.dates.end
                     listOf(
                         PropertyValue.Nomenclature(
                             "TYP_GRP",
@@ -170,7 +182,7 @@ class SetDefaultNomenclatureValuesUseCaseTest {
     @Test
     fun `should return an observation records with all property values with additional fields`() =
         runTest {
-            // given some observation record
+            // given some observation record with one taxon and one counting
             val observationRecord = ObservationRecord(internalId = 1234).apply {
                 taxa.add(
                     Taxon(
@@ -229,77 +241,78 @@ class SetDefaultNomenclatureValuesUseCaseTest {
 
             // and some default nomenclature values
             coEvery {
-                nomenclatureRepository.getEditableFields(EditableField.Type.DEFAULT)
+                nomenclatureRepository.getEditableFields(FormField.Type.DEFAULT)
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.DEFAULT,
-                        "TYP_GRP",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        "TYP_GRP",
-                    ).apply {
+                    FormField.NomenclatureType(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.nomenclature_typ_grp),
+                        nomenclatureType = "TYP_GRP",
                         value = PropertyValue.Nomenclature(
-                            "TYP_GRP",
-                            "NSP",
-                            129L
+                            code = "TYP_GRP",
+                            label = "NSP",
+                            value = 129L
                         )
-                    }
+                    )
                 )
             )
             coEvery {
-                nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
+                nomenclatureRepository.getEditableFields(FormField.Type.INFORMATION)
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "ETA_BIO",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        "ETA_BIO",
-                    ).apply {
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Etat biologique de l'observation",
+                        nomenclatureType = "ETA_BIO",
                         value = PropertyValue.Nomenclature(
-                            "ETA_BIO",
-                            "NSP",
-                            152L
+                            code = "ETA_BIO",
+                            label = "NSP",
+                            value = 152L
                         )
-                    }
+                    )
                 )
             )
             coEvery {
-                nomenclatureRepository.getEditableFields(EditableField.Type.COUNTING)
+                nomenclatureRepository.getEditableFields(FormField.Type.COUNTING)
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.COUNTING,
-                        "STADE_VIE",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        "STADE_VIE",
-                    ).apply {
+                    FormField.NomenclatureType(
+                        type = FormField.Type.COUNTING,
+                        label = application.getString(R.string.nomenclature_stade_vie),
+                        nomenclatureType = "STADE_VIE",
                         value = PropertyValue.Nomenclature(
-                            "STADE_VIE",
-                            "Indéterminé",
-                            2L
+                            code = "STADE_VIE",
+                            label = "Indéterminé",
+                            value = 2L
                         )
-                    }
+                    )
                 )
             )
             coEvery {
                 additionalFieldRepository.getAllAdditionalFields(
                     any(),
-                    EditableField.Type.INFORMATION
+                    FormField.Type.DEFAULT
                 )
             } returns Result.success(listOf())
             coEvery {
                 additionalFieldRepository.getAllAdditionalFields(
                     any(),
-                    EditableField.Type.COUNTING
+                    FormField.Type.INFORMATION
+                )
+            } returns Result.success(listOf())
+            coEvery {
+                additionalFieldRepository.getAllAdditionalFields(
+                    any(),
+                    FormField.Type.COUNTING
                 )
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "as_TYPE_PROTOCOLE",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        "TYPE_PROTOCOLE"
+                    FormField.NomenclatureType(
+                        type = FormField.Type.COUNTING,
+                        label = "Protocole",
+                        additionalField = true,
+                        nomenclatureType = "TYPE_PROTOCOLE",
+                        value = PropertyValue.Nomenclature(code = "as_TYPE_PROTOCOLE")
                     )
                 )
             )
@@ -388,6 +401,8 @@ class SetDefaultNomenclatureValuesUseCaseTest {
             assertTrue(result.isSuccess)
             assertEquals(
                 ObservationRecord(internalId = 1234).apply {
+                    dates.start = observationRecord.dates.start
+                    dates.end = observationRecord.dates.end
                     listOf(
                         PropertyValue.Nomenclature(
                             "TYP_GRP",
@@ -521,77 +536,78 @@ class SetDefaultNomenclatureValuesUseCaseTest {
 
             // and some default nomenclature values
             coEvery {
-                nomenclatureRepository.getEditableFields(EditableField.Type.DEFAULT)
+                nomenclatureRepository.getEditableFields(FormField.Type.DEFAULT)
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.DEFAULT,
-                        "TYP_GRP",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        "TYP_GRP",
-                    ).apply {
+                    FormField.NomenclatureType(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.nomenclature_typ_grp),
+                        nomenclatureType = "TYP_GRP",
                         value = PropertyValue.Nomenclature(
-                            "TYP_GRP",
-                            "NSP",
-                            129L
+                            code = "TYP_GRP",
+                            label = "NSP",
+                            value = 129L
                         )
-                    }
+                    )
                 )
             )
             coEvery {
-                nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
+                nomenclatureRepository.getEditableFields(FormField.Type.INFORMATION)
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "ETA_BIO",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        "ETA_BIO",
-                    ).apply {
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Etat biologique de l'observation",
+                        nomenclatureType = "ETA_BIO",
                         value = PropertyValue.Nomenclature(
-                            "ETA_BIO",
-                            "NSP",
-                            152L
+                            code = "ETA_BIO",
+                            label = "NSP",
+                            value = 152L
                         )
-                    }
+                    )
                 )
             )
             coEvery {
-                nomenclatureRepository.getEditableFields(EditableField.Type.COUNTING)
+                nomenclatureRepository.getEditableFields(FormField.Type.COUNTING)
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.COUNTING,
-                        "STADE_VIE",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        "STADE_VIE",
-                    ).apply {
+                    FormField.NomenclatureType(
+                        type = FormField.Type.COUNTING,
+                        label = application.getString(R.string.nomenclature_stade_vie),
+                        nomenclatureType = "STADE_VIE",
                         value = PropertyValue.Nomenclature(
-                            "STADE_VIE",
-                            "Indéterminé",
-                            2L
+                            code = "STADE_VIE",
+                            label = "Indéterminé",
+                            value = 2L
                         )
-                    }
+                    )
                 )
             )
             coEvery {
                 additionalFieldRepository.getAllAdditionalFields(
                     any(),
-                    EditableField.Type.INFORMATION
+                    FormField.Type.DEFAULT
                 )
             } returns Result.success(listOf())
             coEvery {
                 additionalFieldRepository.getAllAdditionalFields(
                     any(),
-                    EditableField.Type.COUNTING
+                    FormField.Type.INFORMATION
+                )
+            } returns Result.success(listOf())
+            coEvery {
+                additionalFieldRepository.getAllAdditionalFields(
+                    any(),
+                    FormField.Type.COUNTING
                 )
             } returns Result.success(
                 listOf(
-                    EditableField(
-                        EditableField.Type.INFORMATION,
-                        "as_TYPE_PROTOCOLE",
-                        EditableField.ViewType.NOMENCLATURE_TYPE,
-                        "TYPE_PROTOCOLE"
+                    FormField.NomenclatureType(
+                        type = FormField.Type.COUNTING,
+                        label = "Protocole",
+                        additionalField = true,
+                        nomenclatureType = "TYPE_PROTOCOLE",
+                        value = PropertyValue.Nomenclature(code = "as_TYPE_PROTOCOLE")
                     )
                 )
             )
@@ -667,7 +683,7 @@ class SetDefaultNomenclatureValuesUseCaseTest {
                 )
             )
 
-            // when loading all default nomenclature values from use case
+            // when loading all default nomenclature values with no additional fields from use case
             val result = setDefaultNomenclatureValuesUseCase.run(
                 SetDefaultNomenclatureValuesUseCase.Params(observationRecord)
             )
@@ -676,6 +692,8 @@ class SetDefaultNomenclatureValuesUseCaseTest {
             assertTrue(result.isSuccess)
             assertEquals(
                 ObservationRecord(internalId = 1234).apply {
+                    dates.start = observationRecord.dates.start
+                    dates.end = observationRecord.dates.end
                     listOf(
                         PropertyValue.Nomenclature(
                             "TYP_GRP",
@@ -754,7 +772,7 @@ class SetDefaultNomenclatureValuesUseCaseTest {
 
             // with no default nomenclature values
             coEvery {
-                nomenclatureRepository.getEditableFields(EditableField.Type.DEFAULT)
+                nomenclatureRepository.getEditableFields(FormField.Type.DEFAULT)
             } returns Result.success(emptyList())
 
             // when trying to load all default nomenclature values from use case

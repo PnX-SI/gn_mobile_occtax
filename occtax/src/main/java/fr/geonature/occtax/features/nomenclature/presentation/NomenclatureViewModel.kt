@@ -7,9 +7,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.lifecycle.BaseViewModel
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.nomenclature.usecase.GetEditableFieldsUseCase
 import fr.geonature.occtax.features.nomenclature.usecase.GetNomenclatureValuesByTypeAndTaxonomyUseCase
+import fr.geonature.occtax.features.settings.domain.InputDateSettings
 import fr.geonature.occtax.features.settings.domain.PropertySettings
 import org.tinylog.Logger
 import javax.inject.Inject
@@ -28,8 +29,8 @@ class NomenclatureViewModel @Inject constructor(
     private val getNomenclatureValuesByTypeAndTaxonomyUseCase: GetNomenclatureValuesByTypeAndTaxonomyUseCase
 ) : BaseViewModel() {
 
-    private val _editableNomenclatures = MutableLiveData<List<EditableField>>()
-    val editableNomenclatures: LiveData<List<EditableField>> = _editableNomenclatures
+    private val _editableNomenclatures = MutableLiveData<List<FormField>>()
+    val editableNomenclatures: LiveData<List<FormField>> = _editableNomenclatures
 
     /**
      * Gets all editable fields from given type with default values.
@@ -40,9 +41,10 @@ class NomenclatureViewModel @Inject constructor(
     fun getEditableFields(
         datasetId: Long? = null,
         withAdditionalFields: Boolean = false,
-        type: EditableField.Type,
+        type: FormField.Type,
         defaultPropertySettings: List<PropertySettings> = listOf(),
-        taxonomy: Taxonomy? = null
+        taxonomy: Taxonomy? = null,
+        dateSettings: InputDateSettings = InputDateSettings.DEFAULT
     ) {
         getEditableFieldsUseCase(
             GetEditableFieldsUseCase.Params(
@@ -50,7 +52,8 @@ class NomenclatureViewModel @Inject constructor(
                 withAdditionalFields,
                 type,
                 defaultPropertySettings,
-                taxonomy
+                taxonomy,
+                dateSettings
             ),
             viewModelScope
         ) {

@@ -170,7 +170,7 @@ class ObservationRecordJsonWriter {
                 }
 
                 is PropertyValue.Dataset -> writer.name(propertyValue.code)
-                    .value(propertyValue.datasetId)
+                    .value(propertyValue.value?.id)
 
                 is PropertyValue.Nomenclature -> {
                     // GeoNature default properties mapping
@@ -178,6 +178,13 @@ class ObservationRecordJsonWriter {
                         "TYP_GRP" -> writer.name("id_nomenclature_grp_typ")
                             .value(propertyValue.value)
                     }
+                }
+
+                is PropertyValue.Observers -> {
+                    writer.name(propertyValue.code)
+                        .beginArray()
+                    propertyValue.value.forEach { value -> writer.value(value.id) }
+                    writer.endArray()
                 }
 
                 is PropertyValue.AdditionalFields -> {
@@ -266,6 +273,9 @@ class ObservationRecordJsonWriter {
 
         additionalFields.value.values.forEach {
             when (it) {
+                is PropertyValue.Date -> writer.name(it.code)
+                    .value(it.value?.format("yyyy-MM-dd"))
+
                 is PropertyValue.Nomenclature -> writer.name(it.code)
                     .value(it.value)
 
@@ -288,6 +298,9 @@ class ObservationRecordJsonWriter {
 
                 is PropertyValue.Text -> writer.name(it.code)
                     .value(it.value)
+
+                is PropertyValue.Time -> writer.name(it.code)
+                    .value(it.toTimeString())
 
                 else -> {}
             }
