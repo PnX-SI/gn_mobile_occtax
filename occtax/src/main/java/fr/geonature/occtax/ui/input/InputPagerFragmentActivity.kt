@@ -106,11 +106,6 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
         )
 
         pageFragmentViewModel.set(
-            R.string.pager_fragment_observers_and_date_input_title to ObserversAndDateInputFragment.newInstance(
-                dateSettings = appSettings.inputSettings.dateSettings,
-                withAdditionalFields = appSettings.nomenclatureSettings?.withAdditionalFields
-                    ?: false
-            ),
             R.string.pager_fragment_map_title to InputMapFragment.newInstance(
                 MapSettings.Builder()
                     .from(appSettings.mapSettings)
@@ -119,6 +114,11 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
                     .showZoom(showZoom(this))
                     .editMode(EditFeatureButton.EditMode.SINGLE)
                     .build()
+            ),
+            R.string.pager_fragment_observers_and_date_input_title to ObserversAndDateInputFragment.newInstance(
+                dateSettings = appSettings.inputSettings.dateSettings,
+                withAdditionalFields = appSettings.nomenclatureSettings?.withAdditionalFields
+                    ?: false
             ),
             R.string.pager_fragment_summary_title to InputTaxaSummaryFragment.newInstance(appSettings.inputSettings.dateSettings)
         )
