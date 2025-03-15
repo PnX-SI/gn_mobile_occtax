@@ -2,8 +2,9 @@ package fr.geonature.occtax.features.nomenclature.repository
 
 import fr.geonature.commons.data.entity.AdditionalField
 import fr.geonature.commons.features.nomenclature.data.IAdditionalFieldLocalDataSource
+import fr.geonature.commons.util.toDate
 import fr.geonature.occtax.features.nomenclature.domain.AdditionalFieldType
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import org.tinylog.Logger
 
@@ -19,15 +20,15 @@ class AdditionalFieldRepositoryImpl(
 
     override suspend fun getAllAdditionalFields(
         datasetId: Long?,
-        type: EditableField.Type
-    ): Result<List<EditableField>> {
+        type: FormField.Type
+    ): Result<List<FormField>> {
         return runCatching {
             additionalFieldLocalDataSource.getAdditionalFields(
                 datasetId,
                 *when (type) {
-                    EditableField.Type.DEFAULT -> arrayOf(AdditionalFieldType.DEFAULT.type)
-                    EditableField.Type.INFORMATION -> arrayOf(AdditionalFieldType.INFORMATION.type)
-                    EditableField.Type.COUNTING -> arrayOf(AdditionalFieldType.COUNTING.type)
+                    FormField.Type.DEFAULT -> arrayOf(AdditionalFieldType.DEFAULT.type)
+                    FormField.Type.INFORMATION -> arrayOf(AdditionalFieldType.INFORMATION.type)
+                    FormField.Type.COUNTING -> arrayOf(AdditionalFieldType.COUNTING.type)
                 }
             )
                 .mapNotNull {
@@ -41,20 +42,49 @@ class AdditionalFieldRepositoryImpl(
                                 return@mapNotNull null
                             }
 
-                            EditableField(
+                            FormField.Checkbox(
                                 type = type,
-                                code = it.additionalField.name,
-                                viewType = EditableField.ViewType.CHECKBOX,
+                                label = it.additionalField.label,
                                 visible = true,
                                 default = true,
+                                order = it.additionalField.order,
                                 additionalField = true,
-                                label = it.additionalField.label,
+                                mandatory = it.additionalField.mandatory,
                                 values = it.values.map { fieldValue ->
                                     PropertyValue.Text(
                                         fieldValue.value,
                                         fieldValue.label
                                     )
+                                },
+                                value = PropertyValue.StringArray(code = it.additionalField.name)
+                            )
+                                .also { ff ->
+                                    val defaultValue =
+                                        it.additionalField.defaultValue ?: return@also
+
+                                    if (ff.values.map { pv -> pv.code }
+                                            .any { code -> code == defaultValue }) {
+                                        ff.value = PropertyValue.StringArray(
+                                            code = it.additionalField.name,
+                                            value = arrayOf(defaultValue)
+                                        )
+                                    }
                                 }
+                        }
+
+                        AdditionalField.FieldType.DATE -> {
+                            FormField.Date(
+                                type = type,
+                                label = it.additionalField.label,
+                                visible = true,
+                                default = true,
+                                order = it.additionalField.order,
+                                additionalField = true,
+                                mandatory = it.additionalField.mandatory,
+                                value = PropertyValue.Date(
+                                    it.additionalField.name,
+                                    value = it.additionalField.defaultValue?.let { defaultValue -> toDate(defaultValue) }
+                                )
                             )
                         }
 
@@ -67,34 +97,52 @@ class AdditionalFieldRepositoryImpl(
                                 return@mapNotNull null
                             }
 
-                            EditableField(
+                            FormField.SelectMultiple(
                                 type = type,
-                                code = it.additionalField.name,
-                                viewType = EditableField.ViewType.SELECT_MULTIPLE,
+                                label = it.additionalField.label,
                                 visible = true,
                                 default = true,
+                                order = it.additionalField.order,
                                 additionalField = true,
-                                label = it.additionalField.label,
+                                mandatory = it.additionalField.mandatory,
                                 values = it.values.map { fieldValue ->
                                     PropertyValue.Text(
                                         fieldValue.value,
                                         fieldValue.label
                                     )
-                                }
+                                },
+                                value = PropertyValue.StringArray(it.additionalField.name)
                             )
+                                .also { ff ->
+                                    val defaultValue =
+                                        it.additionalField.defaultValue ?: return@also
+
+                                    if (ff.values.map { pv -> pv.code }
+                                            .any { code -> code == defaultValue }) {
+                                        ff.value = PropertyValue.StringArray(
+                                            code = it.additionalField.name,
+                                            value = arrayOf(defaultValue)
+                                        )
+                                    }
+                                }
                         }
 
                         AdditionalField.FieldType.NOMENCLATURE -> {
                             it.nomenclatureTypeMnemonic?.let { mnemonic ->
-                                EditableField(
+                                FormField.NomenclatureType(
                                     type = type,
-                                    code = it.additionalField.name,
-                                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                                    label = it.additionalField.label,
                                     nomenclatureType = mnemonic,
                                     visible = true,
                                     default = true,
+                                    order = it.additionalField.order,
                                     additionalField = true,
-                                    label = it.additionalField.label
+                                    mandatory = it.additionalField.mandatory,
+                                    value = PropertyValue.Nomenclature(
+                                        code = it.additionalField.name,
+                                        label = null,
+                                        value = it.additionalField.defaultValue?.toLongOrNull()
+                                    )
                                 )
                             } ?: run {
                                 Logger.warn {
@@ -105,14 +153,18 @@ class AdditionalFieldRepositoryImpl(
                             }
                         }
 
-                        AdditionalField.FieldType.NUMBER -> EditableField(
+                        AdditionalField.FieldType.NUMBER -> FormField.Number(
                             type = type,
-                            code = it.additionalField.name,
-                            viewType = EditableField.ViewType.NUMBER,
+                            label = it.additionalField.label,
                             visible = true,
                             default = true,
+                            order = it.additionalField.order,
                             additionalField = true,
-                            label = it.additionalField.label
+                            mandatory = it.additionalField.mandatory,
+                            value = PropertyValue.Number(
+                                code = it.additionalField.name,
+                                value = it.additionalField.defaultValue?.toLongOrNull()
+                            )
                         )
 
                         AdditionalField.FieldType.RADIO -> {
@@ -124,21 +176,37 @@ class AdditionalFieldRepositoryImpl(
                                 return@mapNotNull null
                             }
 
-                            EditableField(
+                            FormField.Radio(
                                 type = type,
-                                code = it.additionalField.name,
-                                viewType = EditableField.ViewType.RADIO,
+                                label = it.additionalField.label,
                                 visible = true,
                                 default = true,
+                                order = it.additionalField.order,
                                 additionalField = true,
-                                label = it.additionalField.label,
+                                mandatory = it.additionalField.mandatory,
                                 values = it.values.map { fieldValue ->
                                     PropertyValue.Text(
                                         fieldValue.value,
                                         fieldValue.label
                                     )
-                                }
+                                },
+                                value = PropertyValue.Text(
+                                    code = it.additionalField.name,
+                                    value = null
+                                )
                             )
+                                .also { ff ->
+                                    val defaultValue =
+                                        it.additionalField.defaultValue ?: return@also
+
+                                    if (ff.values.map { pv -> pv.code }
+                                            .any { code -> code == defaultValue }) {
+                                        ff.value = PropertyValue.Text(
+                                            code = it.additionalField.name,
+                                            value = defaultValue
+                                        )
+                                    }
+                                }
                         }
 
                         AdditionalField.FieldType.SELECT -> {
@@ -150,42 +218,84 @@ class AdditionalFieldRepositoryImpl(
                                 return@mapNotNull null
                             }
 
-                            EditableField(
+                            FormField.Select(
                                 type = type,
-                                code = it.additionalField.name,
-                                viewType = EditableField.ViewType.SELECT_SIMPLE,
+                                label = it.additionalField.label,
                                 visible = true,
                                 default = true,
+                                order = it.additionalField.order,
                                 additionalField = true,
-                                label = it.additionalField.label,
+                                mandatory = it.additionalField.mandatory,
                                 values = it.values.map { fieldValue ->
                                     PropertyValue.Text(
                                         fieldValue.value,
                                         fieldValue.label
                                     )
-                                }
+                                },
+                                value = PropertyValue.Text(
+                                    code = it.additionalField.name,
+                                    value = null
+                                )
                             )
+                                .also { ff ->
+                                    val defaultValue =
+                                        it.additionalField.defaultValue ?: return@also
+
+                                    if (ff.values.map { pv -> pv.code }
+                                            .any { code -> code == defaultValue }) {
+                                        ff.value = PropertyValue.Text(
+                                            code = it.additionalField.name,
+                                            value = defaultValue
+                                        )
+                                    }
+                                }
                         }
 
-                        AdditionalField.FieldType.TEXT -> EditableField(
+                        AdditionalField.FieldType.TEXT -> FormField.Text(
                             type = type,
-                            code = it.additionalField.name,
-                            viewType = EditableField.ViewType.TEXT_SIMPLE,
+                            label = it.additionalField.label,
                             visible = true,
                             default = true,
+                            order = it.additionalField.order,
                             additionalField = true,
-                            label = it.additionalField.label
+                            mandatory = it.additionalField.mandatory,
+                            value = PropertyValue.Text(
+                                code = it.additionalField.name,
+                                value = it.additionalField.defaultValue
+                            )
                         )
 
-                        AdditionalField.FieldType.TEXTAREA -> EditableField(
+                        AdditionalField.FieldType.TEXTAREA -> FormField.TextMultiple(
                             type = type,
-                            code = it.additionalField.name,
-                            viewType = EditableField.ViewType.TEXT_MULTIPLE,
+                            label = it.additionalField.label,
                             visible = true,
                             default = true,
+                            order = it.additionalField.order,
                             additionalField = true,
-                            label = it.additionalField.label
+                            mandatory = it.additionalField.mandatory,
+                            value = PropertyValue.Text(
+                                code = it.additionalField.name,
+                                value = it.additionalField.defaultValue
+                            )
                         )
+
+                        AdditionalField.FieldType.TIME -> {
+                            FormField.Time(
+                                type = type,
+                                label = it.additionalField.label,
+                                visible = true,
+                                default = true,
+                                order = it.additionalField.order,
+                                additionalField = true,
+                                mandatory = it.additionalField.mandatory,
+                                value = it.additionalField.defaultValue?.let { defaultValue ->
+                                    PropertyValue.Time.parse(
+                                        it.additionalField.name,
+                                        defaultValue
+                                    )
+                                } ?: PropertyValue.Time(it.additionalField.name)
+                            )
+                        }
 
                         else -> {
                             Logger.warn {

@@ -40,6 +40,8 @@
         "id_nomenclature_bio_status": 29,
         "additional_fields": {
           "some_field_text": "some_value",
+          "some_field_date": "2016-10-28",
+          "some_field_time": "08:15",
           "some_field_as_long": 42,
           "some_field_as_double": 3.14,
           "some_field_array_string": [
@@ -60,6 +62,8 @@
             "id_nomenclature_type_count": 93,
             "additional_fields": {
               "some_field_text": "some_value",
+              "some_field_date_counting": "2009-01-03",
+              "some_field_time_counting": "13:00",
               "some_invalid_field": [
                 3,
                 "val3"

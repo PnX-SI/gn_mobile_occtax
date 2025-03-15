@@ -226,6 +226,8 @@ class ObservationRecordViewModelTest {
         // then
         verify(atLeast = 1) {
             observationRecordObserver.onChanged(ObservationRecord(internalId = 1234).apply {
+                dates.start = observationRecord.dates.start
+                dates.end = observationRecord.dates.end
                 listOf(
                     PropertyValue.Nomenclature(
                         "TYP_GRP",

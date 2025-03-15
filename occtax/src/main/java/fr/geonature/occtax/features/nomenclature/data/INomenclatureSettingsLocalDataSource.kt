@@ -1,6 +1,6 @@
 package fr.geonature.occtax.features.nomenclature.data
 
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.settings.domain.PropertySettings
 
 /**
@@ -11,14 +11,14 @@ import fr.geonature.occtax.features.settings.domain.PropertySettings
 interface INomenclatureSettingsLocalDataSource {
 
     /**
-     * Gets all [EditableField] matching given nomenclature main type.
-     * If the default main type is requested, returns all default [EditableField]
+     * Gets all [FormField] matching given nomenclature main type.
+     * If the default main type is requested, returns all default [FormField]
      * whatever the given [PropertySettings].
      *
-     * @return a list of [EditableField]
+     * @return a list of [FormField]
      */
     suspend fun getNomenclatureTypeSettings(
-        type: EditableField.Type,
+        type: FormField.Type,
         vararg defaultPropertySettings: PropertySettings
-    ): List<EditableField>
+    ): List<FormField>
 }

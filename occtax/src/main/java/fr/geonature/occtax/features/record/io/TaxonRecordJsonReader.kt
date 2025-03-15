@@ -6,6 +6,7 @@ import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.util.nextLongOrNull
 import fr.geonature.commons.util.nextStringOrNull
+import fr.geonature.commons.util.toDate
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
@@ -276,9 +277,9 @@ class TaxonRecordJsonReader {
                 else -> {
                     when (reader.peek()) {
                         JsonToken.STRING -> additionalFields.add(
-                            PropertyValue.Text(
-                                keyName,
-                                reader.nextStringOrNull()
+                            readPropertyValueFromString(
+                                reader,
+                                keyName
                             )
                         )
 
@@ -333,6 +334,34 @@ class TaxonRecordJsonReader {
         reader.endObject()
 
         return additionalFields
+    }
+
+    private fun readPropertyValueFromString(
+        reader: JsonReader,
+        code: String
+    ): PropertyValue {
+        val value = reader.nextStringOrNull()
+
+        if (value.isNullOrEmpty()) {
+            return PropertyValue.Text(
+                code,
+                value
+            )
+        }
+
+        return PropertyValue.Time.parse(
+            code,
+            value
+        )
+            .takeIf { !it.isEmpty() } ?: toDate(value)?.let {
+            PropertyValue.Date(
+                code,
+                it
+            )
+        } ?: PropertyValue.Text(
+            code,
+            value
+        )
     }
 
     /**

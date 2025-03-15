@@ -172,7 +172,7 @@ All these settings may not be defined and the default values will then be used i
 
 **Note:** Any unknown nomenclature attribute added will be simply ignored at startup.
 
-You can override these default settings by adding a property for each nomenclature settings, e.g:
+You can override these default settings by adding a property for each nomenclature settings, e.g.:
 
 ```json
 {

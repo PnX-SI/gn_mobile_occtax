@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<fr.geonature.occtax.ui.shared.view.ValidationCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/padding_default"
+    app:cardCornerRadius="@dimen/cardview_radius"
+    app:cardElevation="0dp"
+    app:contentPadding="@dimen/padding_default"
+    app:strokeColor="@color/stroke_color"
+    app:strokeWidth="1dp">
+
+    <fr.geonature.occtax.ui.shared.view.ListItemActionView
+        android:id="@+id/list_item_action_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:action="@string/action_edit"
+        app:action_empty="@string/action_add"
+        app:no_data="@string/no_data"
+        app:visible_items="2"
+        tools:title="@tools:sample/lorem" />
+
+</fr.geonature.occtax.ui.shared.view.ValidationCardView>

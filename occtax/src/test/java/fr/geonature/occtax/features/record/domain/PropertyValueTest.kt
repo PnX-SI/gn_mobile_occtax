@@ -5,7 +5,10 @@ import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.util.toDate
 import kotlinx.parcelize.parcelableCreator
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -21,6 +24,31 @@ class PropertyValueTest {
 
     @Test
     fun `is empty`() {
+        assertTrue(
+            PropertyValue.Date("some_code")
+                .isEmpty()
+        )
+        assertFalse(
+            PropertyValue.Date(
+                "some_code",
+                Date()
+            )
+                .isEmpty()
+        )
+
+        assertTrue(
+            PropertyValue.Time("some_code")
+                .isEmpty()
+        )
+        assertFalse(
+            PropertyValue.Time(
+                code = "some_code",
+                hour = 8,
+                minute = 15
+            )
+                .isEmpty()
+        )
+
         assertTrue(
             PropertyValue.Text(
                 "some_code",
@@ -136,6 +164,20 @@ class PropertyValueTest {
             )
                 .toPair()
         )
+        assertEquals(
+            "some_code" to
+                PropertyValue.Time(
+                    code = "some_code",
+                    hour = 8,
+                    minute = 15
+                ),
+            PropertyValue.Time(
+                code = "some_code",
+                hour = 8,
+                minute = 15
+            )
+                .toPair()
+        )
 
         assertEquals(
             "some_code" to
@@ -232,6 +274,32 @@ class PropertyValueTest {
         assertEquals(
             pv,
             parcelableCreator<PropertyValue.Date>().createFromParcel(parcel)
+        )
+    }
+
+    @Test
+    fun `should create property time value from Parcel`() {
+        // given a property time value instance to write
+        val pv = PropertyValue.Time(
+            code = "some_code",
+            hour = 8,
+            minute = 15
+        )
+
+        // when we obtain a Parcel object to write this property value to it
+        val parcel = Parcel.obtain()
+        pv.writeToParcel(
+            parcel,
+            0
+        )
+
+        // reset the parcel for reading
+        parcel.setDataPosition(0)
+
+        // then
+        assertEquals(
+            pv,
+            parcelableCreator<PropertyValue.Time>().createFromParcel(parcel)
         )
     }
 
@@ -398,6 +466,115 @@ class PropertyValueTest {
         assertEquals(
             pv,
             parcelableCreator<PropertyValue.Counting>().createFromParcel(parcel)
+        )
+    }
+
+    @Test
+    fun `should returns a string representation of a local time`() {
+        assertNull(
+            PropertyValue.Time(code = "some_code")
+                .toTimeString()
+        )
+        assertEquals(
+            "08:15",
+            PropertyValue.Time(
+                code = "some_code",
+                hour = 8,
+                minute = 15
+            )
+                .toTimeString()
+        )
+        assertEquals(
+            "08:00",
+            PropertyValue.Time(
+                code = "some_code",
+                hour = 8
+            )
+                .toTimeString()
+        )
+        assertEquals(
+            "00:15",
+            PropertyValue.Time(
+                code = "some_code",
+                minute = 15
+            )
+                .toTimeString()
+        )
+    }
+
+    @Test
+    fun `should parse a local time from string`() {
+        assertEquals(
+            PropertyValue.Time(code = "some_code"),
+            PropertyValue.Time.parse(
+                "some_code",
+                null,
+            )
+        )
+        assertEquals(
+            PropertyValue.Time(code = "some_code"),
+            PropertyValue.Time.parse(
+                "some_code",
+                "",
+            )
+        )
+        assertEquals(
+            PropertyValue.Time(code = "some_code"),
+            PropertyValue.Time.parse(
+                "some_code",
+                " ",
+            )
+        )
+        assertEquals(
+            PropertyValue.Time(code = "some_code"),
+            PropertyValue.Time.parse(
+                "some_code",
+                "invalid_time",
+            )
+        )
+        assertEquals(
+            PropertyValue.Time(code = "some_code"),
+            PropertyValue.Time.parse(
+                "some_code",
+                "08:"
+            )
+        )
+        assertEquals(
+            PropertyValue.Time(code = "some_code"),
+            PropertyValue.Time.parse(
+                "some_code",
+                "08:150"
+            )
+        )
+        assertEquals(
+            PropertyValue.Time(code = "some_code"),
+            PropertyValue.Time.parse(
+                "some_code",
+                "2016-10-28T08:15:00Z"
+            )
+        )
+
+        assertEquals(
+            PropertyValue.Time(
+                code = "some_code",
+                hour = 8,
+                minute = 15
+            ),
+            PropertyValue.Time.parse(
+                "some_code",
+                "08:15"
+            )
+        )
+        assertEquals(
+            PropertyValue.Time(
+                code = "some_code",
+                hour = 23,
+                minute = 59
+            ),
+            PropertyValue.Time.parse(
+                "some_code",
+                "28:75"
+            )
         )
     }
 }
