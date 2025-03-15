@@ -2,6 +2,7 @@
 <resources>
 
     <!-- nomenclature type default label -->
+    <string name="nomenclature_typ_grp">Grouping type</string>
     <string name="nomenclature_meth_obs">Technical observation</string>
     <string name="nomenclature_eta_bio">Biological state</string>
     <string name="nomenclature_more">More information</string>
