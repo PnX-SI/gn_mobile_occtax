@@ -1,14 +1,17 @@
 package fr.geonature.occtax.features.nomenclature.presentation
 
+import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
+import androidx.test.core.app.ApplicationProvider
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.error.Failure
 import fr.geonature.commons.features.nomenclature.error.NomenclatureException
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.R
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.nomenclature.usecase.GetEditableFieldsUseCase
 import fr.geonature.occtax.features.nomenclature.usecase.GetNomenclatureValuesByTypeAndTaxonomyUseCase
 import fr.geonature.occtax.features.record.domain.PropertyValue
@@ -25,6 +28,8 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
 /**
  * Unit tests about [NomenclatureViewModel].
@@ -32,6 +37,7 @@ import org.junit.Test
  * @author S. Grimault
  */
 @ExperimentalCoroutinesApi
+@RunWith(RobolectricTestRunner::class)
 class NomenclatureViewModelTest {
 
     @get:Rule
@@ -40,6 +46,8 @@ class NomenclatureViewModelTest {
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
 
+    private lateinit var application: Application
+
     @RelaxedMockK
     private lateinit var getEditableFieldsUseCase: GetEditableFieldsUseCase
 
@@ -47,7 +55,7 @@ class NomenclatureViewModelTest {
     private lateinit var getNomenclatureValuesByTypeAndTaxonomyUseCase: GetNomenclatureValuesByTypeAndTaxonomyUseCase
 
     @RelaxedMockK
-    private lateinit var editableNomenclaturesObserver: Observer<List<EditableField>>
+    private lateinit var editableNomenclaturesObserver: Observer<List<FormField>>
 
     @RelaxedMockK
     private lateinit var nomenclatureValuesObserver: Observer<List<Nomenclature>>
@@ -63,6 +71,8 @@ class NomenclatureViewModelTest {
     @Before
     fun setUp() {
         init(this)
+
+        application = ApplicationProvider.getApplicationContext()
 
         nomenclatureViewModel = NomenclatureViewModel(
             getEditableFieldsUseCase,
@@ -80,24 +90,23 @@ class NomenclatureViewModelTest {
         runTest {
             // given some nomenclature types with default values
             val expectedEditableNomenclatures = listOf(
-                EditableField(
-                    EditableField.Type.INFORMATION,
-                    "METH_OBS",
-                    EditableField.ViewType.NOMENCLATURE_TYPE,
-                    label = "Méthodes d'observation"
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_meth_obs),
+                    nomenclatureType = "METH_OBS",
+                    value = PropertyValue.Nomenclature(code = "METH_OBS")
                 ),
-                EditableField(
-                    EditableField.Type.INFORMATION,
-                    "ETA_BIO",
-                    EditableField.ViewType.NOMENCLATURE_TYPE,
-                    label = "Etat biologique de l'observation"
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_eta_bio),
+                    nomenclatureType = "ETA_BIO",
+                    value = PropertyValue.Nomenclature(code = "ETA_BIO")
                 ),
-                EditableField(
-                    EditableField.Type.INFORMATION,
-                    "STATUT_BIO",
-                    EditableField.ViewType.NOMENCLATURE_TYPE,
-                    label = "Statut biologique",
-                    visible = false,
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_statut_bio),
+                    default = false,
+                    nomenclatureType = "STATUT_BIO",
                     value = PropertyValue.Nomenclature(
                         code = "STATUT_BIO",
                         label = "Non renseigné",
@@ -108,14 +117,14 @@ class NomenclatureViewModelTest {
             coEvery {
                 getEditableFieldsUseCase.run(
                     GetEditableFieldsUseCase.Params(
-                        type = EditableField.Type.INFORMATION,
+                        type = FormField.Type.INFORMATION,
                     )
                 )
             } returns Result.success(expectedEditableNomenclatures)
             coEvery {
                 getEditableFieldsUseCase(
                     GetEditableFieldsUseCase.Params(
-                        type = EditableField.Type.INFORMATION,
+                        type = FormField.Type.INFORMATION,
                     ),
                     nomenclatureViewModel.viewModelScope,
                     any()
@@ -123,7 +132,7 @@ class NomenclatureViewModelTest {
             } answers { callOriginal() }
 
             // when
-            nomenclatureViewModel.getEditableFields(type = EditableField.Type.INFORMATION)
+            nomenclatureViewModel.getEditableFields(type = FormField.Type.INFORMATION)
             nomenclatureViewModel.editableNomenclatures.observeForever(editableNomenclaturesObserver)
             nomenclatureViewModel.error.observeForever(errorObserver)
 
@@ -139,14 +148,14 @@ class NomenclatureViewModelTest {
             coEvery {
                 getEditableFieldsUseCase.run(
                     GetEditableFieldsUseCase.Params(
-                        type = EditableField.Type.INFORMATION,
+                        type = FormField.Type.INFORMATION,
                     )
                 )
             } returns Result.failure(NomenclatureException.NoNomenclatureTypeFoundException)
             coEvery {
                 getEditableFieldsUseCase(
                     GetEditableFieldsUseCase.Params(
-                        type = EditableField.Type.INFORMATION,
+                        type = FormField.Type.INFORMATION,
                     ),
                     nomenclatureViewModel.viewModelScope,
                     any()
@@ -154,7 +163,7 @@ class NomenclatureViewModelTest {
             } answers { callOriginal() }
 
             // when
-            nomenclatureViewModel.getEditableFields(type = EditableField.Type.INFORMATION)
+            nomenclatureViewModel.getEditableFields(type = FormField.Type.INFORMATION)
             nomenclatureViewModel.editableNomenclatures.observeForever(editableNomenclaturesObserver)
             nomenclatureViewModel.error.observeForever(errorObserver)
 

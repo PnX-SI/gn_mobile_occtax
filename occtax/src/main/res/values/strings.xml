@@ -165,6 +165,8 @@
         <item quantity="other">%d days</item>
     </plurals>
 
+    <string name="form_field_error_mandatory">Mandatory field</string>
+
     <string name="information_no_data">⚠ No nomenclature found.\nPlease start a data synchronization.</string>
 
     <string name="counting_no_data">No counting.\nCreate a new one by tapping the + button.</string>

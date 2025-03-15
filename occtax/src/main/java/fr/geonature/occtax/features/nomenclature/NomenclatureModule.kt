@@ -1,8 +1,10 @@
 package fr.geonature.occtax.features.nomenclature
 
+import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import fr.geonature.commons.data.GeoNatureModuleName
 import fr.geonature.commons.data.LocalDatabase
@@ -49,8 +51,8 @@ object NomenclatureModule {
 
     @Singleton
     @Provides
-    fun provideNomenclatureSettingsLocalDataSource(): INomenclatureSettingsLocalDataSource {
-        return NomenclatureSettingsLocalDataSourceImpl()
+    fun provideNomenclatureSettingsLocalDataSource(@ApplicationContext appContext: Context): INomenclatureSettingsLocalDataSource {
+        return NomenclatureSettingsLocalDataSourceImpl(appContext)
     }
 
     @Singleton

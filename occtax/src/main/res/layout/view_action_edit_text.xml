@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.textfield.TextInputLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@android:id/edit"
     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="@dimen/padding_default"
+    app:endIconMode="clear_text"
     tools:hint="Hint">
 
     <com.google.android.material.textfield.TextInputEditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="top"
         android:imeOptions="actionDone"
         android:importantForAutofill="no"
         android:inputType="textNoSuggestions"
-        android:gravity="top"
         android:selectAllOnFocus="true"
         tools:ignore="SpeakableTextPresentCheck,TextContrastCheck" />
 

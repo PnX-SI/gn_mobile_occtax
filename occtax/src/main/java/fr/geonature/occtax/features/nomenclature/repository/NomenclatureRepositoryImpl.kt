@@ -4,7 +4,7 @@ import fr.geonature.commons.data.entity.NomenclatureWithType
 import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSource
 import fr.geonature.commons.features.nomenclature.error.NomenclatureException
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureSettingsLocalDataSource
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.settings.domain.PropertySettings
 import org.tinylog.Logger
@@ -12,7 +12,7 @@ import fr.geonature.commons.features.nomenclature.repository.NomenclatureReposit
 
 /**
  * Implementation of [INomenclatureRepository] based from [BaseNomenclatureRepositoryImpl] with
- * support of [EditableField].
+ * support of [FormField].
  *
  * @author S. Grimault
  * @see BaseNomenclatureRepositoryImpl
@@ -23,9 +23,9 @@ class NomenclatureRepositoryImpl(
 ) : BaseNomenclatureRepositoryImpl(nomenclatureLocalDataSource), INomenclatureRepository {
 
     override suspend fun getEditableFields(
-        type: EditableField.Type,
+        type: FormField.Type,
         vararg defaultPropertySettings: PropertySettings
-    ): Result<List<EditableField>> {
+    ): Result<List<FormField>> {
         return runCatching {
             val nomenclatureTypes =
                 nomenclatureLocalDataSource.getAllNomenclatureTypes()
@@ -46,32 +46,27 @@ class NomenclatureRepositoryImpl(
                 *defaultPropertySettings
             )
                 .mapNotNull {
-                    if (it.viewType == EditableField.ViewType.NOMENCLATURE_TYPE) nomenclatureTypes[it.code]?.let { nomenclatureType ->
-                        EditableField(
-                            type = it.type,
-                            code = it.code,
-                            viewType = it.viewType,
-                            nomenclatureType = it.code,
-                            visible = it.visible,
-                            default = it.default,
-                            additionalField = false,
-                            label = nomenclatureType.defaultLabel.takeIf { label -> label.isNotEmpty() }
-                                ?: run {
-                                    Logger.warn { "no label found for nomenclature type '${nomenclatureType.mnemonic}', use default..." }
-                                    null
-                                }
-                        )
+                    if (it is FormField.NomenclatureType) nomenclatureTypes[it.nomenclatureType]?.let { nomenclatureType ->
+                        it.copy(label = nomenclatureType.defaultLabel.takeIf { label -> label.isNotEmpty() }
+                            ?: run {
+                                Logger.warn { "no label found for nomenclature type '${nomenclatureType.mnemonic}', use default..." }
+                                it.label
+                            })
                     } else it
                 }
-                .map { editableField ->
-                    editableField.copy(value = defaultNomenclatureValues.firstOrNull { it.type?.mnemonic == editableField.code }
-                        ?.let {
-                            PropertyValue.Nomenclature(
-                                editableField.code,
-                                it.defaultLabel,
-                                it.id
-                            )
-                        } ?: editableField.value)
+                .map { formField ->
+                    if (formField is FormField.NomenclatureType) {
+                        formField.also { ff ->
+                            ff.setValue(defaultNomenclatureValues.firstOrNull { it.type?.mnemonic == formField.nomenclatureType }
+                                ?.let {
+                                    PropertyValue.Nomenclature(
+                                        formField.nomenclatureType,
+                                        it.defaultLabel,
+                                        it.id
+                                    )
+                                } ?: formField.value)
+                        }
+                    } else formField
                 }
                 .also {
                     if (it.isEmpty()) throw NomenclatureException.NoNomenclatureTypeFoundException

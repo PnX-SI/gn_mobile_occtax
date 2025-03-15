@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAllCaps="false"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="List items title" />
@@ -42,6 +42,21 @@
             android:visibility="gone" />
 
     </FrameLayout>
+
+    <TextView
+        android:id="@android:id/message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:textAllCaps="false"
+        android:textAppearance="?textAppearanceCaption"
+        android:textColor="?colorError"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@android:id/button1"
+        app:layout_constraintEnd_toStartOf="@android:id/button1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@android:id/content"
+        tools:text="some error" />
 
     <Button
         android:id="@android:id/button1"

@@ -13,6 +13,7 @@ import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.record.domain.TaxaRecord
 import java.io.IOException
 import java.io.Reader
+import java.io.Serializable
 import java.io.StringReader
 
 /**
@@ -173,6 +174,15 @@ class ObservationRecordJsonReader {
                         continue
                     }
 
+                    if (keyName == ObservationRecord.ADDITIONAL_FIELDS_KEY) {
+                        readAdditionalFields(reader).takeIf { it.isNotEmpty() }
+                            ?.also {
+                                updatedObservationRecord.additionalFields = it
+                            }
+
+                        continue
+                    }
+
                     when (reader.peek()) {
                         JsonToken.STRING -> readPropertyValueFromString(
                             reader,
@@ -199,6 +209,75 @@ class ObservationRecordJsonReader {
         return updatedObservationRecord
     }
 
+    private fun readAdditionalFields(reader: JsonReader): List<PropertyValue> {
+        val additionalFields = mutableListOf<PropertyValue>()
+
+        reader.beginObject()
+
+        while (reader.hasNext()) {
+            when (val keyName = reader.nextName()) {
+                else -> {
+                    when (reader.peek()) {
+                        JsonToken.STRING -> additionalFields.add(
+                            readPropertyValueFromString(
+                                reader,
+                                keyName
+                            )
+                        )
+
+                        JsonToken.NUMBER -> additionalFields.add(
+                            PropertyValue.Number(
+                                keyName,
+                                runCatching { reader.nextLongOrNull() }.getOrNull()
+                                    ?: reader.nextDouble()
+                            )
+                        )
+
+                        JsonToken.BEGIN_ARRAY -> {
+                            val values = mutableListOf<Serializable>()
+
+                            reader.beginArray()
+
+                            while (reader.hasNext()) {
+                                when (reader.peek()) {
+                                    JsonToken.STRING -> values.add(reader.nextString())
+                                    JsonToken.NUMBER -> values.add(reader.nextLong())
+                                    else -> reader.skipValue()
+                                }
+                            }
+
+                            reader.endArray()
+
+                            (values.filterIsInstance<String>()
+                                .takeIf { it.size == values.size }
+                                ?.let {
+                                    PropertyValue.StringArray(
+                                        keyName,
+                                        it.toTypedArray()
+                                    )
+                                } ?: values.filterIsInstance<Long>()
+                                .takeIf { it.size == values.size }
+                                ?.let {
+                                    PropertyValue.NumberArray(
+                                        keyName,
+                                        it.toTypedArray()
+                                    )
+                                })?.also {
+                                additionalFields.add(it)
+                            }
+                        }
+
+                        else -> reader.skipValue()
+                    }
+                }
+            }
+        }
+
+        reader.endObject()
+
+        return additionalFields
+    }
+
     private fun readPropertyValueFromString(
         reader: JsonReader,
         code: String
@@ -212,7 +291,11 @@ class ObservationRecordJsonReader {
             )
         }
 
-        return toDate(value)?.let {
+        return PropertyValue.Time.parse(
+            code,
+            value
+        )
+            .takeIf { !it.isEmpty() } ?: toDate(value)?.let {
             PropertyValue.Date(
                 code,
                 it
