@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
@@ -35,19 +36,19 @@ import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewMo
 import fr.geonature.occtax.features.nomenclature.presentation.adapter.FormFieldAdapter
 import fr.geonature.occtax.features.record.domain.DatasetRecord
 import fr.geonature.occtax.features.record.domain.MediaRecord
+import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.ObserversRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.settings.domain.InputDateSettings
 import fr.geonature.occtax.ui.dataset.DatasetListActivity
 import fr.geonature.occtax.ui.input.AbstractInputFragment
-import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
 import fr.geonature.occtax.ui.observers.InputObserverListActivity
 import org.tinylog.kotlin.Logger
 import java.util.Locale
 import javax.inject.Inject
 
 /**
- * Selected observer and current date as first page used by [InputPagerFragmentActivity].
+ * [Fragment] to let the user to select observers and dataset to the given [ObservationRecord].
  *
  * @author S. Grimault
  */
