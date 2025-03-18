@@ -99,6 +99,8 @@ class TaxonRecordJsonWriter {
             .value(taxonRecord.taxon.name)
 
         if (settings == null) {
+            writer.name("internal_id")
+                .value(taxonRecord.internalId)
             writer.name("regne")
                 .value(taxonRecord.taxon.taxonomy.kingdom)
             writer.name("group2_inpn")

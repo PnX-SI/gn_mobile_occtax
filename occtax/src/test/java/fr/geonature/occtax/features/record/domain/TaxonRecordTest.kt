@@ -27,6 +27,59 @@ class TaxonRecordTest {
     }
 
     @Test
+    fun `should override internal id`() {
+        val taxonRecord = TaxonRecord(
+            recordId = 1234L,
+            taxon = Taxon(
+                1234L,
+                "taxon_01",
+                Taxonomy(
+                    "Animalia",
+                    "Ascidies"
+                ),
+                null
+            )
+        ).copy(internalId = 12341)
+
+        assertEquals(
+            12341L,
+            taxonRecord.internalId
+        )
+    }
+
+    @Test
+    fun `should make a copy`() {
+        assertEquals(
+            TaxonRecord(
+                internalId = 12341L,
+                recordId = 1234L,
+                taxon = Taxon(
+                    1234L,
+                    "taxon_01",
+                    Taxonomy(
+                        "Animalia",
+                        "Ascidies"
+                    ),
+                    null
+                )
+            ),
+            TaxonRecord(
+                internalId = 12341L,
+                recordId = 1234L,
+                taxon = Taxon(
+                    1234L,
+                    "taxon_01",
+                    Taxonomy(
+                        "Animalia",
+                        "Ascidies"
+                    ),
+                    null
+                )
+            ).copy()
+        )
+    }
+
+    @Test
     fun `should set and get all counting`() {
         // given some counting
         val counting = CountingRecord(
@@ -376,7 +429,8 @@ class TaxonRecordTest {
         }
 
         // when updating this counting
-        val countingToUpdate = existingCounting.copy(properties = listOf(
+        val countingToUpdate = existingCounting.copy(
+            properties = listOf(
             PropertyValue.Number(
                 "STADE_VIE",
                 2L
