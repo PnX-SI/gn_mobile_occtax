@@ -193,7 +193,7 @@ class TaxaFragment : AbstractInputFragment() {
                         }
                     } else {
                         // no taxon found according to given criteria
-                        observationRecord?.taxa?.selectedTaxonRecord?.taxon?.id?.also {
+                        observationRecord?.taxa?.selectedTaxonRecord?.internalId?.also {
                             observationRecord?.taxa?.delete(it)
                         }
                     }
@@ -248,8 +248,8 @@ class TaxaFragment : AbstractInputFragment() {
         adapter = TaxaRecyclerViewAdapter(object :
             TaxaRecyclerViewAdapter.OnTaxaRecyclerViewAdapterListener {
             override fun onSelectedTaxon(taxon: AbstractTaxon) {
-                observationRecord?.taxa?.selectedTaxonRecord
-                    ?.also { observationRecord?.taxa?.delete(it.taxon.id) }
+                observationRecord?.taxa?.selectedTaxonRecord?.internalId
+                    ?.also { observationRecord?.taxa?.delete(it) }
 
                 observationRecord?.taxa?.add(taxon)
 
@@ -259,8 +259,8 @@ class TaxaFragment : AbstractInputFragment() {
             }
 
             override fun onNoTaxonSelected() {
-                observationRecord?.taxa?.selectedTaxonRecord
-                    ?.also { observationRecord?.taxa?.delete(it.taxon.id) }
+                observationRecord?.taxa?.selectedTaxonRecord?.internalId
+                    ?.also { observationRecord?.taxa?.delete(it) }
 
                 listener.validateCurrentPage()
             }
@@ -543,7 +543,8 @@ class TaxaFragment : AbstractInputFragment() {
                     tag = areaObservationToAdd
                     text = areaObservationToAdd.short
 
-                    setChipBackgroundColorResource(context.resources.getIdentifier(
+                    setChipBackgroundColorResource(
+                        context.resources.getIdentifier(
                         "area_observation_${areaObservationToAdd.type.name.lowercase(Locale.ROOT)}",
                         "color",
                         context.packageName

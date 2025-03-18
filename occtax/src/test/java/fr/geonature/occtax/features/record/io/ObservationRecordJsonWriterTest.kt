@@ -103,7 +103,8 @@ class ObservationRecordJsonWriterTest {
                             "Animalia",
                             "Ascidies"
                         )
-                    )
+                    ),
+                    internalId = 12341L
                 )
                     .apply {
                         listOf(
