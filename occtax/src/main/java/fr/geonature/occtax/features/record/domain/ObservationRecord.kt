@@ -402,7 +402,10 @@ class ObserversRecord(private val properties: SortedMap<String, PropertyValue>) 
 
         PropertyValue.Observers(
             OBSERVERS_KEY,
-            observers?.let { it.value.filterNot { inputObserver -> inputObserver.id == id }.toTypedArray() + arrayOf(InputObserver(id)) }
+            observers?.let {
+                it.value.filterNot { inputObserver -> inputObserver.id == id }
+                    .toTypedArray() + arrayOf(InputObserver(id))
+            }
                 ?: arrayOf(InputObserver(id))
         )
             .also {
@@ -444,8 +447,7 @@ class TaxaRecord(
         set(value) {
             PropertyValue.Taxa(
                 TAXA_KEY,
-                value.distinctBy { it.taxon.id }
-                    .toTypedArray()
+                value.toTypedArray()
             )
                 .also {
                     properties[it.code] = it
@@ -461,13 +463,13 @@ class TaxaRecord(
             ?.let { it as PropertyValue.Number }?.value?.let {
                 properties[TAXA_KEY]?.takeIf { it is PropertyValue.Taxa }
                     ?.let { it as PropertyValue.Taxa }?.value?.firstOrNull { taxonRecord ->
-                        taxonRecord.taxon.id == it
+                        taxonRecord.internalId == it
                     }
             }
         set(value) {
             PropertyValue.Number(
                 CURRENT_TAXON_ID,
-                value?.taxon?.id
+                value?.internalId
             )
                 .also {
                     if (it.isEmpty()) properties.remove(CURRENT_TAXON_ID)
@@ -478,14 +480,15 @@ class TaxaRecord(
     /**
      * Adds a taxon record from given [AbstractTaxon].
      */
-    fun add(taxon: AbstractTaxon): TaxonRecord {
+    fun add(taxon: AbstractTaxon, internalId: Long? = null): TaxonRecord {
         return TaxonRecord(
             recordId = recordId,
             taxon = taxon
-        ).also {
-            taxa = taxa.filterNot { t -> it.taxon.id == t.taxon.id } + listOf(it)
-            selectedTaxonRecord = it
-        }
+        ).let { it.copy(internalId = internalId ?: it.internalId) }
+            .also {
+                taxa = taxa.filterNot { t -> it.internalId == t.internalId } + listOf(it)
+                selectedTaxonRecord = it
+            }
     }
 
     /**
@@ -494,7 +497,7 @@ class TaxaRecord(
     fun addOrUpdate(taxonRecord: TaxonRecord): TaxonRecord {
         return taxonRecord.copy(recordId = recordId)
             .also {
-                taxa = taxa.filterNot { t -> it.taxon.id == t.taxon.id } + listOf(it)
+                taxa = taxa.filterNot { t -> it.internalId == t.internalId } + listOf(it)
                 selectedTaxonRecord = it
             }
     }
@@ -504,11 +507,11 @@ class TaxaRecord(
      *
      * @return the deleted [TaxonRecord], `null` otherwise
      */
-    fun delete(taxonId: Long): TaxonRecord? {
-        val taxonRecordToDelete = taxa.find { it.taxon.id == taxonId }
-        taxa = taxa.filterNot { it.taxon.id == taxonId }
+    fun delete(id: Long): TaxonRecord? {
+        val taxonRecordToDelete = taxa.find { it.internalId == id }
+        taxa = taxa.filterNot { it.internalId == id }
 
-        if (selectedTaxonRecord?.taxon?.id == taxonId) {
+        if (selectedTaxonRecord?.internalId == id) {
             selectedTaxonRecord = null
         }
 
@@ -526,7 +529,7 @@ class TaxaRecord(
  *
  * @return an unique ID
  */
-private fun generateId(): Long {
+fun generateId(): Long {
     val now = Calendar.getInstance()
         .apply {
             set(

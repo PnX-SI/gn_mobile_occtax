@@ -11,12 +11,17 @@ import java.io.File
 import java.util.SortedMap
 
 /**
- * Describes a [taxon][fr.geonature.commons.data.entity.AbstractTaxon] record.
+ * Describes a [taxon][AbstractTaxon] record.
  *
  * @author S. Grimault
  */
 @Parcelize
 data class TaxonRecord(
+
+    /**
+     * The internal ID of this [taxon][AbstractTaxon] record
+     */
+    val internalId: Long = generateId(),
 
     /**
      * The observation record ID linked to this taxon record.
@@ -69,6 +74,16 @@ data class TaxonRecord(
                     properties[it.code] = it
                 }
         }
+
+    fun copy():TaxonRecord {
+        return TaxonRecord(
+            internalId,
+            recordId,
+            id,
+            taxon,
+            properties = properties.toSortedMap()
+        )
+    }
 
     companion object {
         const val ADDITIONAL_FIELDS_KEY = "additional_fields"
