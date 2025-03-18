@@ -411,11 +411,12 @@ class ObservationRecordTest {
     }
 
     @Test
-    fun `should avoid duplicates when setting all taxa`() {
+    fun `should add the same taxon when setting all taxa`() {
         // given an observation record
         val record = ObservationRecord(internalId = 1234L)
         // and some taxon records to set
         val taxonRecord1 = TaxonRecord(
+            internalId = 12341L,
             recordId = 1234L,
             taxon = Taxon(
                 8L,
@@ -427,6 +428,7 @@ class ObservationRecordTest {
             )
         )
         val taxonRecord2 = TaxonRecord(
+            internalId = 12342L,
             recordId = 1234L,
             taxon = Taxon(
                 8L,
@@ -446,7 +448,10 @@ class ObservationRecordTest {
 
         // then
         assertArrayEquals(
-            arrayOf(taxonRecord1),
+            arrayOf(
+                taxonRecord1,
+                taxonRecord2
+            ),
             record.taxa.taxa.toTypedArray()
         )
     }
@@ -493,10 +498,11 @@ class ObservationRecordTest {
 
     @Test
     fun `should replace an existing taxon record from taxon`() {
-        // given an observation record with a taxon record
+        // given an observation record with a taxon record and some property values
         val record = ObservationRecord(internalId = 1234L).apply {
             taxa.taxa = listOf(
                 TaxonRecord(
+                    internalId = 12341L,
                     recordId = internalId,
                     taxon = Taxon(
                         8L,
@@ -529,11 +535,15 @@ class ObservationRecordTest {
         )
 
         // when adding a new taxon record
-        val taxonRecordAdded = record.taxa.add(taxon)
+        val taxonRecordAdded = record.taxa.add(
+            taxon,
+            internalId = 12341L
+        )
 
         // then
         assertEquals(
             TaxonRecord(
+                internalId = 12341L,
                 recordId = record.internalId,
                 taxon = taxon
             ),
@@ -542,6 +552,7 @@ class ObservationRecordTest {
         assertArrayEquals(
             arrayOf(
                 TaxonRecord(
+                    internalId = 12341L,
                     recordId = record.internalId,
                     taxon = taxon
                 )
@@ -613,10 +624,11 @@ class ObservationRecordTest {
 
     @Test
     fun `should add taxon record with existing ones`() {
-        // given an observation record with a taxon record
+        // given an observation record with a taxon record and some property values
         val record = ObservationRecord(internalId = 1234L).apply {
             taxa.taxa = listOf(
                 TaxonRecord(
+                    internalId = 12341L,
                     recordId = internalId,
                     taxon = Taxon(
                         8L,
@@ -656,6 +668,7 @@ class ObservationRecordTest {
         // then
         assertEquals(
             TaxonRecord(
+                internalId = taxonRecordAdded.internalId,
                 recordId = record.internalId,
                 taxon = Taxon(
                     7L,
@@ -671,6 +684,7 @@ class ObservationRecordTest {
         assertArrayEquals(
             arrayOf(
                 TaxonRecord(
+                    internalId = 12341L,
                     recordId = record.internalId,
                     taxon = Taxon(
                         8L,
@@ -690,6 +704,7 @@ class ObservationRecordTest {
                         }
                 },
                 TaxonRecord(
+                    internalId = taxonRecordAdded.internalId,
                     recordId = record.internalId,
                     taxon = Taxon(
                         7L,
@@ -815,10 +830,11 @@ class ObservationRecordTest {
     }
 
     @Test
-    fun `should delete existing taxon record`() {
+    fun `should delete an existing taxon record`() {
         // given an observation record with a taxon record
         val record = ObservationRecord(internalId = 1234L)
         val taxonRecord = TaxonRecord(
+            internalId = 12341L,
             recordId = record.internalId,
             taxon = Taxon(
                 8L,
@@ -839,8 +855,8 @@ class ObservationRecordTest {
         }
         record.taxa.taxa = listOf(taxonRecord)
 
-        // when deleting an existing taonx record
-        val taxonRecordDeleted = record.taxa.delete(8L)
+        // when deleting an existing taxon record
+        val taxonRecordDeleted = record.taxa.delete(12341L)
 
         // then
         assertEquals(
@@ -921,6 +937,8 @@ class ObservationRecordTest {
         assertEquals(
             ObservationRecord(internalId = 1234L).apply {
                 comment.comment = "some comment"
+                dates.start = observationRecord.dates.start
+                dates.end = observationRecord.dates.end
                 taxa.taxa = emptyList()
             },
             copy

@@ -89,6 +89,7 @@ class TaxonRecordJsonReader {
     ): TaxonRecord {
         reader.beginObject()
 
+        var internalId: Long? = null
         var id: Long? = null
         var taxonId: Long? = null
         var name: String? = null
@@ -98,6 +99,7 @@ class TaxonRecordJsonReader {
 
         while (reader.hasNext()) {
             when (val keyName = reader.nextName()) {
+                "internal_id" -> internalId = reader.nextLong()
                 "id_occurrence_occtax" -> id = reader.nextLong()
                 "cd_nom" -> taxonId = reader.nextLong()
                 "nom_cite" -> name = reader.nextString()
@@ -111,8 +113,9 @@ class TaxonRecordJsonReader {
                         continue
                     }
 
-                    taxonRecord = taxonRecord ?: observationRecord.taxa.add(
-                        Taxon(
+                    taxonRecord = (taxonRecord ?: TaxonRecord(
+                        recordId = observationRecord.internalId,
+                        taxon = Taxon(
                             taxonId,
                             name,
                             Taxonomy(
@@ -120,8 +123,7 @@ class TaxonRecordJsonReader {
                                 group
                             )
                         )
-                    )
-                        .copy(id = id)
+                    ))
 
                     if (keyName.startsWith("id_nomenclature")) {
                         readNomenclatureValue(
@@ -186,12 +188,18 @@ class TaxonRecordJsonReader {
                         kingdom,
                         group
                     )
-                )
+                ),
+                internalId = internalId
             )
         }
 
         taxonRecord?.also {
-            observationRecord.taxa.addOrUpdate(taxonRecord.copy(id = id))
+            taxonRecord = observationRecord.taxa.addOrUpdate(it.let {
+                it.copy(
+                    internalId = internalId ?: it.internalId,
+                    id = id
+                )
+            })
         }
 
         reader.endObject()

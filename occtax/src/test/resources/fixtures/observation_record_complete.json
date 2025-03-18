@@ -30,6 +30,7 @@
       {
         "cd_nom": 10,
         "nom_cite": "taxon_01",
+        "internal_id": 12341,
         "regne": "Animalia",
         "group2_inpn": "Ascidies",
         "id_nomenclature_bio_condition": 29,
