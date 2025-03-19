@@ -6,6 +6,7 @@ import fr.geonature.commons.data.entity.InputObserver
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
 import fr.geonature.commons.util.add
+import fr.geonature.commons.util.toDate
 import kotlinx.parcelize.parcelableCreator
 import org.junit.Assert.*
 import org.junit.Before
@@ -874,6 +875,8 @@ class ObservationRecordTest {
                 internalId = 1234L,
                 status = ObservationRecord.Status.TO_SYNC
             ).apply {
+                dates.start = toDate("2024-10-28T09:15:00Z")!!
+                dates.end = toDate("2024-10-29T10:00:00Z")!!
                 taxa.add(
                     Taxon(
                         8L,
@@ -886,6 +889,8 @@ class ObservationRecordTest {
                 )
             },
             ObservationRecord(internalId = 1234L).apply {
+                dates.start = toDate("2024-10-28T09:15:00Z")!!
+                dates.end = toDate("2024-10-29T10:00:00Z")!!
                 taxa.add(
                     Taxon(
                         8L,

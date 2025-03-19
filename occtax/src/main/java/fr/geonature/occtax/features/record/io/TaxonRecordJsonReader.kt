@@ -387,6 +387,7 @@ class TaxonRecordJsonReader {
             "id_nomenclature_behaviour" -> "OCC_COMPORTEMENT"
             "id_nomenclature_exist_proof" -> "PREUVE_EXIST"
             "id_nomenclature_bio_status" -> "STATUT_BIO"
+            "id_nomenclature_observation_status" -> "STATUT_OBS"
             "id_nomenclature_obj_count" -> "OBJ_DENBR"
             "id_nomenclature_sex" -> "SEXE"
             "id_nomenclature_life_stage" -> "STADE_VIE"

@@ -117,6 +117,11 @@ class ObservationRecordJsonWriterTest {
                                 "Determiner value"
                             ),
                             PropertyValue.Nomenclature(
+                                "STATUT_OBS",
+                                null,
+                                84
+                            ),
+                            PropertyValue.Nomenclature(
                                 "ETA_BIO",
                                 null,
                                 29
