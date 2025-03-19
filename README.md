@@ -147,7 +147,8 @@ All these settings may not be defined and the default values will then be used i
 **Information settings**
 
 | Nomenclature       | Label                | Displayed by default | Editable (visible) |
-| ------------------ | -------------------- | -------------------- | ------------------ |
+| ------------------ |----------------------|----------------------|--------------------|
+| `STATUT_OBS`       | observation status   | `true`               | `false`            |
 | `METH_OBS`         | Observation methods  | `true`               | `true`             |
 | `ETA_BIO`          | Biological state     | `true`               | `true`             |
 | `METH_DETERMIN`    | Determination method | `false`              | `true`             |
