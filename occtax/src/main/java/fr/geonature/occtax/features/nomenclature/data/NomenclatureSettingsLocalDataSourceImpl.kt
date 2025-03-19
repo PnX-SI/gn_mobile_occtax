@@ -67,6 +67,13 @@ class NomenclatureSettingsLocalDataSourceImpl(context: Context) :
         ),
         FormField.NomenclatureType(
             type = FormField.Type.INFORMATION,
+            label = context.getString(R.string.nomenclature_statut_obs),
+            nomenclatureType = "STATUT_OBS",
+            visible = false,
+            value = PropertyValue.Nomenclature(code = "STATUT_OBS")
+        ),
+        FormField.NomenclatureType(
+            type = FormField.Type.INFORMATION,
             label = context.getString(R.string.nomenclature_meth_obs),
             nomenclatureType = "METH_OBS",
             value = PropertyValue.Nomenclature(code = "METH_OBS")
@@ -186,53 +193,55 @@ class NomenclatureSettingsLocalDataSourceImpl(context: Context) :
                 }
         }
 
-        return defaultNomenclatureTypes.mapNotNull { ff ->
-            when (ff) {
-                is FormField.Editable -> defaultPropertySettings.indexOfFirst { property -> ff.getValue().code == property.key }
-                    .takeIf { it >= 0 }
-                    ?.let {
-                        ff.update(
-                            visible = defaultPropertySettings[it].visible,
-                            default = defaultPropertySettings[it].default,
-                            order = it
-                        )
-                    }
-
-                is FormField.MinMax -> defaultPropertySettings.indexOfFirst { propertySettings ->
-                    arrayOf(
-                        ff.min,
-                        ff.max
-                    ).any { it.value.code == propertySettings.key }
-                }
-                    .takeIf { it >= 0 }
-                    ?.let {
-                        ff.copy(
-                            order = it,
-                            min = defaultPropertySettings.find { property -> ff.min.value.code == property.key }
-                                ?.let { property ->
-                                    ff.min.copy(
-                                        visible = property.visible,
-                                        default = property.default
-                                    )
-                                } ?: ff.min.copy(
-                                visible = false,
-                                default = false
-                            ),
-                            max = defaultPropertySettings.find { property -> ff.max.value.code == property.key }
-                                ?.let { property ->
-                                    ff.max.copy(
-                                        visible = property.visible,
-                                        default = property.default
-                                    )
-                                } ?: ff.max.copy(
-                                visible = false,
-                                default = false
+        return defaultNomenclatureTypes
+            .filter { it.type == type }
+            .mapNotNull { ff ->
+                when (ff) {
+                    is FormField.Editable -> defaultPropertySettings.indexOfFirst { property -> ff.getValue().code == property.key }
+                        .takeIf { it >= 0 }
+                        ?.let {
+                            ff.update(
+                                visible = defaultPropertySettings[it].visible,
+                                default = defaultPropertySettings[it].default,
+                                order = it
                             )
-                        )
-                    }
+                        }
 
-                else -> null
+                    is FormField.MinMax -> defaultPropertySettings.indexOfFirst { propertySettings ->
+                        arrayOf(
+                            ff.min,
+                            ff.max
+                        ).any { it.value.code == propertySettings.key }
+                    }
+                        .takeIf { it >= 0 }
+                        ?.let {
+                            ff.copy(
+                                order = it,
+                                min = defaultPropertySettings.find { property -> ff.min.value.code == property.key }
+                                    ?.let { property ->
+                                        ff.min.copy(
+                                            visible = property.visible,
+                                            default = property.default
+                                        )
+                                    } ?: ff.min.copy(
+                                    visible = false,
+                                    default = false
+                                ),
+                                max = defaultPropertySettings.find { property -> ff.max.value.code == property.key }
+                                    ?.let { property ->
+                                        ff.max.copy(
+                                            visible = property.visible,
+                                            default = property.default
+                                        )
+                                    } ?: ff.max.copy(
+                                    visible = false,
+                                    default = false
+                                )
+                            )
+                        }
+
+                    else -> null
+                }
             }
-        }
     }
 }

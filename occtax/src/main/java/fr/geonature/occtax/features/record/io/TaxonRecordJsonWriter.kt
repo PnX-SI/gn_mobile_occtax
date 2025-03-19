@@ -145,6 +145,9 @@ class TaxonRecordJsonWriter {
 
                         "STATUT_BIO" -> writer.name("id_nomenclature_bio_status")
                             .value(propertyValue.value)
+
+                        "STATUT_OBS" -> writer.name("id_nomenclature_observation_status")
+                            .value(propertyValue.value)
                     }
                 }
 

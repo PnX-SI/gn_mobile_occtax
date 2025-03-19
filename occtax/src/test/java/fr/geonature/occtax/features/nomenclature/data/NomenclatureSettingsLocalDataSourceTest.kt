@@ -107,15 +107,23 @@ class NomenclatureSettingsLocalDataSourceTest {
             listOf(
                 FormField.NomenclatureType(
                     type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_statut_obs),
+                    nomenclatureType = "STATUT_OBS",
+                    visible = false,
+                    order = 0,
+                    value = PropertyValue.Nomenclature(code = "STATUT_OBS")
+                ),
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
                     label = application.getString(R.string.nomenclature_meth_obs),
                     nomenclatureType = "METH_OBS",
-                    order = 0,
+                    order = 1,
                     value = PropertyValue.Nomenclature(code = "METH_OBS")
                 ),
                 FormField.NomenclatureType(
                     type = FormField.Type.INFORMATION,
                     label = application.getString(R.string.nomenclature_eta_bio),
-                    order = 1,
+                    order = 2,
                     nomenclatureType = "ETA_BIO",
                     value = PropertyValue.Nomenclature(code = "ETA_BIO")
                 ),
@@ -123,7 +131,7 @@ class NomenclatureSettingsLocalDataSourceTest {
                     type = FormField.Type.INFORMATION,
                     label = application.getString(R.string.nomenclature_meth_determin),
                     default = false,
-                    order = 2,
+                    order = 3,
                     nomenclatureType = "METH_DETERMIN",
                     value = PropertyValue.Nomenclature(code = "METH_DETERMIN")
                 ),
@@ -131,14 +139,14 @@ class NomenclatureSettingsLocalDataSourceTest {
                     type = FormField.Type.INFORMATION,
                     label = application.getString(R.string.nomenclature_determiner),
                     default = false,
-                    order = 3,
+                    order = 4,
                     value = PropertyValue.Text(code = "determiner")
                 ),
                 FormField.NomenclatureType(
                     type = FormField.Type.INFORMATION,
                     label = application.getString(R.string.nomenclature_statut_bio),
                     default = false,
-                    order = 4,
+                    order = 5,
                     nomenclatureType = "STATUT_BIO",
                     value = PropertyValue.Nomenclature(code = "STATUT_BIO")
                 ),
@@ -146,7 +154,7 @@ class NomenclatureSettingsLocalDataSourceTest {
                     type = FormField.Type.INFORMATION,
                     label = application.getString(R.string.nomenclature_occ_comportement),
                     default = false,
-                    order = 5,
+                    order = 6,
                     nomenclatureType = "OCC_COMPORTEMENT",
                     value = PropertyValue.Nomenclature(code = "OCC_COMPORTEMENT")
                 ),
@@ -154,7 +162,7 @@ class NomenclatureSettingsLocalDataSourceTest {
                     type = FormField.Type.INFORMATION,
                     label = application.getString(R.string.nomenclature_naturalite),
                     default = false,
-                    order = 6,
+                    order = 7,
                     nomenclatureType = "NATURALITE",
                     value = PropertyValue.Nomenclature(code = "NATURALITE")
                 ),
@@ -162,7 +170,7 @@ class NomenclatureSettingsLocalDataSourceTest {
                     type = FormField.Type.INFORMATION,
                     label = application.getString(R.string.nomenclature_preuve_exist),
                     default = false,
-                    order = 7,
+                    order = 8,
                     nomenclatureType = "PREUVE_EXIST",
                     value = PropertyValue.Nomenclature(code = "PREUVE_EXIST")
                 ),
@@ -170,7 +178,7 @@ class NomenclatureSettingsLocalDataSourceTest {
                     type = FormField.Type.INFORMATION,
                     label = application.getString(R.string.nomenclature_comment),
                     default = false,
-                    order = 8,
+                    order = 9,
                     value = PropertyValue.Text(code = "comment")
                 ),
             ),

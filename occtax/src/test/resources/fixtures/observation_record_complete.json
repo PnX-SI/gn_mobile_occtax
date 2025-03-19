@@ -40,6 +40,7 @@
         "id_nomenclature_behaviour": 580,
         "id_nomenclature_exist_proof": 81,
         "id_nomenclature_bio_status": 29,
+        "id_nomenclature_observation_status": 84,
         "additional_fields": {
           "some_field_text": "some_value",
           "some_field_date": "2016-10-28",
