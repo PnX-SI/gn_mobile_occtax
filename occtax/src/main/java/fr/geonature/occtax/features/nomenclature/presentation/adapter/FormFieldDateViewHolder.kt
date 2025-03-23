@@ -43,7 +43,12 @@ class FormFieldDateViewHolder(
 
             setOnClickListener {
                 CoroutineScope(Dispatchers.Main).launch {
-                    val selectedDate = selectDateTime(formField?.value?.value ?: Date())
+                    val selectedDate = selectDate(formField?.value?.value ?: Date())
+
+                    updateDateEditText(
+                        this@apply,
+                        selectedDate
+                    )
 
                     formField?.run {
                         setValue(
@@ -54,11 +59,6 @@ class FormFieldDateViewHolder(
                         )
                         listener.onUpdate(this)
                     }
-
-                    updateDateEditText(
-                        this@apply,
-                        selectedDate
-                    )
                 }
             }
         }
@@ -103,7 +103,7 @@ class FormFieldDateViewHolder(
      * Select a new date from given optional date through date picker.
      * If no date was given, use the current date.
      */
-    private suspend fun selectDateTime(from: Date = Date()): Date =
+    private suspend fun selectDate(from: Date = Date()): Date =
         suspendCoroutine { continuation ->
             val fragmentManager = listener.fragmentManager()
 
