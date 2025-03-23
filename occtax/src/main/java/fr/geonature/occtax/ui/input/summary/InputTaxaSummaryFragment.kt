@@ -148,6 +148,8 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
                 position: Int,
                 item: TaxonRecord
             ) {
+                startEditTaxon = false
+
                 context?.run {
                     getSystemService(
                         this,
@@ -263,9 +265,11 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
     }
 
     override fun validate(): Boolean {
-        return startEditTaxon || (this.observationRecord?.taxa?.taxa ?: emptyList()).all {
-            it.properties.isNotEmpty() && it.counting.counting.isNotEmpty()
-        }
+        return startEditTaxon || ((this.observationRecord?.taxa?.taxa
+            ?: emptyList()).isNotEmpty() && (this.observationRecord?.taxa?.taxa
+            ?: emptyList()).none {
+            it.properties.isEmpty() || it.counting.counting.isEmpty()
+        })
     }
 
     override fun refreshView() {
