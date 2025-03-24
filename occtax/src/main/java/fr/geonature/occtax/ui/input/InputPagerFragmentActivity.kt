@@ -102,7 +102,7 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
 
         observationRecordViewModel.startEdit(
             observationRecord,
-            appSettings.nomenclatureSettings?.withAdditionalFields ?: false
+            appSettings.nomenclatureSettings?.withAdditionalFields ?: true
         )
 
         pageFragmentViewModel.set(
@@ -118,7 +118,7 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
             R.string.pager_fragment_observers_and_date_input_title to ObserversAndDateInputFragment.newInstance(
                 dateSettings = appSettings.inputSettings.dateSettings,
                 withAdditionalFields = appSettings.nomenclatureSettings?.withAdditionalFields
-                    ?: false
+                    ?: true
             ),
             R.string.pager_fragment_summary_title to InputTaxaSummaryFragment.newInstance(appSettings.inputSettings.dateSettings)
         )
@@ -197,7 +197,7 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
                     saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues
                         ?: false,
                     withAdditionalFields = appSettings.nomenclatureSettings?.withAdditionalFields
-                        ?: false,
+                        ?: true,
                     *appSettings.nomenclatureSettings?.information?.toTypedArray()
                         ?: emptyArray()
                 ),
@@ -205,7 +205,7 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
                     saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues
                         ?: false,
                     withAdditionalFields = appSettings.nomenclatureSettings?.withAdditionalFields
-                        ?: false,
+                        ?: true,
                     *appSettings.nomenclatureSettings?.counting?.toTypedArray()
                         ?: emptyArray()
                 ),
