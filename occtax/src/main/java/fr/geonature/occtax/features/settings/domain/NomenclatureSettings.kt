@@ -17,9 +17,9 @@ data class NomenclatureSettings(
     val saveDefaultValues: Boolean = false,
 
     /**
-     * Whether we want to show additional fields
+     * Whether we want to show additional fields.
      */
-    val withAdditionalFields: Boolean = false,
+    val withAdditionalFields: Boolean = true,
 
     val information: List<PropertySettings>,
     val counting: List<PropertySettings>

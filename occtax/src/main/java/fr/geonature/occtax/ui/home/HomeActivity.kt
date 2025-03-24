@@ -192,7 +192,7 @@ class HomeActivity : AppCompatActivity(),
                 appSettings?.dataSyncSettings?.also { dataSyncSettings ->
                     dataSyncViewModel.startSync(
                         dataSyncSettings,
-                        appSettings?.nomenclatureSettings?.withAdditionalFields ?: false,
+                        appSettings?.nomenclatureSettings?.withAdditionalFields ?: true,
                         HomeActivity::class.java,
                         MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                     )
@@ -274,7 +274,7 @@ class HomeActivity : AppCompatActivity(),
                         } else {
                             dataSyncViewModel.startSync(
                                 dataSyncSettings,
-                                appSettings?.nomenclatureSettings?.withAdditionalFields ?: false,
+                                appSettings?.nomenclatureSettings?.withAdditionalFields ?: true,
                                 HomeActivity::class.java,
                                 MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                             )
@@ -511,7 +511,7 @@ class HomeActivity : AppCompatActivity(),
                     dataSyncViewModel.configurePeriodicSync(
                         dataSyncSettings,
                         this@HomeActivity.appSettings?.nomenclatureSettings?.withAdditionalFields
-                            ?: false,
+                            ?: true,
                         HomeActivity::class.java,
                         MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                     )
@@ -520,7 +520,7 @@ class HomeActivity : AppCompatActivity(),
                         dataSyncViewModel.startSync(
                             dataSyncSettings,
                             this@HomeActivity.appSettings?.nomenclatureSettings?.withAdditionalFields
-                                ?: false,
+                                ?: true,
                             HomeActivity::class.java,
                             MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                         )
@@ -547,7 +547,7 @@ class HomeActivity : AppCompatActivity(),
                                         dataSyncViewModel.startSync(
                                             dataSyncSettings,
                                             this@HomeActivity.appSettings?.nomenclatureSettings?.withAdditionalFields
-                                                ?: false,
+                                                ?: true,
                                             HomeActivity::class.java,
                                             MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                                         )
@@ -561,7 +561,7 @@ class HomeActivity : AppCompatActivity(),
                                 dataSyncViewModel.startSync(
                                     dataSyncSettings,
                                     this@HomeActivity.appSettings?.nomenclatureSettings?.withAdditionalFields
-                                        ?: false,
+                                        ?: true,
                                     HomeActivity::class.java,
                                     MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                                 )
