@@ -100,7 +100,7 @@ This settings file `settings_occtax.json` can be found locally in the `Android/d
 ### Parameters description
 
 | Parameter                          | UI      | Description                                                                                        | Default value |
-|------------------------------------| ------- |----------------------------------------------------------------------------------------------------| ------------- |
+|------------------------------------| ------- |----------------------------------------------------------------------------------------------------|---------------|
 | `area_observation_duration`        | &#9744; | Area observation duration period (in days)                                                         | 365           |
 | `sync`                             | &#9744; | Data synchronization settings (cf. https://github.com/PnX-SI/gn_mobile_core/tree/develop/datasync) |               |
 | `map`                              | &#9744; | Maps settings (cf. https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps)                     |               |
@@ -108,7 +108,7 @@ This settings file `settings_occtax.json` can be found locally in the `Android/d
 | `input/date`                       | &#9744; | Date settings                                                                                      |               |
 | `nomenclature`                     | &#9744; | Nomenclature settings                                                                              |               |
 | `nomenclature/save_default_values` | &#9744; | Save default nomenclature values                                                                   | false         |
-| `nomenclature/additional_fields`   | &#9744; | Show additional fields                                                                             | false         |
+| `nomenclature/additional_fields`   | &#9744; | Show additional fields                                                                             | true          |
 | `nomenclature/information`         | &#9744; | Information settings (as array)                                                                    |               |
 | `nomenclature/counting`            | &#9744; | Counting settings (as array)                                                                       |               |
 
