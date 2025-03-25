@@ -1,5 +1,35 @@
 # Changelog
 
+## [2.8.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc0) (2025-03-25, pre-release)
+
+### 🚀 Nouveautés
+
+* Refonte des champs additionnels (https://github.com/PnX-SI/gn_mobile_occtax/issues/122, https://github.com/PnX-SI/gn_mobile_occtax/issues/285).
+* Petites améliorations autour du module cartographique, notamment sur le chargement des couches
+  vectorielles (https://github.com/PnX-SI/gn_mobile_occtax/issues/170) et d'une refonte du 
+  gestionnaire des couches géographiques (https://github.com/PnX-SI/gn_mobile_occtax/issues/193).
+* Au niveau de la saisie du relevé, la saisie de la position se fait maintenant à la première étape
+  (avant la saisie du choix des observateurs, du jeu de données, etc.) (https://github.com/PnX-SI/gn_mobile_occtax/issues/288).
+* Le champ `STATUT_OBS` issu de la nomenclature, fait maintenant partie des champs éditables dans la
+  partie "Informations" (https://github.com/PnX-SI/gn_mobile_occtax/issues/66). Par défaut, il est
+  non visible (donc non éditable par défaut), non obligatoire et prend la valeur par défaut remontée
+  par l'API (`GET -> /api/occtax/defaultNomenclatures`). On peut tout à fait le rendre visible (donc
+  éditable) via le paramétrage de la nomenclature.
+* Légère refonte de la gestion des taxons dans le relevé afin de pouvoir ajouter plusieurs même
+  occurrences de taxon (https://github.com/PnX-SI/gn_mobile_occtax/issues/182).
+
+### 🐛 Corrections
+
+* Correction autour de la gestion de la date de build de l'application (https://github.com/PnX-SI/gn_mobile_occtax/issues/275).
+* Correction pour déterminer l'orientation des images ou des photos prises dans les dénombrements
+  des taxons du relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/278).
+
+### ⚠️ Notes de version
+
+* Code de version : **3323**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+
 ## [2.7.2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.2) (2025-08-29, release)
 
 ### 🐛 Corrections
