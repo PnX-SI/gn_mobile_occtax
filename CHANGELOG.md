@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.8.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc1) (2025-03-28, pre-release)
+
+### 🐛 Corrections
+
+* Petite refonte autour du module cartographique, notamment sur le chargement des couches
+  vectorielles et sur la résolution des chemins des fonds cartographique en local (https://github.com/PnX-SI/gn_mobile_occtax/issues/170).
+
+### ⚠️ Notes de version
+
+* Code de version : **3329**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+
 ## [2.8.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc0) (2025-03-25, pre-release)
 
 ### 🚀 Nouveautés
