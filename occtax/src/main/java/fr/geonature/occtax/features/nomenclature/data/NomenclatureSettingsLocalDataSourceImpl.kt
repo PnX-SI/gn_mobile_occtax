@@ -67,13 +67,6 @@ class NomenclatureSettingsLocalDataSourceImpl(context: Context) :
         ),
         FormField.NomenclatureType(
             type = FormField.Type.INFORMATION,
-            label = context.getString(R.string.nomenclature_statut_obs),
-            nomenclatureType = "STATUT_OBS",
-            visible = false,
-            value = PropertyValue.Nomenclature(code = "STATUT_OBS")
-        ),
-        FormField.NomenclatureType(
-            type = FormField.Type.INFORMATION,
             label = context.getString(R.string.nomenclature_meth_obs),
             nomenclatureType = "METH_OBS",
             value = PropertyValue.Nomenclature(code = "METH_OBS")
@@ -83,6 +76,13 @@ class NomenclatureSettingsLocalDataSourceImpl(context: Context) :
             label = context.getString(R.string.nomenclature_eta_bio),
             nomenclatureType = "ETA_BIO",
             value = PropertyValue.Nomenclature(code = "ETA_BIO")
+        ),
+        FormField.NomenclatureType(
+            type = FormField.Type.INFORMATION,
+            label = context.getString(R.string.nomenclature_statut_obs),
+            nomenclatureType = "STATUT_OBS",
+            visible = false,
+            value = PropertyValue.Nomenclature(code = "STATUT_OBS")
         ),
         FormField.NomenclatureType(
             type = FormField.Type.INFORMATION,

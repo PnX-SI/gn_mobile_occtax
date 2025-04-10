@@ -107,25 +107,25 @@ class NomenclatureSettingsLocalDataSourceTest {
             listOf(
                 FormField.NomenclatureType(
                     type = FormField.Type.INFORMATION,
-                    label = application.getString(R.string.nomenclature_statut_obs),
-                    nomenclatureType = "STATUT_OBS",
-                    visible = false,
-                    order = 0,
-                    value = PropertyValue.Nomenclature(code = "STATUT_OBS")
-                ),
-                FormField.NomenclatureType(
-                    type = FormField.Type.INFORMATION,
                     label = application.getString(R.string.nomenclature_meth_obs),
                     nomenclatureType = "METH_OBS",
-                    order = 1,
+                    order = 0,
                     value = PropertyValue.Nomenclature(code = "METH_OBS")
                 ),
                 FormField.NomenclatureType(
                     type = FormField.Type.INFORMATION,
                     label = application.getString(R.string.nomenclature_eta_bio),
-                    order = 2,
+                    order = 1,
                     nomenclatureType = "ETA_BIO",
                     value = PropertyValue.Nomenclature(code = "ETA_BIO")
+                ),
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_statut_obs),
+                    nomenclatureType = "STATUT_OBS",
+                    visible = false,
+                    order = 2,
+                    value = PropertyValue.Nomenclature(code = "STATUT_OBS")
                 ),
                 FormField.NomenclatureType(
                     type = FormField.Type.INFORMATION,
