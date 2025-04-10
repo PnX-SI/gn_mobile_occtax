@@ -35,6 +35,7 @@ class FormFieldTest {
 
     @Test
     fun `should compare two form fields`() {
+        // whether both form fields are not additional fields
         assertTrue(
             FormField.Button(
                 type = FormField.Type.INFORMATION,
@@ -129,6 +130,7 @@ class FormFieldTest {
             )
         )
 
+        // whether one of these form fields is an additional field
         assertTrue(
             FormField.Text(
                 type = FormField.Type.INFORMATION,
@@ -169,6 +171,7 @@ class FormFieldTest {
             )
         )
 
+        // whether both form fields are additional fields
         assertTrue(
             FormField.Text(
                 type = FormField.Type.INFORMATION,
@@ -224,6 +227,37 @@ class FormFieldTest {
                 additionalField = true,
                 value = PropertyValue.Text(code = "field_text")
             )
+        )
+
+        // whether one of these form fields is a type of Media
+        assertTrue(
+            FormField.Media(
+                type = FormField.Type.COUNTING,
+                label = "add media",
+                order = 1,
+                value = PropertyValue.Media(code = "field_media")
+            ) > FormField.Text(
+                type = FormField.Type.COUNTING,
+                label = "some label",
+                order = 2,
+                additionalField = true,
+                value = PropertyValue.Text(code = "field_text")
+            )
+        )
+        assertTrue(
+            FormField.Text(
+                type = FormField.Type.COUNTING,
+                label = "some label",
+                order = 2,
+                additionalField = true,
+                value = PropertyValue.Text(code = "field_text")
+            ) <
+                FormField.Media(
+                    type = FormField.Type.COUNTING,
+                    label = "add media",
+                    order = 1,
+                    value = PropertyValue.Media(code = "field_media")
+                )
         )
     }
 

@@ -47,8 +47,8 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
             this is Editable && other is Editable && this.additionalField && other.additionalField -> (order
                 ?: Int.MAX_VALUE) - (other.order ?: Int.MAX_VALUE)
 
-            this is Editable && other is Editable && !this.additionalField && other.additionalField -> -1
-            this is Editable && other is Editable && this.additionalField && !other.additionalField -> 1
+            this is Editable && other is Editable && !this.additionalField && other.additionalField -> if (this is Media) 1 else -1
+            this is Editable && other is Editable && this.additionalField && !other.additionalField -> if (other is Media) -1 else 1
             else -> (order ?: Int.MAX_VALUE) - (other.order ?: Int.MAX_VALUE)
         }
     }
