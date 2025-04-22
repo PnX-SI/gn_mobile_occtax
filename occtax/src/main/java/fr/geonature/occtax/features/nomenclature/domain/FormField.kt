@@ -253,7 +253,26 @@ sealed interface FormField : Parcelable, Comparable<FormField> {
         }
 
         /**
-         * Edits the [PropertyValue].
+         * Creates a copy of this editable field.
+         */
+        fun clone(): Editable = when (val ff = this@Editable) {
+            is Checkbox -> ff.copy()
+            is Date -> ff.copy()
+            is Media -> ff.copy()
+            is Modal -> ff.copy()
+            is ModalMultiple -> ff.copy()
+            is NomenclatureType -> ff.copy()
+            is Number -> ff.copy()
+            is Radio -> ff.copy()
+            is Select -> ff.copy()
+            is SelectMultiple -> ff.copy()
+            is Text -> ff.copy()
+            is TextMultiple -> ff.copy()
+            is Time -> ff.copy()
+        }
+
+        /**
+         * Edits the [PropertyValue] of this [FormField.Editable].
          */
         fun setValue(value: PropertyValue) = when (val ff = this@Editable) {
             is Checkbox -> ff.value =
