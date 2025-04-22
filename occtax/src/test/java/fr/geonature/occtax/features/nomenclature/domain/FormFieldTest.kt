@@ -1015,6 +1015,259 @@ class FormFieldTest {
     }
 
     @Test
+    fun `should copy an editable form field`() {
+        assertEquals(
+            FormField.Checkbox(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.StringArray(
+                    code = "some_code",
+                    value = arrayOf(
+                        "value1",
+                        "value2"
+                    )
+                )
+            ),
+            FormField.Checkbox(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.StringArray(
+                    code = "some_code",
+                    value = arrayOf(
+                        "value1",
+                        "value2"
+                    )
+                )
+            )
+                .clone()
+        )
+
+        assertEquals(
+            FormField.Date(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Date(
+                    code = "some_code",
+                    value = toDate("2016-10-28T10:15:00Z")
+                )
+            ),
+            FormField.Date(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Date(
+                    code = "some_code",
+                    value = toDate("2016-10-28T10:15:00Z")
+                )
+            )
+                .clone()
+        )
+
+        assertEquals(
+            FormField.Media(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Media(
+                    code = "some_code",
+                    value = arrayOf(MediaRecord.File(path = "/some/path/to/file"))
+                )
+            ),
+            FormField.Media(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Media(
+                    code = "some_code",
+                    value = arrayOf(MediaRecord.File(path = "/some/path/to/file"))
+                )
+            )
+                .clone()
+        )
+
+        assertEquals(
+            FormField.Modal(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Number(
+                    code = "some_code",
+                    value = 8L
+                )
+            ),
+            FormField.Modal(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Number(
+                    code = "some_code",
+                    value = 8L
+                )
+            )
+                .clone()
+        )
+
+        assertEquals(
+            FormField.NomenclatureType(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                nomenclatureType = "some_code",
+                value = PropertyValue.Nomenclature(
+                    code = "some_code",
+                    value = 8L
+                )
+            ),
+            FormField.NomenclatureType(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                nomenclatureType = "some_code",
+                value = PropertyValue.Nomenclature(
+                    code = "some_code",
+                    value = 8L
+                )
+            )
+                .clone()
+        )
+
+        assertEquals(
+            FormField.Number(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Number(
+                    code = "some_code",
+                    value = 8L
+                )
+            ),
+            FormField.Number(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Number(
+                    code = "some_code",
+                    value = 8L
+                )
+            )
+                .clone()
+        )
+
+        assertEquals(
+            FormField.Radio(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Text(
+                    code = "some_code",
+                    value = "some_value"
+                )
+            ),
+            FormField.Radio(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Text(
+                    code = "some_code",
+                    value = "some_value"
+                )
+            )
+                .clone()
+        )
+
+        assertEquals(
+            FormField.Select(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Text(
+                    code = "some_code",
+                    value = "some_value"
+                )
+            ),
+            FormField.Select(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Text(
+                    code = "some_code",
+                    value = "some_value"
+                )
+            )
+                .clone()
+        )
+
+        assertEquals(
+            FormField.SelectMultiple(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.StringArray(
+                    code = "some_code",
+                    value = arrayOf("some_value")
+                )
+            ),
+            FormField.SelectMultiple(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.StringArray(
+                    code = "some_code",
+                    value = arrayOf("some_value")
+                )
+            )
+                .clone()
+        )
+
+        assertEquals(
+            FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Text(
+                    code = "some_code",
+                    value = "some_value"
+                )
+            ),
+            FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Text(
+                    code = "some_code",
+                    value = "some_value"
+                )
+            )
+                .clone()
+        )
+
+        assertEquals(
+            FormField.TextMultiple(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Text(
+                    code = "some_code",
+                    value = "some_value"
+                )
+            ),
+            FormField.TextMultiple(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Text(
+                    code = "some_code",
+                    value = "some_value"
+                )
+            )
+                .clone()
+        )
+
+        assertEquals(
+            FormField.Time(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Time(
+                    code = "some_code",
+                    hour = 8,
+                    minute = 15
+                )
+            ),
+            FormField.Time(
+                type = FormField.Type.INFORMATION,
+                label = "some label",
+                value = PropertyValue.Time(
+                    code = "some_code",
+                    hour = 8,
+                    minute = 15
+                )
+            )
+                .clone()
+        )
+    }
+
+    @Test
     fun `should edit an editable form field`() {
         assertEquals(
             FormField.Checkbox(
