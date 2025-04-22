@@ -421,7 +421,7 @@ class FormFieldAdapter(private val listener: OnEditableFieldAdapter) :
     fun setPropertyValues(vararg propertyValue: PropertyValue) {
         availableEditableFields.map {
             when (it) {
-                is FormField.Editable -> it.apply {
+                is FormField.Editable -> it.clone().apply {
                     setValue(propertyValue.firstOrNull { pv -> pv.code == it.getValue().code }
                         ?: it.getValue())
                 }
