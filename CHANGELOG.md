@@ -1,5 +1,25 @@
 # Changelog
 
+## [2.8.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc2) (2025-04-22, pre-release)
+
+### 🚀 Nouveautés
+
+* Centrage automatique de la carte sur la dernière position connue de l'utilisateur si le paramètre
+  `map.center` n'a pas été configuré (https://github.com/PnX-SI/gn_mobile_occtax/issues/241).
+
+### 🐛 Corrections
+
+* Petites corrections d'ordre cosmétique notamment sur l'ordre d'affichage des champs de type média,
+  positionnés à la fin.
+* Notifier l'utilisateur qu'une photo a été ajoutée lors de l'abandon de la saisie sur la partie
+  dénombrement.
+
+### ⚠️ Notes de version
+
+* Code de version : **3331**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+
 ## [2.8.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc1) (2025-03-28, pre-release)
 
 ### 🐛 Corrections
