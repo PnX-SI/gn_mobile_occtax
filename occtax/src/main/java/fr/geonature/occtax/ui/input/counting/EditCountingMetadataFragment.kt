@@ -323,6 +323,7 @@ class EditCountingMetadataFragment : Fragment() {
                                     Logger.info { "add image from file '${imageFile.absolutePath}'" }
 
                                     countingRecord.medias.addFile(imageFile.absolutePath)
+                                    listener?.onCountingRecord(countingRecord)
 
                                     adapter?.setPropertyValues(
                                         *(countingRecord.properties.values
