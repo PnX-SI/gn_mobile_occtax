@@ -301,6 +301,27 @@ Then simply copy the parameters to be overwritten, respecting the JSON structure
 
 In case of errors, if the final configuration is incorrect, the application will automatically ignore the local settings file that allows you to replace the parameters and load the default configuration from _GeoNature_. Any errors reported can be found in the application logs.
 
+## Advanced search on taxa
+
+The taxon search allows you to combine several search criteria, such as:
+* taxonomic rank (with or without group or kingdom)
+* additional data according to the area selected from the vector layer (by "color", previously
+  observed or not)
+* simple full-text search by name or description (single word)
+* more advanced full-text search by name or description that can combine several words (implicit
+  "AND" operator), with boolean operators like `NOT`, `AND` `OR` and parentheses
+  **Note:** Advanced text search is only available on Android version 11 (API 30+) and higher.
+
+### Some example of search queries
+
+* "ibex": search all taxa matching any word containing *ibex*
+* "ibex sim": search all taxa matching any words containing a phrase query *ibex sim*
+* "ibex* sim*": search all taxa matching any words containing a phrase query with words starting by
+  *ibex\* sim\**
+* "^corsic*": search all taxa matching any phrase starting by *corsic\**
+* "ibex* NOT sim*": search all taxa matching any words containing a phrase query with words starting
+  by *ibex\** but without any word starting by *sim\**
+
 ## Upgrade git sub modules
 
 Do **NOT** modify directly any git sub modules (e.g. `commons`, `compat`, `mountpoint`, `viewpager`
