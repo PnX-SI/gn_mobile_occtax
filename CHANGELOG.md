@@ -1,5 +1,28 @@
 # Changelog
 
+## [2.8.0-rc3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc3) (2025-05-06, pre-release)
+
+### 🚀 Nouveautés
+
+* Support de la recherche en texte intégrale dans la liste des taxons (https://github.com/PnX-SI/gn_mobile_occtax/issues/91).
+  Cette fonctionnalité n'est disponible que sur la version 11 et supérieure d'Android (API 30+).
+
+### 🐛 Corrections
+
+* Centrage automatique de la carte sur la dernière position connue de l'utilisateur. Le paramètre
+  `map.center` est utilisée comme valeur par défaut, si la position n'a pas pu être résolue (https://github.com/PnX-SI/gn_mobile_occtax/issues/241).
+* La synchronisation des données locales se lance automatiquement à chaque mise à jour du schéma de
+  la base de données locale.
+
+### ⚠️ Notes de version
+
+* Code de version : **3343**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+* La version 2.15.3 minimum de GeoNature est requise si la version 2.15 est souhaitée.
+* La version 2.15 (ou plus) de GeoNature nécessite de modifier la configuration de l'URL de l'API de
+  TaxHub.
+
 ## [2.8.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc2) (2025-04-22, pre-release)
 
 ### 🚀 Nouveautés
@@ -19,6 +42,9 @@
 * Code de version : **3331**
 * Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
   qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+* La version 2.15.3 minimum de GeoNature est requise si la version 2.15 est souhaitée.
+* La version 2.15 (ou plus) de GeoNature nécessite de modifier la configuration de l'URL de l'API de
+  TaxHub.
 
 ## [2.8.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc1) (2025-03-28, pre-release)
 
@@ -62,6 +88,9 @@
 * Code de version : **3323**
 * Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
   qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+* La version 2.15.3 minimum de GeoNature est requise si la version 2.15 est souhaitée.
+* La version 2.15 (ou plus) de GeoNature nécessite de modifier la configuration de l'URL de l'API de
+  TaxHub.
 
 ## [2.7.2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.2) (2025-08-29, release)
 
