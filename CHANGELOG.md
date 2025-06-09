@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.8.0-rc4](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc4) (2025-06-09, pre-release)
+
+### 🚀 Nouveautés
+
+* Ajout d'une nouveau mode d'édition de la position du marqueur sur la carte en affichant un
+  marqueur "fantôme" centré sur la carte servant de guide à la saisie (https://github.com/PnX-SI/gn_mobile_occtax/issues/176).
+
+### 🐛 Corrections
+
+* Centrage automatique de la carte sur la dernière position connue de l'utilisateur. Le paramètre
+  `map.center` est utilisée comme valeur par défaut, si la position n'a pas pu être résolue (https://github.com/PnX-SI/gn_mobile_occtax/issues/241).
+
+### ⚠️ Notes de version
+
+* Code de version : **3347**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+* La version 2.15.3 minimum de GeoNature est requise si la version 2.15 est souhaitée.
+* La version 2.15 (ou plus) de GeoNature nécessite de modifier la configuration de l'URL de l'API de
+  TaxHub.
+
 ## [2.8.0-rc3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc3) (2025-05-06, pre-release)
 
 ### 🚀 Nouveautés
