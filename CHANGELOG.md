@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.7.2] (unreleased)
+
+### 🐛 Corrections
+
+* Correction de la construction du nom de fichier lors de l'import de médias depuis la galerie, non-fonctionnelle sur certains modèles de téléphones Xiaomi (https://github.com/PnX-SI/gn_mobile_occtax/issues/268)
+
+### ⚠️ Notes de version
+
+* Code de version : **xxxx**
+
 ## [2.7.1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.1) (2024-11-17, release)
 
 ### 🚀 Nouveautés
