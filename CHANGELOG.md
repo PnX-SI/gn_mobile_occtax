@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.7.2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.2) (2025-08-29, release)
+
+### 🐛 Corrections
+
+* Correction de la construction du nom de fichier lors de l'import de médias depuis la galerie, non-fonctionnelle sur certains modèles de téléphones Xiaomi (https://github.com/PnX-SI/gn_mobile_occtax/issues/268)
+
+### ⚠️ Notes de version
+
+* Code de version : **3322**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+
 ## [2.7.1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.1) (2024-11-17, release)
 
 ### 🚀 Nouveautés
