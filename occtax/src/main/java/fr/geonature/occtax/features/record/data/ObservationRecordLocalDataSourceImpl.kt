@@ -7,8 +7,8 @@ import fr.geonature.commons.util.getInputsFolder
 import fr.geonature.mountpoint.util.FileUtils
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.error.ObservationRecordException
-import fr.geonature.occtax.features.record.io.ObservationRecordJsonReader
-import fr.geonature.occtax.features.record.io.ObservationRecordJsonWriter
+import fr.geonature.occtax.features.record.io.ObservationRecordDefaultJsonReader
+import fr.geonature.occtax.features.record.io.ObservationRecordDefaultJsonWriter
 import fr.geonature.occtax.features.settings.domain.AppSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -34,10 +34,10 @@ class ObservationRecordLocalDataSourceImpl(
 
     private val preferenceManager: SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(context)
-    private val observationRecordJsonReader: ObservationRecordJsonReader =
-        ObservationRecordJsonReader()
-    private val observationRecordJsonWriter: ObservationRecordJsonWriter =
-        ObservationRecordJsonWriter()
+    private val observationRecordDefaultJsonReader: ObservationRecordDefaultJsonReader =
+        ObservationRecordDefaultJsonReader()
+    private val observationRecordDefaultJsonWriter: ObservationRecordDefaultJsonWriter =
+        ObservationRecordDefaultJsonWriter()
 
     override suspend fun readAll(): List<ObservationRecord> {
         val exportedObservationRecords = FileUtils
@@ -49,7 +49,7 @@ class ObservationRecordLocalDataSourceImpl(
             .filter { it.canRead() }
             .map {
                 val input =
-                    runCatching { observationRecordJsonReader.read(it.readText()) }.getOrNull()
+                    runCatching { observationRecordDefaultJsonReader.read(it.readText()) }.getOrNull()
 
                 if (input == null) {
                     Logger.warn { "invalid exported observation record file found '${it.name}'" }
@@ -70,7 +70,7 @@ class ObservationRecordLocalDataSourceImpl(
                     .filterKeys { it.startsWith("${KEY_PREFERENCE_INPUT}_") }
                     .values
                     .mapNotNull {
-                        if (it is String && it.isNotBlank()) runCatching { observationRecordJsonReader.read(it) }
+                        if (it is String && it.isNotBlank()) runCatching { observationRecordDefaultJsonReader.read(it) }
                             .onFailure { throwable -> Logger.error(throwable) { "failed to load observation record" } }
                             .getOrNull() else null
                     } + exportedObservationRecords
@@ -97,7 +97,7 @@ class ObservationRecordLocalDataSourceImpl(
             throw ObservationRecordException.NotFoundException(id)
         }
 
-        runCatching { observationRecordJsonReader.read(observationRecordAsJson) }
+        runCatching { observationRecordDefaultJsonReader.read(observationRecordAsJson) }
             .onFailure { throw ObservationRecordException.ReadException(id) }
             .getOrThrow()
     }
@@ -108,7 +108,7 @@ class ObservationRecordLocalDataSourceImpl(
     ): ObservationRecord =
         withContext(dispatcher) {
             val savedObservationRecord = observationRecord.copy(status = status)
-            val asJson = runCatching { observationRecordJsonWriter.write(savedObservationRecord) }
+            val asJson = runCatching { observationRecordDefaultJsonWriter.write(savedObservationRecord) }
                 .getOrNull()
 
             if (asJson.isNullOrBlank()) throw ObservationRecordException.WriteException(savedObservationRecord.internalId)
@@ -192,7 +192,7 @@ class ObservationRecordLocalDataSourceImpl(
 
         return withContext(dispatcher) {
             val inputAsJson =
-                runCatching { observationRecordJsonWriter.write(observationRecordToSync) }.getOrNull()
+                runCatching { observationRecordDefaultJsonWriter.write(observationRecordToSync) }.getOrNull()
             if (inputAsJson.isNullOrBlank()) throw ObservationRecordException.WriteException(observationRecordToSync.internalId)
 
             File(

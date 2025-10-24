@@ -22,9 +22,9 @@ import java.io.StringReader
  *
  * @author S. Grimault
  *
- * @see TaxonRecordJsonWriter
+ * @see TaxonRecordDefaultJsonWriter
  */
-class TaxonRecordJsonReader {
+class TaxonRecordDefaultJsonReader {
 
     /**
      * parse a `JSON` string to convert as [TaxonRecord].
@@ -125,16 +125,14 @@ class TaxonRecordJsonReader {
                         )
                     ))
 
+                    // manage legacy GeoNature nomenclature mapping...
                     if (keyName.startsWith("id_nomenclature")) {
                         readNomenclatureValue(
                             reader,
                             keyName
                         )?.toPair()
                             ?.also {
-                                taxonRecord?.properties?.set(
-                                    it.first,
-                                    it.second
-                                )
+                                taxonRecord.properties[it.first] = it.second
                             }
 
                         continue
@@ -143,7 +141,7 @@ class TaxonRecordJsonReader {
                     if (keyName == TaxonRecord.ADDITIONAL_FIELDS_KEY) {
                         readAdditionalFields(reader).takeIf { it.isNotEmpty() }
                             ?.also {
-                                taxonRecord?.additionalFields = it
+                                taxonRecord.additionalFields = it
                             }
 
                         continue
@@ -233,6 +231,7 @@ class TaxonRecordJsonReader {
                 // ignore "index" legacy property
                 "index" -> reader.skipValue()
                 else -> {
+                    // manage legacy GeoNature nomenclature mapping...
                     if (keyName.startsWith("id_nomenclature")) {
                         readNomenclatureValue(
                             reader,
@@ -375,6 +374,10 @@ class TaxonRecordJsonReader {
     /**
      * GeoNature nomenclature property values mapping
      */
+    @Deprecated(
+        message = "only used for GeoNature API compatibility",
+        replaceWith = ReplaceWith(expression = "see: TaxonRecordAPIJsonWriter")
+    )
     private fun readNomenclatureValue(
         reader: JsonReader,
         code: String

@@ -21,12 +21,12 @@ import java.io.StringReader
  *
  * @author S. Grimault
  *
- * @see ObservationRecordJsonWriter
- * @see TaxonRecordJsonReader
+ * @see ObservationRecordDefaultJsonWriter
+ * @see TaxonRecordDefaultJsonReader
  */
-class ObservationRecordJsonReader {
+class ObservationRecordDefaultJsonReader {
 
-    private val taxonRecordJsonReader: TaxonRecordJsonReader = TaxonRecordJsonReader()
+    private val taxonRecordDefaultJsonReader: TaxonRecordDefaultJsonReader = TaxonRecordDefaultJsonReader()
 
     /**
      * parse a `JSON` string to convert as [ObservationRecord].
@@ -162,6 +162,7 @@ class ObservationRecordJsonReader {
                 )
 
                 else -> {
+                    // manage legacy GeoNature nomenclature mapping...
                     if (keyName.startsWith("id_nomenclature")) {
                         readNomenclatureValue(
                             reader,
@@ -309,6 +310,10 @@ class ObservationRecordJsonReader {
     /**
      * GeoNature nomenclature property values mapping
      */
+    @Deprecated(
+        message = "only used for GeoNature API compatibility",
+        replaceWith = ReplaceWith(expression = "see: ObservationRecordAPIJsonWriter")
+    )
     private fun readNomenclatureValue(
         reader: JsonReader,
         code: String
@@ -382,7 +387,7 @@ class ObservationRecordJsonReader {
                 while (reader.hasNext()) {
                     when (reader.peek()) {
                         JsonToken.BEGIN_OBJECT -> {
-                            taxonRecordJsonReader.readTaxonRecord(
+                            taxonRecordDefaultJsonReader.readTaxonRecord(
                                 reader,
                                 observationRecord
                             )

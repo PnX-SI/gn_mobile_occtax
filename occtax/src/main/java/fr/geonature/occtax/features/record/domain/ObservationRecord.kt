@@ -518,6 +518,14 @@ class TaxaRecord(
         return taxonRecordToDelete
     }
 
+    /**
+     * Clears all added taxa.
+     */
+    fun clearAll() {
+        properties.remove(TAXA_KEY)
+        properties.remove(CURRENT_TAXON_ID)
+    }
+
     companion object {
         const val TAXA_KEY = "t_occurrences_occtax"
         const val CURRENT_TAXON_ID = "current_taxon_id"

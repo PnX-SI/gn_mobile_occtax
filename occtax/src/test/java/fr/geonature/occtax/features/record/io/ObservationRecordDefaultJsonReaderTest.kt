@@ -19,12 +19,12 @@ import java.io.IOException
 import java.util.Calendar
 
 /**
- * Unit tests about [ObservationRecordJsonReader].
+ * Unit tests about [ObservationRecordDefaultJsonReader].
  *
  * @author S. Grimault
  */
 @RunWith(RobolectricTestRunner::class)
-class ObservationRecordJsonReaderTest {
+class ObservationRecordDefaultJsonReaderTest {
 
     private lateinit var gf: GeometryFactory
 
@@ -37,14 +37,14 @@ class ObservationRecordJsonReaderTest {
     fun `should throw IOException if trying to read an observation record from invalid json string`() {
         // when reading an invalid JSON as observation record
         assertThrows(IOException::class.java) {
-            ObservationRecordJsonReader().read("")
+            ObservationRecordDefaultJsonReader().read("")
         }
     }
 
     @Test
     fun `should read an empty observation record`() {
         // when reading an observation record from an empty JSON object
-        val observationRecord = ObservationRecordJsonReader().read("{}")
+        val observationRecord = ObservationRecordDefaultJsonReader().read("{}")
 
         assertNotNull(observationRecord.internalId)
         assertTrue(observationRecord.taxa.taxa.isEmpty())
@@ -56,7 +56,7 @@ class ObservationRecordJsonReaderTest {
         val json = getFixture("input_simple.json")
 
         // when parsing this file as ObservationRecord
-        val observationRecord = ObservationRecordJsonReader().read(json)
+        val observationRecord = ObservationRecordDefaultJsonReader().read(json)
 
         // then
         assertEquals(
@@ -203,7 +203,7 @@ class ObservationRecordJsonReaderTest {
         val json = getFixture("observation_record_with_invalid_additional_fields.json")
 
         // when parsing this file as ObservationRecord
-        val observationRecord = ObservationRecordJsonReader().read(json)
+        val observationRecord = ObservationRecordDefaultJsonReader().read(json)
 
         // then
         assertEquals(
@@ -409,7 +409,7 @@ class ObservationRecordJsonReaderTest {
         val json = getFixture("observation_record_taxa_empty.json")
 
         // when parsing this file as ObservationRecord
-        val observationRecord = ObservationRecordJsonReader().read(json)
+        val observationRecord = ObservationRecordDefaultJsonReader().read(json)
 
         // then
         assertEquals(
@@ -472,7 +472,7 @@ class ObservationRecordJsonReaderTest {
         val json = getFixture("observation_record_no_taxa_sent.json")
 
         // when parsing this file as ObservationRecord
-        val observationRecord = ObservationRecordJsonReader().read(json)
+        val observationRecord = ObservationRecordDefaultJsonReader().read(json)
 
         // then
         assertEquals(
@@ -610,11 +610,11 @@ class ObservationRecordJsonReaderTest {
     fun `should be the same observation record read from a legacy JSON string or from a new JSON string schema`() {
         // when parsing an input file to read as ObservationRecord
         val observationRecordFromLegacy =
-            ObservationRecordJsonReader().read(getFixture("input_simple.json"))
+            ObservationRecordDefaultJsonReader().read(getFixture("input_simple.json"))
 
         // and parsing an observation record from JSON string
         val observationRecord =
-            ObservationRecordJsonReader().read(getFixture("observation_record_simple.json"))
+            ObservationRecordDefaultJsonReader().read(getFixture("observation_record_simple.json"))
 
         assertEquals(
             observationRecordFromLegacy,

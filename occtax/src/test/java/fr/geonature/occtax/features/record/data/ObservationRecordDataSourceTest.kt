@@ -11,8 +11,8 @@ import fr.geonature.mountpoint.util.FileUtils
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.error.ObservationRecordException
-import fr.geonature.occtax.features.record.io.ObservationRecordJsonReader
-import fr.geonature.occtax.features.record.io.ObservationRecordJsonWriter
+import fr.geonature.occtax.features.record.io.ObservationRecordDefaultJsonReader
+import fr.geonature.occtax.features.record.io.ObservationRecordDefaultJsonWriter
 import io.mockk.MockKAnnotations.init
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -99,7 +99,7 @@ class ObservationRecordDataSourceTest {
             )
                 .bufferedWriter()
                 .use { out ->
-                    out.write(ObservationRecordJsonWriter().write(record4))
+                    out.write(ObservationRecordDefaultJsonWriter().write(record4))
                     out.flush()
                     out.close()
                 }
@@ -259,7 +259,7 @@ class ObservationRecordDataSourceTest {
             )
             assertTrue(exportedJsonFile.exists())
 
-            val observationRecordFromExportedJsonFile = ObservationRecordJsonReader().read(
+            val observationRecordFromExportedJsonFile = ObservationRecordDefaultJsonReader().read(
                 exportedJsonFile.bufferedReader()
             )
             assertEquals(
