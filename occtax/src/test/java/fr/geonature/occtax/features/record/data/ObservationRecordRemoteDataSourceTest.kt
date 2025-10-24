@@ -119,8 +119,7 @@ class ObservationRecordRemoteDataSourceTest {
                 }
         }
 
-        val expectedJSONResponse = getFixture("observation_record_no_taxa_sent.json")
-        mockWebServer.enqueue(MockResponse().setBody(expectedJSONResponse))
+        mockWebServer.enqueue(MockResponse().setBody(getFixture("observation_record_no_taxa_sent.json")))
 
         // when sending this observation record
         val observationRecordUpdated = observationRecordRemoteDataSource.sendObservationRecord(

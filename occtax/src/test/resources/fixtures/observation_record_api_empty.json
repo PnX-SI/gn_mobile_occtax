@@ -1,0 +1,12 @@
+{
+  "id": 1235,
+  "geometry": null,
+  "properties": {
+    "date_min": "2016-10-28",
+    "hour_min": null,
+    "date_max": "2016-10-28",
+    "hour_max": null,
+    "additional_fields": {},
+    "meta_device_entry": "mobile"
+  }
+}

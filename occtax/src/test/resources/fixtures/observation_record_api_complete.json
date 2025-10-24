@@ -1,0 +1,28 @@
+{
+  "id": 1234,
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -1.554476,
+      47.225782
+    ]
+  },
+  "properties": {
+    "date_min": "2016-10-28",
+    "hour_min": null,
+    "date_max": "2016-10-29",
+    "hour_max": null,
+    "id_nomenclature_grp_typ": 133,
+    "additional_fields": {},
+    "comment": "Global comment",
+    "id_dataset": 17,
+    "id_digitiser": 1,
+    "meta_device_entry": "mobile",
+    "observers": [
+      1,
+      5,
+      2,
+      3
+    ]
+  }
+}
