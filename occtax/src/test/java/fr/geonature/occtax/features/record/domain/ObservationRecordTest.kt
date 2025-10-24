@@ -869,6 +869,40 @@ class ObservationRecordTest {
     }
 
     @Test
+    fun `should clear all taxa record`() {
+        // given an observation record with a taxon record
+        val record = ObservationRecord(internalId = 1234L)
+        val taxonRecord = TaxonRecord(
+            internalId = 12341L,
+            recordId = record.internalId,
+            taxon = Taxon(
+                8L,
+                "taxon_02",
+                Taxonomy(
+                    "Animalia",
+                    "Ascidies"
+                )
+            )
+        ).apply {
+            PropertyValue.Text(
+                "some_code",
+                "some_value"
+            )
+                .also {
+                    properties[it.code] = it
+                }
+        }
+        record.taxa.addOrUpdate(taxonRecord)
+
+        // when deleting all existing taxa records
+        record.taxa.clearAll()
+
+        // then
+        assertTrue(record.taxa.taxa.isEmpty())
+        assertNull(record.taxa.selectedTaxonRecord)
+    }
+
+    @Test
     fun `should copy the same observation record`() {
         assertEquals(
             ObservationRecord(

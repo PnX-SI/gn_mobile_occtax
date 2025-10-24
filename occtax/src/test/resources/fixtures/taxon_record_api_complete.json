@@ -1,0 +1,44 @@
+{
+  "cd_nom": 10,
+  "nom_cite": "taxon_01",
+  "id_nomenclature_bio_condition": 29,
+  "id_nomenclature_determination_method": 445,
+  "id_nomenclature_obs_technique": 41,
+  "id_nomenclature_naturalness": 160,
+  "id_nomenclature_behaviour": 580,
+  "id_nomenclature_exist_proof": 81,
+  "id_nomenclature_bio_status": 29,
+  "id_nomenclature_observation_status": 84,
+  "additional_fields": {
+    "some_field_text": "some_value",
+    "some_field_date": "2016-10-28",
+    "some_field_time": "08:15",
+    "some_field_number": 42,
+    "some_field_array_string": [
+      "val1",
+      "val2"
+    ],
+    "some_field_array_number": [
+      3,
+      8
+    ]
+  },
+  "comment": "Some comment",
+  "cor_counting_occtax": [
+    {
+      "id_nomenclature_obj_count": 146,
+      "id_nomenclature_sex": 168,
+      "id_nomenclature_life_stage": 2,
+      "id_nomenclature_type_count": 93,
+      "additional_fields": {
+        "some_field_text": "some_value",
+        "some_field_date_counting": "2009-01-03",
+        "some_field_time_counting": "13:00",
+        "some_field_number": 3.14
+      },
+      "count_max": 2,
+      "count_min": 1
+    }
+  ],
+  "determiner": "Determiner value"
+}

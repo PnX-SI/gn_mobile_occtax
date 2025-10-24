@@ -18,22 +18,22 @@ import java.util.TimeZone
  *
  * @author S. Grimault
  *
- * @see TaxonRecordJsonReader
+ * @see TaxonRecordDefaultJsonReader
  */
-class TaxonRecordJsonWriter {
+class TaxonRecordDefaultJsonWriter {
 
     private var indent: String = ""
 
     /**
-     * Sets the indentation string to be repeated for each level of indentation in the encoded document.
-     * If `indent.isEmpty()` the encoded document will be compact.
-     * Otherwise the encoded document will be more human-readable.
+     * Sets the indentation string to be repeated for each level of indentation in the encoded
+     * document. If `indent.isEmpty()` the encoded document will be compact. Otherwise the encoded
+     * document will be more human-readable.
      *
      * @param indent a string containing only whitespace.
      *
-     * @return [ObservationRecordJsonWriter] fluent interface
+     * @return [ObservationRecordDefaultJsonWriter] fluent interface
      */
-    fun setIndent(indent: String): TaxonRecordJsonWriter {
+    fun setIndent(indent: String): TaxonRecordDefaultJsonWriter {
         this.indent = indent
 
         return this
@@ -43,19 +43,17 @@ class TaxonRecordJsonWriter {
      * Convert the given [TaxonRecord] as `JSON` string.
      *
      * @param taxonRecord the [TaxonRecord] to convert
-     * @param settings additional settings
      *
      * @return a `JSON` string representation of the given [TaxonRecord]
      * @throws IOException if something goes wrong
      * @see [write][fr.geonature.occtax.features.record.io.TaxonRecordJsonWriter.write(java.io.Writer, fr.geonature.occtax.features.record.domain.TaxonRecord)]
      */
-    fun write(taxonRecord: TaxonRecord, settings: AppSettings? = null): String {
+    fun write(taxonRecord: TaxonRecord): String {
         val writer = StringWriter()
 
         write(
             writer,
-            taxonRecord,
-            settings
+            taxonRecord
         )
 
         return writer.toString()
@@ -66,21 +64,18 @@ class TaxonRecordJsonWriter {
      *
      * @param out the `Writer` to use
      * @param taxonRecord the [TaxonRecord] to convert
-     * @param settings additional settings
      *
      * @throws IOException if something goes wrong
      */
     fun write(
         out: Writer,
-        taxonRecord: TaxonRecord,
-        settings: AppSettings? = null
+        taxonRecord: TaxonRecord
     ) {
         val writer = JsonWriter(out)
         writer.setIndent(this.indent)
         writeTaxonRecord(
             writer,
-            taxonRecord,
-            settings
+            taxonRecord
         )
         writer.flush()
         writer.close()
@@ -88,8 +83,7 @@ class TaxonRecordJsonWriter {
 
     internal fun writeTaxonRecord(
         writer: JsonWriter,
-        taxonRecord: TaxonRecord,
-        settings: AppSettings? = null
+        taxonRecord: TaxonRecord
     ) {
         writer.beginObject()
 
@@ -97,15 +91,12 @@ class TaxonRecordJsonWriter {
             .value(taxonRecord.taxon.id)
         writer.name("nom_cite")
             .value(taxonRecord.taxon.name)
-
-        if (settings == null) {
-            writer.name("internal_id")
-                .value(taxonRecord.internalId)
-            writer.name("regne")
-                .value(taxonRecord.taxon.taxonomy.kingdom)
-            writer.name("group2_inpn")
-                .value(taxonRecord.taxon.taxonomy.group)
-        }
+        writer.name("internal_id")
+            .value(taxonRecord.internalId)
+        writer.name("regne")
+            .value(taxonRecord.taxon.taxonomy.kingdom)
+        writer.name("group2_inpn")
+            .value(taxonRecord.taxon.taxonomy.group)
 
         taxonRecord.properties.forEach {
             when (val propertyValue = it.value) {

@@ -19,24 +19,25 @@ import java.util.TimeZone
  *
  * @author S. Grimault
  *
- * @see ObservationRecordJsonReader
- * @see TaxonRecordJsonWriter
+ * @see ObservationRecordDefaultJsonReader
+ * @see TaxonRecordDefaultJsonWriter
  */
-class ObservationRecordJsonWriter {
+class ObservationRecordDefaultJsonWriter {
 
-    private val taxonRecordJsonWriter: TaxonRecordJsonWriter = TaxonRecordJsonWriter()
+    private val taxonRecordDefaultJsonWriter: TaxonRecordDefaultJsonWriter =
+        TaxonRecordDefaultJsonWriter()
     private var indent: String = ""
 
     /**
-     * Sets the indentation string to be repeated for each level of indentation in the encoded document.
-     * If `indent.isEmpty()` the encoded document will be compact.
-     * Otherwise the encoded document will be more human-readable.
+     * Sets the indentation string to be repeated for each level of indentation in the encoded
+     * document. If `indent.isEmpty()` the encoded document will be compact. Otherwise the encoded
+     * document will be more human-readable.
      *
      * @param indent a string containing only whitespace.
      *
-     * @return [ObservationRecordJsonWriter] fluent interface
+     * @return [ObservationRecordDefaultJsonWriter] fluent interface
      */
-    fun setIndent(indent: String): ObservationRecordJsonWriter {
+    fun setIndent(indent: String): ObservationRecordDefaultJsonWriter {
         this.indent = indent
 
         return this
@@ -46,22 +47,17 @@ class ObservationRecordJsonWriter {
      * Convert the given [ObservationRecord] as `JSON` string.
      *
      * @param observationRecord the [ObservationRecord] to convert
-     * @param settings additional settings
      *
      * @return a `JSON` string representation of the given [ObservationRecord]
      * @throws IOException if something goes wrong
      * @see [write][fr.geonature.occtax.features.record.io.ObservationRecordJsonWriter.write(java.io.Writer, fr.geonature.occtax.features.record.domain.ObservationRecord, fr.geonature.occtax.settings.AppSettings)]
      */
-    fun write(
-        observationRecord: ObservationRecord,
-        settings: AppSettings? = null
-    ): String {
+    fun write(observationRecord: ObservationRecord): String {
         val writer = StringWriter()
 
         write(
             writer,
-            observationRecord,
-            settings
+            observationRecord
         )
 
         return writer.toString()
@@ -72,21 +68,18 @@ class ObservationRecordJsonWriter {
      *
      * @param out the `Writer` to use
      * @param observationRecord the [ObservationRecord] to convert
-     * @param settings additional settings
      *
      * @throws IOException if something goes wrong
      */
     fun write(
         out: Writer,
-        observationRecord: ObservationRecord,
-        settings: AppSettings? = null
+        observationRecord: ObservationRecord
     ) {
         val writer = JsonWriter(out)
         writer.setIndent(this.indent)
         writeObservationRecord(
             writer,
-            observationRecord,
-            settings
+            observationRecord
         )
         writer.flush()
         writer.close()
@@ -94,8 +87,7 @@ class ObservationRecordJsonWriter {
 
     private fun writeObservationRecord(
         writer: JsonWriter,
-        observationRecord: ObservationRecord,
-        settings: AppSettings? = null
+        observationRecord: ObservationRecord
     ) {
         writer.beginObject()
 
@@ -110,8 +102,7 @@ class ObservationRecordJsonWriter {
         )
         writeProperties(
             writer,
-            observationRecord,
-            settings
+            observationRecord
         )
 
         writer.endObject()
@@ -137,21 +128,17 @@ class ObservationRecordJsonWriter {
 
     private fun writeProperties(
         writer: JsonWriter,
-        observationRecord: ObservationRecord,
-        settings: AppSettings? = null
+        observationRecord: ObservationRecord
     ) {
         writer.name("properties")
             .beginObject()
 
-        if (settings == null) {
-            writer.name("internal_id")
-                .value(observationRecord.internalId)
-        }
+        writer.name("internal_id")
+            .value(observationRecord.internalId)
 
         writeDates(
             writer,
-            observationRecord,
-            settings?.inputSettings?.dateSettings
+            observationRecord
         )
 
         observationRecord.properties.forEach {
@@ -199,10 +186,9 @@ class ObservationRecordJsonWriter {
                     writer.name(propertyValue.code)
                         .beginArray()
                     propertyValue.value.forEach { taxonRecord ->
-                        taxonRecordJsonWriter.writeTaxonRecord(
+                        taxonRecordDefaultJsonWriter.writeTaxonRecord(
                             writer,
-                            taxonRecord,
-                            settings
+                            taxonRecord
                         )
                     }
                     writer.endArray()
@@ -217,52 +203,12 @@ class ObservationRecordJsonWriter {
 
     private fun writeDates(
         writer: JsonWriter,
-        observationRecord: ObservationRecord,
-        dateSettings: InputDateSettings? = null
+        observationRecord: ObservationRecord
     ) {
-        observationRecord.dates.start.run {
-            writer.name(DatesRecord.DATE_MIN_KEY)
-                .value(
-                    if (dateSettings == null) toIsoDateString() else format(
-                        "yyyy-MM-dd",
-                        TimeZone.getDefault()
-                    )
-                )
-            writer.name("hour_min")
-                .value(
-                    if (dateSettings?.startDateSettings == InputDateSettings.DateSettings.DATETIME) format(
-                        "HH:mm",
-                        TimeZone.getDefault()
-                    )
-                    else null
-                )
-        }
-
-        observationRecord.dates.end.run {
-            writer.name(DatesRecord.DATE_MAX_KEY)
-                .value(
-                    if (dateSettings == null) toIsoDateString()
-                    else if (dateSettings.endDateSettings != null) format(
-                        "yyyy-MM-dd",
-                        TimeZone.getDefault()
-                    ) else observationRecord.dates.start.format(
-                        "yyyy-MM-dd",
-                        TimeZone.getDefault()
-                    )
-                )
-            writer.name("hour_max")
-                .value(
-                    if (dateSettings?.endDateSettings == InputDateSettings.DateSettings.DATETIME) format(
-                        "HH:mm",
-                        TimeZone.getDefault()
-                    )
-                    else if (dateSettings?.startDateSettings == InputDateSettings.DateSettings.DATETIME) observationRecord.dates.start.format(
-                        "HH:mm",
-                        TimeZone.getDefault()
-                    )
-                    else null
-                )
-        }
+        writer.name(DatesRecord.DATE_MIN_KEY)
+            .value(observationRecord.dates.start.toIsoDateString())
+        writer.name(DatesRecord.DATE_MAX_KEY)
+            .value(observationRecord.dates.end.toIsoDateString())
     }
 
     private fun writeAdditionalFields(
