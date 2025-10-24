@@ -37,7 +37,9 @@ class FormFieldNumberViewHolder(
                 PropertyValue.Number(
                     code = getValue().code,
                     value = s?.toString()
-                        ?.toLongOrNull()
+                        ?.let {
+                            it.toLongOrNull() ?: it.toDoubleOrNull()
+                        }
                 )
             )
             listener.onUpdate(this)
