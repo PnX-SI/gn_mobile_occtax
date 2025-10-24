@@ -277,19 +277,25 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
 
     override fun refreshView() {
         if (adapter?.itemCount == 0) {
-            nomenclatureViewModel.getEditableFields(
-                datasetId = observationRecord?.dataset?.dataset?.value?.id,
-                withAdditionalFields = arguments?.getBoolean(
-                    ARG_WITH_ADDITIONAL_FIELDS,
-                    false
-                ) ?: false,
-                type = FormField.Type.DEFAULT,
-                dateSettings = dateSettings
-            )
+            loadEditableFields()
         }
     }
 
+    private fun loadEditableFields() {
+        nomenclatureViewModel.getEditableFields(
+            datasetId = observationRecord?.dataset?.dataset?.value?.id,
+            withAdditionalFields = arguments?.getBoolean(
+                ARG_WITH_ADDITIONAL_FIELDS,
+                false
+            ) ?: false,
+            type = FormField.Type.DEFAULT,
+            dateSettings = dateSettings
+        )
+    }
+
     private fun handleEditableFields(editableFields: List<FormField>) {
+        mapDefaultValueToObservationRecord(editableFields)
+
         adapter?.bind(
             editableFields.map {
                 when (it) {
@@ -358,6 +364,34 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
         listener.validateCurrentPage()
     }
 
+    private fun mapDefaultValueToObservationRecord(editableFields: List<FormField>) {
+        // map editable form fields existing values to the given observation record
+        editableFields
+            .filterIsInstance<FormField.Editable>()
+            .forEach { ff ->
+                // if we have existing value from observation record, do nothing
+                if (!ff.additionalField && observationRecord?.properties?.containsKey(ff.getValue().code) == true) return
+                if (ff.additionalField && observationRecord?.additionalFields?.associateBy { pv -> pv.code }
+                        ?.containsKey(ff.getValue().code) == true) return
+
+                // set default value from editable field to the given observation record
+                if (!ff.additionalField) {
+                    observationRecord?.properties?.set(
+                        ff.getValue().code,
+                        ff.getValue()
+                    )
+                }
+
+                if (ff.additionalField) {
+                    observationRecord?.also { record ->
+                        record.additionalFields = record.additionalFields.filter { pv ->
+                            pv.toPair().first != ff.getValue().code
+                        } + listOfNotNull(ff.getValue())
+                    }
+                }
+            }
+    }
+
     private fun updateSelectedObservers(selectedInputObservers: List<InputObserver>) {
         observationRecord?.observers?.setObservers(selectedInputObservers)
 
@@ -405,6 +439,7 @@ class ObserversAndDateInputFragment : AbstractInputFragment() {
                 adapter?.updateEditableField(it)
             }
 
+        loadEditableFields()
         listener.validateCurrentPage()
     }
 
