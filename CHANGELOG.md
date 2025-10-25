@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.8.0-rc5](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc5) (2025-10-25, pre-release)
+
+### 🐛 Corrections
+
+* Légère refonte autour de la gestion des relevés, la sérialisation JSON des relevés comporte
+  maintenant deux approches : la première pour gérer les relevés en local, la seconde pour gérer les
+  relevés lors de la synchronisation.
+* Corrections autour des champs additionnels (https://github.com/PnX-SI/gn_mobile_occtax/issues/122).
+
+### ⚠️ Notes de version
+
+* Code de version : **3359**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+* La version 2.15.3 minimum de GeoNature est requise si la version 2.15 est souhaitée.
+* La version 2.15 (ou plus) de GeoNature nécessite de modifier la configuration de l'URL de l'API de
+  TaxHub.
+
 ## [2.8.0-rc4](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc4) (2025-06-09, pre-release)
 
 ### 🚀 Nouveautés
