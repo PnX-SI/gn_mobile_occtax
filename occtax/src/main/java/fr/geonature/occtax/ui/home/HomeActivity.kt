@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -23,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.FileProvider
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
@@ -124,7 +127,21 @@ class HomeActivity : AppCompatActivity(),
     private lateinit var startSyncResultLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+
+        if (intent.action == Intent.ACTION_MAIN) {
+            val splashScreen = installSplashScreen()
+            var splashScreenStays = true
+            splashScreen.setKeepOnScreenCondition { splashScreenStays }
+            Handler(Looper.getMainLooper()).postDelayed(
+                { splashScreenStays = false },
+                1200L
+            )
+
+            super.onCreate(savedInstanceState)
+        } else {
+            super.onCreate(savedInstanceState)
+            setTheme(R.style.AppTheme_NoActionBar)
+        }
 
         setContentView(R.layout.activity_home)
 

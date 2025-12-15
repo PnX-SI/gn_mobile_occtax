@@ -84,6 +84,7 @@ dependencies {
 
     implementation libs.androidx.cardview
     implementation libs.androidx.constraintlayout
+    implementation libs.androidx.core.splashscreen
     implementation libs.androidx.exifinterface
     implementation libs.androidx.lifecycle.livedata.ktx
     implementation libs.androidx.preference.ktx
