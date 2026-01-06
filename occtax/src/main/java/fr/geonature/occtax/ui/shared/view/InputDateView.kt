@@ -26,8 +26,12 @@ import fr.geonature.occtax.features.settings.domain.InputDateSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
+import java.util.TimeZone
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -214,13 +218,16 @@ class InputDateView : ConstraintLayout {
                                         .set(
                                             Calendar.HOUR_OF_DAY,
                                             0
-                                        ).set(
+                                        )
+                                        .set(
                                             Calendar.MINUTE,
                                             0
-                                        ).set(
+                                        )
+                                        .set(
                                             Calendar.SECOND,
                                             0
-                                        ).set(
+                                        )
+                                        .set(
                                             Calendar.MILLISECOND,
                                             0
                                         ).time
@@ -265,9 +272,10 @@ class InputDateView : ConstraintLayout {
             0
         )
 
-        ta.getString(R.styleable.InputDateView_title)?.also {
-            setTitle(it)
-        }
+        ta.getString(R.styleable.InputDateView_title)
+            ?.also {
+                setTitle(it)
+            }
         setTitle(
             ta.getResourceId(
                 R.styleable.InputDateView_title,
@@ -312,13 +320,22 @@ class InputDateView : ConstraintLayout {
                     .build()
             ) {
                 addOnPositiveButtonClickListener {
-                    val selectedDate = Date(it).set(
-                        Calendar.HOUR_OF_DAY,
-                        from.get(Calendar.HOUR_OF_DAY)
-                    ).set(
-                        Calendar.MINUTE,
-                        from.get(Calendar.MINUTE)
+                    val selectedDate = Date.from(
+                        LocalDateTime.ofInstant(
+                            Instant.ofEpochMilli(it),
+                            TimeZone.getTimeZone("UTC")
+                                .toZoneId()
+                        )
+                            .atZone(ZoneId.systemDefault()).toInstant()
                     )
+                        .set(
+                            Calendar.HOUR_OF_DAY,
+                            from.get(Calendar.HOUR_OF_DAY)
+                        )
+                        .set(
+                            Calendar.MINUTE,
+                            from.get(Calendar.MINUTE)
+                        )
 
                     if (!withTime) {
                         continuation.resume(selectedDate)
@@ -338,10 +355,11 @@ class InputDateView : ConstraintLayout {
                                 selectedDate.set(
                                     if (DateFormat.is24HourFormat(context)) Calendar.HOUR_OF_DAY else Calendar.HOUR,
                                     hour
-                                ).set(
-                                    Calendar.MINUTE,
-                                    minute
                                 )
+                                    .set(
+                                        Calendar.MINUTE,
+                                        minute
+                                    )
                             )
                         }
                         addOnNegativeButtonClickListener {
@@ -384,7 +402,8 @@ class InputDateView : ConstraintLayout {
                             else R.string.input_date_format
                         ),
                         it
-                    ).toString()
+                    )
+                        .toString()
                 )
         }
     }
