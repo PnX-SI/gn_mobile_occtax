@@ -14,7 +14,11 @@ import fr.geonature.occtax.features.record.domain.PropertyValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.Date
+import java.util.TimeZone
 import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -120,7 +124,17 @@ class FormFieldDateViewHolder(
                     .build()
             ) {
                 addOnPositiveButtonClickListener {
-                    continuation.resume(Date(it))
+                    continuation.resume(
+                        Date.from(
+                            LocalDateTime.ofInstant(
+                                Instant.ofEpochMilli(it),
+                                TimeZone.getTimeZone("UTC")
+                                    .toZoneId()
+                            )
+                                .atZone(ZoneId.systemDefault())
+                                .toInstant()
+                        )
+                    )
                 }
                 addOnNegativeButtonClickListener {
                     continuation.resume(from)
@@ -141,7 +155,8 @@ class FormFieldDateViewHolder(
     /**
      * Callback used by [FormFieldDateViewHolder].
      */
-    interface OnFormFieldDateViewHolderListener: OnAbstractFormFieldTextViewHolderViewHolderListener<FormField.Date> {
+    interface OnFormFieldDateViewHolderListener :
+        OnAbstractFormFieldTextViewHolderViewHolderListener<FormField.Date> {
 
         /**
          * Return the FragmentManager for interacting with fragments associated with this adapter views.

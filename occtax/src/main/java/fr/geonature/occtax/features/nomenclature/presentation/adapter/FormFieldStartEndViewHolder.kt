@@ -28,9 +28,12 @@ import fr.geonature.occtax.features.settings.domain.InputDateSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.temporal.ChronoUnit
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
+import java.util.TimeZone
 import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -285,9 +288,13 @@ class FormFieldStartEndViewHolder(
                     .build()
             ) {
                 addOnPositiveButtonClickListener {
-                    val selectedDate = Date(it).set(
-                        Calendar.HOUR_OF_DAY,
-                        from.get(Calendar.HOUR_OF_DAY)
+                    val selectedDate = Date.from(
+                        LocalDateTime.ofInstant(
+                            Instant.ofEpochMilli(it),
+                            TimeZone.getTimeZone("UTC")
+                                .toZoneId()
+                        )
+                            .atZone(ZoneId.systemDefault()).toInstant()
                     )
                         .set(
                             Calendar.MINUTE,
@@ -295,12 +302,7 @@ class FormFieldStartEndViewHolder(
                         )
 
                     if (!withTime) {
-                        continuation.resume(
-                            Date.from(
-                                selectedDate.toInstant()
-                                    .truncatedTo(ChronoUnit.DAYS)
-                            )
-                        )
+                        continuation.resume(selectedDate)
 
                         return@addOnPositiveButtonClickListener
                     }
