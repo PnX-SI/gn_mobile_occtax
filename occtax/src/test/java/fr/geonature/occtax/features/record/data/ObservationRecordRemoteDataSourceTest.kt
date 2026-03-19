@@ -97,6 +97,7 @@ class ObservationRecordRemoteDataSourceTest {
         ).apply {
             dates.start = toDate("2016-10-28")!!
             dates.end = toDate("2016-10-29")!!
+            dates.lastModified = toDate("2016-10-29")!!
             comment.comment = "some comment"
             taxa.add(
                 Taxon(
@@ -162,6 +163,7 @@ class ObservationRecordRemoteDataSourceTest {
             ).apply {
                 dates.start = toDate("2016-10-28")!!
                 dates.end = toDate("2016-10-29")!!
+                dates.lastModified = toDate("2016-10-29")!!
                 comment.comment = "some comment"
                 taxa.add(
                     Taxon(

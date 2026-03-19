@@ -12,6 +12,7 @@
     "internal_id": 1234,
     "date_min": "2016-10-28T08:15:00Z",
     "date_max": "2016-10-29T09:00:00Z",
+    "date_last_modified": "2016-10-28T08:15:00Z",
     "id_nomenclature_grp_typ": 133,
     "additional_fields": {},
     "comment": "Global comment",

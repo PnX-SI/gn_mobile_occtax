@@ -201,6 +201,7 @@ class DatesRecord(private val properties: SortedMap<String, PropertyValue>) {
     init {
         start
         end
+        lastModified
     }
 
     /**
@@ -243,9 +244,26 @@ class DatesRecord(private val properties: SortedMap<String, PropertyValue>) {
             }
         }
 
+    /**
+     * The last modified date of this observation record.
+     */
+    var lastModified: Date
+        get() = properties[DATE_LAST_MODIFIED].takeIf { it is PropertyValue.Date }
+            ?.let { it as PropertyValue.Date }?.value ?: Date().also { lastModified = it }
+        set(value) {
+            PropertyValue.Date(
+                DATE_LAST_MODIFIED,
+                value
+            )
+                .also {
+                    properties[it.code] = it
+                }
+        }
+
     companion object {
         const val DATE_MIN_KEY = "date_min"
         const val DATE_MAX_KEY = "date_max"
+        const val DATE_LAST_MODIFIED = "date_last_modified"
     }
 }
 

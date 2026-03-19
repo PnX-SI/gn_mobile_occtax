@@ -25,6 +25,7 @@ import fr.geonature.occtax.features.record.repository.MediaRecordRepositoryImpl
 import fr.geonature.occtax.features.record.repository.ObservationRecordRepositoryImpl
 import fr.geonature.occtax.features.record.repository.SynchronizeObservationRecordRepositoryImpl
 import fr.geonature.occtax.features.settings.repository.IAppSettingsRepository
+import java.time.Clock
 import javax.inject.Singleton
 
 /**
@@ -40,11 +41,13 @@ object ObservationRecordModule {
     @Provides
     fun provideObservationRecordLocalDataSource(
         @ApplicationContext appContext: Context,
-        @GeoNatureModuleName moduleName: String
+        @GeoNatureModuleName moduleName: String,
+        clock: Clock
     ): IObservationRecordLocalDataSource {
         return ObservationRecordLocalDataSourceImpl(
             appContext,
-            moduleName
+            moduleName,
+            clock
         )
     }
 

@@ -20,6 +20,9 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import org.tinylog.Logger
 import java.io.File
+import java.util.Date
+import androidx.core.content.edit
+import java.time.Clock
 
 /**
  * Default implementation of [IObservationRecordLocalDataSource] using [SharedPreferences].
@@ -29,6 +32,7 @@ import java.io.File
 class ObservationRecordLocalDataSourceImpl(
     private val context: Context,
     private val geoNatureModuleName: String,
+    private val clock: Clock,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : IObservationRecordLocalDataSource {
 
@@ -108,8 +112,11 @@ class ObservationRecordLocalDataSourceImpl(
     ): ObservationRecord =
         withContext(dispatcher) {
             val savedObservationRecord = observationRecord.copy(status = status)
-            val asJson = runCatching { observationRecordDefaultJsonWriter.write(savedObservationRecord) }
-                .getOrNull()
+                .apply { dates.lastModified = Date.from(clock.instant()) }
+
+            val asJson =
+                runCatching { observationRecordDefaultJsonWriter.write(savedObservationRecord) }
+                    .getOrNull()
 
             if (asJson.isNullOrBlank()) throw ObservationRecordException.WriteException(savedObservationRecord.internalId)
 
@@ -181,13 +188,15 @@ class ObservationRecordLocalDataSourceImpl(
     ): ObservationRecord {
         val observationRecordToSync =
             observationRecord.copy(status = ObservationRecord.Status.TO_SYNC)
-                .apply { module.module = geoNatureModuleName }
+                .apply {
+                    dates.lastModified = Date.from(clock.instant())
+                    module.module = geoNatureModuleName
+                }
 
         if (preferenceManager.contains(buildInputPreferenceKey(observationRecord.internalId))) {
-            preferenceManager
-                .edit()
-                .remove(buildInputPreferenceKey(observationRecord.internalId))
-                .apply()
+            preferenceManager.edit {
+                remove(buildInputPreferenceKey(observationRecord.internalId))
+            }
         }
 
         return withContext(dispatcher) {

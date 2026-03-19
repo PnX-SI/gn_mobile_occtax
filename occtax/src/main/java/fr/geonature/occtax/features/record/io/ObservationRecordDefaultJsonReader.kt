@@ -310,10 +310,7 @@ class ObservationRecordDefaultJsonReader {
     /**
      * GeoNature nomenclature property values mapping
      */
-    @Deprecated(
-        message = "only used for GeoNature API compatibility",
-        replaceWith = ReplaceWith(expression = "see: ObservationRecordAPIJsonWriter")
-    )
+    @Deprecated(message = "only used for GeoNature API compatibility, see: ObservationRecordAPIJsonWriter")
     private fun readNomenclatureValue(
         reader: JsonReader,
         code: String

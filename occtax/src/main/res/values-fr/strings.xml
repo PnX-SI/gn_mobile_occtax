@@ -74,6 +74,11 @@
     </plurals>
     <string name="action_save">Sauvegarder</string>
 
+    <string name="shortcut_input_start_short">Nouveau relevé</string>
+    <string name="shortcut_input_start_long">Démarrer un nouveau relevé</string>
+    <string name="shortcut_input_resume_last_short">Reprendre le dernier relevé</string>
+    <string name="shortcut_input_resume_last_long">Reprendre le dernier relevé en cours</string>
+
     <string name="alert_new_app_version_available_title">Nouvelle version disponible</string>
     <string name="alert_new_app_version_available_description">Une nouvelle version est disponible.\nVoulez vous la mettre à jour maintenant ?</string>
     <string name="alert_new_app_version_action_ok">Mettre à jour</string>

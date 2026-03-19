@@ -19,7 +19,7 @@ import androidx.annotation.ColorRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.setMargins
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -53,7 +53,7 @@ import org.osmdroid.views.overlay.Marker
 @AndroidEntryPoint
 class ObservationRecordsMapFragment : MapFragment() {
 
-    private val observationRecordViewModel: ObservationRecordViewModel by viewModels()
+    private val observationRecordViewModel: ObservationRecordViewModel by activityViewModels()
 
     private var listener: OnObservationRecordListener? = null
 

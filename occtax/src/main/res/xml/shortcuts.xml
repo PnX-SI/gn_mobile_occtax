@@ -1,0 +1,15 @@
+<?xml version ="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+     <shortcut android:shortcutId="input_new"
+         android:enabled="true"
+         android:icon="@drawable/ic_add"
+         android:shortcutShortLabel="@string/shortcut_input_start_short"
+         android:shortcutLongLabel="@string/shortcut_input_start_long">
+         <intent
+             android:action="INPUT_NEW"
+             android:targetClass="fr.geonature.occtax.ui.home.HomeActivity"
+             android:targetPackage="fr.geonature.occtax2" />
+     </shortcut>
+
+</shortcuts>
