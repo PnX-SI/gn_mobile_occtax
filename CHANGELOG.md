@@ -1,5 +1,36 @@
 # Changelog
 
+## [2.8.0-rc6](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc6) (2026-03-19, pre-release)
+
+### 🚀 Nouveautés
+
+* Nouveau mode d'édition de la position du marqueur sur la carte en affichant un
+  petit guide centré sur la carte afin d'aider à la saisie (https://github.com/PnX-SI/gn_mobile_occtax/issues/176).
+* Ajout des raccourcis au niveau de l'application permettant de :
+  * Démarrer un nouveau relevé
+  * Reprendre le dernier relevé édité
+* Petites améliorations cosmétiques comme :
+  * Respect de la géométrie de l'icône adaptative de l'application en mode "debug"
+  * Écran de démarrage
+
+### 🐛 Corrections
+
+* Prise en compte de la date et l'heure locale selon le fuseau horaire du terminal dans la gestion
+  des relevés (https://github.com/PnX-SI/gn_mobile_occtax/issues/304).
+* Lot de corrections diverses autour du module cartographique, notamment :
+  * Petites améliorations sur l'affichage des couches géographiques, notamment en affichant un petit "loader" pour les couches géographiques locales qui tardent à s'afficher. Les autres couches sont visibles et accessibles entre temps.
+  * Meilleur support du choix des couches géographiques locales à afficher sur la carte, notamment si elles sont prises depuis les raccourcis du sélecteur de fichiers comme "Downloads".
+  * Fin du support des fonds cartographiques venant de [Wikimedia Maps](https://maps.wikimedia.org) (cf. [Using maps in third-party services](https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use_for_Wikimedia_Maps#Using_maps_in_third-party_services)).
+
+### ⚠️ Notes de version
+
+* Code de version : **3361**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+* La version 2.15.3 minimum de GeoNature est requise si la version 2.15 est souhaitée.
+* La version 2.15 (ou plus) de GeoNature nécessite de modifier la configuration de l'URL de l'API de
+  TaxHub.
+
 ## [2.8.0-rc5](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc5) (2025-10-25, pre-release)
 
 ### 🐛 Corrections
@@ -22,7 +53,7 @@
 
 ### 🚀 Nouveautés
 
-* Ajout d'une nouveau mode d'édition de la position du marqueur sur la carte en affichant un
+* Ajout d'un nouveau mode d'édition de la position du marqueur sur la carte en affichant un
   marqueur "fantôme" centré sur la carte servant de guide à la saisie (https://github.com/PnX-SI/gn_mobile_occtax/issues/176).
 
 ### 🐛 Corrections
