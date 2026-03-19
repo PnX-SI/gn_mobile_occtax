@@ -3,12 +3,14 @@ package fr.geonature.occtax.features.record.io
 import fr.geonature.commons.data.entity.Dataset
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.commons.util.set
 import fr.geonature.commons.util.toDate
 import fr.geonature.occtax.FixtureHelper.getFixture
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,7 +18,8 @@ import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
 import org.robolectric.RobolectricTestRunner
 import java.io.IOException
-import java.util.Calendar
+import java.time.Instant
+import java.util.Date
 
 /**
  * Unit tests about [ObservationRecordDefaultJsonReader].
@@ -81,6 +84,7 @@ class ObservationRecordDefaultJsonReaderTest {
                 )
                 dates.start = toDate("2016-10-28T08:15:00Z")!!
                 dates.end = toDate("2016-10-29T09:00:00Z")!!
+                dates.lastModified = observationRecord.dates.lastModified
 
                 PropertyValue.Nomenclature(
                     "TYP_GRP",
@@ -228,6 +232,7 @@ class ObservationRecordDefaultJsonReaderTest {
                 )
                 dates.start = toDate("2016-10-28T08:15:00Z")!!
                 dates.end = toDate("2016-10-29T09:00:00Z")!!
+                dates.lastModified = observationRecord.dates.lastModified
 
                 PropertyValue.Nomenclature(
                     "TYP_GRP",
@@ -434,6 +439,7 @@ class ObservationRecordDefaultJsonReaderTest {
                 )
                 dates.start = toDate("2016-10-28T08:15:00Z")!!
                 dates.end = toDate("2016-10-29T09:00:00Z")!!
+                dates.lastModified = observationRecord.dates.lastModified
 
                 PropertyValue.Nomenclature(
                     "TYP_GRP",
@@ -495,38 +501,9 @@ class ObservationRecordDefaultJsonReaderTest {
                         createdAt = observationRecord.dataset.dataset?.value?.createdAt!!
                     )
                 )
-                dates.start = toDate("2016-10-28")!!.set(
-                    Calendar.HOUR_OF_DAY,
-                    0
-                )
-                    .set(
-                        Calendar.MINUTE,
-                        0
-                    )
-                    .set(
-                        Calendar.SECOND,
-                        0
-                    )
-                    .set(
-                        Calendar.MILLISECOND,
-                        0
-                    )
-                dates.end = toDate("2016-10-29")!!.set(
-                    Calendar.HOUR_OF_DAY,
-                    0
-                )
-                    .set(
-                        Calendar.MINUTE,
-                        0
-                    )
-                    .set(
-                        Calendar.SECOND,
-                        0
-                    )
-                    .set(
-                        Calendar.MILLISECOND,
-                        0
-                    )
+                dates.start = toDate("2016-10-28")!!
+                dates.end = toDate("2016-10-29")!!
+                dates.lastModified = observationRecord.dates.lastModified
 
                 PropertyValue.Nomenclature(
                     "TYP_GRP",
@@ -568,41 +545,7 @@ class ObservationRecordDefaultJsonReaderTest {
                     addObserverId(81L)
                 }
             },
-            observationRecord.copy()
-                .apply {
-                    dates.start = dates.start.set(
-                        Calendar.HOUR_OF_DAY,
-                        0
-                    )
-                        .set(
-                            Calendar.MINUTE,
-                            0
-                        )
-                        .set(
-                            Calendar.SECOND,
-                            0
-                        )
-                        .set(
-                            Calendar.MILLISECOND,
-                            0
-                        )
-                    dates.end = dates.end.set(
-                        Calendar.HOUR_OF_DAY,
-                        0
-                    )
-                        .set(
-                            Calendar.MINUTE,
-                            0
-                        )
-                        .set(
-                            Calendar.SECOND,
-                            0
-                        )
-                        .set(
-                            Calendar.MILLISECOND,
-                            0
-                        )
-                }
+            observationRecord
         )
     }
 
@@ -610,11 +553,15 @@ class ObservationRecordDefaultJsonReaderTest {
     fun `should be the same observation record read from a legacy JSON string or from a new JSON string schema`() {
         // when parsing an input file to read as ObservationRecord
         val observationRecordFromLegacy =
-            ObservationRecordDefaultJsonReader().read(getFixture("input_simple.json"))
+            ObservationRecordDefaultJsonReader().read(getFixture("input_simple.json")).apply {
+                dates.lastModified = Date.from(Instant.parse("2016-10-28T08:15:00Z"))
+            }
 
         // and parsing an observation record from JSON string
         val observationRecord =
-            ObservationRecordDefaultJsonReader().read(getFixture("observation_record_simple.json"))
+            ObservationRecordDefaultJsonReader().read(getFixture("observation_record_simple.json")).apply {
+                dates.lastModified = Date.from(Instant.parse("2016-10-28T08:15:00Z"))
+            }
 
         assertEquals(
             observationRecordFromLegacy,

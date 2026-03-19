@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="intent_action_input_new" translatable="false">INPUT_NEW</string>
+    <string name="intent_action_input_resume_last" translatable="false">INPUT_RESUME_LAST</string>
+</resources>

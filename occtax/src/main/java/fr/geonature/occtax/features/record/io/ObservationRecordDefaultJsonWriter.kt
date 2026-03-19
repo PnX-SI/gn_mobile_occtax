@@ -209,6 +209,8 @@ class ObservationRecordDefaultJsonWriter {
             .value(observationRecord.dates.start.toIsoDateString())
         writer.name(DatesRecord.DATE_MAX_KEY)
             .value(observationRecord.dates.end.toIsoDateString())
+        writer.name(DatesRecord.DATE_LAST_MODIFIED)
+            .value(observationRecord.dates.lastModified.toIsoDateString())
     }
 
     private fun writeAdditionalFields(

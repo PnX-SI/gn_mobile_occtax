@@ -164,6 +164,7 @@ class SetDefaultNomenclatureValuesUseCaseTest {
                 ObservationRecord(internalId = 1234).apply {
                     dates.start = observationRecord.dates.start
                     dates.end = observationRecord.dates.end
+                    dates.lastModified = observationRecord.dates.lastModified
                     listOf(
                         PropertyValue.Nomenclature(
                             "TYP_GRP",
@@ -403,6 +404,7 @@ class SetDefaultNomenclatureValuesUseCaseTest {
                 ObservationRecord(internalId = 1234).apply {
                     dates.start = observationRecord.dates.start
                     dates.end = observationRecord.dates.end
+                    dates.lastModified = observationRecord.dates.lastModified
                     listOf(
                         PropertyValue.Nomenclature(
                             "TYP_GRP",
@@ -694,6 +696,7 @@ class SetDefaultNomenclatureValuesUseCaseTest {
                 ObservationRecord(internalId = 1234).apply {
                     dates.start = observationRecord.dates.start
                     dates.end = observationRecord.dates.end
+                    dates.lastModified = observationRecord.dates.lastModified
                     listOf(
                         PropertyValue.Nomenclature(
                             "TYP_GRP",

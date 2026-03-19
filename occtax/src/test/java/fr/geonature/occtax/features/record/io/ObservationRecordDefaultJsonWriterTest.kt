@@ -41,6 +41,7 @@ class ObservationRecordDefaultJsonWriterTest {
             .write(ObservationRecord(internalId = 1234).apply {
                 dates.start = toDate("2016-10-28T08:15:00Z")!!
                 dates.end = toDate("2016-10-29T09:00:00Z")!!
+                dates.lastModified = toDate("2016-10-28T08:15:00Z")!!
             })
 
         // then
@@ -69,6 +70,7 @@ class ObservationRecordDefaultJsonWriterTest {
                 dataset.setDatasetId(17L)
                 dates.start = toDate("2016-10-28T08:15:00Z")!!
                 dates.end = toDate("2016-10-29T09:00:00Z")!!
+                dates.lastModified = toDate("2016-10-28T08:15:00Z")!!
 
                 PropertyValue.Nomenclature(
                     "TYP_GRP",
