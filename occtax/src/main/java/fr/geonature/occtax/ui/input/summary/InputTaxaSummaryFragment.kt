@@ -227,6 +227,7 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
             // bypass this page and redirect to the previous one if we have started editing the first taxon
             if (startEditTaxon && observationRecord?.taxa?.taxa?.isEmpty() == true) {
                 startEditTaxon = false
+                listener.finishEditTaxon()
                 listener.goToPreviousPage()
                 return@post
             }
