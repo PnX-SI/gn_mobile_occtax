@@ -10,7 +10,9 @@ import android.provider.Settings
 import android.widget.ListView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.edit
 import androidx.core.os.bundleOf
+import androidx.fragment.app.viewModels
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
@@ -30,8 +32,10 @@ import fr.geonature.datasync.api.IGeoNatureAPIClient
 import fr.geonature.datasync.features.settings.presentation.ConfigureServerSettingsDialogFragment
 import fr.geonature.maps.settings.MapSettings
 import fr.geonature.maps.util.MapSettingsPreferencesUtils
+import fr.geonature.maps.util.observeOnce
 import fr.geonature.mountpoint.util.MountPointUtils
 import fr.geonature.occtax.R
+import fr.geonature.occtax.features.record.presentation.ObservationRecordViewModel
 import fr.geonature.occtax.ui.dataset.DatasetListActivity
 import fr.geonature.occtax.ui.observers.InputObserverListActivity
 import fr.geonature.occtax.util.SettingsUtils.getDefaultDatasetId
@@ -50,6 +54,8 @@ class PreferencesFragment : PreferenceFragmentCompat() {
     @ContentProviderAuthority
     @Inject
     lateinit var authority: String
+
+    private val observationRecordViewModel: ObservationRecordViewModel by viewModels()
 
     private lateinit var datasetResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var observerResultLauncher: ActivityResultLauncher<Intent>
@@ -74,6 +80,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                     null,
                     null
                 )
+
                 LOADER_OBSERVERS_IDS -> CursorLoader(
                     requireContext(),
                     buildUri(
@@ -88,6 +95,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                     null,
                     null
                 )
+
                 else -> throw IllegalArgumentException()
             }
         }
@@ -102,6 +110,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                         data
                     ) else null
                 )
+
                 LOADER_OBSERVERS_IDS -> {
                     updateDefaultObserversPreference(data?.let { cursor ->
                         mutableListOf<InputObserver>().let {
@@ -160,11 +169,11 @@ class PreferencesFragment : PreferenceFragmentCompat() {
 
         loadDefaultDataset()
         loadDefaultObserver()
-        configurePermissionsPreference()
 
+        configureServerUrlsPreference()
+        configurePermissionsPreference()
         configureNotificationsPreferences()
 
-        setServerUrlsPreferences(arguments?.getParcelableCompat(ARG_SERVER_URLS))
         setMapSettingsPreferences(arguments?.getParcelableCompat(ARG_MAP_SETTINGS))
         setMountPointsPreferences(preferenceScreen)
     }
@@ -268,7 +277,7 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                                         url
                                     )
 
-                                    serverSettingsPreference.summary = url
+                                        serverSettingsPreference.summary = url
 
                                     it.apply()
                                 }
@@ -352,23 +361,21 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             true
         }
 
-        val editor = PreferenceManager.getDefaultSharedPreferences(defaultDatasetPreference.context)
-            .edit()
+        PreferenceManager.getDefaultSharedPreferences(defaultDatasetPreference.context)
+            .edit {
+                if (defaultDataset == null) {
+                    remove(getString(R.string.preference_category_dataset_default_key))
 
-        if (defaultDataset == null) {
-            editor.remove(getString(R.string.preference_category_dataset_default_key))
+                    defaultDatasetPreference.setSummary(R.string.preference_category_dataset_default_not_set)
+                } else {
+                    putLong(
+                        getString(R.string.preference_category_dataset_default_key),
+                        defaultDataset.id
+                    )
 
-            defaultDatasetPreference.setSummary(R.string.preference_category_dataset_default_not_set)
-        } else {
-            editor.putLong(
-                getString(R.string.preference_category_dataset_default_key),
-                defaultDataset.id
-            )
-
-            defaultDatasetPreference.summary = defaultDataset.name
-        }
-
-        editor.apply()
+                    defaultDatasetPreference.summary = defaultDataset.name
+                }
+            }
     }
 
     private fun updateDefaultObserversPreference(defaultObservers: List<InputObserver> = emptyList()) {
@@ -390,30 +397,57 @@ class PreferencesFragment : PreferenceFragmentCompat() {
             true
         }
 
-        val editor =
-            PreferenceManager.getDefaultSharedPreferences(defaultObserverPreference.context)
-                .edit()
+        PreferenceManager.getDefaultSharedPreferences(defaultObserverPreference.context)
+            .edit {
+                if (defaultObservers.isEmpty()) {
+                    remove(getString(R.string.preference_category_observers_default_key))
 
-        if (defaultObservers.isEmpty()) {
-            editor.remove(getString(R.string.preference_category_observers_default_key))
+                    defaultObserverPreference.setSummary(R.string.preference_category_observers_default_not_set)
+                } else {
+                    putStringSet(
+                        getString(R.string.preference_category_observers_default_key),
+                        defaultObservers.map { it.id.toString() }
+                            .toSet()
+                    )
+                    defaultObserverPreference.summary =
+                        if (defaultObservers.size < 3) defaultObservers.joinToString(", ") {
+                            "${it.lastname?.uppercase(Locale.getDefault())} ${it.firstname}"
+                        } else getString(
+                            R.string.preference_category_observers_default_set_multiple,
+                            defaultObservers.size
+                        )
+                }
+            }
+    }
 
-            defaultObserverPreference.setSummary(R.string.preference_category_observers_default_not_set)
-        } else {
-            editor.putStringSet(
-                getString(R.string.preference_category_observers_default_key),
-                defaultObservers.map { it.id.toString() }
-                    .toSet()
-            )
-            defaultObserverPreference.summary =
-                if (defaultObservers.size < 3) defaultObservers.joinToString(", ") {
-                    "${it.lastname?.uppercase(Locale.getDefault())} ${it.firstname}"
-                } else getString(
-                    R.string.preference_category_observers_default_set_multiple,
-                    defaultObservers.size
+    private fun configureServerUrlsPreference() {
+        setServerUrlsPreferences(arguments?.getParcelableCompat(ARG_SERVER_URLS))
+
+        val serverSettingsPreference: Preference =
+            preferenceScreen.findPreference(getString(fr.geonature.datasync.R.string.preference_category_server_geonature_url_key))
+                ?: return
+
+        val serverUrl =
+            PreferenceManager.getDefaultSharedPreferences(serverSettingsPreference.context)
+                .getString(
+                    getString(fr.geonature.datasync.R.string.preference_category_server_geonature_url_key),
+                    arguments?.getParcelableCompat<IGeoNatureAPIClient.ServerUrls?>(ARG_SERVER_URLS)?.geoNatureBaseUrl
                 )
+
+        if (serverUrl.isNullOrBlank()) {
+           return
         }
 
-        editor.apply()
+        observationRecordViewModel.getAll()
+        observationRecordViewModel.observationRecords.observeOnce(this@PreferencesFragment) { observationRecords ->
+            val existingObservationRecords = observationRecords ?: emptyList()
+
+            serverSettingsPreference.isEnabled = existingObservationRecords.isEmpty()
+
+            if (!serverSettingsPreference.isEnabled) {
+                serverSettingsPreference.summary = "$serverUrl\n${serverSettingsPreference.context.getString(R.string.summary_warning_existing_inputs)}"
+            }
+        }
     }
 
     private fun configurePermissionsPreference() {

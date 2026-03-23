@@ -215,5 +215,6 @@
     </plurals>
     <string name="summary_taxon_counting_zero">⚠ aucun dénombrement</string>
     <string name="summary_toast_no_input_taxon">Aucune saisie. Redirection vers la dernière étape valide.</string>
+    <string name="summary_warning_existing_inputs">⚠ Relevés existants, l\'URL ne peut pas être modifiée.</string>
 
 </resources>

@@ -208,5 +208,6 @@
     </plurals>
     <string name="summary_taxon_counting_zero">⚠ no counting</string>
     <string name="summary_toast_no_input_taxon">No input taxon.\nRedirecting to the last valid step.</string>
+    <string name="summary_warning_existing_inputs">⚠ Existing inputs, the URL cannot be changed.</string>
 
 </resources>
