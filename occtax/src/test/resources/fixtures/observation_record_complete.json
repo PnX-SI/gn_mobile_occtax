@@ -11,9 +11,8 @@
   "properties": {
     "internal_id": 1234,
     "date_min": "2016-10-28T08:15:00Z",
-    "hour_min": null,
     "date_max": "2016-10-29T09:00:00Z",
-    "hour_max": null,
+    "date_last_modified": "2016-10-28T08:15:00Z",
     "id_nomenclature_grp_typ": 133,
     "additional_fields": {},
     "comment": "Global comment",
@@ -30,6 +29,7 @@
       {
         "cd_nom": 10,
         "nom_cite": "taxon_01",
+        "internal_id": 12341,
         "regne": "Animalia",
         "group2_inpn": "Ascidies",
         "id_nomenclature_bio_condition": 29,
@@ -39,8 +39,11 @@
         "id_nomenclature_behaviour": 580,
         "id_nomenclature_exist_proof": 81,
         "id_nomenclature_bio_status": 29,
+        "id_nomenclature_observation_status": 84,
         "additional_fields": {
           "some_field_text": "some_value",
+          "some_field_date": "2016-10-28",
+          "some_field_time": "08:15",
           "some_field_number": 42,
           "some_field_array_string": [
             "val1",
@@ -60,6 +63,8 @@
             "id_nomenclature_type_count": 93,
             "additional_fields": {
               "some_field_text": "some_value",
+              "some_field_date_counting": "2009-01-03",
+              "some_field_time_counting": "13:00",
               "some_field_number": 3.14
             },
             "count_max": 2,

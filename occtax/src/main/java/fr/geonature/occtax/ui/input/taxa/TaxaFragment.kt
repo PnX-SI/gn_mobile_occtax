@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.database.Cursor
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -44,6 +45,8 @@ import fr.geonature.occtax.ui.input.AbstractInputFragment
 import org.tinylog.Logger
 import java.util.Locale
 import javax.inject.Inject
+import androidx.core.view.isVisible
+import androidx.core.view.isNotEmpty
 
 /**
  * [Fragment] to let the user to choose a [Taxon] from the list.
@@ -93,7 +96,6 @@ class TaxaFragment : AbstractInputFragment() {
 
                     val taxonFilter =
                         TaxonWithArea.Filter()
-                            .byNameOrDescription(args?.getString(KEY_FILTER_BY_NAME))
                             .also {
                                 val filterByAreaObservation =
                                     selectedFilters
@@ -112,7 +114,7 @@ class TaxaFragment : AbstractInputFragment() {
                                     selectedFilters.find { filter -> filter.type == Filter.FilterType.TAXONOMY }?.value as Taxonomy?
 
                                 if (filterByAreaObservation.isNotEmpty() && !selectedFeatureId.isNullOrBlank()) {
-                                    (it as TaxonWithArea.Filter).byAreaColors(*filterByAreaObservation.toTypedArray())
+                                    it.byAreaColors(*filterByAreaObservation.toTypedArray())
                                 }
 
                                 if (filterByTaxonomy != null) {
@@ -128,14 +130,27 @@ class TaxaFragment : AbstractInputFragment() {
                             Taxon.TABLE_NAME,
                             if (taxaListId == null) "" else "list/$taxaListId",
                             selectedFeatureId?.toLongOrNull()
-                                ?.let { "area/$it" } ?: ""
-                        ),
+                                ?.let { "area/$it" } ?: "",
+                        ).buildUpon()
+                            .apply {
+                                args?.getString(KEY_FILTER_BY_NAME)
+                                    ?.takeIf { it.length >= 2 }
+                                    ?.also {
+                                        appendQueryParameter(
+                                            "search",
+                                            it
+                                        )
+                                    }
+                            }
+                            .build(),
                         null,
                         taxonFilter.first,
                         taxonFilter.second.map { it.toString() }
                             .toTypedArray(),
                         TaxonWithArea.OrderBy()
-                            .byName(args?.getString(KEY_FILTER_BY_NAME))
+                            .byName(
+                                args?.getString(KEY_FILTER_BY_NAME)
+                                    ?.takeIf { it.length >= 2 && Build.VERSION.SDK_INT < Build.VERSION_CODES.R })
                             .build()
                     )
                 }
@@ -193,7 +208,7 @@ class TaxaFragment : AbstractInputFragment() {
                         }
                     } else {
                         // no taxon found according to given criteria
-                        observationRecord?.taxa?.selectedTaxonRecord?.taxon?.id?.also {
+                        observationRecord?.taxa?.selectedTaxonRecord?.internalId?.also {
                             observationRecord?.taxa?.delete(it)
                         }
                     }
@@ -248,8 +263,8 @@ class TaxaFragment : AbstractInputFragment() {
         adapter = TaxaRecyclerViewAdapter(object :
             TaxaRecyclerViewAdapter.OnTaxaRecyclerViewAdapterListener {
             override fun onSelectedTaxon(taxon: AbstractTaxon) {
-                observationRecord?.taxa?.selectedTaxonRecord
-                    ?.also { observationRecord?.taxa?.delete(it.taxon.id) }
+                observationRecord?.taxa?.selectedTaxonRecord?.internalId
+                    ?.also { observationRecord?.taxa?.delete(it) }
 
                 observationRecord?.taxa?.add(taxon)
 
@@ -259,8 +274,8 @@ class TaxaFragment : AbstractInputFragment() {
             }
 
             override fun onNoTaxonSelected() {
-                observationRecord?.taxa?.selectedTaxonRecord
-                    ?.also { observationRecord?.taxa?.delete(it.taxon.id) }
+                observationRecord?.taxa?.selectedTaxonRecord?.internalId
+                    ?.also { observationRecord?.taxa?.delete(it) }
 
                 listener.validateCurrentPage()
             }
@@ -275,7 +290,7 @@ class TaxaFragment : AbstractInputFragment() {
 
                 progressBar?.visibility = View.GONE
 
-                if (emptyTextView.visibility == View.VISIBLE == show) {
+                if (emptyTextView.isVisible == show) {
                     return
                 }
 
@@ -436,7 +451,7 @@ class TaxaFragment : AbstractInputFragment() {
         )
 
         // set the current taxa list ID from selected dataset or from global settings as fallback
-        (observationRecord?.dataset?.dataset?.taxaListId ?: arguments?.getLong(
+        (observationRecord?.dataset?.dataset?.value?.taxaListId ?: arguments?.getLong(
             KEY_TAXA_LIST_ID,
             -1L
         ))?.also {
@@ -516,14 +531,14 @@ class TaxaFragment : AbstractInputFragment() {
             filterChipGroup.removeView(it)
         }
 
-        filterChipGroup.visibility = if (filterChipGroup.childCount > 0) View.VISIBLE else View.GONE
+        filterChipGroup.visibility = if (filterChipGroup.isNotEmpty()) View.VISIBLE else View.GONE
 
         if (areaObservation.isEmpty()) {
             return
         }
 
         // nothing to do if all area observation types are selected
-        if (areaObservation.size == FilterAreaObservation.AreaObservationType.values().size) {
+        if (areaObservation.size == FilterAreaObservation.AreaObservationType.entries.size) {
             return
         }
 
@@ -543,12 +558,13 @@ class TaxaFragment : AbstractInputFragment() {
                     tag = areaObservationToAdd
                     text = areaObservationToAdd.short
 
-                    setChipBackgroundColorResource(context.resources.getIdentifier(
-                        "area_observation_${areaObservationToAdd.type.name.lowercase(Locale.ROOT)}",
-                        "color",
-                        context.packageName
-                    )
-                        .takeIf { it > 0 } ?: R.color.accent)
+                    setChipBackgroundColorResource(
+                        context.resources.getIdentifier(
+                            "area_observation_${areaObservationToAdd.type.name.lowercase(Locale.ROOT)}",
+                            "color",
+                            context.packageName
+                        )
+                            .takeIf { it > 0 } ?: R.color.accent)
                     setTextColor(
                         ThemeUtils.getColor(
                             context,
@@ -597,7 +613,7 @@ class TaxaFragment : AbstractInputFragment() {
             filterChipGroup.removeView(it)
         }
 
-        filterChipGroup.visibility = if (filterChipGroup.childCount > 0) View.VISIBLE else View.GONE
+        filterChipGroup.visibility = if (filterChipGroup.isNotEmpty()) View.VISIBLE else View.GONE
 
         if (selectedTaxonomy != null) {
             filterChipGroup.visibility = View.VISIBLE

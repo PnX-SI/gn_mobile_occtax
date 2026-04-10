@@ -1,13 +1,16 @@
 package fr.geonature.occtax.features.nomenclature.repository
 
+import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.core.app.ApplicationProvider
 import fr.geonature.commons.data.entity.Nomenclature
 import fr.geonature.commons.data.entity.NomenclatureType
 import fr.geonature.commons.features.nomenclature.data.INomenclatureLocalDataSource
 import fr.geonature.commons.features.nomenclature.error.NomenclatureException
 import fr.geonature.occtax.CoroutineTestRule
+import fr.geonature.occtax.R
 import fr.geonature.occtax.features.nomenclature.data.INomenclatureSettingsLocalDataSource
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import io.mockk.MockKAnnotations.init
 import io.mockk.coEvery
@@ -21,6 +24,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
 /**
  * Unit tests about [INomenclatureRepository].
@@ -28,6 +33,7 @@ import org.junit.Test
  * @author S. Grimault
  */
 @ExperimentalCoroutinesApi
+@RunWith(RobolectricTestRunner::class)
 class NomenclatureRepositoryTest {
 
     @get:Rule
@@ -35,6 +41,8 @@ class NomenclatureRepositoryTest {
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
+
+    private lateinit var application: Application
 
     @MockK
     private lateinit var nomenclatureLocalDataSource: INomenclatureLocalDataSource
@@ -47,6 +55,8 @@ class NomenclatureRepositoryTest {
     @Before
     fun setUp() {
         init(this)
+
+        application = ApplicationProvider.getApplicationContext()
 
         nomenclatureRepository = NomenclatureRepositoryImpl(
             nomenclatureLocalDataSource,
@@ -79,37 +89,37 @@ class NomenclatureRepositoryTest {
                 defaultLabel = "Méthodes d'observation"
             )
         )
-        // and corresponding editable fields
-        coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.INFORMATION) } returns listOf(
-            EditableField(
-                type = EditableField.Type.INFORMATION,
-                code = "METH_OBS",
-                viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                nomenclatureType = "METH_OBS",
-                visible = true
-            ),
-            EditableField(
-                type = EditableField.Type.INFORMATION,
-                code = "ETA_BIO",
-                viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                nomenclatureType = "ETA_BIO",
-                visible = true
-            ),
-            EditableField(
-                type = EditableField.Type.INFORMATION,
-                code = "DETERMINER",
-                viewType = EditableField.ViewType.TEXT_SIMPLE,
+        // and corresponding form fields
+        coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(FormField.Type.INFORMATION) } returns listOf(
+            FormField.NomenclatureType(
+                type = FormField.Type.INFORMATION,
+                label = application.getString(R.string.nomenclature_meth_obs),
                 visible = true,
-                default = false
+                nomenclatureType = "METH_OBS",
+                value = PropertyValue.Nomenclature(code = "METH_OBS")
             ),
-            EditableField(
-                type = EditableField.Type.INFORMATION,
-                code = "STATUT_BIO",
-                viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                nomenclatureType = "STATUT_BIO",
+            FormField.NomenclatureType(
+                type = FormField.Type.INFORMATION,
+                label = application.getString(R.string.nomenclature_eta_bio),
+                visible = true,
+                nomenclatureType = "ETA_BIO",
+                value = PropertyValue.Nomenclature(code = "ETA_BIO")
+            ),
+            FormField.Text(
+                type = FormField.Type.INFORMATION,
+                label = application.getString(R.string.nomenclature_determiner),
+                default = false,
+                visible = true,
+                value = PropertyValue.Text(code = "determiner")
+            ),
+            FormField.NomenclatureType(
+                type = FormField.Type.INFORMATION,
+                label = application.getString(R.string.nomenclature_statut_bio),
+                default = false,
                 visible = false,
-                default = false
-            ),
+                nomenclatureType = "STATUT_BIO",
+                value = PropertyValue.Nomenclature(code = "STATUT_BIO")
+            )
         )
         // and some default values for these types
         coEvery { nomenclatureLocalDataSource.getAllDefaultNomenclatureValues() } returns listOf(
@@ -124,41 +134,37 @@ class NomenclatureRepositoryTest {
 
         // when
         val editableNomenclatureSettings =
-            nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
+            nomenclatureRepository.getEditableFields(FormField.Type.INFORMATION)
 
         // then
         assertTrue(editableNomenclatureSettings.isSuccess)
         assertEquals(
             listOf(
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "METH_OBS",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = "Méthodes d'observation",
                     nomenclatureType = "METH_OBS",
-                    label = "Méthodes d'observation"
+                    value = PropertyValue.Nomenclature(code = "METH_OBS")
                 ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "ETA_BIO",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = "Etat biologique de l'observation",
                     nomenclatureType = "ETA_BIO",
-                    label = "Etat biologique de l'observation"
+                    value = PropertyValue.Nomenclature(code = "ETA_BIO")
                 ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "DETERMINER",
-                    viewType = EditableField.ViewType.TEXT_SIMPLE,
-                    visible = true,
-                    default = false
-                ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "STATUT_BIO",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                    nomenclatureType = "STATUT_BIO",
-                    label = "Statut biologique",
-                    visible = false,
+                FormField.Text(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_determiner),
                     default = false,
+                    visible = true,
+                    value = PropertyValue.Text(code = "determiner")
+                ),
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = "Statut biologique",
+                    default = false,
+                    visible = false,
+                    nomenclatureType = "STATUT_BIO",
                     value = PropertyValue.Nomenclature(
                         code = "STATUT_BIO",
                         label = "Non renseigné",
@@ -186,37 +192,37 @@ class NomenclatureRepositoryTest {
                     defaultLabel = "Méthodes d'observation"
                 )
             )
-            // and corresponding editable fields
-            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.INFORMATION) } returns listOf(
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "METH_OBS",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                    nomenclatureType = "METH_OBS",
-                    visible = true
-                ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "ETA_BIO",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                    nomenclatureType = "ETA_BIO",
-                    visible = true
-                ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "DETERMINER",
-                    viewType = EditableField.ViewType.TEXT_SIMPLE,
+            // and corresponding form fields
+            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(FormField.Type.INFORMATION) } returns listOf(
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_meth_obs),
                     visible = true,
-                    default = false
+                    nomenclatureType = "METH_OBS",
+                    value = PropertyValue.Nomenclature(code = "METH_OBS")
                 ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "STATUT_BIO",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                    nomenclatureType = "STATUT_BIO",
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_eta_bio),
+                    visible = true,
+                    nomenclatureType = "ETA_BIO",
+                    value = PropertyValue.Nomenclature(code = "ETA_BIO")
+                ),
+                FormField.Text(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_determiner),
+                    default = false,
+                    visible = true,
+                    value = PropertyValue.Text(code = "determiner")
+                ),
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_statut_bio),
+                    default = false,
                     visible = false,
-                    default = false
-                ),
+                    nomenclatureType = "STATUT_BIO",
+                    value = PropertyValue.Nomenclature(code = "STATUT_BIO")
+                )
             )
             // and some default values for these types
             coEvery { nomenclatureLocalDataSource.getAllDefaultNomenclatureValues() } returns listOf(
@@ -231,32 +237,30 @@ class NomenclatureRepositoryTest {
 
             // when
             val editableNomenclatureSettings =
-                nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
+                nomenclatureRepository.getEditableFields(FormField.Type.INFORMATION)
 
             // then
             assertTrue(editableNomenclatureSettings.isSuccess)
             assertEquals(
                 listOf(
-                    EditableField(
-                        type = EditableField.Type.INFORMATION,
-                        code = "METH_OBS",
-                        viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Méthodes d'observation",
                         nomenclatureType = "METH_OBS",
-                        label = "Méthodes d'observation"
+                        value = PropertyValue.Nomenclature(code = "METH_OBS")
                     ),
-                    EditableField(
-                        type = EditableField.Type.INFORMATION,
-                        code = "ETA_BIO",
-                        viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = "Etat biologique de l'observation",
                         nomenclatureType = "ETA_BIO",
-                        label = "Etat biologique de l'observation"
+                        value = PropertyValue.Nomenclature(code = "ETA_BIO")
                     ),
-                    EditableField(
-                        type = EditableField.Type.INFORMATION,
-                        code = "DETERMINER",
-                        viewType = EditableField.ViewType.TEXT_SIMPLE,
+                    FormField.Text(
+                        type = FormField.Type.INFORMATION,
+                        label = application.getString(R.string.nomenclature_determiner),
+                        default = false,
                         visible = true,
-                        default = false
+                        value = PropertyValue.Text(code = "determiner")
                     )
                 ),
                 editableNomenclatureSettings.getOrThrow()
@@ -268,38 +272,38 @@ class NomenclatureRepositoryTest {
         runTest {
             // given no nomenclature types found
             coEvery { nomenclatureLocalDataSource.getAllNomenclatureTypes() } returns listOf()
-            // and some editable fields
-            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.INFORMATION) } returns listOf(
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "METH_OBS",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                    nomenclatureType = "METH_OBS"
+            // and some form fields
+            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(FormField.Type.INFORMATION) } returns listOf(
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_meth_obs),
+                    nomenclatureType = "METH_OBS",
+                    value = PropertyValue.Nomenclature(code = "METH_OBS")
                 ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "ETA_BIO",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                    nomenclatureType = "ETA_BIO"
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_eta_bio),
+                    nomenclatureType = "ETA_BIO",
+                    value = PropertyValue.Nomenclature(code = "ETA_BIO")
                 ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "DETERMINER",
-                    viewType = EditableField.ViewType.TEXT_SIMPLE
+                FormField.Text(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_determiner),
+                    value = PropertyValue.Text(code = "determiner")
                 ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "STATUT_BIO",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_statut_bio),
+                    default = false,
                     nomenclatureType = "STATUT_BIO",
-                    default = false
+                    value = PropertyValue.Nomenclature(code = "STATUT_BIO")
                 ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "COMMENT",
-                    viewType = EditableField.ViewType.TEXT_MULTIPLE,
+                FormField.TextMultiple(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_comment),
+                    default = false,
                     visible = true,
-                    default = false
+                    value = PropertyValue.Text(code = "comment")
                 )
             )
             // and no default values for these types
@@ -307,23 +311,23 @@ class NomenclatureRepositoryTest {
 
             // when
             val editableNomenclatureSettings =
-                nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
+                nomenclatureRepository.getEditableFields(FormField.Type.INFORMATION)
 
             // then
             assertTrue(editableNomenclatureSettings.isSuccess)
             assertEquals(
                 listOf(
-                    EditableField(
-                        type = EditableField.Type.INFORMATION,
-                        code = "DETERMINER",
-                        viewType = EditableField.ViewType.TEXT_SIMPLE
+                    FormField.Text(
+                        type = FormField.Type.INFORMATION,
+                        label = application.getString(R.string.nomenclature_determiner),
+                        value = PropertyValue.Text(code = "determiner")
                     ),
-                    EditableField(
-                        type = EditableField.Type.INFORMATION,
-                        code = "COMMENT",
-                        viewType = EditableField.ViewType.TEXT_MULTIPLE,
+                    FormField.TextMultiple(
+                        type = FormField.Type.INFORMATION,
+                        label = application.getString(R.string.nomenclature_comment),
+                        default = false,
                         visible = true,
-                        default = false
+                        value = PropertyValue.Text(code = "comment")
                     )
                 ),
                 editableNomenclatureSettings.getOrThrow()
@@ -331,39 +335,39 @@ class NomenclatureRepositoryTest {
         }
 
     @Test
-    fun `should return NoNomenclatureTypeFoundLocallyFailure if no nomenclature types was found`() =
+    fun `should return NoNomenclatureTypeFoundException failure if no nomenclature types was found`() =
         runTest {
             // given no nomenclature types found
             coEvery { nomenclatureLocalDataSource.getAllNomenclatureTypes() } returns listOf()
-            // and some editable fields
-            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.INFORMATION) } returns listOf(
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "METH_OBS",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                    nomenclatureType = "METH_OBS"
+            // and some form fields
+            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(FormField.Type.INFORMATION) } returns listOf(
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_meth_obs),
+                    nomenclatureType = "METH_OBS",
+                    value = PropertyValue.Nomenclature(code = "METH_OBS")
                 ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "ETA_BIO",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                    nomenclatureType = "ETA_BIO"
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_eta_bio),
+                    nomenclatureType = "ETA_BIO",
+                    value = PropertyValue.Nomenclature(code = "ETA_BIO")
                 ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "STATUT_BIO",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                    nomenclatureType = "STATUT_BIO",
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_statut_bio),
+                    default = false,
                     visible = false,
-                    default = false
-                ),
+                    nomenclatureType = "STATUT_BIO",
+                    value = PropertyValue.Nomenclature(code = "STATUT_BIO")
+                )
             )
             // and no default values for these types
             coEvery { nomenclatureLocalDataSource.getAllDefaultNomenclatureValues() } returns listOf()
 
             // when
             val editableNomenclatureSettings =
-                nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
+                nomenclatureRepository.getEditableFields(FormField.Type.INFORMATION)
 
             // then
             assertTrue(editableNomenclatureSettings.isFailure)
@@ -371,7 +375,7 @@ class NomenclatureRepositoryTest {
         }
 
     @Test
-    fun `should return NoNomenclatureTypeFoundLocallyFailure if no nomenclature type settings matches nomenclature types`() =
+    fun `should return NoNomenclatureTypeFoundException failure if no nomenclature type settings matches nomenclature types`() =
         runTest {
             // given some nomenclature types
             coEvery { nomenclatureLocalDataSource.getAllNomenclatureTypes() } returns listOf(
@@ -391,13 +395,13 @@ class NomenclatureRepositoryTest {
                     defaultLabel = "Méthodes d'observation"
                 )
             )
-            // and some other editable fields
-            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.INFORMATION) } returns listOf(
-                EditableField(
-                    type = EditableField.Type.COUNTING,
-                    code = "TYP_DENBR",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                    nomenclatureType = "TYP_DENBR"
+            // and some other form fields
+            coEvery { nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(FormField.Type.INFORMATION) } returns listOf(
+                FormField.NomenclatureType(
+                    type = FormField.Type.COUNTING,
+                    label = application.getString(R.string.nomenclature_typ_denbr),
+                    nomenclatureType = "TYP_DENBR",
+                    value = PropertyValue.Nomenclature(code = "TYP_DENBR")
                 )
             )
             // and some default values for these types
@@ -413,7 +417,7 @@ class NomenclatureRepositoryTest {
 
             // when
             val editableNomenclatureSettings =
-                nomenclatureRepository.getEditableFields(EditableField.Type.INFORMATION)
+                nomenclatureRepository.getEditableFields(FormField.Type.INFORMATION)
 
             // then
             assertTrue(editableNomenclatureSettings.isFailure)

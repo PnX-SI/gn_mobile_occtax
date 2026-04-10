@@ -102,7 +102,7 @@ class ObservationRecordViewModel @Inject constructor(
         MediatorLiveData<List<ObservationRecord>>().apply {
             addSource(_observationRecords) {
                 value = it.map { observationRecord ->
-                    if (observationRecord.status == ObservationRecord.Status.DRAFT) return@map observationRecord
+                   if (observationRecord.status == ObservationRecord.Status.DRAFT) return@map observationRecord
 
                     (value
                         ?: emptyList()).firstOrNull { existingObservationRecord ->

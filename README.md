@@ -21,7 +21,7 @@ Based on [datasync module](https://github.com/PnX-SI/gn_mobile_core) to synchron
 
 ## Settings
 
-The app settings file is automatically updated locally when the application is started, as soon as the *GeoNature* URL is defined, with the one on *GeoNature* server.
+The app settings file is automatically updated locally when the application is started, as soon as the _GeoNature_ URL is defined, with the one on _GeoNature_ server.
 This settings file `settings_occtax.json` can be found locally in the `Android/data/fr.geonature.occtax2/` directory of the terminal's main storage. Example:
 
 ```json
@@ -100,7 +100,7 @@ This settings file `settings_occtax.json` can be found locally in the `Android/d
 ### Parameters description
 
 | Parameter                          | UI      | Description                                                                                        | Default value |
-|------------------------------------| ------- |----------------------------------------------------------------------------------------------------| ------------- |
+| ---------------------------------- | ------- | -------------------------------------------------------------------------------------------------- | ------------- |
 | `area_observation_duration`        | &#9744; | Area observation duration period (in days)                                                         | 365           |
 | `sync`                             | &#9744; | Data synchronization settings (cf. https://github.com/PnX-SI/gn_mobile_core/tree/develop/datasync) |               |
 | `map`                              | &#9744; | Maps settings (cf. https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps)                     |               |
@@ -108,7 +108,7 @@ This settings file `settings_occtax.json` can be found locally in the `Android/d
 | `input/date`                       | &#9744; | Date settings                                                                                      |               |
 | `nomenclature`                     | &#9744; | Nomenclature settings                                                                              |               |
 | `nomenclature/save_default_values` | &#9744; | Save default nomenclature values                                                                   | false         |
-| `nomenclature/additional_fields`   | &#9744; | Show additional fields                                                                             | false         |
+| `nomenclature/additional_fields`   | &#9744; | Show additional fields                                                                             | true          |
 | `nomenclature/information`         | &#9744; | Information settings (as array)                                                                    |               |
 | `nomenclature/counting`            | &#9744; | Counting settings (as array)                                                                       |               |
 
@@ -140,39 +140,40 @@ If nothing is configured, only the start date without the hour part is editable.
 values as default values (default: `false`).
 
 Allows to define if fields are displayed by default and if they are editable (visible).
-If a field is not editable (visible), it will use the default value set in Occtax database.
+If a field is not editable (visible), it will use the default value set in _Occtax_ database.
 
 All these settings may not be defined and the default values will then be used instead:
 
 **Information settings**
 
-| Nomenclature       | Label                | Displayed by default | Editable (visible) |
-| ------------------ | -------------------- | -------------------- | ------------------ |
-| `METH_OBS`         | Observation methods  | `true`               | `true`             |
-| `ETA_BIO`          | Biological state     | `true`               | `true`             |
-| `METH_DETERMIN`    | Determination method | `false`              | `true`             |
-| `determiner`       | Determiner           | `false`              | `true`             |
-| `STATUT_BIO`       | Biological status    | `false`              | `true`             |
-| `OCC_COMPORTEMENT` | Behaviour            | `false`              | `true`             |
-| `NATURALITE`       | Level of naturalness | `false`              | `true`             |
-| `PREUVE_EXIST`     | Proof of existence   | `false`              | `true`             |
-| `comment`          | Comment              | `false`              | `true`             |
+| Nomenclature       | Label                | Displayed by default (default) | Displayed in advanced view | Editable (visible) |
+| ------------------ | -------------------- | ------------------------------ | -------------------------- | ------------------ |
+| `STATUT_OBS`       | observation status   | &#9745;                        | &#9745;                    | &#9744;            |
+| `METH_OBS`         | Observation methods  | &#9745;                        | &#9745;                    | &#9745;            |
+| `ETA_BIO`          | Biological state     | &#9745;                        | &#9745;                    | &#9745;            |
+| `METH_DETERMIN`    | Determination method | &#9744;                        | &#9745;                    | &#9745;            |
+| `determiner`       | Determiner           | &#9744;                        | &#9745;                    | &#9745;            |
+| `STATUT_BIO`       | Biological status    | &#9744;                        | &#9745;                    | &#9745;            |
+| `OCC_COMPORTEMENT` | Behaviour            | &#9744;                        | &#9745;                    | &#9745;            |
+| `NATURALITE`       | Level of naturalness | &#9744;                        | &#9745;                    | &#9745;            |
+| `PREUVE_EXIST`     | Proof of existence   | &#9744;                        | &#9745;                    | &#9745;            |
+| `comment`          | Comment              | &#9744;                        | &#9745;                    | &#9745;            |
 
 **Counting settings**
 
-| Nomenclature | Label                      | Displayed by default | Editable (visible) |
-| ------------ | -------------------------- | -------------------- | ------------------ |
-| `STADE_VIE`  | Life stage                 | `true`               | `true`             |
-| `SEXE`       | Sex                        | `true`               | `true`             |
-| `OBJ_DENBR`  | Purpose of the enumeration | `true`               | `true`             |
-| `TYP_DENBR`  | Type of enumeration        | `true`               | `true`             |
-| `count_min`  | Min                        | `true`               | `true`             |
-| `count_max`  | Max                        | `true`               | `true`             |
-| `medias`     | Medias                     | `true`               | `true`             |
+| Nomenclature | Label                      | Displayed by default (default) | Editable (visible) |
+| ------------ | -------------------------- | ------------------------------ | ------------------ |
+| `STADE_VIE`  | Life stage                 | &#9745;                        | &#9745;            |
+| `SEXE`       | Sex                        | &#9745;                        | &#9745;            |
+| `OBJ_DENBR`  | Purpose of the enumeration | &#9745;                        | &#9745;            |
+| `TYP_DENBR`  | Type of enumeration        | &#9745;                        | &#9745;            |
+| `count_min`  | Min                        | &#9745;                        | &#9745;            |
+| `count_max`  | Max                        | &#9745;                        | &#9745;            |
+| `medias`     | Medias                     | &#9745;                        | &#9745;            |
 
 **Note:** Any unknown nomenclature attribute added will be simply ignored at startup.
 
-You can override these default settings by adding a property for each nomenclature settings, e.g:
+You can override these default settings by adding a property for each nomenclature settings, e.g.:
 
 ```json
 {
@@ -216,11 +217,11 @@ You can override these default settings by adding a property for each nomenclatu
 
 Each property may be a simple string representing the nomenclature attribute to show or an object with the following properties:
 
-| Property  | Description                                                           | Mandatory |
-| --------- | --------------------------------------------------------------------- | --------- |
-| `key`     | The nomenclature attribute                                            | &#9745;   |
-| `visible` | If this attribute is visible (thus editable) or not (default: `true`) | &#9744;   |
-| `default` | If this attribute is shown by default (default: `true`)               | &#9744;   |
+| Property  | Description                                                                    | Mandatory |
+| --------- |--------------------------------------------------------------------------------| --------- |
+| `key`     | The nomenclature attribute                                                     | &#9745;   |
+| `visible` | If this attribute is visible (thus directly editable) or not (default: `true`) | &#9744;   |
+| `default` | If this attribute is present by default (default: `true`)                      | &#9744;   |
 
 **Example:**
 
@@ -271,8 +272,8 @@ Each property may be a simple string representing the nomenclature attribute to 
 
 ### Override parameters from app settings
 
-As this local settings file is updated automatically with the one on *GeoNature* server, we advise you not to update it directly by hand.
-To do this, you can locally overwrite the values from the *GeoNature* server by creating a `settings_occtax.local.json` file in the same location as the app settings file in the terminal's main storage.
+As this local settings file is updated automatically with the one on _GeoNature_ server, we advise you not to update it directly by hand.
+To do this, you can locally overwrite the values from the _GeoNature_ server by creating a `settings_occtax.local.json` file in the same location as the app settings file in the terminal's main storage.
 Then simply copy the parameters to be overwritten, respecting the JSON structure of the app settings file. Example, to override map layers configuration:
 
 ```json
@@ -296,9 +297,30 @@ Then simply copy the parameters to be overwritten, respecting the JSON structure
 }
 ```
 
-**⚠ Note:** When using such a configuration, which can potentially replace all the application's parameters, it's your responsibility to ensure that the final configuration is always valid and keeps pace with any changes made to *GeoNature*.
+**⚠ Note:** When using such a configuration, which can potentially replace all the application's parameters, it's your responsibility to ensure that the final configuration is always valid and keeps pace with any changes made to _GeoNature_.
 
-In case of errors, if the final configuration is incorrect, the application will automatically ignore the local settings file that allows you to replace the parameters and load the default configuration from *GeoNature*. Any errors reported can be found in the application logs.
+In case of errors, if the final configuration is incorrect, the application will automatically ignore the local settings file that allows you to replace the parameters and load the default configuration from _GeoNature_. Any errors reported can be found in the application logs.
+
+## Advanced search on taxa
+
+The taxon search allows you to combine several search criteria, such as:
+* taxonomic rank (with or without group or kingdom)
+* additional data according to the area selected from the vector layer (by "color", previously
+  observed or not)
+* simple full-text search by name or description (single word)
+* more advanced full-text search by name or description that can combine several words (implicit
+  "AND" operator), with boolean operators like `NOT`, `AND` `OR` and parentheses
+  **Note:** Advanced text search is only available on Android version 11 (API 30+) and higher.
+
+### Some example of search queries
+
+* "ibex": search all taxa matching any word containing *ibex*
+* "ibex sim": search all taxa matching any words containing a phrase query *ibex sim*
+* "ibex* sim*": search all taxa matching any words containing a phrase query with words starting by
+  *ibex\* sim\**
+* "^corsic*": search all taxa matching any phrase starting by *corsic\**
+* "ibex* NOT sim*": search all taxa matching any words containing a phrase query with words starting
+  by *ibex\** but without any word starting by *sim\**
 
 ## Upgrade git sub modules
 

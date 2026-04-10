@@ -1,5 +1,167 @@
 # Changelog
 
+## [2.8.0-rc6](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc6) (2026-03-19, pre-release)
+
+### 🚀 Nouveautés
+
+* Nouveau mode d'édition de la position du marqueur sur la carte en affichant un
+  petit guide centré sur la carte afin d'aider à la saisie (https://github.com/PnX-SI/gn_mobile_occtax/issues/176).
+* Ajout des raccourcis au niveau de l'application permettant de :
+  * Démarrer un nouveau relevé
+  * Reprendre le dernier relevé édité
+* Petites améliorations cosmétiques comme :
+  * Respect de la géometrie de l'icone adaptative de l'application en mode debug
+  * Écran de démarrage
+
+### 🐛 Corrections
+
+* Prise en compte de la date et l'heure locale selon le fuseau horaire du terminal dans la gestion
+  des relevés (https://github.com/PnX-SI/gn_mobile_occtax/issues/304).
+* Lot de corrections diverses autour du module cartographique, notamment :
+  * Petites améliorations sur l'affichage des couches géographiques, notamment en affichant un petit "loader" pour les couches géographiques locales qui tardent à s'afficher. Les autres couches sont visibles et accessibles entre temps.
+  * Meilleur support du choix des couches géographiques locales à afficher sur la carte, notamment si elles sont prises depuis les raccourcis du sélecteur de fichiers comme "Downloads".
+  * Fin du support des fonds cartographiques venant de [Wikimedia Maps](https://maps.wikimedia.org) (cf. [Using maps in third-party services](https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use_for_Wikimedia_Maps#Using_maps_in_third-party_services)).
+
+### ⚠️ Notes de version
+
+* Code de version : **3361**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+* La version 2.15.3 minimum de GeoNature est requise si la version 2.15 est souhaitée.
+* La version 2.15 (ou plus) de GeoNature nécessite de modifier la configuration de l'URL de l'API de
+  TaxHub.
+
+## [2.8.0-rc5](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc5) (2025-10-25, pre-release)
+
+### 🐛 Corrections
+
+* Légère refonte autour de la gestion des relevés, la sérialisation JSON des relevés comporte
+  maintenant deux approches : la première pour gérer les relevés en local, la seconde pour gérer les
+  relevés lors de la synchronisation.
+* Corrections autour des champs additionnels (https://github.com/PnX-SI/gn_mobile_occtax/issues/122).
+
+### ⚠️ Notes de version
+
+* Code de version : **3359**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+* La version 2.15.3 minimum de GeoNature est requise si la version 2.15 est souhaitée.
+* La version 2.15 (ou plus) de GeoNature nécessite de modifier la configuration de l'URL de l'API de
+  TaxHub.
+
+## [2.8.0-rc4](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc4) (2025-06-09, pre-release)
+
+### 🚀 Nouveautés
+
+* Ajout d'un nouveau mode d'édition de la position du marqueur sur la carte en affichant un
+  marqueur "fantôme" centré sur la carte servant de guide à la saisie (https://github.com/PnX-SI/gn_mobile_occtax/issues/176).
+
+### 🐛 Corrections
+
+* Centrage automatique de la carte sur la dernière position connue de l'utilisateur. Le paramètre
+  `map.center` est utilisée comme valeur par défaut, si la position n'a pas pu être résolue (https://github.com/PnX-SI/gn_mobile_occtax/issues/241).
+
+### ⚠️ Notes de version
+
+* Code de version : **3347**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+* La version 2.15.3 minimum de GeoNature est requise si la version 2.15 est souhaitée.
+* La version 2.15 (ou plus) de GeoNature nécessite de modifier la configuration de l'URL de l'API de
+  TaxHub.
+
+## [2.8.0-rc3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc3) (2025-05-06, pre-release)
+
+### 🚀 Nouveautés
+
+* Support de la recherche en texte intégrale dans la liste des taxons (https://github.com/PnX-SI/gn_mobile_occtax/issues/91).
+  Cette fonctionnalité n'est disponible que sur la version 11 et supérieure d'Android (API 30+).
+
+### 🐛 Corrections
+
+* Centrage automatique de la carte sur la dernière position connue de l'utilisateur. Le paramètre
+  `map.center` est utilisée comme valeur par défaut, si la position n'a pas pu être résolue (https://github.com/PnX-SI/gn_mobile_occtax/issues/241).
+* La synchronisation des données locales se lance automatiquement à chaque mise à jour du schéma de
+  la base de données locale.
+
+### ⚠️ Notes de version
+
+* Code de version : **3343**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+* La version 2.15.3 minimum de GeoNature est requise si la version 2.15 est souhaitée.
+* La version 2.15 (ou plus) de GeoNature nécessite de modifier la configuration de l'URL de l'API de
+  TaxHub.
+
+## [2.8.0-rc2](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc2) (2025-04-22, pre-release)
+
+### 🚀 Nouveautés
+
+* Centrage automatique de la carte sur la dernière position connue de l'utilisateur si le paramètre
+  `map.center` n'a pas été configuré (https://github.com/PnX-SI/gn_mobile_occtax/issues/241).
+
+### 🐛 Corrections
+
+* Petites corrections d'ordre cosmétique notamment sur l'ordre d'affichage des champs de type média,
+  positionnés à la fin.
+* Notifier l'utilisateur qu'une photo a été ajoutée lors de l'abandon de la saisie sur la partie
+  dénombrement.
+
+### ⚠️ Notes de version
+
+* Code de version : **3331**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+* La version 2.15.3 minimum de GeoNature est requise si la version 2.15 est souhaitée.
+* La version 2.15 (ou plus) de GeoNature nécessite de modifier la configuration de l'URL de l'API de
+  TaxHub.
+
+## [2.8.0-rc1](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc1) (2025-03-28, pre-release)
+
+### 🐛 Corrections
+
+* Petite refonte autour du module cartographique, notamment sur le chargement des couches
+  vectorielles et sur la résolution des chemins des fonds cartographique en local (https://github.com/PnX-SI/gn_mobile_occtax/issues/170).
+
+### ⚠️ Notes de version
+
+* Code de version : **3329**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+
+## [2.8.0-rc0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc0) (2025-03-25, pre-release)
+
+### 🚀 Nouveautés
+
+* Refonte des champs additionnels (https://github.com/PnX-SI/gn_mobile_occtax/issues/122, https://github.com/PnX-SI/gn_mobile_occtax/issues/285).
+* Petites améliorations autour du module cartographique, notamment sur le chargement des couches
+  vectorielles (https://github.com/PnX-SI/gn_mobile_occtax/issues/170) et d'une refonte du 
+  gestionnaire des couches géographiques (https://github.com/PnX-SI/gn_mobile_occtax/issues/193).
+* Au niveau de la saisie du relevé, la saisie de la position se fait maintenant à la première étape
+  (avant la saisie du choix des observateurs, du jeu de données, etc.) (https://github.com/PnX-SI/gn_mobile_occtax/issues/288).
+* Le champ `STATUT_OBS` issu de la nomenclature, fait maintenant partie des champs éditables dans la
+  partie "Informations" (https://github.com/PnX-SI/gn_mobile_occtax/issues/66). Par défaut, il est
+  non visible (donc non éditable par défaut), non obligatoire et prend la valeur par défaut remontée
+  par l'API (`GET -> /api/occtax/defaultNomenclatures`). On peut tout à fait le rendre visible (donc
+  éditable) via le paramétrage de la nomenclature.
+* Légère refonte de la gestion des taxons dans le relevé afin de pouvoir ajouter plusieurs même
+  occurrences de taxon (https://github.com/PnX-SI/gn_mobile_occtax/issues/182).
+
+### 🐛 Corrections
+
+* Correction autour de la gestion de la date de build de l'application (https://github.com/PnX-SI/gn_mobile_occtax/issues/275).
+* Correction pour déterminer l'orientation des images ou des photos prises dans les dénombrements
+  des taxons du relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/278).
+
+### ⚠️ Notes de version
+
+* Code de version : **3323**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+* La version 2.15.3 minimum de GeoNature est requise si la version 2.15 est souhaitée.
+* La version 2.15 (ou plus) de GeoNature nécessite de modifier la configuration de l'URL de l'API de
+  TaxHub.
+
 ## [2.7.3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.3) (2026-01-07, release)
 
 ### 🐛 Corrections

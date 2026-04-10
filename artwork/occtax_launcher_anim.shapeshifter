@@ -1,0 +1,811 @@
+{
+  "version": 1,
+  "layers": {
+    "vectorLayer": {
+      "id": "349",
+      "name": "vector",
+      "type": "vector",
+      "width": 288,
+      "height": 288,
+      "children": [
+        {
+          "id": "376",
+          "name": "stem",
+          "type": "path",
+          "pathData": "M 144 237 C 121.927 220.522 102.928 205.533 111.588 164.509",
+          "strokeColor": "#00701a",
+          "strokeWidth": 4,
+          "strokeLinecap": "round",
+          "strokeLinejoin": "round"
+        },
+        {
+          "id": "351",
+          "name": "poi",
+          "type": "group",
+          "pivotX": 144,
+          "children": [
+            {
+              "id": "352",
+              "name": "marker",
+              "type": "path",
+              "pathData": "M 144 72 C 104.278 72 72 104.278 72 144 C 72 145.436 72.053 146.86 72.136 148.275 C 72.19 149.298 72.271 150.309 72.366 151.317 C 72.369 151.35 72.376 151.382 72.38 151.416 C 77.69 206.944 144 240 144 240 C 144 240 204.441 209.742 214.538 158.498 C 214.849 156.919 215.118 155.322 215.33 153.703 C 215.481 152.584 215.61 151.458 215.709 150.323 C 215.751 149.83 215.789 149.335 215.822 148.837 C 215.928 147.237 216 145.627 216 144 C 216 104.278 183.722 72 144 72 Z M 144 79.2 C 179.83 79.2 208.8 108.169 208.8 144 C 208.8 179.831 179.83 208.8 144 208.8 C 108.169 208.8 79.2 179.831 79.2 144 C 79.2 108.169 108.169 79.2 144 79.2 Z",
+              "fillColor": "#000",
+              "strokeWidth": 1
+            }
+          ]
+        },
+        {
+          "id": "353",
+          "name": "flower",
+          "type": "group",
+          "children": [
+            {
+              "id": "354",
+              "name": "leaf_left",
+              "type": "path",
+              "pathData": "M 104.377 144 C 104.455 156.435 104.446 175.597 104.503 182.349 C 104.499 177.514 104.485 159.437 104.456 154.59 C 104.481 157.544 104.499 173.311 104.508 179.62 C 104.518 148.107 104.454 136.683 104.377 144 Z",
+              "fillColor": "#00701a",
+              "fillAlpha": 0
+            },
+            {
+              "id": "355",
+              "name": "leaf_right",
+              "type": "path",
+              "pathData": "M 112.427 177.802 C 112.356 174.826 112.348 193.312 112.297 187.615 C 112.305 181.735 112.313 178.587 112.331 173.343 C 112.316 176.908 112.307 179.845 112.295 186.563 C 112.314 159.888 112.375 159.917 112.427 177.802 Z",
+              "fillColor": "#00701a",
+              "fillAlpha": 0
+            },
+            {
+              "id": "102387",
+              "name": "petals_g",
+              "type": "group",
+              "pivotX": 110,
+              "pivotY": 170,
+              "children": [
+                {
+                  "id": "356",
+                  "name": "petals",
+                  "type": "path",
+                  "pathData": "M 139.15 131.753 C 136.829 132.381 137.467 128.389 135.569 127.757 C 133.25 126.284 132.396 135.107 128.6 133.842 C 126.069 132.999 127.763 127.958 126.288 126.065 C 123.339 122.28 119.317 134.252 116.791 129.206 C 115.107 125.843 119.122 120.174 115.535 120.38 C 114.058 120.588 112.579 122.898 111.104 121.005 C 106.89 116.798 103.513 118.475 100.975 123.935 C 96.746 132.335 98.413 150.407 103.467 158.397 C 106.204 162.813 108.53 157.983 111.479 161.768 C 114.64 164.924 116.122 160.513 118.65 163.457 C 118.86 164.929 120.337 164.72 121.393 163.671 C 130.469 159.689 139.971 152.346 143.99 142.475 C 145.896 136.804 146.112 131.971 139.15 131.753 Z",
+                  "fillColor": "#f4511e",
+                  "fillAlpha": 0
+                }
+              ]
+            },
+            {
+              "id": "357",
+              "name": "path_5",
+              "type": "path",
+              "pathData": "M 124.402 114.927 C 126.089 116.19 126.719 118.502 125.451 120.181 C 124.816 122.072 122.495 122.699 120.808 121.437 C 118.91 120.804 118.28 118.492 118.915 116.602 C 120.183 114.922 122.504 114.295 124.402 114.927 Z",
+              "fillColor": "#ffa000",
+              "fillAlpha": 0
+            },
+            {
+              "id": "358",
+              "name": "path_6",
+              "type": "path",
+              "pathData": "M 132.624 119.769 C 134.522 120.402 135.153 122.714 134.517 124.604 C 133.25 126.284 130.928 126.911 129.242 125.649 C 127.977 125.227 127.347 122.915 127.982 121.025 C 129.249 119.345 130.938 118.507 132.624 119.769 Z",
+              "fillColor": "#ffa000",
+              "fillAlpha": 0
+            },
+            {
+              "id": "359",
+              "name": "path_4",
+              "type": "path",
+              "pathData": "M 115.543 114.077 C 116.808 114.498 117.65 116.18 116.382 117.86 C 115.959 119.12 114.482 119.328 113.217 118.907 C 112.163 117.855 111.321 116.173 112.377 115.124 C 112.8 113.863 114.277 113.655 115.543 114.077 Z",
+              "fillColor": "#ffa000",
+              "fillAlpha": 0
+            },
+            {
+              "id": "360",
+              "name": "path_7",
+              "type": "path",
+              "pathData": "M 140.428 121.669 C 141.481 122.721 142.323 124.403 141.267 125.452 C 140.844 126.712 139.367 126.921 138.102 126.499 C 136.836 126.077 135.994 124.396 137.262 122.716 C 137.686 121.456 139.163 121.247 140.428 121.669 Z",
+              "fillColor": "#ffa000",
+              "fillAlpha": 0
+            },
+            {
+              "id": "361",
+              "name": "path_8",
+              "type": "path",
+              "pathData": "M 132.213 110.524 C 133.899 111.786 134.741 113.468 133.474 115.148 C 132.838 117.038 130.517 117.666 128.619 117.033 C 126.933 115.77 126.303 113.458 127.359 112.409 C 127.994 110.519 130.315 109.891 132.213 110.524 Z",
+              "fillColor": "#ffa000",
+              "fillAlpha": 0
+            },
+            {
+              "id": "362",
+              "name": "path_9",
+              "type": "path",
+              "pathData": "M 125.254 108.204 C 126.307 109.256 126.517 110.727 126.093 111.987 C 125.037 113.037 123.56 113.245 122.295 112.824 C 121.241 111.772 121.032 110.301 121.456 109.04 C 122.512 107.991 123.989 107.783 125.254 108.204 Z",
+              "fillColor": "#ffa000",
+              "fillAlpha": 0
+            },
+            {
+              "id": "363",
+              "name": "path_10",
+              "type": "path",
+              "pathData": "M 138.325 115.363 C 139.591 115.785 140.433 117.467 139.165 119.146 C 138.742 120.407 137.265 120.615 135.999 120.193 C 134.946 119.141 134.104 117.46 135.16 116.41 C 135.583 115.15 137.06 114.942 138.325 115.363 Z",
+              "fillColor": "#ffa000",
+              "fillAlpha": 0
+            }
+          ]
+        },
+        {
+          "id": "364",
+          "name": "hummingbird",
+          "type": "group",
+          "translateX": 140,
+          "translateY": -140,
+          "children": [
+            {
+              "id": "365",
+              "name": "hummingbird_body",
+              "type": "path",
+              "pathData": "M 166.875 101.129 C 166.875 101.129 151.447 84.754 139.011 101.967 C 138.987 101.993 138.96 102.012 138.938 102.04 C 137.769 103.566 120 124.977 120 124.977 L 120.188 124.805 L 120.29 124.71 L 137.561 108.703 C 137.575 108.692 140.859 106.279 146.622 109.592 C 149.56 111.294 153.033 116.933 156.692 120.128 C 156.692 120.128 160.876 126.015 185.04 140.692 C 189.586 143.454 193.276 148.093 195.691 168 C 195.691 168 200.663 133.985 183.539 115.808 Z M 142.557 104.673 C 141.944 104.717 141.402 104.298 141.349 103.738 C 141.296 103.178 141.751 102.688 142.365 102.644 C 142.98 102.6 143.52 103.019 143.573 103.579 C 143.625 104.14 143.172 104.629 142.557 104.673 Z",
+              "fillColor": "#408080",
+              "fillAlpha": 0
+            },
+            {
+              "id": "366",
+              "name": "wings_top",
+              "type": "path",
+              "pathData": "M 220 92.665 C 220 92.665 212.282 99.773 189.93 104.175 C 189.93 104.175 201.061 96.98 199.105 83.531 C 199.105 83.531 204.148 82.548 202.258 68 C 202.258 68 195.707 89.24 166.875 101.129 L 183.539 115.808 C 183.539 115.808 203.401 114.462 220 92.665 Z",
+              "fillColor": "#408080",
+              "fillAlpha": 0
+            },
+            {
+              "id": "367",
+              "name": "wings_bottom",
+              "type": "path",
+              "pathData": "M 164.644 134.826 C 164.644 134.826 157.449 145.957 144 144 C 144 144 143.017 149.043 128.469 147.153 C 128.469 147.153 149.709 140.602 161.598 111.771 C 161.598 111.771 177.552 121.143 176.277 128.435 C 175.514 132.793 164.644 134.826 164.644 134.826 Z",
+              "fillColor": "#408080",
+              "fillAlpha": 0
+            }
+          ]
+        },
+        {
+          "id": "368",
+          "name": "mushroom1_g",
+          "type": "group",
+          "children": [
+            {
+              "id": "369",
+              "name": "mushroom1_stem",
+              "type": "path",
+              "pathData": "M 131.31 216.207 C 130.802 219.187 130.592 222.157 130.757 225.128 C 133.144 226.791 134.724 228.286 135.906 230.481 C 136.16 229.948 136.436 229.416 136.712 228.893 C 135.431 224.82 134.447 220.653 134.182 216.254 C 133.221 216.282 132.26 216.263 131.31 216.207 Z",
+              "fillColor": "#3dbc8c",
+              "fillAlpha": 0,
+              "strokeWidth": 1
+            },
+            {
+              "id": "370",
+              "name": "mushroom1_cap_g",
+              "type": "group",
+              "pivotX": 131,
+              "children": [
+                {
+                  "id": "371",
+                  "name": "mushroom1_cap",
+                  "type": "path",
+                  "pathData": "M 133.773 200 C 129.984 200.436 126.692 202.377 124.241 204.857 C 121.961 207.155 120.467 209.911 120 212.106 C 127.763 214.675 135.398 215.899 143.562 212.573 C 142.866 208.257 140.767 202.688 133.773 200 Z",
+                  "fillColor": "#86bc3d",
+                  "fillAlpha": 0,
+                  "strokeWidth": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "372",
+          "name": "grass_g",
+          "type": "group",
+          "pivotY": 240,
+          "children": [
+            {
+              "id": "373",
+              "name": "grass",
+              "type": "path",
+              "pathData": "M 164.774 222.653 C 159.555 228.288 156.402 230.983 153.98 237.571 C 153.177 233.815 151.005 230.23 148.422 228.175 C 148.975 230.086 152.725 241.378 146 228.192 C 145.491 227.194 146.66 232.843 144 234.203 C 139.307 230.481 142.98 226.663 143.562 222.572 C 140.236 226.682 137.798 230.79 135.895 235.525 C 134.57 230.972 131.238 227.523 128.36 225.651 C 129.671 230.126 127.967 234.643 125.767 237.655 C 125.246 233.357 123.165 229.138 120.316 227.015 C 122.05 231.266 121.887 235.572 120.368 240 L 168 240 C 163.889 236.052 166.166 234.516 167.138 231.06 C 163.22 233.046 162.639 234.809 161.824 238.674 C 159.267 230.786 162.19 226.986 164.774 222.653 Z",
+              "fillColor": "#00701a",
+              "strokeWidth": 1
+            }
+          ]
+        },
+        {
+          "id": "443",
+          "name": "mushroom2_g",
+          "type": "group",
+          "children": [
+            {
+              "id": "374",
+              "name": "mushroom2_stem",
+              "type": "path",
+              "pathData": "M 156.864 215.73 C 156.278 215.749 155.682 215.758 155.085 215.749 L 151.782 229.22 C 152.29 229.631 152.732 230.014 153.118 230.425 C 153.56 230.892 153.914 231.396 154.223 231.976 C 154.731 231.125 155.339 230.247 156.035 229.351 Z",
+              "fillColor": "#4e52bc",
+              "fillAlpha": 0,
+              "strokeWidth": 1
+            },
+            {
+              "id": "442",
+              "name": "mushroom2_cap_g",
+              "type": "group",
+              "pivotX": 155,
+              "children": [
+                {
+                  "id": "375",
+                  "name": "mushroom2_cap",
+                  "type": "path",
+                  "pathData": "M 155.162 204.969 C 149.66 206.688 147.981 210.079 147.373 212.816 C 153.859 214.89 159.979 214.133 166.166 212.489 C 165.724 211.181 164.586 209.546 162.885 208.154 C 160.929 206.548 158.256 205.268 155.162 204.969 Z",
+                  "fillColor": "#3d42bc",
+                  "fillAlpha": 0,
+                  "strokeWidth": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "hiddenLayerIds": []
+  },
+  "timeline": {
+    "animation": {
+      "id": "377",
+      "name": "anim",
+      "duration": 1200,
+      "blocks": [
+        {
+          "id": "382",
+          "layerId": "356",
+          "propertyName": "fillAlpha",
+          "startTime": 400,
+          "endTime": 1000,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "385",
+          "layerId": "354",
+          "propertyName": "fillAlpha",
+          "startTime": 400,
+          "endTime": 700,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "386",
+          "layerId": "354",
+          "propertyName": "pathData",
+          "startTime": 400,
+          "endTime": 1100,
+          "interpolator": "FAST_OUT_SLOW_IN",
+          "type": "path",
+          "fromValue": "M 104.377 144 C 104.455 156.435 104.446 175.597 104.503 182.349 C 104.499 177.514 104.485 159.437 104.456 154.59 C 104.481 157.544 104.499 173.311 104.508 179.62 C 104.518 148.107 104.454 136.683 104.377 144 Z",
+          "toValue": "M 48 144 C 81.107 156.435 77.287 175.597 101.751 182.349 C 99.858 177.514 93.972 159.437 81.531 154.59 C 92.497 157.544 99.863 173.311 104.075 179.62 C 108.331 148.107 80.708 136.683 48 144 Z"
+        },
+        {
+          "id": "388",
+          "layerId": "355",
+          "propertyName": "fillAlpha",
+          "startTime": 400,
+          "endTime": 700,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "389",
+          "layerId": "355",
+          "propertyName": "pathData",
+          "startTime": 400,
+          "endTime": 1100,
+          "interpolator": "FAST_OUT_SLOW_IN",
+          "type": "path",
+          "fromValue": "M 112.427 177.802 C 112.356 174.826 112.348 193.312 112.297 187.615 C 112.305 181.735 112.313 178.587 112.331 173.343 C 112.316 176.908 112.307 179.845 112.295 186.563 C 112.314 159.888 112.375 159.917 112.427 177.802 Z",
+          "toValue": "M 168 177.802 C 138.046 174.826 134.649 193.312 113.348 187.615 C 116.731 181.735 119.899 178.587 127.289 173.343 C 121.166 176.908 117.366 179.845 112.295 186.563 C 120.553 159.888 145.869 159.917 168 177.802 Z"
+        },
+        {
+          "id": "391",
+          "layerId": "359",
+          "propertyName": "fillAlpha",
+          "startTime": 800,
+          "endTime": 1100,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "393",
+          "layerId": "357",
+          "propertyName": "fillAlpha",
+          "startTime": 700,
+          "endTime": 1000,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "395",
+          "layerId": "358",
+          "propertyName": "fillAlpha",
+          "startTime": 700,
+          "endTime": 1000,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "397",
+          "layerId": "360",
+          "propertyName": "fillAlpha",
+          "startTime": 800,
+          "endTime": 1100,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "399",
+          "layerId": "361",
+          "propertyName": "fillAlpha",
+          "startTime": 900,
+          "endTime": 1200,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "401",
+          "layerId": "362",
+          "propertyName": "fillAlpha",
+          "startTime": 900,
+          "endTime": 1200,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "403",
+          "layerId": "363",
+          "propertyName": "fillAlpha",
+          "startTime": 900,
+          "endTime": 1200,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "404",
+          "layerId": "351",
+          "propertyName": "scaleX",
+          "startTime": 0,
+          "endTime": 300,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 1,
+          "toValue": 0
+        },
+        {
+          "id": "405",
+          "layerId": "351",
+          "propertyName": "scaleX",
+          "startTime": 300,
+          "endTime": 600,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "406",
+          "layerId": "351",
+          "propertyName": "scaleX",
+          "startTime": 600,
+          "endTime": 900,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 1,
+          "toValue": 0
+        },
+        {
+          "id": "407",
+          "layerId": "351",
+          "propertyName": "scaleX",
+          "startTime": 900,
+          "endTime": 1200,
+          "interpolator": "DECELERATE",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "408",
+          "layerId": "351",
+          "propertyName": "translateY",
+          "startTime": 0,
+          "endTime": 1000,
+          "interpolator": "BOUNCE",
+          "type": "number",
+          "fromValue": -230,
+          "toValue": 0
+        },
+        {
+          "id": "409",
+          "layerId": "353",
+          "propertyName": "scaleY",
+          "startTime": 600,
+          "endTime": 900,
+          "interpolator": "OVERSHOOT",
+          "type": "number",
+          "fromValue": 1,
+          "toValue": 1.04
+        },
+        {
+          "id": "410",
+          "layerId": "353",
+          "propertyName": "scaleY",
+          "startTime": 900,
+          "endTime": 1200,
+          "interpolator": "OVERSHOOT",
+          "type": "number",
+          "fromValue": 1.04,
+          "toValue": 1
+        },
+        {
+          "id": "411",
+          "layerId": "364",
+          "propertyName": "translateX",
+          "startTime": 300,
+          "endTime": 900,
+          "interpolator": "DECELERATE",
+          "type": "number",
+          "fromValue": 140,
+          "toValue": 0
+        },
+        {
+          "id": "412",
+          "layerId": "364",
+          "propertyName": "translateY",
+          "startTime": 300,
+          "endTime": 700,
+          "interpolator": "FAST_OUT_SLOW_IN",
+          "type": "number",
+          "fromValue": -140,
+          "toValue": 0
+        },
+        {
+          "id": "414",
+          "layerId": "365",
+          "propertyName": "fillAlpha",
+          "startTime": 400,
+          "endTime": 600,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "416",
+          "layerId": "366",
+          "propertyName": "fillAlpha",
+          "startTime": 400,
+          "endTime": 600,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "418",
+          "layerId": "365",
+          "propertyName": "pathData",
+          "startTime": 400,
+          "endTime": 900,
+          "interpolator": "LINEAR",
+          "type": "path",
+          "fromValue": "M 166.875 101.129 C 166.875 101.129 151.447 84.754 139.011 101.967 C 138.987 101.993 138.96 102.012 138.938 102.04 C 137.769 103.566 120 124.977 120 124.977 L 120.188 124.805 L 120.29 124.71 L 137.561 108.703 C 137.575 108.692 140.859 106.279 146.622 109.592 C 149.56 111.294 153.033 116.933 156.692 120.128 C 156.692 120.128 160.876 126.015 185.04 140.692 C 189.586 143.454 197.204 144.866 204.604 159.946 C 207.651 166.155 200.663 133.985 183.539 115.808 Z M 142.557 104.673 C 141.944 104.717 141.402 104.298 141.349 103.738 C 141.296 103.178 141.751 102.688 142.365 102.644 C 142.98 102.6 143.52 103.019 143.573 103.579 C 143.625 104.14 143.172 104.629 142.557 104.673 Z",
+          "toValue": "M 166.875 101.129 C 166.875 101.129 151.447 84.754 139.011 101.967 C 138.987 101.993 138.96 102.012 138.938 102.04 C 137.769 103.566 120 124.977 120 124.977 L 120.188 124.805 L 120.29 124.71 L 137.561 108.703 C 137.575 108.692 140.859 106.279 146.622 109.592 C 149.56 111.294 153.033 116.933 156.692 120.128 C 156.692 120.128 160.876 126.015 185.04 140.692 C 189.586 143.454 193.276 148.093 195.691 168 C 195.691 168 200.663 133.985 183.539 115.808 Z M 142.557 104.673 C 141.944 104.717 141.402 104.298 141.349 103.738 C 141.296 103.178 141.751 102.688 142.365 102.644 C 142.98 102.6 143.52 103.019 143.573 103.579 C 143.625 104.14 143.172 104.629 142.557 104.673 Z"
+        },
+        {
+          "id": "419",
+          "layerId": "367",
+          "propertyName": "fillAlpha",
+          "startTime": 600,
+          "endTime": 700,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "420",
+          "layerId": "366",
+          "propertyName": "fillAlpha",
+          "startTime": 600,
+          "endTime": 700,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 1,
+          "toValue": 0
+        },
+        {
+          "id": "421",
+          "layerId": "366",
+          "propertyName": "fillAlpha",
+          "startTime": 700,
+          "endTime": 800,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "422",
+          "layerId": "367",
+          "propertyName": "fillAlpha",
+          "startTime": 700,
+          "endTime": 800,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 1,
+          "toValue": 0
+        },
+        {
+          "id": "423",
+          "layerId": "367",
+          "propertyName": "fillAlpha",
+          "startTime": 800,
+          "endTime": 900,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "424",
+          "layerId": "366",
+          "propertyName": "fillAlpha",
+          "startTime": 800,
+          "endTime": 900,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 1,
+          "toValue": 0
+        },
+        {
+          "id": "425",
+          "layerId": "366",
+          "propertyName": "fillAlpha",
+          "startTime": 900,
+          "endTime": 1000,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "426",
+          "layerId": "367",
+          "propertyName": "fillAlpha",
+          "startTime": 900,
+          "endTime": 1000,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 1,
+          "toValue": 0
+        },
+        {
+          "id": "427",
+          "layerId": "366",
+          "propertyName": "fillAlpha",
+          "startTime": 1000,
+          "endTime": 1100,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 1,
+          "toValue": 0
+        },
+        {
+          "id": "428",
+          "layerId": "366",
+          "propertyName": "fillAlpha",
+          "startTime": 1100,
+          "endTime": 1200,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "429",
+          "layerId": "367",
+          "propertyName": "fillAlpha",
+          "startTime": 1000,
+          "endTime": 1100,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "430",
+          "layerId": "367",
+          "propertyName": "fillAlpha",
+          "startTime": 1100,
+          "endTime": 1200,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 1,
+          "toValue": 0
+        },
+        {
+          "id": "431",
+          "layerId": "364",
+          "propertyName": "translateY",
+          "startTime": 700,
+          "endTime": 900,
+          "interpolator": "LINEAR",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 5
+        },
+        {
+          "id": "432",
+          "layerId": "364",
+          "propertyName": "translateY",
+          "startTime": 900,
+          "endTime": 1200,
+          "interpolator": "DECELERATE",
+          "type": "number",
+          "fromValue": 5,
+          "toValue": 0
+        },
+        {
+          "id": "433",
+          "layerId": "376",
+          "propertyName": "trimPathEnd",
+          "startTime": 0,
+          "endTime": 600,
+          "interpolator": "DECELERATE",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "434",
+          "layerId": "372",
+          "propertyName": "scaleY",
+          "startTime": 0,
+          "endTime": 1000,
+          "interpolator": "DECELERATE",
+          "type": "number",
+          "fromValue": 0.4,
+          "toValue": 1
+        },
+        {
+          "id": "435",
+          "layerId": "369",
+          "propertyName": "fillAlpha",
+          "startTime": 100,
+          "endTime": 500,
+          "interpolator": "DECELERATE",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "436",
+          "layerId": "374",
+          "propertyName": "fillAlpha",
+          "startTime": 100,
+          "endTime": 500,
+          "interpolator": "DECELERATE",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "437",
+          "layerId": "371",
+          "propertyName": "fillAlpha",
+          "startTime": 400,
+          "endTime": 700,
+          "interpolator": "DECELERATE",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "438",
+          "layerId": "368",
+          "propertyName": "translateY",
+          "startTime": 100,
+          "endTime": 700,
+          "interpolator": "ANTICIPATE_OVERSHOOT",
+          "type": "number",
+          "fromValue": 8,
+          "toValue": 0
+        },
+        {
+          "id": "439",
+          "layerId": "370",
+          "propertyName": "scaleX",
+          "startTime": 400,
+          "endTime": 700,
+          "interpolator": "FAST_OUT_SLOW_IN",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "444",
+          "layerId": "443",
+          "propertyName": "translateY",
+          "startTime": 100,
+          "endTime": 700,
+          "interpolator": "ANTICIPATE_OVERSHOOT",
+          "type": "number",
+          "fromValue": 7,
+          "toValue": 0
+        },
+        {
+          "id": "445",
+          "layerId": "375",
+          "propertyName": "fillAlpha",
+          "startTime": 400,
+          "endTime": 700,
+          "interpolator": "DECELERATE",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "446",
+          "layerId": "442",
+          "propertyName": "scaleX",
+          "startTime": 400,
+          "endTime": 700,
+          "interpolator": "FAST_OUT_SLOW_IN",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "102516",
+          "layerId": "102387",
+          "propertyName": "scaleY",
+          "startTime": 400,
+          "endTime": 900,
+          "interpolator": "FAST_OUT_SLOW_IN",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        },
+        {
+          "id": "147877",
+          "layerId": "102387",
+          "propertyName": "scaleX",
+          "startTime": 400,
+          "endTime": 900,
+          "interpolator": "FAST_OUT_SLOW_IN",
+          "type": "number",
+          "fromValue": 0,
+          "toValue": 1
+        }
+      ]
+    }
+  }
+}

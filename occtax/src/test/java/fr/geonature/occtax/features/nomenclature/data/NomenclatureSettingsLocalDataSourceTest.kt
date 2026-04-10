@@ -1,10 +1,17 @@
 package fr.geonature.occtax.features.nomenclature.data
 
+import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.core.app.ApplicationProvider
 import fr.geonature.occtax.CoroutineTestRule
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.R
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.record.domain.AllMediaRecord
+import fr.geonature.occtax.features.record.domain.CommentRecord
 import fr.geonature.occtax.features.record.domain.CountingRecord
+import fr.geonature.occtax.features.record.domain.DatasetRecord
+import fr.geonature.occtax.features.record.domain.DatesRecord
+import fr.geonature.occtax.features.record.domain.ObserversRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
 import fr.geonature.occtax.features.settings.domain.PropertySettings
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,6 +20,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
 /**
  * Unit tests about [INomenclatureSettingsLocalDataSource].
@@ -20,6 +29,7 @@ import org.junit.Test
  * @author S. Grimault
  */
 @ExperimentalCoroutinesApi
+@RunWith(RobolectricTestRunner::class)
 class NomenclatureSettingsLocalDataSourceTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -27,147 +37,213 @@ class NomenclatureSettingsLocalDataSourceTest {
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
 
+    private lateinit var application: Application
     private lateinit var nomenclatureSettingsLocalDataSource: INomenclatureSettingsLocalDataSource
 
     @Before
     fun setUp() {
-        nomenclatureSettingsLocalDataSource = NomenclatureSettingsLocalDataSourceImpl()
+        application = ApplicationProvider.getApplicationContext()
+        nomenclatureSettingsLocalDataSource = NomenclatureSettingsLocalDataSourceImpl(application)
     }
 
     @Test
     fun `should get default nomenclature type settings by nomenclature main type`() = runTest {
         assertEquals(
             listOf(
-                EditableField(
-                    type = EditableField.Type.DEFAULT,
-                    code = "TYP_GRP",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                    nomenclatureType = "TYP_GRP"
+                FormField.NomenclatureType(
+                    type = FormField.Type.DEFAULT,
+                    label = application.getString(R.string.nomenclature_typ_grp),
+                    visible = false,
+                    mandatory = true,
+                    order = 0,
+                    nomenclatureType = "TYP_GRP",
+                    value = PropertyValue.Nomenclature(code = "TYP_GRP")
+                ),
+                FormField.ModalMultiple(
+                    type = FormField.Type.DEFAULT,
+                    label = application.getString(R.string.observers_and_date_selected_observers),
+                    mandatory = true,
+                    order = 1,
+                    emptyText = application.getString(R.string.observers_and_date_selected_observers_no_data),
+                    actionText = application.getString(R.string.action_edit),
+                    actionEmptyText = application.getString(R.string.action_add),
+                    visibleItems = 2,
+                    value = PropertyValue.NumberArray(code = ObserversRecord.OBSERVERS_KEY)
+                ),
+                FormField.Modal(
+                    type = FormField.Type.DEFAULT,
+                    label = application.getString(R.string.observers_and_date_dataset),
+                    mandatory = true,
+                    order = 2,
+                    emptyText = application.getString(R.string.no_data),
+                    value = PropertyValue.Number(code = DatasetRecord.DATASET_ID_KEY)
+                ),
+                FormField.StartEnd(
+                    type = FormField.Type.DEFAULT,
+                    label = application.getString(R.string.input_date_hint),
+                    order = 3,
+                    start = FormField.Date(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.input_date_start_hint),
+                        value = PropertyValue.Date(code = DatesRecord.DATE_MIN_KEY)
+                    ),
+                    end = FormField.Date(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.input_date_end_hint),
+                        value = PropertyValue.Date(code = DatesRecord.DATE_MAX_KEY)
+                    ),
+                ),
+                FormField.TextMultiple(
+                    type = FormField.Type.DEFAULT,
+                    label = application.getString(R.string.input_comment_add_hint),
+                    order = 4,
+                    value = PropertyValue.Text(code = CommentRecord.COMMENT_KEY)
                 )
             ),
-            nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.DEFAULT)
+            nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(FormField.Type.DEFAULT)
         )
 
         assertEquals(
             listOf(
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "METH_OBS",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                    nomenclatureType = "METH_OBS"
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_meth_obs),
+                    nomenclatureType = "METH_OBS",
+                    order = 0,
+                    value = PropertyValue.Nomenclature(code = "METH_OBS")
                 ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "ETA_BIO",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                    nomenclatureType = "ETA_BIO"
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_eta_bio),
+                    order = 1,
+                    nomenclatureType = "ETA_BIO",
+                    value = PropertyValue.Nomenclature(code = "ETA_BIO")
                 ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "METH_DETERMIN",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_statut_obs),
+                    nomenclatureType = "STATUT_OBS",
+                    visible = false,
+                    order = 2,
+                    value = PropertyValue.Nomenclature(code = "STATUT_OBS")
+                ),
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_meth_determin),
+                    default = false,
+                    order = 3,
                     nomenclatureType = "METH_DETERMIN",
-                    default = false
+                    value = PropertyValue.Nomenclature(code = "METH_DETERMIN")
                 ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "determiner",
-                    viewType = EditableField.ViewType.TEXT_SIMPLE,
-                    default = false
+                FormField.Text(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_determiner),
+                    default = false,
+                    order = 4,
+                    value = PropertyValue.Text(code = "determiner")
                 ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "STATUT_BIO",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_statut_bio),
+                    default = false,
+                    order = 5,
                     nomenclatureType = "STATUT_BIO",
-                    default = false
+                    value = PropertyValue.Nomenclature(code = "STATUT_BIO")
                 ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "OCC_COMPORTEMENT",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_occ_comportement),
+                    default = false,
+                    order = 6,
                     nomenclatureType = "OCC_COMPORTEMENT",
-                    default = false
+                    value = PropertyValue.Nomenclature(code = "OCC_COMPORTEMENT")
                 ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "NATURALITE",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_naturalite),
+                    default = false,
+                    order = 7,
                     nomenclatureType = "NATURALITE",
-                    default = false
+                    value = PropertyValue.Nomenclature(code = "NATURALITE")
                 ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "PREUVE_EXIST",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                FormField.NomenclatureType(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_preuve_exist),
+                    default = false,
+                    order = 8,
                     nomenclatureType = "PREUVE_EXIST",
-                    default = false
+                    value = PropertyValue.Nomenclature(code = "PREUVE_EXIST")
                 ),
-                EditableField(
-                    type = EditableField.Type.INFORMATION,
-                    code = "comment",
-                    viewType = EditableField.ViewType.TEXT_MULTIPLE,
-                    default = false
-                )
+                FormField.TextMultiple(
+                    type = FormField.Type.INFORMATION,
+                    label = application.getString(R.string.nomenclature_comment),
+                    default = false,
+                    order = 9,
+                    value = PropertyValue.Text(code = "comment")
+                ),
             ),
-            nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.INFORMATION)
+            nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(FormField.Type.INFORMATION)
         )
 
         assertEquals(
             listOf(
-                EditableField(
-                    type = EditableField.Type.COUNTING,
-                    code = "STADE_VIE",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                    nomenclatureType = "STADE_VIE"
+                FormField.NomenclatureType(
+                    type = FormField.Type.COUNTING,
+                    label = application.getString(R.string.nomenclature_stade_vie),
+                    order = 0,
+                    nomenclatureType = "STADE_VIE",
+                    value = PropertyValue.Nomenclature(code = "STADE_VIE")
                 ),
-                EditableField(
-                    type = EditableField.Type.COUNTING,
-                    code = "SEXE",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                    nomenclatureType = "SEXE"
+                FormField.NomenclatureType(
+                    type = FormField.Type.COUNTING,
+                    label = application.getString(R.string.nomenclature_sexe),
+                    order = 1,
+                    nomenclatureType = "SEXE",
+                    value = PropertyValue.Nomenclature(code = "SEXE")
                 ),
-                EditableField(
-                    type = EditableField.Type.COUNTING,
-                    code = "OBJ_DENBR",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                    nomenclatureType = "OBJ_DENBR"
+                FormField.NomenclatureType(
+                    type = FormField.Type.COUNTING,
+                    label = application.getString(R.string.nomenclature_obj_denbr),
+                    order = 2,
+                    nomenclatureType = "OBJ_DENBR",
+                    value = PropertyValue.Nomenclature(code = "OBJ_DENBR")
                 ),
-                EditableField(
-                    type = EditableField.Type.COUNTING,
-                    code = "TYP_DENBR",
-                    viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                    nomenclatureType = "TYP_DENBR"
+                FormField.NomenclatureType(
+                    type = FormField.Type.COUNTING,
+                    label = application.getString(R.string.nomenclature_typ_denbr),
+                    order = 3,
+                    nomenclatureType = "TYP_DENBR",
+                    value = PropertyValue.Nomenclature(code = "TYP_DENBR")
                 ),
-                EditableField(
-                    type = EditableField.Type.COUNTING,
-                    code = CountingRecord.MIN_KEY,
-                    viewType = EditableField.ViewType.MIN_MAX
-                ).apply {
-                    value = PropertyValue.Number(
-                        code,
-                        1
-                    )
-                },
-                EditableField(
-                    type = EditableField.Type.COUNTING,
-                    code = CountingRecord.MAX_KEY,
-                    viewType = EditableField.ViewType.MIN_MAX
-                ).apply {
-                    value = PropertyValue.Number(
-                        code,
-                        1
-                    )
-                },
-                EditableField(
-                    type = EditableField.Type.COUNTING,
-                    code = AllMediaRecord.MEDIAS_KEY,
-                    viewType = EditableField.ViewType.MEDIA
-                ).apply {
-                    value = PropertyValue.Media(code)
-                }
+                FormField.MinMax(
+                    type = FormField.Type.COUNTING,
+                    label = "",
+                    order = 4,
+                    min = FormField.Number(
+                        type = FormField.Type.COUNTING,
+                        label = application.getString(R.string.nomenclature_count_min),
+                        value = PropertyValue.Number(
+                            CountingRecord.MIN_KEY,
+                            1
+                        )
+                    ),
+                    max = FormField.Number(
+                        type = FormField.Type.COUNTING,
+                        label = application.getString(R.string.nomenclature_count_max),
+                        value = PropertyValue.Number(
+                            CountingRecord.MAX_KEY,
+                            1
+                        )
+                    ),
+                ),
+                FormField.Media(
+                    type = FormField.Type.COUNTING,
+                    label = application.getString(R.string.nomenclature_media),
+                    order = 5,
+                    value = PropertyValue.Media(AllMediaRecord.MEDIAS_KEY)
+                )
             ),
-            nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.COUNTING)
+            nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(FormField.Type.COUNTING)
         )
     }
 
@@ -176,27 +252,113 @@ class NomenclatureSettingsLocalDataSourceTest {
         runTest {
             assertEquals(
                 listOf(
-                    EditableField(
-                        type = EditableField.Type.DEFAULT,
-                        code = "TYP_GRP",
-                        viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                        nomenclatureType = "TYP_GRP"
+                    FormField.NomenclatureType(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.nomenclature_typ_grp),
+                        visible = false,
+                        mandatory = true,
+                        order = 0,
+                        nomenclatureType = "TYP_GRP",
+                        value = PropertyValue.Nomenclature(code = "TYP_GRP")
+                    ),
+                    FormField.ModalMultiple(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.observers_and_date_selected_observers),
+                        mandatory = true,
+                        order = 1,
+                        emptyText = application.getString(R.string.observers_and_date_selected_observers_no_data),
+                        actionText = application.getString(R.string.action_edit),
+                        actionEmptyText = application.getString(R.string.action_add),
+                        visibleItems = 2,
+                        value = PropertyValue.NumberArray(code = ObserversRecord.OBSERVERS_KEY)
+                    ),
+                    FormField.Modal(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.observers_and_date_dataset),
+                        mandatory = true,
+                        order = 2,
+                        emptyText = application.getString(R.string.no_data),
+                        value = PropertyValue.Number(code = DatasetRecord.DATASET_ID_KEY)
+                    ),
+                    FormField.StartEnd(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.input_date_hint),
+                        order = 3,
+                        start = FormField.Date(
+                            type = FormField.Type.DEFAULT,
+                            label = application.getString(R.string.input_date_start_hint),
+                            value = PropertyValue.Date(code = DatesRecord.DATE_MIN_KEY)
+                        ),
+                        end = FormField.Date(
+                            type = FormField.Type.DEFAULT,
+                            label = application.getString(R.string.input_date_end_hint),
+                            value = PropertyValue.Date(code = DatesRecord.DATE_MAX_KEY)
+                        ),
+                    ),
+                    FormField.TextMultiple(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.input_comment_add_hint),
+                        order = 4,
+                        value = PropertyValue.Text(code = CommentRecord.COMMENT_KEY)
                     )
                 ),
-                nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(EditableField.Type.DEFAULT)
+                nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(FormField.Type.DEFAULT)
             )
 
             assertEquals(
                 listOf(
-                    EditableField(
-                        type = EditableField.Type.DEFAULT,
-                        code = "TYP_GRP",
-                        viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                        nomenclatureType = "TYP_GRP"
+                    FormField.NomenclatureType(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.nomenclature_typ_grp),
+                        visible = false,
+                        mandatory = true,
+                        order = 0,
+                        nomenclatureType = "TYP_GRP",
+                        value = PropertyValue.Nomenclature(code = "TYP_GRP")
+                    ),
+                    FormField.ModalMultiple(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.observers_and_date_selected_observers),
+                        mandatory = true,
+                        order = 1,
+                        emptyText = application.getString(R.string.observers_and_date_selected_observers_no_data),
+                        actionText = application.getString(R.string.action_edit),
+                        actionEmptyText = application.getString(R.string.action_add),
+                        visibleItems = 2,
+                        value = PropertyValue.NumberArray(code = ObserversRecord.OBSERVERS_KEY)
+                    ),
+                    FormField.Modal(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.observers_and_date_dataset),
+                        mandatory = true,
+                        order = 2,
+                        emptyText = application.getString(R.string.no_data),
+                        value = PropertyValue.Number(code = DatasetRecord.DATASET_ID_KEY)
+                    ),
+                    FormField.StartEnd(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.input_date_hint),
+                        order = 3,
+                        start = FormField.Date(
+                            type = FormField.Type.DEFAULT,
+                            label = application.getString(R.string.input_date_start_hint),
+                            value = PropertyValue.Date(code = DatesRecord.DATE_MIN_KEY)
+                        ),
+                        end = FormField.Date(
+                            type = FormField.Type.DEFAULT,
+                            label = application.getString(R.string.input_date_end_hint),
+                            value = PropertyValue.Date(code = DatesRecord.DATE_MAX_KEY)
+                        ),
+                    ),
+                    FormField.TextMultiple(
+                        type = FormField.Type.DEFAULT,
+                        label = application.getString(R.string.input_comment_add_hint),
+                        order = 4,
+                        value = PropertyValue.Text(code = CommentRecord.COMMENT_KEY)
                     )
                 ),
                 nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(
-                    EditableField.Type.DEFAULT,
+                    FormField.Type.DEFAULT,
                     PropertySettings(
                         key = "TYP_GRP",
                         visible = false,
@@ -211,30 +373,33 @@ class NomenclatureSettingsLocalDataSourceTest {
         runTest {
             assertEquals(
                 listOf(
-                    EditableField(
-                        type = EditableField.Type.INFORMATION,
-                        code = "METH_OBS",
-                        viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                        nomenclatureType = "METH_OBS"
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = application.getString(R.string.nomenclature_meth_obs),
+                        order = 0,
+                        nomenclatureType = "METH_OBS",
+                        value = PropertyValue.Nomenclature(code = "METH_OBS")
                     ),
-                    EditableField(
-                        type = EditableField.Type.INFORMATION,
-                        code = "ETA_BIO",
-                        viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
-                        nomenclatureType = "ETA_BIO",
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = application.getString(R.string.nomenclature_eta_bio),
                         visible = true,
-                        default = false
+                        default = false,
+                        order = 1,
+                        nomenclatureType = "ETA_BIO",
+                        value = PropertyValue.Nomenclature(code = "ETA_BIO")
                     ),
-                    EditableField(
-                        type = EditableField.Type.INFORMATION,
-                        code = "OCC_COMPORTEMENT",
-                        viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    FormField.NomenclatureType(
+                        type = FormField.Type.INFORMATION,
+                        label = application.getString(R.string.nomenclature_occ_comportement),
+                        visible = false,
+                        order = 2,
                         nomenclatureType = "OCC_COMPORTEMENT",
-                        visible = false
-                    )
+                        value = PropertyValue.Nomenclature(code = "OCC_COMPORTEMENT")
+                    ),
                 ),
                 nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(
-                    EditableField.Type.INFORMATION,
+                    FormField.Type.INFORMATION,
                     PropertySettings(
                         key = "METH_OBS",
                         visible = true,
@@ -252,18 +417,23 @@ class NomenclatureSettingsLocalDataSourceTest {
                     )
                 )
             )
+        }
 
+    @Test
+    fun `should get only valid nomenclature type settings by nomenclature main type according to given settings`() =
+        runTest {
             assertEquals(
                 listOf(
-                    EditableField(
-                        type = EditableField.Type.COUNTING,
-                        code = "STADE_VIE",
-                        viewType = EditableField.ViewType.NOMENCLATURE_TYPE,
+                    FormField.NomenclatureType(
+                        type = FormField.Type.COUNTING,
+                        label = application.getString(R.string.nomenclature_stade_vie),
+                        order = 0,
                         nomenclatureType = "STADE_VIE",
+                        value = PropertyValue.Nomenclature(code = "STADE_VIE")
                     )
                 ),
                 nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(
-                    EditableField.Type.COUNTING,
+                    FormField.Type.COUNTING,
                     PropertySettings(
                         key = "STADE_VIE",
                         visible = true,
@@ -273,6 +443,173 @@ class NomenclatureSettingsLocalDataSourceTest {
                         key = "NO_SUCH_SETTINGS",
                         visible = true,
                         default = true
+                    )
+                )
+            )
+        }
+
+    @Test
+    fun `should get nomenclature type settings of type MinMax with min and max settings defined`() =
+        runTest {
+            assertEquals(
+                listOf(
+                    FormField.NomenclatureType(
+                        type = FormField.Type.COUNTING,
+                        label = application.getString(R.string.nomenclature_stade_vie),
+                        order = 0,
+                        nomenclatureType = "STADE_VIE",
+                        value = PropertyValue.Nomenclature(code = "STADE_VIE")
+                    ),
+                    FormField.MinMax(
+                        type = FormField.Type.COUNTING,
+                        label = "",
+                        order = 1,
+                        min = FormField.Number(
+                            type = FormField.Type.COUNTING,
+                            label = application.getString(R.string.nomenclature_count_min),
+                            visible = true,
+                            default = false,
+                            value = PropertyValue.Number(
+                                CountingRecord.MIN_KEY,
+                                1
+                            )
+                        ),
+                        max = FormField.Number(
+                            type = FormField.Type.COUNTING,
+                            label = application.getString(R.string.nomenclature_count_max),
+                            visible = true,
+                            default = false,
+                            value = PropertyValue.Number(
+                                CountingRecord.MAX_KEY,
+                                1
+                            )
+                        ),
+                    )
+                ),
+                nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(
+                    FormField.Type.COUNTING,
+                    PropertySettings(
+                        key = "STADE_VIE",
+                        visible = true,
+                        default = true
+                    ),
+                    PropertySettings(
+                        key = CountingRecord.MIN_KEY,
+                        visible = true,
+                        default = false
+                    ),
+                    PropertySettings(
+                        key = CountingRecord.MAX_KEY,
+                        visible = true,
+                        default = false
+                    )
+                )
+            )
+        }
+
+    @Test
+    fun `should get nomenclature type settings of type MinMax with only min settings defined`() =
+        runTest {
+            assertEquals(
+                listOf(
+                    FormField.NomenclatureType(
+                        type = FormField.Type.COUNTING,
+                        label = application.getString(R.string.nomenclature_stade_vie),
+                        order = 0,
+                        nomenclatureType = "STADE_VIE",
+                        value = PropertyValue.Nomenclature(code = "STADE_VIE")
+                    ),
+                    FormField.MinMax(
+                        type = FormField.Type.COUNTING,
+                        label = "",
+                        order = 1,
+                        min = FormField.Number(
+                            type = FormField.Type.COUNTING,
+                            label = application.getString(R.string.nomenclature_count_min),
+                            visible = true,
+                            default = true,
+                            value = PropertyValue.Number(
+                                CountingRecord.MIN_KEY,
+                                1
+                            )
+                        ),
+                        max = FormField.Number(
+                            type = FormField.Type.COUNTING,
+                            label = application.getString(R.string.nomenclature_count_max),
+                            visible = false,
+                            default = false,
+                            value = PropertyValue.Number(
+                                CountingRecord.MAX_KEY,
+                                1
+                            )
+                        ),
+                    )
+                ),
+                nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(
+                    FormField.Type.COUNTING,
+                    PropertySettings(
+                        key = "STADE_VIE",
+                        visible = true,
+                        default = true
+                    ),
+                    PropertySettings(
+                        key = CountingRecord.MIN_KEY,
+                        visible = true,
+                        default = true
+                    )
+                )
+            )
+        }
+
+    @Test
+    fun `should get nomenclature type settings of type MinMax with only max settings defined`() =
+        runTest {
+            assertEquals(
+                listOf(
+                    FormField.NomenclatureType(
+                        type = FormField.Type.COUNTING,
+                        label = application.getString(R.string.nomenclature_stade_vie),
+                        order = 0,
+                        nomenclatureType = "STADE_VIE",
+                        value = PropertyValue.Nomenclature(code = "STADE_VIE")
+                    ),
+                    FormField.MinMax(
+                        type = FormField.Type.COUNTING,
+                        label = "",
+                        order = 1,
+                        min = FormField.Number(
+                            type = FormField.Type.COUNTING,
+                            label = application.getString(R.string.nomenclature_count_min),
+                            visible = false,
+                            default = false,
+                            value = PropertyValue.Number(
+                                CountingRecord.MIN_KEY,
+                                1
+                            )
+                        ),
+                        max = FormField.Number(
+                            type = FormField.Type.COUNTING,
+                            label = application.getString(R.string.nomenclature_count_max),
+                            visible = true,
+                            default = false,
+                            value = PropertyValue.Number(
+                                CountingRecord.MAX_KEY,
+                                1
+                            )
+                        ),
+                    )
+                ),
+                nomenclatureSettingsLocalDataSource.getNomenclatureTypeSettings(
+                    FormField.Type.COUNTING,
+                    PropertySettings(
+                        key = "STADE_VIE",
+                        visible = true,
+                        default = true
+                    ),
+                    PropertySettings(
+                        key = CountingRecord.MAX_KEY,
+                        visible = true,
+                        default = false
                     )
                 )
             )

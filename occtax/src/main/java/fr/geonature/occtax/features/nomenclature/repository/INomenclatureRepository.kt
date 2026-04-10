@@ -1,6 +1,6 @@
 package fr.geonature.occtax.features.nomenclature.repository
 
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.settings.domain.PropertySettings
 import fr.geonature.commons.features.nomenclature.repository.INomenclatureRepository as IBaseNomenclatureRepository
 
@@ -18,10 +18,10 @@ interface INomenclatureRepository : IBaseNomenclatureRepository {
      * @param type the main editable field type
      * @param defaultPropertySettings the default nomenclature settings
      *
-     * @return a list of [EditableField] or [Result.Failure] if none was configured
+     * @return a list of [FormField] or [Result.Failure] if none was configured
      */
     suspend fun getEditableFields(
-        type: EditableField.Type,
+        type: FormField.Type,
         vararg defaultPropertySettings: PropertySettings
-    ): Result<List<EditableField>>
+    ): Result<List<FormField>>
 }

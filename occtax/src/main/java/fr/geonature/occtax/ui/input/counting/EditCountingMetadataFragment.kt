@@ -14,6 +14,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -30,10 +31,10 @@ import fr.geonature.compat.content.getParcelableExtraCompat
 import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.compat.os.getParcelableCompat
 import fr.geonature.occtax.R
-import fr.geonature.occtax.features.nomenclature.domain.EditableField
-import fr.geonature.occtax.features.nomenclature.presentation.EditableFieldAdapter
+import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
+import fr.geonature.occtax.features.nomenclature.presentation.adapter.FormFieldAdapter
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.MediaRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
@@ -61,10 +62,10 @@ class EditCountingMetadataFragment : Fragment() {
 
     private var takePhotoLifecycleObserver: TakePhotoLifecycleObserver? = null
     private var content: CoordinatorLayout? = null
-    private var fab: ExtendedFloatingActionButton? = null
+    private var saveFab: ExtendedFloatingActionButton? = null
 
     private var listener: OnEditCountingMetadataFragmentListener? = null
-    private var adapter: EditableFieldAdapter? = null
+    private var adapter: FormFieldAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -139,7 +140,7 @@ class EditCountingMetadataFragment : Fragment() {
         val progressBar = view.findViewById<ProgressBar>(android.R.id.progress)
             .apply { visibility = View.VISIBLE }
 
-        fab = view.findViewById<ExtendedFloatingActionButton?>(R.id.fab)
+        saveFab = view.findViewById<ExtendedFloatingActionButton?>(R.id.fab)
             ?.apply {
                 text = getString(R.string.action_save)
                 extend()
@@ -156,8 +157,12 @@ class EditCountingMetadataFragment : Fragment() {
             }
 
         // Set the adapter
-        adapter = EditableFieldAdapter(object :
-            EditableFieldAdapter.OnEditableFieldAdapter {
+        adapter = FormFieldAdapter(object :
+            FormFieldAdapter.OnEditableFieldAdapter {
+
+            override fun getContext(): Context {
+                return requireContext()
+            }
 
             override fun getLifecycleOwner(): LifecycleOwner {
                 return this@EditCountingMetadataFragment
@@ -165,6 +170,10 @@ class EditCountingMetadataFragment : Fragment() {
 
             override fun getCoordinatorLayout(): CoordinatorLayout? {
                 return this@EditCountingMetadataFragment.content
+            }
+
+            override fun fragmentManager(): FragmentManager? {
+                return activity?.supportFragmentManager
             }
 
             override fun showEmptyTextView(show: Boolean) {
@@ -212,40 +221,69 @@ class EditCountingMetadataFragment : Fragment() {
                 )
             }
 
-            override fun onUpdate(editableField: EditableField) {
+            override fun onUpdate(editableField: FormField.Editable) {
                 val countingRecord = countingRecord ?: return
 
-                if (editableField.additionalField) {
+                val notify = if (editableField.additionalField) {
+                    val notify =
+                        countingRecord.additionalFields.firstOrNull { it.code == editableField.getValue().code }
+                            ?.toPair()?.second != editableField.getValue()
+
                     // as additional field
-                    countingRecord.additionalFields =
-                        (countingRecord.additionalFields.filter {
-                            it.toPair().first != editableField.code
-                        } + listOfNotNull(editableField.value))
+                    if (notify) {
+                        countingRecord.additionalFields =
+                            (countingRecord.additionalFields.filter {
+                                it.code != editableField.getValue().code
+                            } + listOfNotNull(editableField.getValue()))
+                    }
+
+                    notify
                 } else {
+                    val notify =
+                        countingRecord.properties[editableField.getValue().code]?.toPair()?.second != editableField.getValue()
+
                     // as editable field
-                    editableField.value?.toPair()
-                        .also {
-                            if (it == null) countingRecord.properties.remove(editableField.code)
-                            else countingRecord.properties[editableField.code] =
-                                it.second
-                        }
+                    if (notify) {
+                        editableField.getValue()
+                            .toPair()
+                            .also {
+                                if (it.second.isEmpty()) countingRecord.properties.remove(editableField.getValue().code)
+                                else countingRecord.properties[editableField.getValue().code] =
+                                    it.second
+                            }
+                    }
+
+                    notify
                 }
 
-                listener?.onCountingRecord(countingRecord)
+                if (notify) {
+                    listener?.onCountingRecord(countingRecord)
+                }
+
+                if (adapter?.hasErrors() == true) {
+                    saveFab?.hide()
+                }
+                else {
+                    saveFab?.show()
+                }
 
                 val taxonomy = taxonRecord?.taxon?.taxonomy ?: Taxonomy(
                     Taxonomy.ANY,
                     Taxonomy.ANY
                 )
-                val propertyValue = editableField.value
+                val propertyValue = editableField.getValue()
 
-                if (propertyValue !== null && editableField.locked) propertyValueModel.setPropertyValue(
+                if (editableField.locked) propertyValueModel.setPropertyValue(
                     taxonomy,
                     propertyValue
                 ) else propertyValueModel.clearPropertyValue(
                     taxonomy,
-                    editableField.code
+                    editableField.getValue().code
                 )
+            }
+
+            override fun onAction(formField: FormField) {
+                // nothing to do…
             }
 
             override fun onAddMedia(nomenclatureTypeMnemonic: String) {
@@ -285,6 +323,7 @@ class EditCountingMetadataFragment : Fragment() {
                                     Logger.info { "add image from file '${imageFile.absolutePath}'" }
 
                                     countingRecord.medias.addFile(imageFile.absolutePath)
+                                    listener?.onCountingRecord(countingRecord)
 
                                     adapter?.setPropertyValues(
                                         *(countingRecord.properties.values
@@ -346,27 +385,15 @@ class EditCountingMetadataFragment : Fragment() {
                 ARG_WITH_ADDITIONAL_FIELDS,
                 false
             ) ?: false,
-            EditableField.Type.COUNTING,
+            FormField.Type.COUNTING,
             (arguments?.getParcelableArrayCompat<PropertySettings>(ARG_PROPERTIES)
                 ?.toList() ?: emptyList()),
             taxonRecord.taxon.taxonomy
         )
     }
 
-    private fun handleEditableFields(editableFields: List<EditableField>) {
-        editableFields.filter { it.value != null }
-            .forEach {
-                if (countingRecord?.properties?.containsKey(it.code) == true) return@forEach
-
-                it.value?.toPair()
-                    .also { pair ->
-                        if (pair == null) countingRecord?.properties?.remove(it.code)
-                        else countingRecord?.properties?.set(
-                            pair.first,
-                            pair.second
-                        )
-                    }
-            }
+    private fun handleEditableFields(editableFields: List<FormField>) {
+        mapDefaultValueToCountingRecord(editableFields)
 
         adapter?.bind(
             editableFields,
@@ -376,6 +403,51 @@ class EditCountingMetadataFragment : Fragment() {
                 ?.filterNot { it is PropertyValue.AdditionalFields }
                 ?: emptyList()) + (countingRecord?.additionalFields ?: emptyList())).toTypedArray()
         )
+
+        if (adapter?.hasErrors() == true) {
+            saveFab?.hide()
+        }
+        else {
+            saveFab?.extend()
+        }
+    }
+
+    private fun mapDefaultValueToCountingRecord(editableFields: List<FormField>) {
+        // map editable form fields existing values to the given counting record
+        editableFields.flatMap { ff ->
+            when (ff) {
+                is FormField.Editable -> listOf(ff)
+                is FormField.MinMax -> listOf(
+                    ff.min,
+                    ff.max
+                )
+
+                else -> listOf(null)
+            }
+        }
+            .filterNotNull()
+            .forEach { ff ->
+                // if we have existing value from counting record, do nothing
+                if (!ff.additionalField && countingRecord?.properties?.containsKey(ff.getValue().code) == true) return
+                if (ff.additionalField && countingRecord?.additionalFields?.associateBy { pv -> pv.code }
+                        ?.containsKey(ff.getValue().code) == true) return
+
+                // set default value from editable field to the given counting record
+                if (!ff.additionalField) {
+                    countingRecord?.properties?.set(
+                        ff.getValue().code,
+                        ff.getValue()
+                    )
+                }
+
+                if (ff.additionalField) {
+                    countingRecord?.also { record ->
+                        record.additionalFields = record.additionalFields.filter { pv ->
+                            pv.toPair().first != ff.getValue().code
+                        } + listOfNotNull(ff.getValue())
+                    }
+                }
+            }
     }
 
     private fun launchMediaActivity(selectedMedia: MediaRecord? = null) {
