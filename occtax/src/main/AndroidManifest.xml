@@ -41,6 +41,10 @@
             android:theme="@style/AppTheme.Login"
             android:windowSoftInputMode="adjustPan" />
         <activity
+            android:name="fr.geonature.datasync.ui.login.KeycloakLoginActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme.Login" />
+        <activity
             android:name=".ui.settings.PreferencesActivity"
             android:label="@string/activity_preferences_title"
             android:windowSoftInputMode="adjustResize" />
