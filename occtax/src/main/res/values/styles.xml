@@ -22,10 +22,11 @@
 
     </style>
 
+    <!-- no animated splash screen for Android < 12 (API 31) -->
     <style name="AppTheme.SplashScreen" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/primary</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_anim</item>
-        <item name="windowSplashScreenAnimationDuration">1200</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_splashscreen_flat</item>
+        <item name="windowSplashScreenAnimationDuration">@integer/splash_screen_duration</item>
         <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
     </style>
 

@@ -4,8 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -127,29 +125,23 @@ class HomeActivity : AppCompatActivity(),
     private var viewPager: ViewPager2? = null
     private var emptyTextView: TextView? = null
     private var progressSnackbar: Pair<Snackbar, CircularProgressIndicator>? = null
-
     private var appSettings: AppSettings? = null
 
     private lateinit var startSyncResultLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen().also {
+            var keepSplashScreenOn = true
+            lifecycleScope.launch {
+                delay(resources.getInteger(R.integer.splash_screen_duration).toLong())
+                keepSplashScreenOn = false
+            }
+            it.setKeepOnScreenCondition { keepSplashScreenOn }
+        }
+
+        super.onCreate(savedInstanceState)
 
         Logger.info { "onCreate: ${intent.action}" }
-
-        if (intent.action == Intent.ACTION_MAIN) {
-            val splashScreen = installSplashScreen()
-            var splashScreenStays = true
-            splashScreen.setKeepOnScreenCondition { splashScreenStays }
-            Handler(Looper.getMainLooper()).postDelayed(
-                { splashScreenStays = false },
-                1200L
-            )
-
-            super.onCreate(savedInstanceState)
-        } else {
-            super.onCreate(savedInstanceState)
-            setTheme(R.style.AppTheme_NoActionBar)
-        }
 
         setContentView(R.layout.activity_home)
 
