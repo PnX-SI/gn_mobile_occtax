@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.7.4](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.4) (2026-05-06, release)
+
+### 🐛 Corrections
+* Bascule sur le nouveau certificat de signature pour le build de l'APK au format v3 et abandon de la rotation des certificats qui embarquait l'ancien (https://github.com/PnX-SI/gn_mobile_occtax/issues/309).
+
+### ⚠️ Notes de version
+
+* Code de version : **3326**
+* Cette version nécessite la version [1.14.2 minimum de TaxHub](https://github.com/PnX-SI/TaxHub/releases/)
+  qui elle-même nécessite au minimum la version 2.14 de GeoNature.
+
 ## [2.7.3](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.7.3) (2026-01-07, release)
 
 ### 🐛 Corrections
