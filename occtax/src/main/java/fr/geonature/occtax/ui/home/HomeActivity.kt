@@ -454,9 +454,7 @@ class HomeActivity : AppCompatActivity(),
                         } ?: getString(R.string.sync_last_synchronization_never)
                     ))
             }
-            vm
-                .observeDataSyncStatus()
-                .observe(
+            vm.dataSyncStatus.observe(
                     this@HomeActivity
                 ) {
                     if (it == null) {
