@@ -11,6 +11,7 @@
 * Centrage automatique de la carte sur la dernière position connue de l'utilisateur. Le paramètre `map.center` est utilisée comme valeur par défaut, si la position n'a pas pu être résolue (https://github.com/PnX-SI/gn_mobile_occtax/issues/241).
 * Légère refonte de la gestion des taxons dans le relevé afin de pouvoir ajouter plusieurs occurrences d'un même taxon dans un relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/182).
 * Support de la recherche en texte intégrale dans la liste des taxons (https://github.com/PnX-SI/gn_mobile_occtax/issues/91). Cette fonctionnalité n'est disponible que sur la version 11 et supérieure d'Android (API 30+).
+* Ajout d'une de recherche textuelle dans le champ de sélection du jeu de données (https://github.com/PnX-SI/gn_mobile_occtax/issues/300)
 * Le champ `STATUT_OBS` issu de la nomenclature, fait maintenant partie des champs éditables dans la partie "Informations" (https://github.com/PnX-SI/gn_mobile_occtax/issues/66). Par défaut, il est non visible (donc non éditable par défaut), non obligatoire et prend la valeur par défaut remontée par l'API (`GET -> /api/occtax/defaultNomenclatures`). On peut tout à fait le rendre visible (donc éditable) via le paramétrage des nomenclatures.
 * Ajout de raccourcis au niveau de l'icône de lancement de l'application permettant de :
   * Démarrer un nouveau relevé
