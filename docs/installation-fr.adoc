@@ -101,7 +101,7 @@ Le fichier de configuration `settings.json` de l'application peut être directem
 
 Dans tous les cas, l'installation et la configuration centralisée devront être mis en place pour que la synchronisation des données fonctionne.
 Le fichier de configuration sur le serveur écrasera celui sur le terminal à chaque lancement de l'application *_Occtax-mobile_*.
-Il est cependant possible de surcoucher localement les paramètres de configuration via la création d'un fichier `settings_occtax.local.json`. Ce fichier devra être placé au même endroit que `settings_occtax.local.json`.
+Il est cependant possible de surcoucher localement les paramètres de configuration via la création d'un fichier `settings_occtax.local.json`. Ce fichier devra être placé au même endroit que le fichier `settings_occtax.json` (dans le dossier `/Android/data/fr.geonature.occtax2/` du terminal mobile).
 
 * Détail des paramètres du fichier de configuration : https://github.com/PnX-SI/gn_mobile_occtax#settings
 
