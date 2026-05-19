@@ -1,5 +1,47 @@
 # Changelog
 
+## 2.8.0 (unreleased)
+
+### 🚀 Nouveautés
+
+* Refonte des champs additionnels, intégrés au niveau des relevés, prenant en compte leur ordre, caractère obligatoire et valeur par défaut et désormais activés par défaut avec le paramètre `additional_fields` (https://github.com/PnX-SI/gn_mobile_occtax/issues/122, https://github.com/PnX-SI/gn_mobile_occtax/issues/285).
+* Améliorations du module cartographique, notamment sur le chargement des couches vectorielles (https://github.com/PnX-SI/gn_mobile_occtax/issues/170) et d'une refonte du gestionnaire des couches géographiques (https://github.com/PnX-SI/gn_mobile_occtax/issues/193).
+* Au niveau de la saisie d'un relevé, la saisie de la localisation se fait maintenant à la première étape (avant la saisie du choix des observateurs, du jeu de données, etc.) (https://github.com/PnX-SI/gn_mobile_occtax/issues/288).
+* Nouveau mode d'édition de la position du marqueur sur la carte en affichant un petit guide centré sur la carte afin d'aider et d'accélérer la saisie (https://github.com/PnX-SI/gn_mobile_occtax/issues/176).
+* Centrage automatique de la carte sur la dernière position connue de l'utilisateur. Le paramètre `map.center` est utilisée comme valeur par défaut, si la position n'a pas pu être résolue (https://github.com/PnX-SI/gn_mobile_occtax/issues/241).
+* Légère refonte de la gestion des taxons dans le relevé afin de pouvoir ajouter plusieurs occurrences d'un même taxon dans un relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/182).
+* Support de la recherche en texte intégrale dans la liste des taxons (https://github.com/PnX-SI/gn_mobile_occtax/issues/91). Cette fonctionnalité n'est disponible que sur la version 11 et supérieure d'Android (API 30+).
+* Ajout d'une de recherche textuelle dans le champ de sélection du jeu de données (https://github.com/PnX-SI/gn_mobile_occtax/issues/300).
+* Le champ `STATUT_OBS` issu de la nomenclature, fait maintenant partie des champs éditables dans la partie "Informations" (https://github.com/PnX-SI/gn_mobile_occtax/issues/66). Par défaut, il est non visible (donc non éditable par défaut), non obligatoire et prend la valeur par défaut remontée par l'API (`GET -> /api/occtax/defaultNomenclatures`). On peut tout à fait le rendre visible (donc éditable) via le paramétrage des nomenclatures.
+* Ajout de raccourcis au niveau de l'icône de lancement de l'application permettant de :
+    * Démarrer un nouveau relevé
+    * Reprendre le dernier relevé édité
+* Petites améliorations cosmétiques comme :
+    * Respect de la géométrie de l’icône adaptative de l'application en mode "debug"
+    * Écran de démarrage animé
+
+### 🐛 Corrections
+
+* Correction autour de la gestion de la date de build de l'application (https://github.com/PnX-SI/gn_mobile_occtax/issues/275).
+* Correction pour déterminer l'orientation des images ou des photos prises dans les dénombrements des taxons du relevé (https://github.com/PnX-SI/gn_mobile_occtax/issues/278).
+* Petites corrections d'ordre cosmétique notamment sur l'ordre d'affichage des champs de type média, positionnés à la fin du formulaire de dénombrement.
+* Notification de l'utilisateur lorsqu'une photo a été ajoutée lors de l'abandon de la saisie sur la partie dénombrement.
+* La synchronisation des données locales se lance automatiquement à chaque mise à jour du schéma de la base de données locale.
+* Légère refonte autour de la gestion des relevés, la sérialisation JSON des relevés comporte maintenant deux approches : la première pour gérer les relevés en local, la seconde pour gérer les relevés lors de la synchronisation.
+* Prise en compte de la date et l'heure locale selon le fuseau horaire du terminal dans la gestion des relevés (https://github.com/PnX-SI/gn_mobile_occtax/issues/304).
+* Lot de corrections diverses autour du module cartographique, notamment :
+    * Petites améliorations sur l'affichage des couches géographiques, notamment en affichant un petit "loader" pour les couches géographiques locales qui tardent à s'afficher. Les autres couches sont visibles et accessibles entre temps.
+    * Meilleur support du choix des couches géographiques locales à afficher sur la carte, notamment si elles sont prises depuis les raccourcis du sélecteur de fichiers comme "Downloads".
+    * Fin du support des fonds cartographiques venant de [Wikimedia Maps](https://maps.wikimedia.org) (cf. [Using maps in third-party services](https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use_for_Wikimedia_Maps#Using_maps_in_third-party_services)).
+
+### ⚠️ Notes de version
+
+* Code de version : **XXXX**
+* ⚠️ Cette version n'assure plus de compatibilité au niveau des signatures avec les versions
+  précédentes inférieures à la 2.7.0. Par exemple, mettre à jour une ancienne version comme la
+  version 2.6.0 directement à cette version ne fonctionnera pas (conflit au niveau des signatures).
+  Il faudra à minima passer à la version 2.7.0 puis à cette version.
+
 ## [2.8.0-rc6](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0-rc6) (2026-03-19, pre-release)
 
 ### 🚀 Nouveautés
