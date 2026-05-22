@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="nomenclature_typ_grp">Type de regroupement</string>
+    <string name="nomenclature_statut_obs">Statut d\'observation</string>
     <string name="nomenclature_meth_obs">Techniques d\'observation</string>
     <string name="nomenclature_eta_bio">État biologique</string>
     <string name="nomenclature_more">Informations avancées</string>

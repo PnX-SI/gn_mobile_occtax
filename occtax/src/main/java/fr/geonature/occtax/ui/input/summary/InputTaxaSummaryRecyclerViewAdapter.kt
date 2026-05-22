@@ -39,7 +39,7 @@ class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapte
         oldItemPosition: Int,
         newItemPosition: Int
     ): Boolean {
-        return oldItems[oldItemPosition].taxon.id == newItems[newItemPosition].taxon.id
+        return oldItems[oldItemPosition].internalId == newItems[newItemPosition].internalId
     }
 
     override fun areContentsTheSame(
@@ -62,31 +62,33 @@ class InputTaxaSummaryRecyclerViewAdapter(listener: OnListItemRecyclerViewAdapte
             title.text = item.taxon.name
             text1.text = item.taxon.commonName
             summary.text = buildInformation(*item.properties.values.toTypedArray())
+            // activate the marquee forever animation
             summary.isSelected = true
             text2.text = buildCounting(item.counting.counting.size)
         }
 
         private fun buildInformation(vararg propertyValue: PropertyValue): Spanned {
             return if (propertyValue.isEmpty()) SpannedString(itemView.context.getString(R.string.summary_taxon_information_empty))
-            else HtmlCompat.fromHtml(propertyValue
-                .asSequence()
-                .filterNot { it.isEmpty() }
-                .mapNotNull {
-                    when (it) {
-                        is PropertyValue.Text -> it.code to it.value
-                        is PropertyValue.Number -> it.code to it.value
-                        is PropertyValue.Nomenclature -> it.code to (it.label ?: it.value)
-                        else -> null
+            else HtmlCompat.fromHtml(
+                propertyValue
+                    .asSequence()
+                    .filterNot { it.isEmpty() }
+                    .mapNotNull {
+                        when (it) {
+                            is PropertyValue.Text -> it.code to it.value
+                            is PropertyValue.Number -> it.code to it.value
+                            is PropertyValue.Nomenclature -> it.code to (it.label ?: it.value)
+                            else -> null
+                        }
                     }
-                }
-                .map {
-                    itemView.context.getString(
-                        R.string.summary_taxon_information,
-                        getNomenclatureTypeLabel(it.first),
-                        it.second
-                    )
-                }
-                .joinToString(", "),
+                    .map {
+                        itemView.context.getString(
+                            R.string.summary_taxon_information,
+                            getNomenclatureTypeLabel(it.first),
+                            it.second
+                        )
+                    }
+                    .joinToString(", "),
                 HtmlCompat.FROM_HTML_MODE_LEGACY)
         }
 

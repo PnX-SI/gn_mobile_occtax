@@ -31,8 +31,8 @@ android {
         compileSdk 34
         minSdkVersion 26
         targetSdkVersion 34
-        versionCode 3326
-        versionName "2.7.4"
+        versionCode 3370
+        versionName "2.8.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         archivesBaseName = project.name + "-" + versionName
     }
@@ -84,6 +84,7 @@ dependencies {
 
     implementation libs.androidx.cardview
     implementation libs.androidx.constraintlayout
+    implementation libs.androidx.core.splashscreen
     implementation libs.androidx.exifinterface
     implementation libs.androidx.lifecycle.livedata.ktx
     implementation libs.androidx.preference.ktx

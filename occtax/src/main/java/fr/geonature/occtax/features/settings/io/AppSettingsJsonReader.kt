@@ -146,7 +146,7 @@ class AppSettingsJsonReader(private val fromExistingAppSettings: AppSettings? = 
         }
 
         var saveDefaultValues = false
-        var withAdditionalFields = false
+        var withAdditionalFields = true
         val information = mutableListOf<PropertySettings>()
         val counting = mutableListOf<PropertySettings>()
 
@@ -155,7 +155,7 @@ class AppSettingsJsonReader(private val fromExistingAppSettings: AppSettings? = 
         while (reader.hasNext()) {
             when (reader.nextName()) {
                 "save_default_values" -> saveDefaultValues = reader.nextBooleanOrElse { false }
-                "additional_fields" -> withAdditionalFields = reader.nextBooleanOrElse { false }
+                "additional_fields" -> withAdditionalFields = reader.nextBooleanOrElse { true }
                 "information" -> information.addAll(readPropertySettingsAsList(reader))
                 "counting" -> counting.addAll(readPropertySettingsAsList(reader))
                 else -> reader.skipValue()

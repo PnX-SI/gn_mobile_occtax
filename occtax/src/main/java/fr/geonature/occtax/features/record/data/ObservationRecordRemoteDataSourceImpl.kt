@@ -3,8 +3,8 @@ package fr.geonature.occtax.features.record.data
 import fr.geonature.occtax.api.IOcctaxAPIClient
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.error.ObservationRecordException
-import fr.geonature.occtax.features.record.io.ObservationRecordJsonWriter
-import fr.geonature.occtax.features.record.io.TaxonRecordJsonWriter
+import fr.geonature.occtax.features.record.io.ObservationRecordAPIJsonWriter
+import fr.geonature.occtax.features.record.io.TaxonRecordAPIJsonWriter
 import fr.geonature.occtax.features.settings.domain.AppSettings
 import org.json.JSONObject
 import retrofit2.await
@@ -18,9 +18,9 @@ import retrofit2.awaitResponse
 class ObservationRecordRemoteDataSourceImpl(private val occtaxAPIClient: IOcctaxAPIClient) :
     IObservationRecordRemoteDataSource {
 
-    private val observationRecordJsonWriter: ObservationRecordJsonWriter =
-        ObservationRecordJsonWriter()
-    private val taxonRecordJsonWriter: TaxonRecordJsonWriter = TaxonRecordJsonWriter()
+    private val observationRecordAPIJsonWriter: ObservationRecordAPIJsonWriter =
+        ObservationRecordAPIJsonWriter()
+    private val taxonRecordAPIJsonWriter: TaxonRecordAPIJsonWriter = TaxonRecordAPIJsonWriter()
 
     override fun setBaseUrl(url: String) {
         occtaxAPIClient.setBaseUrl(url)
@@ -34,24 +34,10 @@ class ObservationRecordRemoteDataSourceImpl(private val occtaxAPIClient: IOcctax
             throw ObservationRecordException.InvalidStatusException(observationRecord.internalId)
         }
 
-        val observationRecordToSend = ObservationRecord(
-            internalId = observationRecord.internalId,
-            geometry = observationRecord.geometry
-        ).apply {
-            comment.comment = observationRecord.comment.comment
-            dataset.dataset = observationRecord.dataset.dataset
-            dates.start = observationRecord.dates.start
-            dates.end = observationRecord.dates.end
-            observationRecord.observers.getAllObserverIds()
-                .forEach {
-                    observers.addObserverId(it)
-                }
-        }
-
         val observationRecordToSendAsJson = runCatching {
             JSONObject(
-                observationRecordJsonWriter.write(
-                    observationRecordToSend,
+                observationRecordAPIJsonWriter.write(
+                    observationRecord,
                     appSettings
                 )
             )
@@ -84,12 +70,7 @@ class ObservationRecordRemoteDataSourceImpl(private val occtaxAPIClient: IOcctax
 
         observationRecord.taxa.taxa.forEach {
             val asJson = runCatching {
-                JSONObject(
-                    taxonRecordJsonWriter.write(
-                        it,
-                        appSettings
-                    )
-                )
+                JSONObject(taxonRecordAPIJsonWriter.write(it))
             }.onFailure { throw ObservationRecordException.WriteException(observationRecord.internalId) }
                 .getOrThrow()
 

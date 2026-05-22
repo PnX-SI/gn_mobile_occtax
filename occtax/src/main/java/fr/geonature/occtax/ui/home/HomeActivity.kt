@@ -23,6 +23,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.FileProvider
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.graphics.drawable.IconCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
@@ -64,11 +68,13 @@ import fr.geonature.occtax.BuildConfig
 import fr.geonature.occtax.MainApplication
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.ObservationRecord
+import fr.geonature.occtax.features.record.presentation.ObservationRecordViewModel
 import fr.geonature.occtax.features.settings.domain.AppSettings
 import fr.geonature.occtax.features.settings.error.AppSettingsException
 import fr.geonature.occtax.features.settings.presentation.AppSettingsViewModel
 import fr.geonature.occtax.ui.input.InputPagerFragmentActivity
 import fr.geonature.occtax.ui.settings.PreferencesActivity
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.tinylog.Logger
@@ -96,6 +102,7 @@ class HomeActivity : AppCompatActivity(),
     private val dataSyncViewModel: DataSyncViewModel by viewModels()
     private val configureServerSettingsViewModel: ConfigureServerSettingsViewModel by viewModels()
     private val updateSettingsViewModel: UpdateSettingsViewModel by viewModels()
+    private val observationRecordViewModel: ObservationRecordViewModel by viewModels()
 
     @Inject
     lateinit var geoNatureAPIClient: IGeoNatureAPIClient
@@ -118,13 +125,23 @@ class HomeActivity : AppCompatActivity(),
     private var viewPager: ViewPager2? = null
     private var emptyTextView: TextView? = null
     private var progressSnackbar: Pair<Snackbar, CircularProgressIndicator>? = null
-
     private var appSettings: AppSettings? = null
 
     private lateinit var startSyncResultLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen().also {
+            var keepSplashScreenOn = true
+            lifecycleScope.launch {
+                delay(resources.getInteger(R.integer.splash_screen_duration).toLong())
+                keepSplashScreenOn = false
+            }
+            it.setKeepOnScreenCondition { keepSplashScreenOn }
+        }
+
         super.onCreate(savedInstanceState)
+
+        Logger.info { "onCreate: ${intent.action}" }
 
         setContentView(R.layout.activity_home)
 
@@ -192,7 +209,7 @@ class HomeActivity : AppCompatActivity(),
                 appSettings?.dataSyncSettings?.also { dataSyncSettings ->
                     dataSyncViewModel.startSync(
                         dataSyncSettings,
-                        appSettings?.nomenclatureSettings?.withAdditionalFields ?: false,
+                        appSettings?.nomenclatureSettings?.withAdditionalFields ?: true,
                         HomeActivity::class.java,
                         MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                     )
@@ -262,6 +279,7 @@ class HomeActivity : AppCompatActivity(),
         configureConfigureServerSettingsViewModel()
         configureUpdateSettingsViewModel()
         configureAppSettingsViewModel()
+        configureObservationRecordsViewModel()
 
         startSyncResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -274,7 +292,7 @@ class HomeActivity : AppCompatActivity(),
                         } else {
                             dataSyncViewModel.startSync(
                                 dataSyncSettings,
-                                appSettings?.nomenclatureSettings?.withAdditionalFields ?: false,
+                                appSettings?.nomenclatureSettings?.withAdditionalFields ?: true,
                                 HomeActivity::class.java,
                                 MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                             )
@@ -284,6 +302,15 @@ class HomeActivity : AppCompatActivity(),
             }
 
         updateSettingsViewModel.updateAppSettings()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+
+        // update the current intent from this new one
+        setIntent(intent)
+
+        handleShortcuts()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -362,9 +389,11 @@ class HomeActivity : AppCompatActivity(),
                 .checkAuthLogin()
                 .observeOnce(this@HomeActivity) {
                     if (checkGeoNatureSettings() && it == null) {
-                        Logger.info { "not connected, redirect to ${LoginActivity::class.java.name}" }
-
-                        startSyncResultLauncher.launch(LoginActivity.newIntent(this@HomeActivity))
+                        Logger.info { "not connected, redirect to ${LoginActivity::class.java.name}..." }
+                        lifecycleScope.launch {
+                            delay(100)
+                            startSyncResultLauncher.launch(LoginActivity.newIntent(this@HomeActivity))
+                        }
                     }
                 }
             vm.isLoggedIn.observe(
@@ -414,19 +443,18 @@ class HomeActivity : AppCompatActivity(),
                 }
             }
             vm.lastSynchronizedDate.observe(this@HomeActivity) { syncState ->
-                navMenuDataSync?.setText2(getString(
-                    R.string.sync_last_synchronization,
-                    syncState?.second?.let {
-                        android.text.format.DateFormat.format(
-                            getString(R.string.sync_last_synchronization_date),
-                            it
-                        )
-                    } ?: getString(R.string.sync_last_synchronization_never)
-                ))
+                navMenuDataSync?.setText2(
+                    getString(
+                        R.string.sync_last_synchronization,
+                        syncState?.second?.let {
+                            android.text.format.DateFormat.format(
+                                getString(R.string.sync_last_synchronization_date),
+                                it
+                            )
+                        } ?: getString(R.string.sync_last_synchronization_never)
+                    ))
             }
-            vm
-                .observeDataSyncStatus()
-                .observe(
+            vm.dataSyncStatus.observe(
                     this@HomeActivity
                 ) {
                     if (it == null) {
@@ -511,7 +539,7 @@ class HomeActivity : AppCompatActivity(),
                     dataSyncViewModel.configurePeriodicSync(
                         dataSyncSettings,
                         this@HomeActivity.appSettings?.nomenclatureSettings?.withAdditionalFields
-                            ?: false,
+                            ?: true,
                         HomeActivity::class.java,
                         MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                     )
@@ -520,7 +548,7 @@ class HomeActivity : AppCompatActivity(),
                         dataSyncViewModel.startSync(
                             dataSyncSettings,
                             this@HomeActivity.appSettings?.nomenclatureSettings?.withAdditionalFields
-                                ?: false,
+                                ?: true,
                             HomeActivity::class.java,
                             MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                         )
@@ -531,6 +559,8 @@ class HomeActivity : AppCompatActivity(),
                     dataSyncViewModel.hasLocalData()
                         .observeOnce(this@HomeActivity) { hasLocalData ->
                             if (hasLocalData == true) {
+                                handleShortcuts()
+
                                 dataSyncViewModel.lastSynchronizedDate.value?.second?.also { lastDataSynchronization ->
                                     if (
                                         lastDataSynchronization.add(
@@ -547,7 +577,7 @@ class HomeActivity : AppCompatActivity(),
                                         dataSyncViewModel.startSync(
                                             dataSyncSettings,
                                             this@HomeActivity.appSettings?.nomenclatureSettings?.withAdditionalFields
-                                                ?: false,
+                                                ?: true,
                                             HomeActivity::class.java,
                                             MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                                         )
@@ -561,7 +591,7 @@ class HomeActivity : AppCompatActivity(),
                                 dataSyncViewModel.startSync(
                                     dataSyncSettings,
                                     this@HomeActivity.appSettings?.nomenclatureSettings?.withAdditionalFields
-                                        ?: false,
+                                        ?: true,
                                     HomeActivity::class.java,
                                     MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                                 )
@@ -601,6 +631,42 @@ class HomeActivity : AppCompatActivity(),
         }
     }
 
+    private fun configureObservationRecordsViewModel() {
+        // check if we have at least one observation record, and if so, adds a shortcut to resume the last edited one
+        observationRecordViewModel.observationRecords.observe(this@HomeActivity) {
+            if (it.isEmpty()) {
+                ShortcutManagerCompat.removeAllDynamicShortcuts(this)
+            }
+
+            if (it.isNotEmpty()) {
+                val shortcut = ShortcutInfoCompat.Builder(
+                    this,
+                    "input_resume_last"
+                )
+                    .setShortLabel(getString(R.string.shortcut_input_resume_last_short))
+                    .setLongLabel(getString(R.string.shortcut_input_resume_last_long))
+                    .setIcon(
+                        IconCompat.createWithResource(
+                            this,
+                            R.drawable.ic_input_edit
+                        )
+                    )
+                    .setIntent(
+                        Intent(
+                            this,
+                            HomeActivity::class.java
+                        ).apply { action = getString(R.string.intent_action_input_resume_last) })
+                    .build()
+
+                ShortcutManagerCompat.removeAllDynamicShortcuts(this)
+                ShortcutManagerCompat.pushDynamicShortcut(
+                    this,
+                    shortcut
+                )
+            }
+        }
+    }
+
     private fun packageInfoUpdated(packageInfo: PackageInfo) {
         if (packageInfo.hasNewVersionAvailable()) {
             confirmBeforeUpgrade(this.packageName)
@@ -611,6 +677,41 @@ class HomeActivity : AppCompatActivity(),
         }
 
         appSettingsViewModel.loadAppSettings()
+    }
+
+    private fun handleShortcuts() {
+        val appSettings = appSettings ?: return
+
+        when (intent.action) {
+            // start a new input
+            getString(R.string.intent_action_input_new) -> {
+                Logger.info { "shortcut intent action: ${intent.action}" }
+                startActivity(
+                    InputPagerFragmentActivity.newIntent(
+                        this@HomeActivity,
+                        appSettings
+                    )
+                )
+            }
+            // resume last edited input
+            getString(R.string.intent_action_input_resume_last) -> {
+                Logger.info { "shortcut intent action: ${intent.action}" }
+                observationRecordViewModel.observationRecords.observeOnce(this@HomeActivity) { observationRecords ->
+                    (observationRecords ?: emptyList())
+                        .sortedByDescending { it.dates.lastModified }
+                        .firstOrNull { it.status == ObservationRecord.Status.DRAFT }
+                        ?.also { observationRecord ->
+                            startActivity(
+                                InputPagerFragmentActivity.newIntent(
+                                    this@HomeActivity,
+                                    appSettings,
+                                    observationRecord
+                                )
+                            )
+                        }
+                }
+            }
+        }
     }
 
     private fun handleError(error: Throwable) {
@@ -771,7 +872,8 @@ class HomeActivity : AppCompatActivity(),
 
         packageInfoViewModel
             .downloadAppPackage(packageName)
-            .observeUntil(this@HomeActivity,
+            .observeUntil(
+                this@HomeActivity,
                 { appPackageDownloadStatus ->
                     appPackageDownloadStatus?.state in arrayListOf(
                         WorkInfo.State.SUCCEEDED,

@@ -19,7 +19,11 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.core.view.get
+import androidx.core.view.isNotEmpty
+import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -116,7 +120,7 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
         )
 
         // we have a menu item to show in action bar
-        setHasOptionsMenu(true)
+        prepareToolbarMenu()
 
         val recyclerView = view.findViewById<RecyclerView>(android.R.id.list)
         progressBar = view.findViewById(android.R.id.progress)
@@ -144,6 +148,8 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
                 position: Int,
                 item: TaxonRecord
             ) {
+                startEditTaxon = false
+
                 context?.run {
                     getSystemService(
                         this,
@@ -161,7 +167,7 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
                             R.string.alert_dialog_ok
                         ) { dialog, _ ->
                             adapter?.remove(item)
-                            observationRecord?.taxa?.delete(item.taxon.id)
+                            observationRecord?.taxa?.delete(item.internalId)
                             listener.validateCurrentPage()
 
                             dialog.dismiss()
@@ -221,6 +227,7 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
             // bypass this page and redirect to the previous one if we have started editing the first taxon
             if (startEditTaxon && observationRecord?.taxa?.taxa?.isEmpty() == true) {
                 startEditTaxon = false
+                listener.finishEditTaxon()
                 listener.goToPreviousPage()
                 return@post
             }
@@ -235,74 +242,6 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
             // finish taxon editing workflow
             startEditTaxon = false
             listener.finishEditTaxon()
-        }
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onCreateOptionsMenu(
-        menu: Menu,
-        inflater: MenuInflater
-    ) {
-
-        super.onCreateOptionsMenu(
-            menu,
-            inflater
-        )
-
-        with(inflater) {
-            inflate(
-                R.menu.date,
-                menu
-            )
-            inflate(
-                R.menu.filter,
-                menu
-            )
-        }
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        super.onPrepareOptionsMenu(menu)
-
-        val dateMenuItem = menu.findItem(R.id.menu_date)
-        dateMenuItem.isVisible = dateSettings.endDateSettings != null
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu_date -> {
-                val supportFragmentManager = activity?.supportFragmentManager ?: return true
-
-                InputDateDialogFragment.newInstance(
-                    InputDateSettings(endDateSettings = dateSettings.endDateSettings),
-                    observationRecord?.dates?.start ?: Date(),
-                    observationRecord?.dates?.end
-                )
-                    .apply {
-                        setOnInputDateDialogFragmentListenerListener(onInputDateDialogFragmentListener)
-                        show(
-                            supportFragmentManager,
-                            INPUT_DATE_DIALOG_FRAGMENT
-                        )
-                    }
-
-                return true
-            }
-            R.id.menu_filter -> {
-                val context = context ?: return true
-
-                taxaFilterResultLauncher.launch(
-                    TaxaFilterActivity.newIntent(
-                        context,
-                        filter = getSelectedFilters().toTypedArray()
-                    )
-                )
-
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -327,22 +266,21 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
     }
 
     override fun validate(): Boolean {
-        return startEditTaxon || (this.observationRecord?.taxa?.taxa ?: emptyList()).all {
-            it.properties.isNotEmpty() && it.counting.counting.isNotEmpty()
-        }
+        return startEditTaxon || ((this.observationRecord?.taxa?.taxa
+            ?: emptyList()).isNotEmpty() && (this.observationRecord?.taxa?.taxa
+            ?: emptyList()).none {
+            it.properties.isEmpty() || it.counting.counting.isEmpty()
+        })
     }
 
     override fun refreshView() {
-        // FIXME: this is a workaround to refresh adapter's list as getInputTaxa() items are not immutable...
-        if ((adapter?.itemCount ?: 0) > 0) adapter?.clear()
-
         val selectedFilters =
             savedState.getParcelableArrayCompat<Filter<*>>(KEY_SELECTED_FILTERS)
                 ?.toList() ?: emptyList()
         val filterByTaxonomy =
             selectedFilters.find { filter -> filter.type == Filter.FilterType.TAXONOMY }?.value as Taxonomy?
 
-        adapter?.setItems((observationRecord?.taxa?.taxa ?: emptyList()).filter {
+        adapter?.setItems((observationRecord?.taxa?.taxa?.map { it.copy() } ?: emptyList()).filter {
             val taxonomy = filterByTaxonomy ?: return@filter true
 
             // filter by kingdom only
@@ -352,6 +290,73 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
 
             it.taxon.taxonomy == taxonomy
         })
+    }
+
+    private fun prepareToolbarMenu() {
+        (requireActivity() as MenuHost).addMenuProvider(
+            object : MenuProvider {
+                override fun onPrepareMenu(menu: Menu) {
+                    super.onPrepareMenu(menu)
+
+                    val dateMenuItem = menu.findItem(R.id.menu_date)
+                    dateMenuItem.isVisible = dateSettings.endDateSettings != null
+                }
+
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    with(menuInflater) {
+                        inflate(
+                            R.menu.date,
+                            menu
+                        )
+                        inflate(
+                            R.menu.filter,
+                            menu
+                        )
+                    }
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when (menuItem.itemId) {
+                        R.id.menu_date -> {
+                            val supportFragmentManager =
+                                activity?.supportFragmentManager ?: return true
+
+                            InputDateDialogFragment.newInstance(
+                                InputDateSettings(endDateSettings = dateSettings.endDateSettings),
+                                observationRecord?.dates?.start ?: Date(),
+                                observationRecord?.dates?.end
+                            )
+                                .apply {
+                                    setOnInputDateDialogFragmentListenerListener(onInputDateDialogFragmentListener)
+                                    show(
+                                        supportFragmentManager,
+                                        INPUT_DATE_DIALOG_FRAGMENT
+                                    )
+                                }
+
+                            return true
+                        }
+
+                        R.id.menu_filter -> {
+                            val context = context ?: return true
+
+                            taxaFilterResultLauncher.launch(
+                                TaxaFilterActivity.newIntent(
+                                    context,
+                                    filter = getSelectedFilters().toTypedArray()
+                                )
+                            )
+
+                            true
+                        }
+
+                        else -> false
+                    }
+                }
+            },
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED
+        )
     }
 
     private fun applyFilters(vararg filter: Filter<*>) {
@@ -385,7 +390,7 @@ class InputTaxaSummaryFragment : AbstractInputFragment() {
             filterChipGroup.removeView(it)
         }
 
-        filterChipGroup.visibility = if (filterChipGroup.childCount > 0) View.VISIBLE else View.GONE
+        filterChipGroup.visibility = if (filterChipGroup.isNotEmpty()) View.VISIBLE else View.GONE
 
         if (selectedTaxonomy != null) {
             filterChipGroup.visibility = View.VISIBLE

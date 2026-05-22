@@ -100,13 +100,12 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
 
         Logger.info { "loading observation record: ${observationRecord.id}" }
 
-        observationRecordViewModel.startEdit(observationRecord)
+        observationRecordViewModel.startEdit(
+            observationRecord,
+            appSettings.nomenclatureSettings?.withAdditionalFields ?: true
+        )
 
         pageFragmentViewModel.set(
-            R.string.pager_fragment_observers_and_date_input_title to ObserversAndDateInputFragment.newInstance(
-                dateSettings = appSettings.inputSettings.dateSettings,
-                saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues ?: false
-            ),
             R.string.pager_fragment_map_title to InputMapFragment.newInstance(
                 MapSettings.Builder()
                     .from(appSettings.mapSettings)
@@ -115,6 +114,11 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
                     .showZoom(showZoom(this))
                     .editMode(EditFeatureButton.EditMode.SINGLE)
                     .build()
+            ),
+            R.string.pager_fragment_observers_and_date_input_title to ObserversAndDateInputFragment.newInstance(
+                dateSettings = appSettings.inputSettings.dateSettings,
+                withAdditionalFields = appSettings.nomenclatureSettings?.withAdditionalFields
+                    ?: true
             ),
             R.string.pager_fragment_summary_title to InputTaxaSummaryFragment.newInstance(appSettings.inputSettings.dateSettings)
         )
@@ -183,25 +187,30 @@ class InputPagerFragmentActivity : AbstractPagerFragmentActivity(),
 
     override fun startEditTaxon() {
         pageFragmentViewModel.add(
-            R.string.pager_fragment_taxa_title to TaxaFragment.newInstance(
-                appSettings.areaObservationDuration,
-                appSettings.dataSyncSettings.taxrefListId.toLong()
-            ),
-            R.string.pager_fragment_information_title to InformationFragment.newInstance(
-                saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues ?: false,
-                withAdditionalFields = appSettings.nomenclatureSettings?.withAdditionalFields
-                    ?: false,
-                *appSettings.nomenclatureSettings?.information?.toTypedArray()
-                    ?: emptyArray()
-            ),
-            R.string.pager_fragment_counting_title to CountingFragment.newInstance(
-                saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues ?: false,
-                withAdditionalFields = appSettings.nomenclatureSettings?.withAdditionalFields
-                    ?: false,
-                *appSettings.nomenclatureSettings?.counting?.toTypedArray()
-                    ?: emptyArray()
-            ),
-            R.string.pager_fragment_taxa_added_title to InputTaxaSummaryFragment.newInstance(appSettings.inputSettings.dateSettings)
+            *(listOfNotNull(
+                if (observationRecord.taxa.selectedTaxonRecord == null) R.string.pager_fragment_taxa_title to TaxaFragment.newInstance(
+                    appSettings.areaObservationDuration,
+                    appSettings.dataSyncSettings.taxrefListId.toLong()
+                ) else null
+            ) + listOf(
+                R.string.pager_fragment_information_title to InformationFragment.newInstance(
+                    saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues
+                        ?: false,
+                    withAdditionalFields = appSettings.nomenclatureSettings?.withAdditionalFields
+                        ?: true,
+                    *appSettings.nomenclatureSettings?.information?.toTypedArray()
+                        ?: emptyArray()
+                ),
+                R.string.pager_fragment_counting_title to CountingFragment.newInstance(
+                    saveDefaultValues = appSettings.nomenclatureSettings?.saveDefaultValues
+                        ?: false,
+                    withAdditionalFields = appSettings.nomenclatureSettings?.withAdditionalFields
+                        ?: true,
+                    *appSettings.nomenclatureSettings?.counting?.toTypedArray()
+                        ?: emptyArray()
+                ),
+                R.string.pager_fragment_taxa_added_title to InputTaxaSummaryFragment.newInstance(appSettings.inputSettings.dateSettings)
+            )).toTypedArray()
         )
         goToNextPage()
     }

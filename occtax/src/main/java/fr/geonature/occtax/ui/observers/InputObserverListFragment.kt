@@ -9,6 +9,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -31,7 +33,7 @@ import fr.geonature.occtax.R.layout.fast_scroll_recycler_view
 import javax.inject.Inject
 
 /**
- * [Fragment] to let the user to choose an [InputObserver] from the list.
+ * [Fragment] to let the user choose an [InputObserver] from the list.
  *
  * @author S. Grimault
  */
@@ -223,44 +225,11 @@ class InputObserverListFragment : Fragment() {
         )
 
         // we have a menu item to show in action bar
-        setHasOptionsMenu(true)
+        prepareToolbarMenu()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(savedState.apply { putAll(outState) })
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onCreateOptionsMenu(
-        menu: Menu,
-        inflater: MenuInflater
-    ) {
-
-        super.onCreateOptionsMenu(
-            menu,
-            inflater
-        )
-
-        inflater.inflate(
-            R.menu.search,
-            menu
-        )
-
-        (menu.findItem(R.id.action_search)?.actionView as SearchView?)?.apply {
-            configureSearchView(this)
-        }
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                listener?.onSelectedInputObservers(emptyList())
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
-        }
     }
 
     override fun onAttach(context: Context) {
@@ -277,6 +246,39 @@ class InputObserverListFragment : Fragment() {
         super.onDetach()
 
         listener = null
+    }
+
+    private fun prepareToolbarMenu() {
+        requireActivity().addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(
+                    menu: Menu,
+                    menuInflater: MenuInflater
+                ) {
+                    menuInflater.inflate(
+                        R.menu.search,
+                        menu
+                    )
+
+                    (menu.findItem(R.id.action_search)?.actionView as SearchView?)?.apply {
+                        configureSearchView(this)
+                    }
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when (menuItem.itemId) {
+                        android.R.id.home -> {
+                            listener?.onSelectedInputObservers(emptyList())
+                            true
+                        }
+
+                        else -> false
+                    }
+                }
+            },
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED
+        )
     }
 
     private fun configureSearchView(searchView: SearchView) {

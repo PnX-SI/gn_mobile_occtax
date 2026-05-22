@@ -37,7 +37,7 @@ class DefaultPropertyValueRepositoryImpl(
             .filter { propertyValue ->
                 runCatching {
                     nomenclatureLocalDataSource.getNomenclatureValuesByTypeAndTaxonomy(
-                        propertyValue.toPair().first,
+                        propertyValue.code,
                         taxonomy
                     )
                 }.getOrElse { emptyList() }
@@ -61,7 +61,7 @@ class DefaultPropertyValueRepositoryImpl(
             )
         }.fold(
             onSuccess = { Right(Unit) },
-            onFailure = { Left(PropertyValueFailure(propertyValue.toPair().first)) }
+            onFailure = { Left(PropertyValueFailure(propertyValue.code)) }
         )
     }
 

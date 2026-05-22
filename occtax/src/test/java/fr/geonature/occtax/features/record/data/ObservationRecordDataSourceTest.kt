@@ -11,8 +11,8 @@ import fr.geonature.mountpoint.util.FileUtils
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.error.ObservationRecordException
-import fr.geonature.occtax.features.record.io.ObservationRecordJsonReader
-import fr.geonature.occtax.features.record.io.ObservationRecordJsonWriter
+import fr.geonature.occtax.features.record.io.ObservationRecordDefaultJsonReader
+import fr.geonature.occtax.features.record.io.ObservationRecordDefaultJsonWriter
 import io.mockk.MockKAnnotations.init
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -23,6 +23,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.io.File
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneId
 
 /**
  * Unit tests about [IObservationRecordLocalDataSource].
@@ -43,6 +46,10 @@ class ObservationRecordDataSourceTest {
     private lateinit var observationRecordLocalDataSource: IObservationRecordLocalDataSource
 
     private val geoNatureModuleName = "occtax"
+    private val fixedClock = Clock.fixed(
+        Instant.parse("2016-10-30T08:00:00Z"),
+        ZoneId.of("UTC")
+    )
 
     @Before
     fun setUp() {
@@ -52,6 +59,7 @@ class ObservationRecordDataSourceTest {
         observationRecordLocalDataSource = ObservationRecordLocalDataSourceImpl(
             application,
             geoNatureModuleName,
+            fixedClock,
             coroutineTestRule.testDispatcher
         )
     }
@@ -99,7 +107,7 @@ class ObservationRecordDataSourceTest {
             )
                 .bufferedWriter()
                 .use { out ->
-                    out.write(ObservationRecordJsonWriter().write(record4))
+                    out.write(ObservationRecordDefaultJsonWriter().write(record4))
                     out.flush()
                     out.close()
                 }
@@ -123,7 +131,8 @@ class ObservationRecordDataSourceTest {
     @Test
     fun `should throw NotFoundException if trying to read undefined observation record`() =
         runTest {
-            val exception = runCatching { observationRecordLocalDataSource.read(1234) }.exceptionOrNull()
+            val exception =
+                runCatching { observationRecordLocalDataSource.read(1234) }.exceptionOrNull()
 
             assertTrue(exception is ObservationRecordException.NotFoundException)
             assertEquals(
@@ -259,7 +268,7 @@ class ObservationRecordDataSourceTest {
             )
             assertTrue(exportedJsonFile.exists())
 
-            val observationRecordFromExportedJsonFile = ObservationRecordJsonReader().read(
+            val observationRecordFromExportedJsonFile = ObservationRecordDefaultJsonReader().read(
                 exportedJsonFile.bufferedReader()
             )
             assertEquals(
@@ -311,7 +320,8 @@ class ObservationRecordDataSourceTest {
             assertTrue(exportedJsonFile.exists())
 
             // when editing again this exported observation record
-            val savedObservationRecord = observationRecordLocalDataSource.save(exportedObservationRecord)
+            val savedObservationRecord =
+                observationRecordLocalDataSource.save(exportedObservationRecord)
 
             // and reading this observation record from local data source
             observationRecordFromLocalDataSource =

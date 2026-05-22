@@ -3,6 +3,7 @@ package fr.geonature.occtax.features.record.domain
 import android.os.Parcelable
 import fr.geonature.commons.data.entity.AbstractTaxon
 import fr.geonature.commons.data.entity.Dataset
+import fr.geonature.commons.data.entity.InputObserver
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import org.locationtech.jts.geom.Geometry
@@ -82,6 +83,25 @@ data class ObservationRecord(
         properties
     )
 
+    /**
+     * Additional fields of this observation record.
+     */
+    @IgnoredOnParcel
+    var additionalFields: List<PropertyValue>
+        get() = properties[ADDITIONAL_FIELDS_KEY]
+            ?.takeIf { it is PropertyValue.AdditionalFields }
+            ?.let { it as PropertyValue.AdditionalFields }?.value?.values?.toList()
+            ?: emptyList()
+        set(value) {
+            PropertyValue.AdditionalFields(
+                ADDITIONAL_FIELDS_KEY,
+                value.associate { it.toPair() }
+            )
+                .also {
+                    properties[it.code] = it
+                }
+        }
+
     enum class Status {
         DRAFT,
         TO_SYNC,
@@ -139,8 +159,7 @@ class DatasetRecord(private val properties: SortedMap<String, PropertyValue>) {
         set(value) {
             PropertyValue.Dataset(
                 DATASET_ID_KEY,
-                value?.datasetId,
-                value?.taxaListId
+                value?.value
             )
                 .also {
                     if (it.isEmpty()) properties.remove(DATASET_ID_KEY)
@@ -151,15 +170,19 @@ class DatasetRecord(private val properties: SortedMap<String, PropertyValue>) {
     fun setDataset(dataset: Dataset?) {
         this.dataset = PropertyValue.Dataset(
             DATASET_ID_KEY,
-            dataset?.id,
-            dataset?.taxaListId
+            dataset
         )
     }
 
     fun setDatasetId(datasetId: Long?) {
         this.dataset = PropertyValue.Dataset(
             DATASET_ID_KEY,
-            datasetId
+            datasetId?.let {
+                Dataset(
+                    id = it,
+                    name = ""
+                )
+            }
         )
     }
 
@@ -175,12 +198,18 @@ class DatasetRecord(private val properties: SortedMap<String, PropertyValue>) {
  */
 class DatesRecord(private val properties: SortedMap<String, PropertyValue>) {
 
+    init {
+        start
+        end
+        lastModified
+    }
+
     /**
      * The start date of this observation record.
      */
     var start: Date
         get() = properties[DATE_MIN_KEY].takeIf { it is PropertyValue.Date }
-            ?.let { it as PropertyValue.Date }?.value ?: Date()
+            ?.let { it as PropertyValue.Date }?.value ?: Date().also { start = it }
         set(value) {
             PropertyValue.Date(
                 DATE_MIN_KEY,
@@ -200,7 +229,7 @@ class DatesRecord(private val properties: SortedMap<String, PropertyValue>) {
      */
     var end: Date
         get() = properties[DATE_MAX_KEY].takeIf { it is PropertyValue.Date }
-            ?.let { it as PropertyValue.Date }?.value ?: start
+            ?.let { it as PropertyValue.Date }?.value ?: start.also { end = it }
         set(value) {
             PropertyValue.Date(
                 DATE_MAX_KEY,
@@ -215,9 +244,26 @@ class DatesRecord(private val properties: SortedMap<String, PropertyValue>) {
             }
         }
 
+    /**
+     * The last modified date of this observation record.
+     */
+    var lastModified: Date
+        get() = properties[DATE_LAST_MODIFIED].takeIf { it is PropertyValue.Date }
+            ?.let { it as PropertyValue.Date }?.value ?: Date().also { lastModified = it }
+        set(value) {
+            PropertyValue.Date(
+                DATE_LAST_MODIFIED,
+                value
+            )
+                .also {
+                    properties[it.code] = it
+                }
+        }
+
     companion object {
         const val DATE_MIN_KEY = "date_min"
         const val DATE_MAX_KEY = "date_max"
+        const val DATE_LAST_MODIFIED = "date_last_modified"
     }
 }
 
@@ -285,6 +331,39 @@ class ModuleRecord(private val properties: SortedMap<String, PropertyValue>) {
 class ObserversRecord(private val properties: SortedMap<String, PropertyValue>) {
 
     /**
+     * All observers of this observation record.
+     */
+    var observers: PropertyValue.Observers?
+        get() = properties[OBSERVERS_KEY].takeIf { it is PropertyValue.Observers }
+            ?.let { it as PropertyValue.Observers }
+        set(value) {
+            // the "primary" observer at first position
+            PropertyValue.Number(
+                DIGITISER_KEY,
+                value?.value?.firstOrNull()?.id
+            )
+                .also {
+                    if (it.isEmpty()) properties.remove(DIGITISER_KEY)
+                    properties[it.code] = it
+                }
+            PropertyValue.Observers(
+                OBSERVERS_KEY,
+                value?.value ?: emptyArray()
+            )
+                .also {
+                    if (it.isEmpty()) properties.remove(OBSERVERS_KEY)
+                    else properties[it.code] = it
+                }
+        }
+
+    fun setObservers(inputObservers: List<InputObserver>) {
+        observers = PropertyValue.Observers(
+            OBSERVERS_KEY,
+            value = inputObservers.toTypedArray()
+        )
+    }
+
+    /**
      * Gets the primary observer of this observation record.
      */
     fun getPrimaryObserverId(): Long? {
@@ -297,9 +376,9 @@ class ObserversRecord(private val properties: SortedMap<String, PropertyValue>) 
      */
     fun getAllObserverIds(): Set<Long> {
         return properties[OBSERVERS_KEY]
-            ?.takeIf { it is PropertyValue.NumberArray }
-            ?.let { it as PropertyValue.NumberArray }
-            ?.value?.map { it.toLong() }
+            ?.takeIf { it is PropertyValue.Observers }
+            ?.let { it as PropertyValue.Observers }
+            ?.value?.map { it.id }
             ?.toSet() ?: emptySet()
     }
 
@@ -314,16 +393,11 @@ class ObserversRecord(private val properties: SortedMap<String, PropertyValue>) 
             .also {
                 properties[it.code] = it
             }
-        PropertyValue.NumberArray(
+
+        PropertyValue.Observers(
             OBSERVERS_KEY,
-            getAllObserverIds().toMutableList()
-                .also {
-                    it.add(
-                        0,
-                        id
-                    )
-                }
-                .toTypedArray()
+            observers?.let { arrayOf(InputObserver(id)) + it.value.filterNot { inputObserver -> inputObserver.id == id } }
+                ?: arrayOf(InputObserver(id))
         )
             .also {
                 properties[it.code] = it
@@ -344,13 +418,13 @@ class ObserversRecord(private val properties: SortedMap<String, PropertyValue>) 
                 }
         }
 
-        PropertyValue.NumberArray(
+        PropertyValue.Observers(
             OBSERVERS_KEY,
-            getAllObserverIds().toMutableList()
-                .also {
-                    it.add(id)
-                }
-                .toTypedArray()
+            observers?.let {
+                it.value.filterNot { inputObserver -> inputObserver.id == id }
+                    .toTypedArray() + arrayOf(InputObserver(id))
+            }
+                ?: arrayOf(InputObserver(id))
         )
             .also {
                 properties[it.code] = it
@@ -391,8 +465,7 @@ class TaxaRecord(
         set(value) {
             PropertyValue.Taxa(
                 TAXA_KEY,
-                value.distinctBy { it.taxon.id }
-                    .toTypedArray()
+                value.toTypedArray()
             )
                 .also {
                     properties[it.code] = it
@@ -408,13 +481,13 @@ class TaxaRecord(
             ?.let { it as PropertyValue.Number }?.value?.let {
                 properties[TAXA_KEY]?.takeIf { it is PropertyValue.Taxa }
                     ?.let { it as PropertyValue.Taxa }?.value?.firstOrNull { taxonRecord ->
-                        taxonRecord.taxon.id == it
+                        taxonRecord.internalId == it
                     }
             }
         set(value) {
             PropertyValue.Number(
                 CURRENT_TAXON_ID,
-                value?.taxon?.id
+                value?.internalId
             )
                 .also {
                     if (it.isEmpty()) properties.remove(CURRENT_TAXON_ID)
@@ -425,14 +498,15 @@ class TaxaRecord(
     /**
      * Adds a taxon record from given [AbstractTaxon].
      */
-    fun add(taxon: AbstractTaxon): TaxonRecord {
+    fun add(taxon: AbstractTaxon, internalId: Long? = null): TaxonRecord {
         return TaxonRecord(
             recordId = recordId,
             taxon = taxon
-        ).also {
-            taxa = taxa.filterNot { t -> it.taxon.id == t.taxon.id } + listOf(it)
-            selectedTaxonRecord = it
-        }
+        ).let { it.copy(internalId = internalId ?: it.internalId) }
+            .also {
+                taxa = taxa.filterNot { t -> it.internalId == t.internalId } + listOf(it)
+                selectedTaxonRecord = it
+            }
     }
 
     /**
@@ -441,7 +515,7 @@ class TaxaRecord(
     fun addOrUpdate(taxonRecord: TaxonRecord): TaxonRecord {
         return taxonRecord.copy(recordId = recordId)
             .also {
-                taxa = taxa.filterNot { t -> it.taxon.id == t.taxon.id } + listOf(it)
+                taxa = taxa.filterNot { t -> it.internalId == t.internalId } + listOf(it)
                 selectedTaxonRecord = it
             }
     }
@@ -451,15 +525,23 @@ class TaxaRecord(
      *
      * @return the deleted [TaxonRecord], `null` otherwise
      */
-    fun delete(taxonId: Long): TaxonRecord? {
-        val taxonRecordToDelete = taxa.find { it.taxon.id == taxonId }
-        taxa = taxa.filterNot { it.taxon.id == taxonId }
+    fun delete(id: Long): TaxonRecord? {
+        val taxonRecordToDelete = taxa.find { it.internalId == id }
+        taxa = taxa.filterNot { it.internalId == id }
 
-        if (selectedTaxonRecord?.taxon?.id == taxonId) {
+        if (selectedTaxonRecord?.internalId == id) {
             selectedTaxonRecord = null
         }
 
         return taxonRecordToDelete
+    }
+
+    /**
+     * Clears all added taxa.
+     */
+    fun clearAll() {
+        properties.remove(TAXA_KEY)
+        properties.remove(CURRENT_TAXON_ID)
     }
 
     companion object {
@@ -473,7 +555,7 @@ class TaxaRecord(
  *
  * @return an unique ID
  */
-private fun generateId(): Long {
+fun generateId(): Long {
     val now = Calendar.getInstance()
         .apply {
             set(

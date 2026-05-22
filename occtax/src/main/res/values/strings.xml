@@ -75,6 +75,11 @@
     </plurals>
     <string name="action_save">Save</string>
 
+    <string name="shortcut_input_start_short">New input</string>
+    <string name="shortcut_input_start_long">Start a new input</string>
+    <string name="shortcut_input_resume_last_short">Resume the last input</string>
+    <string name="shortcut_input_resume_last_long">Resume the last input</string>
+
     <string name="alert_new_app_version_available_title">New version available</string>
     <string name="alert_new_app_version_available_description">A new version of this app is available.\nWould you like to upgrade now?</string>
     <string name="alert_new_app_version_action_ok">Yes</string>
@@ -165,6 +170,8 @@
         <item quantity="other">%d days</item>
     </plurals>
 
+    <string name="form_field_error_mandatory">Mandatory field</string>
+
     <string name="information_no_data">⚠ No nomenclature found.\nPlease start a data synchronization.</string>
 
     <string name="counting_no_data">No counting.\nCreate a new one by tapping the + button.</string>
@@ -201,5 +208,6 @@
     </plurals>
     <string name="summary_taxon_counting_zero">⚠ no counting</string>
     <string name="summary_toast_no_input_taxon">No input taxon.\nRedirecting to the last valid step.</string>
+    <string name="summary_warning_existing_inputs">⚠ Existing inputs, the URL cannot be changed.</string>
 
 </resources>

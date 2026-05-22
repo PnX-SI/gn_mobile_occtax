@@ -40,7 +40,7 @@ import org.tinylog.Logger
 class ObservationRecordsListFragment : Fragment(R.layout.fragment_recycler_view_fab) {
 
     private val dataSyncViewModel: DataSyncViewModel by activityViewModels()
-    private val observationRecordViewModel: ObservationRecordViewModel by viewModels()
+    private val observationRecordViewModel: ObservationRecordViewModel by activityViewModels()
 
     private var listener: OnObservationRecordListener? = null
 

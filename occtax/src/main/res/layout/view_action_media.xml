@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:paddingHorizontal="4dp"
         android:textAllCaps="false"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="List items title" />
