@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.8.0 (unreleased)
+## [2.8.0](https://github.com/PnX-SI/gn_mobile_occtax/releases/tag/2.8.0) (2026-05-22, release)
 
 ### 🚀 Nouveautés
 
@@ -36,7 +36,7 @@
 
 ### ⚠️ Notes de version
 
-* Code de version : **XXXX**
+* Code de version : **3370**
 * ⚠️ Cette version n'assure plus de compatibilité au niveau des signatures avec les versions
   précédentes inférieures à la 2.7.0. Par exemple, mettre à jour une ancienne version comme la
   version 2.6.0 directement à cette version ne fonctionnera pas (conflit au niveau des signatures).
