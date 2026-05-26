@@ -28,6 +28,7 @@ import fr.geonature.occtax.features.settings.domain.InputDateSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -36,7 +37,6 @@ import java.util.Date
 import java.util.TimeZone
 import java.util.UUID
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * [FormFieldAdapter] view holder representing a group of start and end dates.
@@ -77,7 +77,7 @@ class FormFieldStartEndViewHolder(
                         listener.onUpdate(it)
                     }
                 }
-                // workaround to request focus on a non editable field...
+                // workaround to request focus on a non-editable field...
                 setOnTouchListener { v, event ->
                     if (MotionEvent.ACTION_UP == event.action) {
                         v.requestFocus()
@@ -271,13 +271,13 @@ class FormFieldStartEndViewHolder(
         withTime: Boolean = false,
         from: Date = Date()
     ): Date =
-        suspendCoroutine { continuation ->
+        suspendCancellableCoroutine { continuation ->
             val fragmentManager = listener.fragmentManager()
 
             if (fragmentManager == null) {
                 continuation.resume(from)
 
-                return@suspendCoroutine
+                return@suspendCancellableCoroutine
             }
 
             with(
@@ -294,7 +294,8 @@ class FormFieldStartEndViewHolder(
                             TimeZone.getTimeZone("UTC")
                                 .toZoneId()
                         )
-                            .atZone(ZoneId.systemDefault()).toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toInstant()
                     )
                         .set(
                             Calendar.MINUTE,
