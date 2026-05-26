@@ -48,7 +48,7 @@ import java.util.Locale
 import javax.inject.Inject
 
 /**
- * [Fragment] to let the user to select observers and dataset to the given [ObservationRecord].
+ * [Fragment] to let the user choose observers and dataset to the given [ObservationRecord].
  *
  * @author S. Grimault
  */
