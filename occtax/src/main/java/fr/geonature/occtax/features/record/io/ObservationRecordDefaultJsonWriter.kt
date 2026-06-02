@@ -7,12 +7,9 @@ import fr.geonature.maps.jts.geojson.io.GeoJsonWriter
 import fr.geonature.occtax.features.record.domain.DatesRecord
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
-import fr.geonature.occtax.features.settings.domain.AppSettings
-import fr.geonature.occtax.features.settings.domain.InputDateSettings
 import java.io.IOException
 import java.io.StringWriter
 import java.io.Writer
-import java.util.TimeZone
 
 /**
  * Default `JsonWriter` about writing an [ObservationRecord] as `JSON`.

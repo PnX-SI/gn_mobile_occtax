@@ -4,6 +4,7 @@ import android.util.JsonWriter
 import fr.geonature.commons.util.format
 import fr.geonature.maps.jts.geojson.io.GeoJsonWriter
 import fr.geonature.occtax.features.record.domain.DatesRecord
+import fr.geonature.occtax.features.record.domain.FeatureRecord
 import fr.geonature.occtax.features.record.domain.ModuleRecord
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
@@ -151,6 +152,7 @@ class ObservationRecordAPIJsonWriter {
 
             when {
                 it.key == ModuleRecord.MODULE_KEY -> {}
+                it.key == FeatureRecord.FEATURE_ID_KEY -> {}
                 propertyValue is PropertyValue.Text -> writer.name(propertyValue.code)
                     .value(propertyValue.value)
 
