@@ -30,9 +30,9 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
-import androidx.viewpager2.widget.ViewPager2
-import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import androidx.work.WorkInfo
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -85,6 +85,7 @@ import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 import kotlin.coroutines.resume
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Home screen Activity.
@@ -122,10 +123,10 @@ class HomeActivity : AppCompatActivity(),
     private var navMenuDataSync: DrawerMenuEntryView? = null
     private var navMenuLogout: DrawerMenuEntryView? = null
     private var homeContent: CoordinatorLayout? = null
-    private var viewPager: ViewPager2? = null
     private var emptyTextView: TextView? = null
     private var progressSnackbar: Pair<Snackbar, CircularProgressIndicator>? = null
     private var appSettings: AppSettings? = null
+    private var isMapViewSelected: Boolean = false
 
     private lateinit var startSyncResultLauncher: ActivityResultLauncher<Intent>
 
@@ -133,7 +134,7 @@ class HomeActivity : AppCompatActivity(),
         installSplashScreen().also {
             var keepSplashScreenOn = true
             lifecycleScope.launch {
-                delay(resources.getInteger(R.integer.splash_screen_duration).toLong())
+                delay(resources.getInteger(R.integer.splash_screen_duration).toLong().milliseconds)
                 keepSplashScreenOn = false
             }
             it.setKeepOnScreenCondition { keepSplashScreenOn }
@@ -257,22 +258,7 @@ class HomeActivity : AppCompatActivity(),
 
         homeContent = findViewById(R.id.homeContent)
         emptyTextView = findViewById(android.R.id.empty)
-        viewPager = findViewById<ViewPager2>(R.id.pager)?.apply {
-            // FIXME: this is a workaround to keep MapView alive from ViewPager…
-            // see: https://github.com/osmdroid/osmdroid/issues/1581
-            offscreenPageLimit = 1
-
-            // disable swipe navigation
-            isUserInputEnabled = false
-
-            registerOnPageChangeCallback(object : OnPageChangeCallback() {
-                override fun onPageSelected(position: Int) {
-                    super.onPageSelected(position)
-                    emptyTextView?.isGone = true
-                    invalidateOptionsMenu()
-                }
-            })
-        }
+        initializeHomeFragments(savedInstanceState)
 
         configureAuthLoginViewModel()
         configureDataSyncViewModel()
@@ -287,8 +273,20 @@ class HomeActivity : AppCompatActivity(),
                     RESULT_OK -> {
                         val dataSyncSettings = appSettings?.dataSyncSettings
 
-                        if (dataSyncSettings == null || geoNatureAPIClient.getBaseUrls().geoNatureBaseUrl != dataSyncSettings.geoNatureServerUrl) {
+                        if (dataSyncSettings == null) {
                             configureServerSettingsViewModel.loadAppSettings(geoNatureAPIClient.getBaseUrls().geoNatureBaseUrl)
+                        }
+                        else if (geoNatureAPIClient.getBaseUrls().geoNatureBaseUrl != dataSyncSettings.geoNatureServerUrl) {
+                            dataSyncViewModel.purgeLocalData().observeOnce(this) {
+                                configureServerSettingsViewModel.loadAppSettings(geoNatureAPIClient.getBaseUrls().geoNatureBaseUrl)
+                            }
+                            Toast
+                                .makeText(
+                                    this@HomeActivity,
+                                    R.string.toast_purge_local_data,
+                                    Toast.LENGTH_LONG
+                                )
+                                .show()
                         } else {
                             dataSyncViewModel.startSync(
                                 dataSyncSettings,
@@ -325,8 +323,9 @@ class HomeActivity : AppCompatActivity(),
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         menu?.findItem(android.R.id.toggle)
             ?.apply {
-                setIcon(if (viewPager?.currentItem == 0) R.drawable.ic_map else R.drawable.ic_list)
-                setTitle(if (viewPager?.currentItem == 0) R.string.action_as_map else R.string.action_as_list)
+                setIcon(if (isMapViewSelected) R.drawable.ic_list else R.drawable.ic_map)
+                setTitle(if (isMapViewSelected) R.string.action_as_list else R.string.action_as_map)
+                isEnabled = dataSyncViewModel.getLastSynchronizedDate().second != null
             }
 
         return super.onPrepareOptionsMenu(menu)
@@ -335,12 +334,7 @@ class HomeActivity : AppCompatActivity(),
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.toggle -> {
-                viewPager?.setCurrentItem(
-                    (viewPager?.currentItem?.plus(1)
-                        ?: 0).takeIf { it < (viewPager?.adapter?.itemCount ?: 0) } ?: 0,
-                    true
-                )
-
+                toggleHomeFragment()
                 true
             }
 
@@ -391,7 +385,7 @@ class HomeActivity : AppCompatActivity(),
                     if (checkGeoNatureSettings() && it == null) {
                         Logger.info { "not connected, redirect to ${LoginActivity::class.java.name}..." }
                         lifecycleScope.launch {
-                            delay(100)
+                            delay(100.milliseconds)
                             startSyncResultLauncher.launch(LoginActivity.newIntent(this@HomeActivity))
                         }
                     }
@@ -433,7 +427,7 @@ class HomeActivity : AppCompatActivity(),
             ) {
                 emptyTextView?.isVisible = it
 
-                if (it && dataSyncViewModel.lastSynchronizedDate.value?.second == null) {
+                if (it && dataSyncViewModel.getLastSynchronizedDate().second == null) {
                     emptyTextView?.text = getString(R.string.home_first_sync)
                 }
 
@@ -441,18 +435,6 @@ class HomeActivity : AppCompatActivity(),
                     isClickable = !it
                     setText1(R.string.action_data_sync)
                 }
-            }
-            vm.lastSynchronizedDate.observe(this@HomeActivity) { syncState ->
-                navMenuDataSync?.setText2(
-                    getString(
-                        R.string.sync_last_synchronization,
-                        syncState?.second?.let {
-                            android.text.format.DateFormat.format(
-                                getString(R.string.sync_last_synchronization_date),
-                                it
-                            )
-                        } ?: getString(R.string.sync_last_synchronization_never)
-                    ))
             }
             vm.dataSyncStatus.observe(
                     this@HomeActivity
@@ -498,6 +480,25 @@ class HomeActivity : AppCompatActivity(),
                                 }
                             }
 
+                            WorkInfo.State.SUCCEEDED -> {
+                                navMenuDataSync?.apply {
+                                    icon.clearAnimation()
+                                    setIcon(R.drawable.ic_sync)
+                                    setText2(
+                                        getString(
+                                            R.string.sync_last_synchronization,
+                                            vm.getLastSynchronizedDate().second?.let {
+                                                android.text.format.DateFormat.format(
+                                                    getString(R.string.sync_last_synchronization_date),
+                                                    it
+                                                )
+                                            } ?: getString(R.string.sync_last_synchronization_never)
+                                        ))
+                                }
+                                emptyTextView?.isVisible = false
+                                invalidateOptionsMenu()
+                            }
+
                             else -> {
                                 navMenuDataSync?.apply {
                                     icon.clearAnimation()
@@ -530,10 +531,9 @@ class HomeActivity : AppCompatActivity(),
             observe(appSettings) {
                 this@HomeActivity.appSettings = it
 
-                viewPager?.adapter = ObservationRecordsPagerAdapter(
-                    this@HomeActivity,
-                    it
-                )
+                if (isMapViewSelected) {
+                    showMapFragment(forceReplace = true)
+                }
 
                 it.dataSyncSettings.also { dataSyncSettings ->
                     dataSyncViewModel.configurePeriodicSync(
@@ -544,24 +544,12 @@ class HomeActivity : AppCompatActivity(),
                         MainApplication.CHANNEL_DATA_SYNCHRONIZATION
                     )
 
-                    if (dataSyncViewModel.lastSynchronizedDate.value?.second == null) {
-                        dataSyncViewModel.startSync(
-                            dataSyncSettings,
-                            this@HomeActivity.appSettings?.nomenclatureSettings?.withAdditionalFields
-                                ?: true,
-                            HomeActivity::class.java,
-                            MainApplication.CHANNEL_DATA_SYNCHRONIZATION
-                        )
-
-                        return@also
-                    }
-
                     dataSyncViewModel.hasLocalData()
                         .observeOnce(this@HomeActivity) { hasLocalData ->
                             if (hasLocalData == true) {
                                 handleShortcuts()
 
-                                dataSyncViewModel.lastSynchronizedDate.value?.second?.also { lastDataSynchronization ->
+                                dataSyncViewModel.getLastSynchronizedDate().second?.also { lastDataSynchronization ->
                                     if (
                                         lastDataSynchronization.add(
                                             Calendar.SECOND,
@@ -924,5 +912,85 @@ class HomeActivity : AppCompatActivity(),
         }
 
         startActivity(install)
+    }
+
+    private fun initializeHomeFragments(savedInstanceState: Bundle?) {
+        if (savedInstanceState == null) {
+            showListFragment()
+            return
+        }
+
+        isMapViewSelected = supportFragmentManager.findFragmentByTag(TAG_FRAGMENT_OBSERVATION_RECORDS_MAP)?.isVisible == true
+
+        if (!isMapViewSelected && supportFragmentManager.findFragmentByTag(TAG_FRAGMENT_OBSERVATION_RECORDS_LIST) == null) {
+            showListFragment()
+            return
+        }
+
+        invalidateOptionsMenu()
+    }
+
+    private fun toggleHomeFragment() {
+        if (isMapViewSelected) {
+            showListFragment()
+        } else {
+            showMapFragment()
+        }
+    }
+
+    private fun showListFragment() {
+        val listFragment =
+            supportFragmentManager.findFragmentByTag(TAG_FRAGMENT_OBSERVATION_RECORDS_LIST) ?: ObservationRecordsListFragment.newInstance()
+        val mapFragment = supportFragmentManager.findFragmentByTag(TAG_FRAGMENT_OBSERVATION_RECORDS_MAP)
+
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            mapFragment?.let { hide(it) }
+
+            if (listFragment.isAdded) {
+                show(listFragment)
+            } else {
+                add(R.id.home_fragment_container, listFragment, TAG_FRAGMENT_OBSERVATION_RECORDS_LIST)
+            }
+        }
+
+        isMapViewSelected = false
+        emptyTextView?.isGone = true
+        invalidateOptionsMenu()
+    }
+
+    private fun showMapFragment(forceReplace: Boolean = false) {
+        val appSettings = appSettings ?: return
+
+        var mapFragment: Fragment? = supportFragmentManager.findFragmentByTag(TAG_FRAGMENT_OBSERVATION_RECORDS_MAP)
+        val listFragment = supportFragmentManager.findFragmentByTag(TAG_FRAGMENT_OBSERVATION_RECORDS_LIST)
+
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            listFragment?.let { hide(it) }
+
+            if (forceReplace && mapFragment != null) {
+                remove(mapFragment)
+                mapFragment = null
+            }
+
+            val targetMapFragment = mapFragment
+                ?: ObservationRecordsMapFragment.newInstance(appSettings.mapSettings)
+
+            if (targetMapFragment.isAdded) {
+                show(targetMapFragment)
+            } else {
+                add(R.id.home_fragment_container, targetMapFragment, TAG_FRAGMENT_OBSERVATION_RECORDS_MAP)
+            }
+        }
+
+        isMapViewSelected = true
+        emptyTextView?.isGone = true
+        invalidateOptionsMenu()
+    }
+
+    companion object {
+        private const val TAG_FRAGMENT_OBSERVATION_RECORDS_LIST = "observation_records_list"
+        private const val TAG_FRAGMENT_OBSERVATION_RECORDS_MAP = "observation_records_map"
     }
 }

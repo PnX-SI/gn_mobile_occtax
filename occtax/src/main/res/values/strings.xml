@@ -107,6 +107,7 @@
     <string name="toast_not_connected">Not connected</string>
     <string name="toast_logout_success">Successfully disconnected</string>
     <string name="toast_input_default_properties_loading_failed">Failed to load default property values</string>
+    <string name="toast_purge_local_data">Clear local data…</string>
 
     <string name="dataset_created_at">Created at %s</string>
     <string name="dataset_date">EEE dd MMM yyyy</string>
