@@ -14,6 +14,7 @@ import fr.geonature.occtax.features.record.domain.PropertyValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -21,7 +22,6 @@ import java.util.Date
 import java.util.TimeZone
 import java.util.UUID
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * [FormFieldAdapter] [FormField.Date] view holder representing a textual value of a date.
@@ -108,13 +108,13 @@ class FormFieldDateViewHolder(
      * If no date was given, use the current date.
      */
     private suspend fun selectDate(from: Date = Date()): Date =
-        suspendCoroutine { continuation ->
+        suspendCancellableCoroutine { continuation ->
             val fragmentManager = listener.fragmentManager()
 
             if (fragmentManager == null) {
                 continuation.resume(from)
 
-                return@suspendCoroutine
+                return@suspendCancellableCoroutine
             }
 
             with(

@@ -16,7 +16,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -270,22 +269,20 @@ class ObservationRecordsListFragment : Fragment(R.layout.fragment_recycler_view_
     }
 
     private fun configureDataSyncViewModel() {
-        with(dataSyncViewModel) {
-            observe(isSyncRunning) {
-                emptyTextView?.text =
-                    getString(
-                        if (it && dataSyncViewModel.lastSynchronizedDate.value?.second == null) R.string.home_first_sync
-                        else R.string.home_no_input
-                    )
-                if (it && dataSyncViewModel.lastSynchronizedDate.value?.second == null) {
-                    fab?.hide()
-                    adapter?.clear()
-                } else {
-                    fab?.show()
+        dataSyncViewModel.isSyncRunning.observe(viewLifecycleOwner) {
+            emptyTextView?.text =
+                getString(
+                    if (it && dataSyncViewModel.getLastSynchronizedDate().second == null) R.string.home_first_sync
+                    else R.string.home_no_input
+                )
+            if (it && dataSyncViewModel.getLastSynchronizedDate().second == null) {
+                fab?.hide()
+                adapter?.clear()
+            } else {
+                fab?.show()
 
-                    if (adapter?.items?.isEmpty() == true) {
-                        loadObservationRecords()
-                    }
+                if (adapter?.items?.isEmpty() == true) {
+                    loadObservationRecords()
                 }
             }
         }

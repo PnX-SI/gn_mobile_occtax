@@ -980,6 +980,7 @@ class ObservationRecordTest {
                 comment.comment = "some comment"
                 dates.start = observationRecord.dates.start
                 dates.end = observationRecord.dates.end
+                dates.lastModified = observationRecord.dates.lastModified
                 taxa.taxa = emptyList()
             },
             copy

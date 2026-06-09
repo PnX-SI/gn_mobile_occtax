@@ -13,6 +13,7 @@ import fr.geonature.mountpoint.util.FileUtils
 import fr.geonature.mountpoint.util.MountPointUtils
 import fr.geonature.occtax.ui.home.HomeActivity
 import org.tinylog.Logger
+import org.tinylog.provider.ProviderRegistry
 import java.io.File
 import javax.inject.Inject
 import kotlin.system.exitProcess
@@ -115,6 +116,7 @@ class MainApplication : Application(), Configuration.Provider {
     private class TinylogUncaughtExceptionHandler : Thread.UncaughtExceptionHandler {
         override fun uncaughtException(thread: Thread, ex: Throwable) {
             Logger.error(ex)
+            ProviderRegistry.getLoggingProvider().shutdown()
             exitProcess(1)
         }
     }

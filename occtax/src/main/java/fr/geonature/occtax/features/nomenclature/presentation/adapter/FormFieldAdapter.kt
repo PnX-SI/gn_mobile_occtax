@@ -322,6 +322,10 @@ class FormFieldAdapter(private val listener: OnEditableFieldAdapter) :
                         is FormField.Editable -> it.apply {
                             setValue(propertyValue.firstOrNull { pv -> pv.code == it.getValue().code }
                                 ?: it.getValue())
+                            error = if (mandatory && getValue().isEmpty())
+                                listener.getContext()
+                                    .getString(R.string.form_field_error_mandatory)
+                            else null
                         }
 
                         is FormField.MinMax -> it.copy(
@@ -336,7 +340,8 @@ class FormFieldAdapter(private val listener: OnEditableFieldAdapter) :
                         )
 
                         is FormField.StartEnd -> it.copy(
-                            start = it.start.copy(value = propertyValue.filterIsInstance<PropertyValue.Date>()
+                            start = it.start.copy(
+                                value = propertyValue.filterIsInstance<PropertyValue.Date>()
                                 .firstOrNull { pv -> pv.code == it.start.value.code }
                                 ?: it.start.value),
                             end = it.end.copy(
@@ -421,10 +426,11 @@ class FormFieldAdapter(private val listener: OnEditableFieldAdapter) :
     fun setPropertyValues(vararg propertyValue: PropertyValue) {
         availableEditableFields.map {
             when (it) {
-                is FormField.Editable -> it.clone().apply {
-                    setValue(propertyValue.firstOrNull { pv -> pv.code == it.getValue().code }
-                        ?: it.getValue())
-                }
+                is FormField.Editable -> it.clone()
+                    .apply {
+                        setValue(propertyValue.firstOrNull { pv -> pv.code == it.getValue().code }
+                            ?: it.getValue())
+                    }
 
                 is FormField.MinMax -> it.copy(
                     min = it.min.copy(

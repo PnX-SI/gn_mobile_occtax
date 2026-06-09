@@ -34,11 +34,10 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/pager"
+            <FrameLayout
+                android:id="@+id/home_fragment_container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal" />
+                android:layout_height="match_parent" />
 
             <TextView
                 android:id="@android:id/empty"
