@@ -5,7 +5,7 @@
 ### 🐛 Corrections
 
 * Correction lors de l'envoi du relevé, le champ `feature_id` est à ignorer.
-* La vue carte des relevés n'est plus chargé par défaut.
+* La vue carte des relevés n'est plus chargée par défaut.
 
 ### ⚠️ Notes de version
 
