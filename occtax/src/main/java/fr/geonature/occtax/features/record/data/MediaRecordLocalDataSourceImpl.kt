@@ -1,6 +1,5 @@
 package fr.geonature.occtax.features.record.data
 
-import android.content.Context
 import android.webkit.MimeTypeMap
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.TaxonRecord
@@ -15,14 +14,14 @@ import java.io.File
  *
  * @author S. Grimault
  */
-class MediaRecordLocalDataSourceImpl(private val context: Context) : IMediaRecordLocalDataSource {
+class MediaRecordLocalDataSourceImpl(private val observationRecordsRootFolder: File) : IMediaRecordLocalDataSource {
 
     override suspend fun loadAll(
         taxonRecord: TaxonRecord,
         countingRecord: CountingRecord
     ): List<File> {
         return taxonRecord.counting.mediaBasePath(
-            context,
+            observationRecordsRootFolder,
             countingRecord
         )
             .also {

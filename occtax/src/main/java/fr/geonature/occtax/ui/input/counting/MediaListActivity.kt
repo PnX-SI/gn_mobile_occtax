@@ -1,6 +1,5 @@
 package fr.geonature.occtax.ui.input.counting
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -12,6 +11,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -20,12 +20,14 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.compat.content.getParcelableExtraCompat
 import fr.geonature.occtax.R
+import fr.geonature.occtax.features.record.ObservationRecordsRootFolder
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.viewpager.ui.UnderlinePagerIndicator
 import kotlinx.coroutines.launch
 import org.tinylog.Logger
 import java.io.File
+import javax.inject.Inject
 
 /**
  * Manage media from given [CountingRecord] activity.
@@ -34,6 +36,10 @@ import java.io.File
  */
 @AndroidEntryPoint
 class MediaListActivity : AppCompatActivity() {
+
+    @ObservationRecordsRootFolder
+    @Inject
+    lateinit var observationRecordsRootFolder: File
 
     private lateinit var taxonRecord: TaxonRecord
     private lateinit var countingRecord: CountingRecord
@@ -110,7 +116,7 @@ class MediaListActivity : AppCompatActivity() {
             override fun showEmptyTextView(show: Boolean) {
                 progressBar.visibility = View.GONE
 
-                if (emptyTextView.visibility == View.VISIBLE == show) {
+                if (emptyTextView.isVisible == show) {
                     return
                 }
 
@@ -227,7 +233,7 @@ class MediaListActivity : AppCompatActivity() {
 
     private fun sendResult() {
         setResult(
-            Activity.RESULT_OK,
+            RESULT_OK,
             Intent().apply {
                 putExtra(
                     EXTRA_COUNTING_RECORD,
@@ -247,7 +253,7 @@ class MediaListActivity : AppCompatActivity() {
                 takePhotoLifecycleObserver?.invoke(
                     picker,
                     taxonRecord.counting.mediaBasePath(
-                        this@MediaListActivity,
+                        observationRecordsRootFolder,
                         countingRecord
                     ).absolutePath
                 )

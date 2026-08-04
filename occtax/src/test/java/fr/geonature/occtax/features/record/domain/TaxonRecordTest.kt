@@ -4,12 +4,16 @@ import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.occtax.BuildConfig
-import org.junit.Assert.*
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import java.io.File
 
 /**
  * Unit tests about [TaxonRecord].
@@ -19,11 +23,16 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class TaxonRecordTest {
 
+    @get:Rule
+    var temporaryFolder: TemporaryFolder = TemporaryFolder()
+
     private lateinit var application: Application
+    private lateinit var observationRecordsRootFolder: File
 
     @Before
     fun setUp() {
         application = ApplicationProvider.getApplicationContext()
+        observationRecordsRootFolder = temporaryFolder.newFolder("inputs")
     }
 
     @Test
@@ -514,7 +523,7 @@ class TaxonRecordTest {
 
         // when deleting an existing counting
         val countingDeleted = taxonRecord.counting.delete(
-            application,
+            observationRecordsRootFolder,
             1
         )
 
@@ -549,11 +558,11 @@ class TaxonRecordTest {
         )
 
         assertEquals(
-            "/Android/data/${BuildConfig.APPLICATION_ID}/inputs/${taxonRecord.recordId}/taxon/${taxonRecord.taxon.id}/counting/${countingRecord.index}",
+            "/${taxonRecord.recordId}/taxon/${taxonRecord.taxon.id}/counting/${countingRecord.index}",
             taxonRecord.counting.mediaBasePath(
-                application,
+                observationRecordsRootFolder,
                 countingRecord
-            ).absolutePath.substringAfterLast("external-files")
+            ).absolutePath.substringAfterLast("inputs")
         )
     }
 
@@ -574,11 +583,11 @@ class TaxonRecordTest {
         )
 
         assertEquals(
-            "/Android/data/${BuildConfig.APPLICATION_ID}/inputs/${taxonRecord.recordId}/taxon/${taxonRecord.taxon.id}/counting/1",
+            "/${taxonRecord.recordId}/taxon/${taxonRecord.taxon.id}/counting/1",
             taxonRecord.counting.mediaBasePath(
-                application,
+                observationRecordsRootFolder,
                 taxonRecord.counting.create()
-            ).absolutePath.substringAfterLast("external-files")
+            ).absolutePath.substringAfterLast("inputs")
         )
     }
 

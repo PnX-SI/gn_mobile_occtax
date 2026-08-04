@@ -120,7 +120,7 @@ class TaxonRecordDefaultJsonReader {
                             name,
                             Taxonomy(
                                 kingdom,
-                                group
+                                group?: Taxonomy.ANY
                             )
                         )
                     ))
@@ -184,7 +184,7 @@ class TaxonRecordDefaultJsonReader {
                     name,
                     Taxonomy(
                         kingdom,
-                        group
+                        group ?: Taxonomy.ANY
                     )
                 ),
                 internalId = internalId
@@ -376,7 +376,7 @@ class TaxonRecordDefaultJsonReader {
      */
     @Deprecated(
         message = "only used for GeoNature API compatibility",
-        replaceWith = ReplaceWith(expression = "see: TaxonRecordAPIJsonWriter")
+        replaceWith = ReplaceWith(expression = "TaxonRecordAPIJsonWriter")
     )
     private fun readNomenclatureValue(
         reader: JsonReader,

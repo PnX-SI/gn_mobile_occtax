@@ -2,9 +2,8 @@ package fr.geonature.occtax.features.record.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
-import fr.geonature.commons.util.getInputsFolder
-import fr.geonature.mountpoint.util.FileUtils
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.error.ObservationRecordException
 import fr.geonature.occtax.features.record.io.ObservationRecordDefaultJsonReader
@@ -20,9 +19,8 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import org.tinylog.Logger
 import java.io.File
-import java.util.Date
-import androidx.core.content.edit
 import java.time.Clock
+import java.util.Date
 
 /**
  * Default implementation of [IObservationRecordLocalDataSource] using [SharedPreferences].
@@ -30,9 +28,10 @@ import java.time.Clock
  * @author S. Grimault
  */
 class ObservationRecordLocalDataSourceImpl(
-    private val context: Context,
+    context: Context,
     private val geoNatureModuleName: String,
     private val clock: Clock,
+    private val observationRecordsRootFolder: File,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : IObservationRecordLocalDataSource {
 
@@ -44,8 +43,7 @@ class ObservationRecordLocalDataSourceImpl(
         ObservationRecordDefaultJsonWriter()
 
     override suspend fun readAll(): List<ObservationRecord> {
-        val exportedObservationRecords = FileUtils
-            .getInputsFolder(context)
+        val exportedObservationRecords = observationRecordsRootFolder
             .walkTopDown()
             .asFlow()
             .filter { it.isFile && it.extension == "json" }
@@ -89,9 +87,7 @@ class ObservationRecordLocalDataSourceImpl(
             null
         )
             ?: File(
-                FileUtils
-                    .getInputsFolder(context)
-                    .also { it.mkdirs() },
+                observationRecordsRootFolder,
                 "input_${id}.json"
             )
                 .takeIf { it.exists() }
@@ -131,9 +127,7 @@ class ObservationRecordLocalDataSourceImpl(
             if (!saved) throw ObservationRecordException.WriteException(savedObservationRecord.internalId)
 
             File(
-                FileUtils
-                    .getInputsFolder(context)
-                    .also { it.mkdirs() },
+                observationRecordsRootFolder,
                 "input_${savedObservationRecord.internalId}.json"
             )
                 .takeIf { it.exists() }
@@ -147,15 +141,13 @@ class ObservationRecordLocalDataSourceImpl(
 
         return withContext(dispatcher) {
             File(
-                FileUtils
-                    .getInputsFolder(context)
-                    .also { it.mkdirs() },
+                observationRecordsRootFolder,
                 "input_${id}.json"
             )
                 .takeIf { it.exists() }
                 ?.delete()
             File(
-                FileUtils.getInputsFolder(context),
+                observationRecordsRootFolder,
                 "$id"
             ).takeIf { it.exists() }
                 ?.deleteRecursively()
@@ -205,9 +197,7 @@ class ObservationRecordLocalDataSourceImpl(
             if (inputAsJson.isNullOrBlank()) throw ObservationRecordException.WriteException(observationRecordToSync.internalId)
 
             File(
-                FileUtils
-                    .getInputsFolder(context)
-                    .also { it.mkdirs() },
+                observationRecordsRootFolder,
                 "input_${observationRecordToSync.internalId}.json"
             )
                 .bufferedWriter()

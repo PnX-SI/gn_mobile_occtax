@@ -1,15 +1,13 @@
 package fr.geonature.occtax.features.settings.data
 
-import android.app.Application
+import android.content.Context
 import android.os.Environment
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.core.app.ApplicationProvider
+import fr.geonature.commons.util.getFile
+import fr.geonature.commons.util.getPrimaryExternalStorage
 import fr.geonature.datasync.settings.DataSyncSettings
 import fr.geonature.maps.settings.LayerSettings
 import fr.geonature.maps.settings.MapSettings
-import fr.geonature.mountpoint.model.MountPoint
-import fr.geonature.mountpoint.util.FileUtils.getFile
-import fr.geonature.mountpoint.util.FileUtils.getRootFolder
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.FixtureHelper
 import fr.geonature.occtax.features.settings.domain.AppSettings
@@ -18,18 +16,23 @@ import fr.geonature.occtax.features.settings.domain.InputSettings
 import fr.geonature.occtax.features.settings.domain.NomenclatureSettings
 import fr.geonature.occtax.features.settings.domain.PropertySettings
 import fr.geonature.occtax.features.settings.error.AppSettingsException
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.shadows.ShadowEnvironment
 import java.io.File
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -49,38 +52,52 @@ class AppSettingsFileLocalDataSourceTest {
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
 
-    private lateinit var application: Application
+    @get:Rule
+    var temporaryFolder: TemporaryFolder = TemporaryFolder()
+
+    private lateinit var context: Context
     private lateinit var appSettingsLocalDataSource: IAppSettingsLocalDataSource
     private lateinit var appSettingsFilename: String
 
+    private lateinit var primaryExternalStorage: File
+    private lateinit var internalFilesDir: File
+
     @Before
     fun setUp() {
-        application = ApplicationProvider.getApplicationContext()
-        ShadowEnvironment.setExternalStorageState(
-            File("/"),
-            Environment.MEDIA_MOUNTED
+        primaryExternalStorage = temporaryFolder.newFolder("primary_external_storage")
+        internalFilesDir = temporaryFolder.newFolder("internal_files_dir")
+
+        context = buildMockContext(
+            primaryExternalStorage,
+            internalFilesDir
         )
+
+        mockkStatic(Environment::class)
+        every { Environment.getExternalStorageDirectory() } returns primaryExternalStorage
+        // default: external storage mounted
+        every { Environment.getExternalStorageState() } returns Environment.MEDIA_MOUNTED
+        every { Environment.getExternalStorageState(any()) } returns Environment.MEDIA_MOUNTED
+
         appSettingsFilename = "settings_occtax.json"
         appSettingsLocalDataSource = AppSettingsFileLocalDataSourceImpl(
-            application,
+            context,
             appSettingsFilename
         )
+    }
+
+    @After
+    fun tearDown() {
+        unmockkStatic(Environment::class)
     }
 
     @Test
     fun `should load default app settings`() = runTest {
         // given some existing valid JSON settings from storage
-        getRootFolder(
-            application,
-            MountPoint.StorageType.INTERNAL
-        )
+        context.getPrimaryExternalStorage()
             .apply {
                 FixtureHelper.getFixtureAsFile(appSettingsFilename)
                     .copyTo(
-                        getFile(
-                            this,
-                            appSettingsFilename
-                        ),
+                        getFile(appSettingsFilename),
                         overwrite = true
                     )
             }
@@ -201,13 +218,9 @@ class AppSettingsFileLocalDataSourceTest {
     @Test
     fun `should load app settings from existing one`() = runTest {
         // given additional app settings from storage
-        getFile(
-            getRootFolder(
-                application,
-                MountPoint.StorageType.INTERNAL
-            ).apply { mkdirs() },
-            "${appSettingsFilename.substringBeforeLast(".json")}.local.json"
-        )
+        context
+            .getPrimaryExternalStorage()
+            .getFile("${appSettingsFilename.substringBeforeLast(".json")}.local.json")
             .apply {
                 writeText(
                     """{
@@ -450,14 +463,23 @@ class AppSettingsFileLocalDataSourceTest {
             assertEquals(
                 (exception as AppSettingsException.NoAppSettingsFoundLocallyException).message,
                 AppSettingsException.NoAppSettingsFoundLocallyException(
-                    getFile(
-                        getRootFolder(
-                            application,
-                            MountPoint.StorageType.INTERNAL
-                        ),
-                        appSettingsFilename
-                    ).absolutePath
+                    context
+                        .getPrimaryExternalStorage()
+                        .getFile(appSettingsFilename).absolutePath
                 ).message
             )
         }
+
+    /**
+     * Builds a mock [Context] whose [Context.getExternalFilesDir] and [Context.filesDir]
+     * return the given values.
+     */
+    private fun buildMockContext(
+        externalFilesDir: File?,
+        filesDir: File = internalFilesDir,
+    ): Context = mockk {
+        every { packageName } returns "fr.geonature.sync"
+        every { getExternalFilesDir(null) } returns externalFilesDir
+        every { this@mockk.filesDir } returns filesDir
+    }
 }

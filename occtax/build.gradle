@@ -1,9 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.dagger.hilt.android)
-    alias(libs.plugins.kapt)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -74,13 +74,15 @@ dependencies {
     implementation project(':commons')
     implementation project(':datasync')
     implementation project(':viewpager')
-    implementation project(':maps')
+
+    implementation libs.gn.maps
+    implementation libs.gn.mountpoint
 
     // Hilt dependencies
     implementation libs.androidx.hilt.work
     implementation libs.hilt.android
-    kapt libs.androidx.hilt.compiler
-    kapt libs.hilt.android.compiler
+    ksp libs.androidx.hilt.compiler
+    ksp libs.hilt.android.compiler
 
     implementation libs.androidx.cardview
     implementation libs.androidx.constraintlayout

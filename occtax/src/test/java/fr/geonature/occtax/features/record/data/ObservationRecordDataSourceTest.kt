@@ -5,9 +5,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import fr.geonature.commons.data.entity.Taxon
 import fr.geonature.commons.data.entity.Taxonomy
-import fr.geonature.commons.util.getInputsFolder
 import fr.geonature.commons.util.toDate
-import fr.geonature.mountpoint.util.FileUtils
 import fr.geonature.occtax.CoroutineTestRule
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.error.ObservationRecordException
@@ -16,10 +14,14 @@ import fr.geonature.occtax.features.record.io.ObservationRecordDefaultJsonWriter
 import io.mockk.MockKAnnotations.init
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.io.File
@@ -42,7 +44,11 @@ class ObservationRecordDataSourceTest {
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
 
+    @get:Rule
+    var temporaryFolder: TemporaryFolder = TemporaryFolder()
+
     private lateinit var application: Application
+    private lateinit var observationRecordsRootFolder: File
     private lateinit var observationRecordLocalDataSource: IObservationRecordLocalDataSource
 
     private val geoNatureModuleName = "occtax"
@@ -56,10 +62,12 @@ class ObservationRecordDataSourceTest {
         init(this)
 
         application = ApplicationProvider.getApplicationContext()
+        observationRecordsRootFolder = temporaryFolder.newFolder("inputs")
         observationRecordLocalDataSource = ObservationRecordLocalDataSourceImpl(
             application,
             geoNatureModuleName,
             fixedClock,
+            observationRecordsRootFolder,
             coroutineTestRule.testDispatcher
         )
     }
@@ -67,7 +75,7 @@ class ObservationRecordDataSourceTest {
     @Test
     fun `should return an empty list when reading undefined observation records`() =
         runTest {
-            // when reading non existing observation records
+            // when reading non-existing observation records
             val noSuchObservationRecords = observationRecordLocalDataSource.readAll()
 
             // then
@@ -100,9 +108,7 @@ class ObservationRecordDataSourceTest {
                 dates.start = toDate("2016-10-28T07:15:00Z")!!
             }
             File(
-                FileUtils
-                    .getInputsFolder(application)
-                    .also { it.mkdirs() },
+                observationRecordsRootFolder,
                 "input_${record4.internalId}.json"
             )
                 .bufferedWriter()
@@ -263,7 +269,7 @@ class ObservationRecordDataSourceTest {
             )
 
             val exportedJsonFile = File(
-                FileUtils.getInputsFolder(application),
+                observationRecordsRootFolder,
                 "input_${observationRecord.id}.json"
             )
             assertTrue(exportedJsonFile.exists())
@@ -314,7 +320,7 @@ class ObservationRecordDataSourceTest {
             )
 
             var exportedJsonFile = File(
-                FileUtils.getInputsFolder(application),
+                observationRecordsRootFolder,
                 "input_${observationRecord.id}.json"
             )
             assertTrue(exportedJsonFile.exists())
@@ -338,7 +344,7 @@ class ObservationRecordDataSourceTest {
             )
 
             exportedJsonFile = File(
-                FileUtils.getInputsFolder(application),
+                observationRecordsRootFolder,
                 "input_${observationRecord.id}.json"
             )
             assertFalse(exportedJsonFile.exists())
@@ -377,7 +383,7 @@ class ObservationRecordDataSourceTest {
             )
             assertTrue(
                 File(
-                    FileUtils.getInputsFolder(application),
+                    observationRecordsRootFolder,
                     "input_${observationRecord.id}.json"
                 ).exists()
             )
@@ -398,7 +404,7 @@ class ObservationRecordDataSourceTest {
 
             assertFalse(
                 File(
-                    FileUtils.getInputsFolder(application),
+                    observationRecordsRootFolder,
                     "input_${observationRecord.id}.json"
                 ).exists()
             )

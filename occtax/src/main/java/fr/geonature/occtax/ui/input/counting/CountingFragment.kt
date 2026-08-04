@@ -20,21 +20,30 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import dagger.hilt.android.AndroidEntryPoint
 import fr.geonature.commons.ui.adapter.AbstractListItemRecyclerViewAdapter
 import fr.geonature.compat.content.getParcelableExtraCompat
 import fr.geonature.compat.os.getParcelableArrayCompat
 import fr.geonature.occtax.R
+import fr.geonature.occtax.features.record.ObservationRecordsRootFolder
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.features.settings.domain.PropertySettings
 import fr.geonature.occtax.ui.input.AbstractInputFragment
+import java.io.File
+import javax.inject.Inject
 
 /**
- * [Fragment] to let the user to add additional counting information for the given [TaxonRecord].
+ * [Fragment] to let the user add additional counting information for the given [TaxonRecord].
  *
  * @author S. Grimault
  */
+@AndroidEntryPoint
 class CountingFragment : AbstractInputFragment() {
+
+    @ObservationRecordsRootFolder
+    @Inject
+    lateinit var observationRecordsRootFolder: File
 
     private lateinit var editCountingResultLauncher: ActivityResultLauncher<Intent>
 
@@ -120,7 +129,7 @@ class CountingFragment : AbstractInputFragment() {
                         ) { dialog, _ ->
                             adapter?.remove(item)
                             observationRecord?.taxa?.selectedTaxonRecord?.counting?.delete(
-                                this,
+                                observationRecordsRootFolder,
                                 item.index
                             )
                             listener.validateCurrentPage()
@@ -245,7 +254,7 @@ class CountingFragment : AbstractInputFragment() {
 
         if (countingRecord.isEmpty()) {
             observationRecord?.taxa?.selectedTaxonRecord?.counting?.delete(
-                context,
+                observationRecordsRootFolder,
                 countingRecord.index
             )
             Toast.makeText(
@@ -262,12 +271,11 @@ class CountingFragment : AbstractInputFragment() {
         val selectedMedia = countingRecord.medias.files
         observationRecord?.taxa?.selectedTaxonRecord?.counting?.mediaBasePath?.let {
             it(
-                context,
+                observationRecordsRootFolder,
                 countingRecord
             )
         }
             ?.walkTopDown()
-            ?.asSequence()
             ?.filter { file ->
                 file.isFile && file.canWrite()
             }

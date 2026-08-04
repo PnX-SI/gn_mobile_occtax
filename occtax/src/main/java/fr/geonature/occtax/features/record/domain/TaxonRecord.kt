@@ -1,10 +1,8 @@
 package fr.geonature.occtax.features.record.domain
 
-import android.content.Context
 import android.os.Parcelable
 import fr.geonature.commons.data.entity.AbstractTaxon
-import fr.geonature.commons.util.getInputsFolder
-import fr.geonature.mountpoint.util.FileUtils
+import fr.geonature.commons.util.getFile
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.io.File
@@ -75,7 +73,7 @@ data class TaxonRecord(
                 }
         }
 
-    fun copy():TaxonRecord {
+    fun copy(): TaxonRecord {
         return TaxonRecord(
             internalId,
             recordId,
@@ -125,10 +123,9 @@ class AllCountingRecord(
     /**
      * The media base path.
      */
-    val mediaBasePath: (context: Context, countingRecord: CountingRecord) -> File =
-        { context, countingRecord ->
-            FileUtils.getFile(
-                FileUtils.getInputsFolder(context),
+    val mediaBasePath: (rootFolder: File, countingRecord: CountingRecord) -> File =
+        { rootFolder, countingRecord ->
+            rootFolder.getFile(
                 "$recordId",
                 "taxon",
                 "$taxonId",
@@ -161,7 +158,7 @@ class AllCountingRecord(
             }
     }
 
-    fun delete(context: Context, index: Int): CountingRecord? {
+    fun delete(rootFolder: File, index: Int): CountingRecord? {
         val existingCounting = counting
 
         this.counting = existingCounting.filterNot { it.index == index }
@@ -170,7 +167,7 @@ class AllCountingRecord(
         return existingCounting.firstOrNull { it.index == index }
             ?.also {
                 mediaBasePath(
-                    context,
+                    rootFolder,
                     it
                 ).deleteRecursively()
             }

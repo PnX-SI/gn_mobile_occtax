@@ -1,9 +1,8 @@
 package fr.geonature.occtax.features.settings.data
 
 import android.content.Context
-import fr.geonature.mountpoint.model.MountPoint
-import fr.geonature.mountpoint.util.FileUtils.getFile
-import fr.geonature.mountpoint.util.FileUtils.getRootFolder
+import fr.geonature.commons.util.getFile
+import fr.geonature.commons.util.getPrimaryExternalStorage
 import fr.geonature.occtax.features.settings.domain.AppSettings
 import fr.geonature.occtax.features.settings.error.AppSettingsException
 import fr.geonature.occtax.features.settings.io.AppSettingsJsonReader
@@ -24,13 +23,9 @@ class AppSettingsFileLocalDataSourceImpl(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : IAppSettingsLocalDataSource {
     override suspend fun load(appSettings: AppSettings?): AppSettings = withContext(dispatcher) {
-        val appSettingsJsonFile = getFile(
-            getRootFolder(
-                context,
-                MountPoint.StorageType.INTERNAL
-            ),
-            if (appSettings == null) appSettingsFilename else "${appSettingsFilename.substringBeforeLast(".json")}.local.json"
-        )
+        val appSettingsJsonFile = context
+            .getPrimaryExternalStorage()
+            .getFile(if (appSettings == null) appSettingsFilename else "${appSettingsFilename.substringBeforeLast(".json")}.local.json")
 
         Logger.info { "loading${if (appSettings == null) " " else " additional "}settings from '${appSettingsJsonFile.absolutePath}'..." }
 

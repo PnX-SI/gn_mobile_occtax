@@ -6,9 +6,7 @@ plugins {
     alias(libs.plugins.dagger.hilt.android) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.parcelize) apply false
-    alias(libs.plugins.kapt) apply false
-    // TODO: Dagger’s KSP support is currently in alpha, see: https://dagger.dev/dev-guide/ksp
-    // alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.ksp) apply false
 }
 
 tasks.register('clean', Delete) {

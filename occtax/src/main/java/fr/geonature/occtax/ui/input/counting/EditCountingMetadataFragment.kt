@@ -35,6 +35,7 @@ import fr.geonature.occtax.features.nomenclature.domain.FormField
 import fr.geonature.occtax.features.nomenclature.presentation.NomenclatureViewModel
 import fr.geonature.occtax.features.nomenclature.presentation.PropertyValueModel
 import fr.geonature.occtax.features.nomenclature.presentation.adapter.FormFieldAdapter
+import fr.geonature.occtax.features.record.ObservationRecordsRootFolder
 import fr.geonature.occtax.features.record.domain.CountingRecord
 import fr.geonature.occtax.features.record.domain.MediaRecord
 import fr.geonature.occtax.features.record.domain.PropertyValue
@@ -42,14 +43,20 @@ import fr.geonature.occtax.features.record.domain.TaxonRecord
 import fr.geonature.occtax.features.settings.domain.PropertySettings
 import kotlinx.coroutines.launch
 import org.tinylog.Logger
+import java.io.File
+import javax.inject.Inject
 
 /**
- * [Fragment] to let the user to edit additional counting information for the given [TaxonRecord].
+ * [Fragment] to let the user edit additional counting information for the given [TaxonRecord].
  *
  * @author S. Grimault
  */
 @AndroidEntryPoint
 class EditCountingMetadataFragment : Fragment() {
+
+    @ObservationRecordsRootFolder
+    @Inject
+    lateinit var observationRecordsRootFolder: File
 
     private val nomenclatureViewModel: NomenclatureViewModel by viewModels()
     private val propertyValueModel: PropertyValueModel by viewModels()
@@ -287,10 +294,6 @@ class EditCountingMetadataFragment : Fragment() {
             }
 
             override fun onAddMedia(nomenclatureTypeMnemonic: String) {
-                val context = context ?: run {
-                    Logger.warn { "missing context to pick media: abort" }
-                    null
-                } ?: return
                 val taxonRecord = taxonRecord ?: run {
                     Logger.warn { "missing taxon record argument: abort" }
                     null
@@ -314,7 +317,7 @@ class EditCountingMetadataFragment : Fragment() {
                                     takePhotoLifecycleObserver?.invoke(
                                         if (menuItem.iconResourceId == R.drawable.ic_add_photo) TakePhotoLifecycleObserver.ImagePicker.CAMERA else TakePhotoLifecycleObserver.ImagePicker.GALLERY,
                                         taxonRecord.counting.mediaBasePath(
-                                            context,
+                                            observationRecordsRootFolder,
                                             countingRecord
                                         ).absolutePath
                                     )

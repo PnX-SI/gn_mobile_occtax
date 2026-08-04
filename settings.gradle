@@ -12,13 +12,28 @@ pluginManagement {
     }
 }
 
+def localProperties = new Properties().tap {
+    if (file("local.properties").exists()) {
+        it.load(file("local.properties").newInputStream())
+    }
+}
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        mavenLocal()
         google()
         mavenCentral()
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/PnX-SI/gn_mobile_maps")
+            credentials {
+                username = localProperties.get("gpr.user") ?: System.getenv("USERNAME")
+                password = localProperties.get("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
     }
 }
 
 rootProject.name = "Occtax mobile"
-include ':commons', ':compat', ':datasync', ':maps', ':mountpoint', ':viewpager', ':occtax'
+include ':commons', ':compat', ':datasync', ':viewpager', ':occtax'

@@ -12,10 +12,17 @@
     <string name="activity_counting_edit_title">Editer le dénombrement</string>
     <string name="activity_counting_media_title">Gérer les médias</string>
 
-    <string name="channel_name_check_inputs_to_synchronize">Nouveaux relevés</string>
-    <string name="channel_description_check_inputs_to_synchronize">Relevés à synchroniser</string>
+    <string name="channel_name_check_observation_records_to_synchronize">Nouveaux relevés</string>
+    <string name="channel_description_check_observation_records_to_synchronize">Relevés à synchroniser</string>
     <string name="channel_name_data_synchronization">Synchronisation des données</string>
     <string name="channel_description_data_synchronization">Données locales à synchroniser</string>
+
+    <string name="notification_observation_records_to_synchronize_title">Relevés à synchroniser</string>
+    <plurals name="notification_observation_records_to_synchronize_description" tools:ignore="MissingQuantity">
+        <item quantity="one" tools:ignore="ImpliedQuantity">Un relevé est prêt à être synchronisé</item>
+        <item quantity="other">%d relevés sont prêts à être synchronisés</item>
+        <item quantity="many">%d relevés sont prêts à être synchronisés</item>
+    </plurals>
 
     <string name="sync_data">Synchronisation des données</string>
     <string name="sync_last_synchronization">Dernière synchronisation\n%s</string>

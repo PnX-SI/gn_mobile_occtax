@@ -15,10 +15,16 @@
     <string name="activity_counting_edit_title">Edit counting</string>
     <string name="activity_counting_media_title">Manage media</string>
 
-    <string name="channel_name_check_inputs_to_synchronize">New inputs</string>
-    <string name="channel_description_check_inputs_to_synchronize">Inputs to synchronize</string>
+    <string name="channel_name_check_observation_records_to_synchronize">New inputs</string>
+    <string name="channel_description_check_observation_records_to_synchronize">Inputs to synchronize</string>
     <string name="channel_name_data_synchronization">Data synchronization</string>
     <string name="channel_description_data_synchronization">Data to synchronize</string>
+
+    <string name="notification_observation_records_to_synchronize_title">Inputs to synchronize</string>
+    <plurals name="notification_observation_records_to_synchronize_description">
+        <item quantity="one">One input is ready to synchronize</item>
+        <item quantity="other">%d inputs are ready to synchronize</item>
+    </plurals>
 
     <string name="sync_data">Data synchronization</string>
     <string name="sync_last_synchronization">Last synchronization\n%s</string>

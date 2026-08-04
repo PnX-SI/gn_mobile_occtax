@@ -324,15 +324,13 @@ The taxon search allows you to combine several search criteria, such as:
 
 ## Upgrade git sub modules
 
-Do **NOT** modify directly any git sub modules (e.g. `commons`, `compat`, `mountpoint`, `viewpager`
-and `maps`). Any changes should be made from each underlying git repository:
+Do **NOT** modify directly any git sub modules (e.g. `commons`, `compat`, `datasync` and `viewpager`).
+Any changes should be made from each underlying git repository:
 
 - `commons`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
 - `compat`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
 - `datasync`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
-- `mountpoint`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
 - `viewpager`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
-- `maps`: [gn_mobile_maps](https://github.com/PnX-SI/gn_mobile_maps) git repository
 
 ```bash
 ./upgrade_submodules.sh
@@ -342,7 +340,7 @@ and `maps`). Any changes should be made from each underlying git repository:
 
 - Kotlin error, Redeclaration from class within imported module:
 
-  clean project from menu _Build -> Clean Project_, then rebuild project.
+  clean project from menu _Build → Clean Project_, then rebuild project.
 
 ## Full Build
 

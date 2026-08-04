@@ -60,12 +60,12 @@ import fr.geonature.datasync.settings.error.DataSyncSettingsJsonParseFailure
 import fr.geonature.datasync.settings.error.DataSyncSettingsNotFoundFailure
 import fr.geonature.datasync.sync.DataSyncViewModel
 import fr.geonature.datasync.sync.ServerStatus
+import fr.geonature.datasync.sync.worker.DataSyncWorker
 import fr.geonature.datasync.ui.login.LoginActivity
 import fr.geonature.maps.ui.MapFragment
 import fr.geonature.maps.util.CheckPermissionLifecycleObserver
 import fr.geonature.maps.util.ManageExternalStoragePermissionLifecycleObserver
 import fr.geonature.occtax.BuildConfig
-import fr.geonature.occtax.MainApplication
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.presentation.ObservationRecordViewModel
@@ -212,7 +212,7 @@ class HomeActivity : AppCompatActivity(),
                         dataSyncSettings,
                         appSettings?.nomenclatureSettings?.withAdditionalFields ?: true,
                         HomeActivity::class.java,
-                        MainApplication.CHANNEL_DATA_SYNCHRONIZATION
+                        DataSyncWorker.DEFAULT_CHANNEL_DATA_SYNCHRONIZATION
                     )
                 }
             }
@@ -292,12 +292,12 @@ class HomeActivity : AppCompatActivity(),
                                 dataSyncSettings,
                                 appSettings?.nomenclatureSettings?.withAdditionalFields ?: true,
                                 HomeActivity::class.java,
-                                MainApplication.CHANNEL_DATA_SYNCHRONIZATION
+                                DataSyncWorker.DEFAULT_CHANNEL_DATA_SYNCHRONIZATION
                             )
                         }
                     }
                 }
-            }
+        }
 
         updateSettingsViewModel.updateAppSettings()
     }
@@ -487,10 +487,10 @@ class HomeActivity : AppCompatActivity(),
                                     setText2(
                                         getString(
                                             R.string.sync_last_synchronization,
-                                            vm.getLastSynchronizedDate().second?.let {
+                                            vm.getLastSynchronizedDate().second?.let { lastSynchronizedDate ->
                                                 android.text.format.DateFormat.format(
                                                     getString(R.string.sync_last_synchronization_date),
-                                                    it
+                                                    lastSynchronizedDate
                                                 )
                                             } ?: getString(R.string.sync_last_synchronization_never)
                                         ))
@@ -536,14 +536,6 @@ class HomeActivity : AppCompatActivity(),
                 }
 
                 it.dataSyncSettings.also { dataSyncSettings ->
-                    dataSyncViewModel.configurePeriodicSync(
-                        dataSyncSettings,
-                        this@HomeActivity.appSettings?.nomenclatureSettings?.withAdditionalFields
-                            ?: true,
-                        HomeActivity::class.java,
-                        MainApplication.CHANNEL_DATA_SYNCHRONIZATION
-                    )
-
                     dataSyncViewModel.hasLocalData()
                         .observeOnce(this@HomeActivity) { hasLocalData ->
                             if (hasLocalData == true) {
@@ -567,7 +559,7 @@ class HomeActivity : AppCompatActivity(),
                                             this@HomeActivity.appSettings?.nomenclatureSettings?.withAdditionalFields
                                                 ?: true,
                                             HomeActivity::class.java,
-                                            MainApplication.CHANNEL_DATA_SYNCHRONIZATION
+                                            DataSyncWorker.DEFAULT_CHANNEL_DATA_SYNCHRONIZATION
                                         )
                                     }
                                 }
@@ -581,7 +573,7 @@ class HomeActivity : AppCompatActivity(),
                                     this@HomeActivity.appSettings?.nomenclatureSettings?.withAdditionalFields
                                         ?: true,
                                     HomeActivity::class.java,
-                                    MainApplication.CHANNEL_DATA_SYNCHRONIZATION
+                                    DataSyncWorker.DEFAULT_CHANNEL_DATA_SYNCHRONIZATION
                                 )
                             }
                         }

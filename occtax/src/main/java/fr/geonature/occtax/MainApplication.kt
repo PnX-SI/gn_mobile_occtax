@@ -7,16 +7,16 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
-import fr.geonature.datasync.packageinfo.worker.CheckInputsToSynchronizeWorker
-import fr.geonature.mountpoint.model.MountPoint
-import fr.geonature.mountpoint.util.FileUtils
+import fr.geonature.commons.util.getFile
+import fr.geonature.commons.util.getPrimaryExternalStorage
+import fr.geonature.datasync.sync.worker.DataSyncWorker
 import fr.geonature.mountpoint.util.MountPointUtils
+import fr.geonature.occtax.features.record.worker.CheckObservationRecordsToSynchronizeWorker
 import fr.geonature.occtax.ui.home.HomeActivity
+import org.tinylog.Level
 import org.tinylog.Logger
 import org.tinylog.provider.ProviderRegistry
-import java.io.File
 import javax.inject.Inject
-import kotlin.system.exitProcess
 
 /**
  * Base class to maintain global application state.
@@ -42,10 +42,9 @@ class MainApplication : Application(), Configuration.Provider {
         }
 
         val notificationManager = NotificationManagerCompat.from(this)
-        configureCheckInputsToSynchronizeChannel(notificationManager)
         configureSynchronizeDataChannel(notificationManager)
 
-        checkInputsToSynchronize()
+        checkObservationRecordsToSynchronize()
     }
 
     override val workManagerConfiguration: Configuration
@@ -55,52 +54,35 @@ class MainApplication : Application(), Configuration.Provider {
             .build()
 
     private fun configureLogger() {
-        val directoryForLogs: File = FileUtils.getFile(
-            FileUtils.getRootFolder(
-                this,
-                MountPoint.StorageType.INTERNAL,
-            ),
-            "logs"
-        )
-            .also { it.mkdirs() }
-
         System.setProperty(
             "tinylog.directory",
-            directoryForLogs.absolutePath
+            applicationContext
+                .getPrimaryExternalStorage()
+                .getFile("logs")
+                .absolutePath
+        )
+        System.setProperty(
+            "tinylog.level",
+            if (BuildConfig.DEBUG) Level.DEBUG.name.lowercase() else Level.INFO.name.lowercase()
         )
 
         Thread.setDefaultUncaughtExceptionHandler(TinylogUncaughtExceptionHandler())
 
         Logger.info { "starting ${BuildConfig.APPLICATION_ID} (version ${BuildConfig.VERSION_NAME})..." }
-        Logger.info { "logs directory: '$directoryForLogs'" }
+        Logger.info { "logs directory: '${System.getProperty("tinylog.directory")}'" }
+        Logger.info { "logs level: '${System.getProperty("tinylog.level")}'" }
     }
 
-    private fun checkInputsToSynchronize() {
-        CheckInputsToSynchronizeWorker.enqueueUniquePeriodicWork(
+    private fun checkObservationRecordsToSynchronize() {
+        CheckObservationRecordsToSynchronizeWorker.enqueueUniquePeriodicWork(
             this,
             HomeActivity::class.java
         )
     }
 
-    private fun configureCheckInputsToSynchronizeChannel(notificationManager: NotificationManagerCompat): NotificationChannel {
-        val channel = NotificationChannel(
-            CHANNEL_CHECK_INPUTS_TO_SYNCHRONIZE,
-            getText(R.string.channel_name_check_inputs_to_synchronize),
-            NotificationManager.IMPORTANCE_LOW
-        ).apply {
-            description = getString(R.string.channel_description_check_inputs_to_synchronize)
-            setShowBadge(true)
-        }
-
-        // register this channel with the system
-        notificationManager.createNotificationChannel(channel)
-
-        return channel
-    }
-
     private fun configureSynchronizeDataChannel(notificationManager: NotificationManagerCompat): NotificationChannel {
         val channel = NotificationChannel(
-            CHANNEL_DATA_SYNCHRONIZATION,
+            DataSyncWorker.DEFAULT_CHANNEL_DATA_SYNCHRONIZATION,
             getText(R.string.channel_name_data_synchronization),
             NotificationManager.IMPORTANCE_LOW
         ).apply {
@@ -116,13 +98,9 @@ class MainApplication : Application(), Configuration.Provider {
     private class TinylogUncaughtExceptionHandler : Thread.UncaughtExceptionHandler {
         override fun uncaughtException(thread: Thread, ex: Throwable) {
             Logger.error(ex)
-            ProviderRegistry.getLoggingProvider().shutdown()
-            exitProcess(1)
+            ProviderRegistry.getLoggingProvider()
+                .shutdown()
+            android.os.Process.killProcess(android.os.Process.myPid())
         }
-    }
-
-    companion object {
-        const val CHANNEL_CHECK_INPUTS_TO_SYNCHRONIZE = "channel_check_inputs_to_synchronize"
-        const val CHANNEL_DATA_SYNCHRONIZATION = "channel_data_synchronization"
     }
 }
