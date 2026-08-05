@@ -7,8 +7,8 @@ Based on [datasync module](https://github.com/PnX-SI/gn_mobile_core) to synchron
 
 ## Documentation
 
-- [Installation (in french)](./docs/installation-fr.adoc)
-- [User documentation (in french)](./docs/utilisation-fr.adoc)
+- [Installation (in French)](./docs/installation-fr.adoc)
+- [User documentation (in French)](./docs/utilisation-fr.adoc)
 - [Data synchronization workflow](https://github.com/PnX-SI/gn_mobile_core/blob/develop/docs/data_sync.adoc)
 - [Input workflow](./docs/input_workflow.adoc)
 - [Customization](https://github.com/PnX-SI/gn_mobile_core/blob/develop/docs/styles_themes.adoc)
@@ -16,13 +16,15 @@ Based on [datasync module](https://github.com/PnX-SI/gn_mobile_core) to synchron
 ## Launcher icons
 
 | Name    | Flavor    | Launcher icon                                                                                                                                                                                                                                                    |
-| ------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|---------|-----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Default | _generic_ | ![PNX](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/main/res/mipmap-xxxhdpi/ic_launcher.png) ![PNX_debug](https://raw.githubusercontent.com/PnX-SI/gn_mobile_occtax/develop/occtax/src/debug/res/mipmap-xxxhdpi/ic_launcher.png) |
 
 ## Settings
 
-The app settings file is automatically updated locally when the application is started, as soon as the _GeoNature_ URL is defined, with the one on _GeoNature_ server.
-This settings file `settings_occtax.json` can be found locally in the `Android/data/fr.geonature.occtax2/` directory of the terminal's main storage. Example:
+The app settings file is automatically updated locally when the application is started, as soon as
+the _GeoNature_ URL is defined, with the one on _GeoNature_ server.
+This file (`settings_occtax.json`) can be found locally in the `Android/data/fr.geonature.occtax2/`
+directory of the terminal's main storage. Example:
 
 ```json
 {
@@ -100,7 +102,7 @@ This settings file `settings_occtax.json` can be found locally in the `Android/d
 ### Parameters description
 
 | Parameter                          | UI      | Description                                                                                        | Default value |
-| ---------------------------------- | ------- | -------------------------------------------------------------------------------------------------- | ------------- |
+|------------------------------------|---------|----------------------------------------------------------------------------------------------------|---------------|
 | `area_observation_duration`        | &#9744; | Area observation duration period (in days)                                                         | 365           |
 | `sync`                             | &#9744; | Data synchronization settings (cf. https://github.com/PnX-SI/gn_mobile_core/tree/develop/datasync) |               |
 | `map`                              | &#9744; | Maps settings (cf. https://github.com/PnX-SI/gn_mobile_maps/tree/develop/maps)                     |               |
@@ -121,7 +123,7 @@ Allows to configure settings related to user input.
 How the user can set the start and end date of the input:
 
 | Parameter         | Description                                                                  | Default value |
-| ----------------- | ---------------------------------------------------------------------------- | ------------- |
+|-------------------|------------------------------------------------------------------------------|---------------|
 | `enable_end_date` | Whether to edit as well the end date of the input                            | `false`       |
 | `enable_hours`    | Whether to edit as well the hour part of the start and end date (if enabled) | `false`       |
 
@@ -147,7 +149,7 @@ All these settings may not be defined and the default values will then be used i
 **Information settings**
 
 | Nomenclature       | Label                | Displayed by default (default) | Displayed in advanced view | Editable (visible) |
-| ------------------ | -------------------- | ------------------------------ | -------------------------- | ------------------ |
+|--------------------|----------------------|--------------------------------|----------------------------|--------------------|
 | `STATUT_OBS`       | observation status   | &#9745;                        | &#9745;                    | &#9744;            |
 | `METH_OBS`         | Observation methods  | &#9745;                        | &#9745;                    | &#9745;            |
 | `ETA_BIO`          | Biological state     | &#9745;                        | &#9745;                    | &#9745;            |
@@ -162,7 +164,7 @@ All these settings may not be defined and the default values will then be used i
 **Counting settings**
 
 | Nomenclature | Label                      | Displayed by default (default) | Editable (visible) |
-| ------------ | -------------------------- | ------------------------------ | ------------------ |
+|--------------|----------------------------|--------------------------------|--------------------|
 | `STADE_VIE`  | Life stage                 | &#9745;                        | &#9745;            |
 | `SEXE`       | Sex                        | &#9745;                        | &#9745;            |
 | `OBJ_DENBR`  | Purpose of the enumeration | &#9745;                        | &#9745;            |
@@ -218,14 +220,14 @@ You can override these default settings by adding a property for each nomenclatu
 Each property may be a simple string representing the nomenclature attribute to show or an object with the following properties:
 
 | Property  | Description                                                                    | Mandatory |
-| --------- |--------------------------------------------------------------------------------| --------- |
+|-----------|--------------------------------------------------------------------------------|-----------|
 | `key`     | The nomenclature attribute                                                     | &#9745;   |
 | `visible` | If this attribute is visible (thus directly editable) or not (default: `true`) | &#9744;   |
 | `default` | If this attribute is present by default (default: `true`)                      | &#9744;   |
 
 **Example:**
 
-- `"METH_OBS"` has the same meaning like
+- `"METH_OBS"` has the same meaning as
 
   ```json
   {
@@ -261,7 +263,7 @@ Each property may be a simple string representing the nomenclature attribute to 
   }
   ```
 
-- An omitted property (e.g. `METH_OBS`) has the same meaning like
+- An omitted property (e.g. `METH_OBS`) has the same meaning as
 
   ```json
   {
@@ -321,20 +323,6 @@ The taxon search allows you to combine several search criteria, such as:
 * "^corsic*": search all taxa matching any phrase starting by *corsic\**
 * "ibex* NOT sim*": search all taxa matching any words containing a phrase query with words starting
   by *ibex\** but without any word starting by *sim\**
-
-## Upgrade git sub modules
-
-Do **NOT** modify directly any git sub modules (e.g. `commons`, `compat`, `datasync` and `viewpager`).
-Any changes should be made from each underlying git repository:
-
-- `commons`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
-- `compat`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
-- `datasync`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
-- `viewpager`: [gn_mobile_core](https://github.com/PnX-SI/gn_mobile_core) git repository
-
-```bash
-./upgrade_submodules.sh
-```
 
 ## Troubleshooting
 

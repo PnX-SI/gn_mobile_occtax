@@ -71,12 +71,12 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation project(':commons')
-    implementation project(':datasync')
-    implementation project(':viewpager')
-
+    implementation libs.gn.commons
+    implementation libs.gn.compat
+    implementation libs.gn.datasync
     implementation libs.gn.maps
     implementation libs.gn.mountpoint
+    implementation libs.gn.viewpager
 
     // Hilt dependencies
     implementation libs.androidx.hilt.work

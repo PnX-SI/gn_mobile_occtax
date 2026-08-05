@@ -36,4 +36,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Occtax mobile"
-include ':commons', ':compat', ':datasync', ':viewpager', ':occtax'
+include ':occtax'

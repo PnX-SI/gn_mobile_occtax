@@ -11,8 +11,12 @@ coreTesting = "2.2.0"
 exifinterface = "1.3.7"
 fastscroll = "2.0.1"
 fragmentKtx = "1.8.4"
+gnCommons = "1.5.2"
+gnCompat = "0.0.2"
+gnDatasync = "0.6.6"
 gnMaps = "0.8.9"
 gnMountpoint = "0.1.3"
+gnViewpager = "0.3.2"
 hiltAndroid = "2.55"
 hiltWork = "1.3.0"
 junit = "4.13.2"
@@ -59,8 +63,12 @@ androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref =
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 androidx-work-testing = { module = "androidx.work:work-testing", version.ref = "workRuntimeKtx" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+gn-commons = { module = "fr.geonature:commons", version.ref = "gnCommons" }
+gn-compat = { module = "fr.geonature:compat", version.ref = "gnCompat" }
+gn-datasync = { module = "fr.geonature:datasync", version.ref = "gnDatasync" }
 gn-maps = { module = "fr.geonature:maps", version.ref = "gnMaps" }
 gn-mountpoint = { module = "fr.geonature:mountpoint", version.ref = "gnMountpoint" }
+gn-viewpager = { module = "fr.geonature:viewpager", version.ref = "gnViewpager" }
 fastscroll = { module = "io.github.l4digital:fastscroll", version.ref = "fastscroll" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
