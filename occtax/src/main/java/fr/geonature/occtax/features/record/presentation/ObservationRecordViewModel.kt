@@ -26,6 +26,7 @@ import kotlinx.coroutines.delay
 import org.tinylog.kotlin.Logger
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * [ObservationRecord] view model.
@@ -94,6 +95,7 @@ class ObservationRecordViewModel @Inject constructor(
                     }
                     ?: return@map null
             }
+    val observeSynchronizationStatus: LiveData<SynchronizationStatus?> = _observeSynchronizationStatus
 
     /**
      * All [ObservationRecord]s loaded.
@@ -125,7 +127,7 @@ class ObservationRecordViewModel @Inject constructor(
                     emit(synchronizationStatus)
 
                     if (synchronizationStatus.status == ObservationRecord.Status.SYNC_SUCCESSFUL) {
-                        delay(500)
+                        delay(500.milliseconds)
                         value =
                             (value ?: emptyList()).filter {
                                 it.internalId != synchronizationStatus.internalId
@@ -286,8 +288,6 @@ class ObservationRecordViewModel @Inject constructor(
      * Synchronizes all eligible [ObservationRecord]s (i.e. with a valid status [ObservationRecord.Status.TO_SYNC]).
      */
     fun synchronizeObservationRecords() {
-        currentSyncWorkerId = SynchronizeObservationRecordsWorker.enqueueUniqueWork(
-            getApplication()
-        )
+        currentSyncWorkerId = SynchronizeObservationRecordsWorker.enqueueUniqueWork(getApplication())
     }
 }

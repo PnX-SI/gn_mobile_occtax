@@ -7,6 +7,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
 import org.json.JSONObject
+import org.tinylog.Logger
 import retrofit2.Call
 
 /**
@@ -21,6 +22,7 @@ class OcctaxAPIClientImpl(private val cookieManager: ICookieManager) : IOcctaxAP
 
     override fun setBaseUrl(url: String) {
         if (url.isNotBlank()) {
+            Logger.info { "set Occtax base URL ('$url')..." }
             this.geoNatureBaseUrl = url
             occtaxAPIService = createServiceClient(
                 url,

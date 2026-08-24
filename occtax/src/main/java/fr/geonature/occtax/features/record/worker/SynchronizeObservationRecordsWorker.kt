@@ -11,18 +11,23 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import androidx.work.await
 import androidx.work.workDataOf
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import fr.geonature.datasync.api.error.BaseApiException
+import fr.geonature.datasync.auth.error.AuthException
+import fr.geonature.datasync.sync.ServerStatus
 import fr.geonature.occtax.features.record.domain.ObservationRecord
 import fr.geonature.occtax.features.record.domain.SynchronizationStatus
 import fr.geonature.occtax.features.record.repository.IObservationRecordRepository
 import fr.geonature.occtax.features.record.repository.ISynchronizeObservationRecordRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import org.tinylog.Logger
 import java.util.Date
 import java.util.UUID
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Dedicated worker to synchronize all [ObservationRecord]s with valid status.
@@ -44,10 +49,12 @@ class SynchronizeObservationRecordsWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         val startTime = Date()
 
-        val alreadyRunning = workManager
-            .getWorkInfosByTag(OBSERVATION_RECORDS_SYNC_WORKER_TAG)
-            .await()
-            .any { it.id != id && it.state == WorkInfo.State.RUNNING }
+        val alreadyRunning = withContext(Dispatchers.IO) {
+            workManager
+                .getWorkInfosByTag(OBSERVATION_RECORDS_SYNC_WORKER_TAG)
+                .get()
+                .any { it.id != id && it.state == WorkInfo.State.RUNNING }
+        }
 
         if (alreadyRunning) {
             Logger.warn { "already running: abort" }
@@ -76,32 +83,49 @@ class SynchronizeObservationRecordsWorker @AssistedInject constructor(
                 )
             )
 
-            delay(500)
+            delay(500.milliseconds)
 
             synchronizeObservationRecordRepository.synchronize(observationRecordToSync)
-                .fold(
-                    onSuccess = {
-                        setProgress(
-                            workData(
-                                state = WorkInfo.State.RUNNING,
-                                recordInternalId = observationRecordToSync.internalId,
-                                recordStatus = ObservationRecord.Status.SYNC_SUCCESSFUL
-                            )
+                .onSuccess {
+                    setProgress(
+                        workData(
+                            state = WorkInfo.State.RUNNING,
+                            recordInternalId = observationRecordToSync.internalId,
+                            recordStatus = ObservationRecord.Status.SYNC_SUCCESSFUL
                         )
-                        observationRecordsSynchronized.add(it)
-                    },
-                    onFailure = {
-                        setProgress(
+                    )
+                    observationRecordsSynchronized.add(it)
+                }
+                .onFailure {
+                    Logger.warn(it) { "failed to synchronize observation record '${observationRecordToSync.internalId}'" }
+                    setProgress(
+                        workData(
+                            state = WorkInfo.State.RUNNING,
+                            recordInternalId = observationRecordToSync.internalId,
+                            recordStatus = ObservationRecord.Status.SYNC_ERROR,
+                            serverStatus = when (it) {
+                                is BaseApiException.UnauthorizedException, is AuthException.NotConnectedException -> ServerStatus.UNAUTHORIZED
+                                is BaseApiException.InternalServerException -> ServerStatus.INTERNAL_SERVER_ERROR
+                                is BaseApiException.ApiException -> if (it.statusCode == 403) ServerStatus.FORBIDDEN else ServerStatus.INTERNAL_SERVER_ERROR
+                                else -> ServerStatus.OK
+                            }
+                        )
+                    )
+
+                    // abort the current synchronization if the error is related to authentication or authorization
+                    if (it is BaseApiException.UnauthorizedException || it is AuthException.NotConnectedException) {
+                        return Result.failure(
                             workData(
-                                state = WorkInfo.State.RUNNING,
+                                state = WorkInfo.State.FAILED,
                                 recordInternalId = observationRecordToSync.internalId,
-                                recordStatus = ObservationRecord.Status.SYNC_ERROR
+                                recordStatus = ObservationRecord.Status.TO_SYNC,
+                                serverStatus = ServerStatus.UNAUTHORIZED
                             )
                         )
                     }
-                )
+                }
 
-            delay(500)
+            delay(500.milliseconds)
         }
 
         Logger.info {
@@ -122,12 +146,14 @@ class SynchronizeObservationRecordsWorker @AssistedInject constructor(
     private fun workData(
         state: WorkInfo.State,
         recordInternalId: Long? = null,
-        recordStatus: ObservationRecord.Status? = null
+        recordStatus: ObservationRecord.Status? = null,
+        serverStatus: ServerStatus = ServerStatus.OK
     ): Data {
         return workDataOf(
             KEY_WORKER_STATUS to state.ordinal,
             KEY_OBSERVATION_RECORD_INTERNAL_ID to recordInternalId,
-            KEY_OBSERVATION_RECORD_STATUS to recordStatus?.ordinal
+            KEY_OBSERVATION_RECORD_STATUS to recordStatus?.ordinal,
+            KEY_SERVER_STATUS to serverStatus.ordinal
         )
     }
 
@@ -136,6 +162,7 @@ class SynchronizeObservationRecordsWorker @AssistedInject constructor(
         private const val KEY_WORKER_STATUS = "key_worker_status"
         private const val KEY_OBSERVATION_RECORD_INTERNAL_ID = "key_observation_record_internal_id"
         private const val KEY_OBSERVATION_RECORD_STATUS = "key_observation_record_status"
+        private const val KEY_SERVER_STATUS = "key_server_status"
 
         private const val OBSERVATION_RECORDS_SYNC_WORKER = "observation_records_sync_worker"
         const val OBSERVATION_RECORDS_SYNC_WORKER_TAG = "observation_records_sync_worker_tag"
@@ -178,7 +205,7 @@ class SynchronizeObservationRecordsWorker @AssistedInject constructor(
                 .takeIf { it >= 0 }
                 ?.let { workInfo.outputData } ?: return null
 
-            val workerStatus = WorkInfo.State.values()[validWorkInfo.getInt(
+            val workerStatus = WorkInfo.State.entries[validWorkInfo.getInt(
                 KEY_WORKER_STATUS,
                 0
             )]
@@ -192,12 +219,20 @@ class SynchronizeObservationRecordsWorker @AssistedInject constructor(
                 -1
             )
                 .takeIf { it >= 0 }
-                ?.let { ObservationRecord.Status.values()[it] }
+                ?.let { ObservationRecord.Status.entries[it] }
 
-            return if (observationRecordInternalId != null && observationRecordStatus != null) SynchronizationStatus.ObservationRecordStatus(
+            val serverStatus = validWorkInfo.getInt(
+                KEY_SERVER_STATUS,
+                -1
+            )
+                .takeIf { it >= 0 }
+                ?.let { ServerStatus.entries[it] }
+
+            return if (observationRecordInternalId != null && observationRecordStatus != null && serverStatus != null) SynchronizationStatus.ObservationRecordStatus(
                 state = workerStatus,
                 internalId = observationRecordInternalId,
-                status = observationRecordStatus
+                status = observationRecordStatus,
+                serverStatus = serverStatus
             ) else SynchronizationStatus.WorkerStatus(state = workerStatus)
         }
     }

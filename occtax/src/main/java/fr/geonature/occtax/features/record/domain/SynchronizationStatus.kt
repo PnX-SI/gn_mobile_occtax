@@ -1,6 +1,7 @@
 package fr.geonature.occtax.features.record.domain
 
 import androidx.work.WorkInfo
+import fr.geonature.datasync.sync.ServerStatus
 
 /**
  * Describes the current status of [ObservationRecord] synchronization.
@@ -20,6 +21,7 @@ sealed class SynchronizationStatus(open val state: WorkInfo.State ) {
     data class ObservationRecordStatus(
         override val state: WorkInfo.State,
         val internalId: Long,
-        val status: ObservationRecord.Status
+        val status: ObservationRecord.Status,
+        val serverStatus: ServerStatus
     ) : SynchronizationStatus(state)
 }

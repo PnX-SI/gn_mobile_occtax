@@ -68,6 +68,7 @@ import fr.geonature.maps.util.ManageExternalStoragePermissionLifecycleObserver
 import fr.geonature.occtax.BuildConfig
 import fr.geonature.occtax.R
 import fr.geonature.occtax.features.record.domain.ObservationRecord
+import fr.geonature.occtax.features.record.domain.SynchronizationStatus
 import fr.geonature.occtax.features.record.presentation.ObservationRecordViewModel
 import fr.geonature.occtax.features.settings.domain.AppSettings
 import fr.geonature.occtax.features.settings.error.AppSettingsException
@@ -509,7 +510,7 @@ class HomeActivity : AppCompatActivity(),
                         }
 
                         if (it.serverStatus == ServerStatus.UNAUTHORIZED) {
-                            Logger.info { "not connected (HTTP error code: 401), redirect to ${LoginActivity::class.java.name}" }
+                            Logger.info { "not connected, redirect to ${LoginActivity::class.java.name}" }
 
                             Toast
                                 .makeText(
@@ -612,37 +613,59 @@ class HomeActivity : AppCompatActivity(),
     }
 
     private fun configureObservationRecordsViewModel() {
-        // check if we have at least one observation record, and if so, adds a shortcut to resume the last edited one
-        observationRecordViewModel.observationRecords.observe(this@HomeActivity) {
-            if (it.isEmpty()) {
-                ShortcutManagerCompat.removeAllDynamicShortcuts(this)
-            }
+        with(observationRecordViewModel) {
+            // check if we have at least one observation record, and if so, adds a shortcut to resume the last edited one
+            observe(observationRecords) {
+                if (it.isEmpty()) {
+                    ShortcutManagerCompat.removeAllDynamicShortcuts(this@HomeActivity)
+                }
 
-            if (it.isNotEmpty()) {
-                val shortcut = ShortcutInfoCompat.Builder(
-                    this,
-                    "input_resume_last"
-                )
-                    .setShortLabel(getString(R.string.shortcut_input_resume_last_short))
-                    .setLongLabel(getString(R.string.shortcut_input_resume_last_long))
-                    .setIcon(
-                        IconCompat.createWithResource(
-                            this,
-                            R.drawable.ic_input_edit
-                        )
+                if (it.isNotEmpty()) {
+                    val shortcut = ShortcutInfoCompat.Builder(
+                        this@HomeActivity,
+                        "input_resume_last"
                     )
-                    .setIntent(
-                        Intent(
-                            this,
-                            HomeActivity::class.java
-                        ).apply { action = getString(R.string.intent_action_input_resume_last) })
-                    .build()
+                        .setShortLabel(getString(R.string.shortcut_input_resume_last_short))
+                        .setLongLabel(getString(R.string.shortcut_input_resume_last_long))
+                        .setIcon(
+                            IconCompat.createWithResource(
+                                this@HomeActivity,
+                                R.drawable.ic_input_edit
+                            )
+                        )
+                        .setIntent(
+                            Intent(
+                                this@HomeActivity,
+                                HomeActivity::class.java
+                            ).apply { action = getString(R.string.intent_action_input_resume_last) })
+                        .build()
 
-                ShortcutManagerCompat.removeAllDynamicShortcuts(this)
-                ShortcutManagerCompat.pushDynamicShortcut(
-                    this,
-                    shortcut
-                )
+                    ShortcutManagerCompat.removeAllDynamicShortcuts(this@HomeActivity)
+                    ShortcutManagerCompat.pushDynamicShortcut(
+                        this@HomeActivity,
+                        shortcut
+                    )
+                }
+            }
+            observeSynchronizationStatus.observe(this@HomeActivity) { synchronizationStatus ->
+                synchronizationStatus
+                    ?.takeIf { it is SynchronizationStatus.ObservationRecordStatus }
+                    ?.let { it as SynchronizationStatus.ObservationRecordStatus }
+                    ?.also {
+                        if (it.serverStatus == ServerStatus.UNAUTHORIZED) {
+                            Logger.info { "not connected, redirect to ${LoginActivity::class.java.name}" }
+
+                            Toast
+                                .makeText(
+                                    this@HomeActivity,
+                                    R.string.toast_not_connected,
+                                    Toast.LENGTH_SHORT
+                                )
+                                .show()
+
+                            startSyncResultLauncher.launch(LoginActivity.newIntent(this@HomeActivity))
+                        }
+                    }
             }
         }
     }

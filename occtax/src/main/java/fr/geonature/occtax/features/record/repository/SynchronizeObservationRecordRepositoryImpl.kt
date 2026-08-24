@@ -74,7 +74,7 @@ class SynchronizeObservationRecordRepositoryImpl(
                 geoNatureAPIClient.getIdTableLocation()
                     .await()
             }.onFailure {
-                Logger.warn {
+                Logger.warn(it) {
                     "failed to fetch ID table location"
                 }
             }
@@ -86,7 +86,7 @@ class SynchronizeObservationRecordRepositoryImpl(
                 appSettings
             )
         }.onFailure {
-            Logger.error {
+            Logger.error(it) {
                 "failed to synchronize observation record '${observationRecord.internalId}'"
             }
         }
@@ -118,7 +118,7 @@ class SynchronizeObservationRecordRepositoryImpl(
                 appSettings
             )
         }.onFailure {
-            Logger.error {
+            Logger.error(it) {
                 "failed to synchronize all taxa from observation record '${observationRecord.internalId}'"
             }
             Logger.info {
@@ -130,7 +130,7 @@ class SynchronizeObservationRecordRepositoryImpl(
             runCatching {
                 observationRecordRemoteDataSource.deleteObservationRecord(observationRecordSent)
             }.onFailure {
-                Logger.warn {
+                Logger.warn(it) {
                     "failed to delete observation record '${observationRecordSent.id}' from GeoNature"
                 }
             }
@@ -144,7 +144,7 @@ class SynchronizeObservationRecordRepositoryImpl(
         }
 
         runCatching { observationRecordLocalDataSource.delete(observationRecord.internalId) }.onFailure {
-            Logger.warn {
+            Logger.warn(it) {
                 "failed to delete a fully synchronized observation record '${observationRecord.internalId}'"
             }
         }
